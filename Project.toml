@@ -9,4 +9,5 @@ Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
 DifferentialEquations = "7"
+Symbolics = "4"
 julia = "1.6"
