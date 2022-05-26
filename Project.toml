@@ -8,4 +8,5 @@ DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
+DifferentialEquations = "7"
 julia = "1.6"
