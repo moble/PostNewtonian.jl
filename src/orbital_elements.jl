@@ -26,8 +26,5 @@ object 1.  This also completes the right-handed triple of (ℓ̂, n̂, λ̂).
 λ̂(R) = R * 𝐣 * conj(R)
 
 
-Ω_v(v) = v^3
-Ω_v(v, M) = Ω_v(v) / M
-
-v_Ω(Ω::T) where T = Ω^inv(T(3))
-v_Ω(Ω, M) = v_Ω(M*Ω)
+Ω(;v, M=1) = v^3 / M
+v(;Ω, M=1) = (M*Ω)^(1//3)

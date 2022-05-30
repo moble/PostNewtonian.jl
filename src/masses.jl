@@ -20,7 +20,7 @@ Note that the denominator is squared, unlike in the reduced mass [`μ`](@ref).
 """
 ν(M₁, M₂) = reduced_mass_ratio(M₁, M₂)
 reduced_mass_ratio(M₁, M₂) = (M₁ * M₂) / (M₁ + M₂)^2
-ν(q) = q / (1+q)^2
+ν(;q) = q / (1+q)^2
 
 
 """
@@ -32,7 +32,7 @@ Compute mass-difference ratio ``(M₁-M₂)/(M₁+M₂)``.
 """
 δ(M₁, M₂) = reduced_mass(M₁, M₂)
 mass_difference_ratio(M₁, M₂) = (M₁ - M₂) / (M₁ + M₂)
-δ(q) = (q-1) / (q+1)
+δ(;q) = (q-1) / (q+1)
 
 
 """
@@ -64,7 +64,6 @@ The chirp mass is defined as
 
 """
 function chirp_mass(M₁, M₂)
-    T = promote_type(typeof(M₁), typeof(M₂))
-    ((M₁ * M₂)^3 / (M₁ + M₂))^inv(T(5))
+    ((M₁ * M₂)^3 / (M₁ + M₂))^(1//5)
 end
 ℳ(M₁, M₂) = chirp_mass(M₁, M₂)

@@ -31,15 +31,23 @@ components of spin to precisely 0.
 function noneccentric_evolution(
     M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ,
     Rᵢ=Rotor(true), Ω₁=Ωᵢ;
-    PNSystem=TaylorT1
+    PNSys=TaylorT1, PNOrder=7//2,
+    check_up_down_instability=true,
 )
-    vᵢ = v_Ω(Ωᵢ, M₁+M₂)
-    v₁ = v_Ω(Ω₁, M₁+M₂)
+    if Ω₁ > Ωᵢ
+        error(
+            "Initial frequency Ωᵢ=$Ωᵢ should be greater"
+            * " than or equal to first frequency Ω₁=$Ω₁"
+        )
+    end
+
+    vᵢ = v(Ω=Ωᵢ, M=M₁+M₂)
+    v₁ = v(Ω=Ω₁, M=M₁+M₂)
     uᵢ = [  # Initial conditions for the ODE integration
         M₁;
         M₂;
-        χ⃗₁.components[2:4];
-        χ⃗₂.components[2:4];
+        χ⃗₁.vec;
+        χ⃗₂.vec;
         Rᵢ.components;
         vᵢ
     ]
@@ -49,28 +57,46 @@ function noneccentric_evolution(
     abstol = √eps(T)
     Mₜₒₜ = M₁ + M₂
     Ω⃗ᵢ = QuatVec{T}(Ωᵢ * Rᵢ * imz * conj(Rᵢ))
-    pn = PNSystem(uᵢ[1], uᵢ[2], QuatVec(uᵢ[3:5]...), QuatVec(uᵢ[6:8]...), Ω⃗ᵢ, vᵢ)
+    pn = PNSys(PNOrder, T)
+    unpack!(pn, uᵢ)
 
-    estimated_time_to_merger = 5/(256ν(Mₜₒₜ) * T(vᵢ)^8) # Lowest-order PN time-to-merger
-    tspan = (0estimated_time_to_merger, 4estimated_time_to_merger)
+    if check_up_down_instability
+        χₚₑᵣₚ = let n̂=n̂(pn.R),λ̂=λ̂(pn.R)
+            √((pn.χ⃗₁ ⋅ n̂)^2 + (pn.χ⃗₁ ⋅ λ̂)^2 + (pn.χ⃗₂ ⋅ n̂)^2 + (pn.χ⃗₂ ⋅ λ̂)^2)
+        end
+        if χₚₑᵣₚ ≤ 1e-2
+            (Ω₊, Ω₋) = up_down_instability(pn)
+            if Ω₁ < Ω₋ < 1//8 || Ω₁ < Ω₊ < 1//8
+                @warn (
+                    "This system is likely to encounter the up-down instability in the\n"
+                    * "frequency range (Ω₊, Ω₋)=$((Ω₊, Ω₋)).\n"
+                    * "This is a true physical instability; not just a numerical issue.\n"
+                    * "Despite the initial conditions containing very small precession,\n"
+                    * "the system will likely evolve to have very large precession."
+                )
+            end
+        end
+    end
+
+    estimated_time_to_merger = 5/(256ν(M₁, M₂) * T(vᵢ)^8) # Lowest-order PN time-to-merger
+    tspan = (T(0), 4estimated_time_to_merger)
     problem_forwards = ODEProblem(noneccentric_RHS!, uᵢ, tspan, pn)
 
     termination_criterion = ContinuousCallback(
         (u,t,integrator) -> u[end] - 1,  # Terminate at v = 1
-        terminate!,
         terminate!
     )
 
     solution_forwards = solve(
-        problem_forwards, Tsit5(),
+        problem_forwards, AutoVern9(Rodas5()),
         reltol=reltol, abstol=abstol,
         callback=termination_criterion,
         dtmin=dtmin
     )
 
     if v₁ < vᵢ
-        estimated_backwards_time = 5/(256ν(Mₜₒₜ) * T(v₁)^8) - estimated_time_to_merger
-        tspan = (0estimated_backwards_time, -3estimated_backwards_time)
+        estimated_backwards_time = 5/(256ν(M₁, M₂) * T(v₁)^8) - estimated_time_to_merger
+        tspan = (T(0), -3estimated_backwards_time)
         # dtmin *= -1  # TODO: Figure out if this should happen
 
         problem_backwards = remake(problem_forwards; tspan=tspan)
@@ -81,9 +107,10 @@ function noneccentric_evolution(
         )
 
         solution_backwards = solve(
-            problem_backwards, Tsit5(dtmin=dtmin),
+            problem_backwards, AutoVern9(Rodas5()),
             reltol=reltol, abstol=abstol,
-            callback=termination_criterion
+            callback=termination_criterion,
+            dtmin=dtmin
         )
 
         # Combine forwards and backwards
@@ -105,11 +132,11 @@ could be used to pass un-evolved parameters through.
 """
 function noneccentric_RHS!(u̇, u, pn, t)
     recalculate!(pn, u)
-    u̇[1] = pn.ṁ₁
-    u̇[2] = pn.ṁ₂
-    u̇[3:5] = (pn.Ω⃗ᵪ₁ × QuatVec(u[3:5]...)).components[2:4]
-    u̇[6:8] = (pn.Ω⃗ᵪ₂ × QuatVec(u[6:8]...)).components[2:4]
-    u̇[9:12] = (pn.Ω⃗ * Quaternion(u[9:12]...) / 2).components
+    u̇[1] = pn.Ṁ₁
+    u̇[2] = pn.Ṁ₂
+    u̇[3:5] = (pn.Ω⃗ᵪ₁ × pn.χ⃗₁).vec
+    u̇[6:8] = (pn.Ω⃗ᵪ₂ × pn.χ⃗₂).vec
+    u̇[9:12] = (pn.Ω⃗ * pn.R / 2).components
     u̇[13] = pn.v̇
     nothing
 end
