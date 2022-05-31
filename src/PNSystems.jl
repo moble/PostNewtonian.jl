@@ -11,11 +11,22 @@ mutable struct TaylorT1{PNOrder,T} <: PNSystem{PNOrder,T}
     v::T
     Ṁ₁::T
     Ṁ₂::T
-    Ω⃗ᵪ₁::QuatVec{T}
-    Ω⃗ᵪ₂::QuatVec{T}
-    Ω⃗::Quaternion{T}
+    χ⃗̇₁::QuatVec{T}
+    χ⃗̇₂::QuatVec{T}
+    Ṙ::Quaternion{T}
     v̇::T
     TaylorT1{PNOrder,T}() where {PNOrder,T} = new()
+end
+
+macro unpack(pn)
+    esc(quote
+            M₁ = $(pn).M₁
+            M₂ = $(pn).M₂
+            χ⃗₁ = $(pn).χ⃗₁
+            χ⃗₂ = $(pn).χ⃗₂
+            R = $(pn).R
+            v = $(pn).v
+    end)
 end
 
 function unpack!(pn::PNSystem{PNOrder,T}, u) where {PNOrder,T}
@@ -30,11 +41,19 @@ end
 
 function recalculate!(pn::TaylorT1{PNOrder,T}, u) where {PNOrder,T}
     unpack!(pn, u)
-    pn.Ṁ₁ = 0
-    pn.Ṁ₂ = 0
-    pn.Ω⃗ᵪ₁ = QuatVec{T}(0)
-    pn.Ω⃗ᵪ₂ = QuatVec{T}(0)
-    pn.Ω⃗ = Ω(v=pn.v, M=pn.M₁+pn.M₂) * ℓ̂(pn.R)
-    pn.v̇ = √(pn.v)
+    @unpack pn
+    χ₁ = absvec(χ⃗₁)
+    χ₂ = absvec(χ⃗₂)
+    (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(pn)
+    let ℓ̂=ℓ̂(R), Ω=Ω(v=v, M=M₁+M₂)
+        χ̂₁ = ifelse(iszero(χ₁), ℓ̂, χ⃗₁ / χ₁)
+        χ̂₂ = ifelse(iszero(χ₂), ℓ̂, χ⃗₂ / χ₂)
+        pn.Ṁ₁ = Ṁ₁
+        pn.Ṁ₂ = Ṁ₂
+        pn.χ⃗̇₁ = (Ṡ₁ / M₁^2) * χ̂₁
+        pn.χ⃗̇₂ = (Ṡ₂ / M₂^2) * χ̂₂
+        pn.Ṙ = Ω * ℓ̂ * R / 2
+        pn.v̇ = √(v)
+    end
     pn
 end

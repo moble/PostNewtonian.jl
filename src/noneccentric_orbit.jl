@@ -134,9 +134,9 @@ function noneccentric_RHS!(u̇, u, pn, t)
     recalculate!(pn, u)
     u̇[1] = pn.Ṁ₁
     u̇[2] = pn.Ṁ₂
-    u̇[3:5] = (pn.Ω⃗ᵪ₁ × pn.χ⃗₁).vec
-    u̇[6:8] = (pn.Ω⃗ᵪ₂ × pn.χ⃗₂).vec
-    u̇[9:12] = (pn.Ω⃗ * pn.R / 2).components
+    u̇[3:5] = pn.χ⃗̇₁.vec
+    u̇[6:8] = pn.χ⃗̇₂.vec
+    u̇[9:12] = pn.Ṙ.components
     u̇[13] = pn.v̇
     nothing
 end
