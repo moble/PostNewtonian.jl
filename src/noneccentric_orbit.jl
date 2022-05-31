@@ -131,12 +131,6 @@ could be used to pass un-evolved parameters through.
 
 """
 function noneccentric_RHS!(u̇, u, pn, t)
-    recalculate!(pn, u)
-    u̇[1] = pn.Ṁ₁
-    u̇[2] = pn.Ṁ₂
-    u̇[3:5] = pn.χ⃗̇₁.vec
-    u̇[6:8] = pn.χ⃗̇₂.vec
-    u̇[9:12] = pn.Ṙ.components
-    u̇[13] = pn.v̇
+    recalculate!(u̇, u, pn)
     nothing
 end

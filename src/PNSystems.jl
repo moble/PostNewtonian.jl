@@ -9,12 +9,6 @@ mutable struct TaylorT1{PNOrder,T} <: PNSystem{PNOrder,T}
     χ⃗₂::QuatVec{T}
     R::Quaternion{T}
     v::T
-    Ṁ₁::T
-    Ṁ₂::T
-    χ⃗̇₁::QuatVec{T}
-    χ⃗̇₂::QuatVec{T}
-    Ṙ::Quaternion{T}
-    v̇::T
     TaylorT1{PNOrder,T}() where {PNOrder,T} = new()
 end
 
@@ -39,7 +33,14 @@ function unpack!(pn::PNSystem{PNOrder,T}, u) where {PNOrder,T}
     pn
 end
 
-function recalculate!(pn::TaylorT1{PNOrder,T}, u) where {PNOrder,T}
+"""
+    recalculate!(u̇, u, pn)
+
+Calculate the new values of `u̇` based on the values of `u`.  Note that this
+modifies both `u̇` and `pn` in place.
+
+"""
+function recalculate!(u̇, u, pn::TaylorT1{PNOrder,T}) where {PNOrder,T}
     unpack!(pn, u)
     @unpack pn
     χ₁ = absvec(χ⃗₁)
@@ -48,12 +49,12 @@ function recalculate!(pn::TaylorT1{PNOrder,T}, u) where {PNOrder,T}
     let ℓ̂=ℓ̂(R), Ω=Ω(v=v, M=M₁+M₂)
         χ̂₁ = ifelse(iszero(χ₁), ℓ̂, χ⃗₁ / χ₁)
         χ̂₂ = ifelse(iszero(χ₂), ℓ̂, χ⃗₂ / χ₂)
-        pn.Ṁ₁ = Ṁ₁
-        pn.Ṁ₂ = Ṁ₂
-        pn.χ⃗̇₁ = (Ṡ₁ / M₁^2) * χ̂₁
-        pn.χ⃗̇₂ = (Ṡ₂ / M₂^2) * χ̂₂
-        pn.Ṙ = Ω * ℓ̂ * R / 2
-        pn.v̇ = √(v)
+        u̇[1] = Ṁ₁
+        u̇[2] = Ṁ₂
+        u̇[3:5] = ((Ṡ₁ / M₁^2) * χ̂₁).vec
+        u̇[6:8] = ((Ṡ₂ / M₂^2) * χ̂₂).vec
+        u̇[9:12] = ((Ω / 2) * ℓ̂ * R).components
+        u̇[13] = √(v)
     end
     pn
 end
