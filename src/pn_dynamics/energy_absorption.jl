@@ -37,8 +37,8 @@ function tidal_heating(pn)
         # References to pages and equation numbers are from Alvi (2001)
 
         # Page 2, line 4
-        rₕ₁ = M₁ * (1 + √(1-χ₁²))
-        rₕ₂ = M₂ * (1 + √(1-χ₂²))
+        rₕ₁ = M₁ * (1 + √(1-min(χ₁²,1)))
+        rₕ₂ = M₂ * (1 + √(1-min(χ₂²,1)))
 
         # Page 2, line 5
         Ωₕ₁ = χ₁ / 2rₕ₁
