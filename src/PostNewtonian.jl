@@ -19,7 +19,7 @@ export χ⃗, S, Σ, χₛ, χₐ
 include("orbital_elements.jl")
 export ℓ̂, n̂, λ̂, Ω, v
 
-include("ud_instability.jl")
+include("up_down_instability.jl")
 export up_down_instability
 
 include("PNSystems.jl")

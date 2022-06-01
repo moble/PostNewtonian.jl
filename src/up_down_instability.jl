@@ -14,8 +14,7 @@ by symmetry.  However, if the spin of the higher-mass object is aligned with
 the orbital angular velocity and the spin of the lower-mass object is
 anti-aligned, the binary is unstable to precession — meaning that any minuscule
 misalignment can grow rapidly into significant precession.  This was first
-reported by [Gerosa et
-al. (2015)](https://link.aps.org/doi/10.1103/PhysRevLett.115.141102), and the
+reported by [Gerosa et al. (2015)](http://arxiv.org/abs/1506.09116), and the
 range over which the system is unstable is given by Eq. (2) of that reference.
 We use the lowest-order approximation to convert binary separation to
 frequency.  The result is also "clamped" between 0 and 1, because sometimes the
