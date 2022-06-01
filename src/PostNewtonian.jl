@@ -25,7 +25,7 @@ export up_down_instability
 include("PNSystems.jl")
 export PNSystem, TaylorT1
 
-include("pn_dynamics/energy_absorption.jl")
+include("pn_dynamics/tidal_heating.jl")
 export tidal_heating
 
 include("noneccentric_orbit.jl")
