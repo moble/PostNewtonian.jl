@@ -1,5 +1,5 @@
 """
-    noneccentric_evolution(m₁, m₂, χ⃗₁, χ⃗₂, Ωᵢ, Rᵢ=Rotor(true), Ω₁=Ωᵢ)
+    noneccentric_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, [Ω₁=Ωᵢ], [Rᵢ=Rotor(true)])
 
 Integrate the orbital dynamics of a non-eccentric compact binary.
 
@@ -17,20 +17,29 @@ series.
 
 For example, if you are trying to match to a numerical relativity (NR)
 simulation, you can read the masses and spins off of the NR data when the
-system is orbiting at angular velocity `Ωᵢ`.  However, you may want to know what the
+system is orbiting at angular velocity `Ωᵢ`.  Integrating the post-Newtonian
+(PN) solution forwards in time from this point will allow you to compare the PN
+and NR waveforms.  However, you may want to know what the waveform was at
+*earlier* times than are present in the NR data.  For this, you also have to
+integrate backwards in time.  We parametrise the point to which you integrate
+backwards with `Ω₁`.  In either case, element `1` of the output solution will
+have frequency `Ω₁` — though by default it is equal to `Ωᵢ`.
 
-Be aware that the up-down instability (where the more massive black hole has
-spin aligned with the orbital angular velocity, and the less massive has spin
-anti-aligned) can cause systems with nearly zero precession at the initial time
-to evolve into a highly precessing system either at earlier or later times.
-This is a real physical result, rather than a numerical issue.  If you want to
-simulate a truly non-precessing system, you should explicitly set the in-place
-components of spin to precisely 0.
+## Up-down instability
+
+Be aware that the [up-down instability](http://arxiv.org/abs/1506.09116) (where
+the more massive black hole has spin aligned with the orbital angular velocity,
+and the less massive has spin anti-aligned) can cause systems with nearly zero
+precession at the initial time to evolve into a highly precessing system either
+at earlier or later times.  This is a real physical result, rather than a
+numerical issue.  If you want to simulate a truly non-precessing system, you
+should explicitly set the in-place components of spin to precisely 0.  By
+default, we check for this condition, and will issue a warning if it is likely
+to be encountered for systems with low initial precession.
 
 """
 function noneccentric_evolution(
-    M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ,
-    Rᵢ=Rotor(true), Ω₁=Ωᵢ;
+    M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; Ω₁=Ωᵢ, Rᵢ=Rotor(true),
     PNSys=TaylorT1, PNOrder=7//2,
     check_up_down_instability=true,
 )
@@ -56,7 +65,7 @@ function noneccentric_evolution(
     reltol = √eps(T)
     abstol = √eps(T)
     Mₜₒₜ = M₁ + M₂
-    Ω⃗ᵢ = QuatVec{T}(Ωᵢ * Rᵢ * imz * conj(Rᵢ))
+    Ω⃗ᵢ = T(Ωᵢ) * ℓ̂(Rᵢ)
     pn = PNSys(PNOrder, T)
     unpack!(pn, uᵢ)
 
@@ -66,7 +75,7 @@ function noneccentric_evolution(
         end
         if χₚₑᵣₚ ≤ 1e-2
             (Ω₊, Ω₋) = up_down_instability(pn)
-            if Ω₁ < Ω₋ < 1//8 || Ω₁ < Ω₊ < 1//8
+            if Ω₁ < Ω₋ < 1//4 || Ω₁ < Ω₊ < 1//4
                 @warn (
                     "This system is likely to encounter the up-down instability in the\n"
                     * "frequency range (Ω₊, Ω₋)=$((Ω₊, Ω₋)).\n"
@@ -80,17 +89,47 @@ function noneccentric_evolution(
 
     estimated_time_to_merger = 5/(256ν(M₁, M₂) * T(vᵢ)^8) # Lowest-order PN time-to-merger
     tspan = (T(0), 4estimated_time_to_merger)
+    @warn "Need to complete precession_dynamics and orbital_dynamics in recalculate!"
     problem_forwards = ODEProblem(noneccentric_RHS!, uᵢ, tspan, pn)
 
-    termination_criterion = ContinuousCallback(
-        (u,t,integrator) -> u[end] - 1,  # Terminate at v = 1
-        terminate!
+    # Triggers the `terminator!` whenever one of these conditions crosses 0.
+    # More precisely, the integrator performs a root find to finish precisely
+    # when one of these conditions crosses 0.
+    function terminators(out,u,t,integrator)
+        out[1] = u[1]  # Terminate if M₁≤0
+        out[2] = u[2]  # Terminate if M₂≤0
+        out[3] = 1 - abs2vec(QuatVec{T}(u[3:5]...))  # Terminate if χ₁>1
+        out[4] = 1 - abs2vec(QuatVec{T}(u[6:8]...))  # Terminate if χ₂>1
+        out[5] = 1 - u[end]  # Terminate at v = 1
+    end
+    function terminator!(integrator, event_index)
+        if event_index == 1
+            @info "Terminating forwards evolution because M₁ has become non-positive.  This is unusual."
+        elseif event_index == 2
+            @info "Terminating forwards evolution because M₂ has become non-positive.  This is unusual."
+        elseif event_index == 3
+            @info "Terminating forwards evolution because χ₁>1.  Suggests early breakdown of PN."
+        elseif event_index == 4
+            @info "Terminating forwards evolution because χ₂>1.  Suggests early breakdown of PN."
+        elseif event_index == 5
+            @info (
+                "Terminating forwards evolution because the PN parameter 𝑣 "
+                * "has reached 1.  This is ideal."
+            )
+        end
+        terminate!(integrator)
+    end
+    termination_criteria = VectorContinuousCallback(
+        terminators,
+        terminator!,
+        5;  # We have 5 criteria above
+        save_positions=(true,false)  # Only save before the termination, not after
     )
 
     solution_forwards = solve(
         problem_forwards, AutoVern9(Rodas5()),
         reltol=reltol, abstol=abstol,
-        callback=termination_criterion,
+        callback=termination_criteria,
         dtmin=dtmin
     )
 
@@ -101,19 +140,46 @@ function noneccentric_evolution(
 
         problem_backwards = remake(problem_forwards; tspan=tspan)
 
-        termination_criterion = ContinuousCallback(
-            (u,t,integrator) -> u[end] - v₁,  # Terminate at v = v₁
-            terminate!
+        function terminators_backwards(out,u,t,integrator)
+            out[1] = u[1]  # Terminate if M₁≤0
+            out[2] = u[2]  # Terminate if M₂≤0
+            out[3] = 1 - abs2vec(QuatVec{T}(u[3:5]...))  # Terminate if χ₁>1
+            out[4] = 1 - abs2vec(QuatVec{T}(u[6:8]...))  # Terminate if χ₂>1
+            out[5] = v₁ - u[end]  # Terminate at v = v₁
+        end
+        function terminator_backwards!(integrator, event_index)
+            if event_index == 1
+                @info "Terminating backwards evolution because M₁ has become non-positive.  This is unusual."
+            elseif event_index == 2
+                @info "Terminating backwards evolution because M₂ has become non-positive.  This is unusual."
+            elseif event_index == 3
+                @info "Terminating backwards evolution because χ₁>1.  Suggests early breakdown of PN."
+            elseif event_index == 4
+                @info "Terminating backwards evolution because χ₂>1.  Suggests early breakdown of PN."
+            elseif event_index == 5
+                @info (
+                    "Terminating backwards evolution because the PN parameter 𝑣 "
+                    * "has reached 𝑣₁.  This is ideal."
+                )
+            end
+            terminate!(integrator)
+        end
+        termination_criteria_backwards = VectorContinuousCallback(
+            terminators_backwards,
+            terminator_backwards!,
+            5;  # We have 5 criteria above
+            save_positions=(true,false)  # Only save before the termination, not after
         )
 
         solution_backwards = solve(
             problem_backwards, AutoVern9(Rodas5()),
             reltol=reltol, abstol=abstol,
-            callback=termination_criterion,
+            callback=termination_criteria_backwards,
             dtmin=dtmin
         )
 
-        # Combine forwards and backwards
+        @warn "Failing to combine forwards and backwards!!!"
+        return solution_forwards, solution_backwards
     end
 
     solution_forwards
