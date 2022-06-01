@@ -4,7 +4,7 @@
 Integrate the orbital dynamics of a non-eccentric compact binary.
 
 
-## Initial frequency vs. first frequency
+## Initial frequency vs. first frequency vs. end frequency
 
 Note the distinction between `Ωᵢ` (with subscript `i`) and `Ω₁` (with subscript
 `1`).  The first, `Ωᵢ`, represents the angular velocity of the *initial
@@ -25,6 +25,9 @@ integrate backwards in time.  We parametrise the point to which you integrate
 backwards with `Ω₁`.  In either case, element `1` of the output solution will
 have frequency `Ω₁` — though by default it is equal to `Ωᵢ`.
 
+Similarly, the optional argument `Ωₑ=1` is the frequency of the `end` element
+of the solution — that is Julia's notation for the last element.
+
 ## Up-down instability
 
 Be aware that the [up-down instability](http://arxiv.org/abs/1506.09116) (where
@@ -37,11 +40,20 @@ should explicitly set the in-place components of spin to precisely 0.  By
 default, we check for this condition, and will issue a warning if it is likely
 to be encountered for systems with low initial precession.
 
+## Time-stepper algorithms
+
+`Tsit5()` is a good default choice for time stepper when using `Float64`s.  If
+stiffness seems to be impacting the results, `AutoTsit5(Rosenbrock23())` will
+automatically switch when stiffness occurs.  For tighter tolerances, as when
+using `Double64`s, `Vern9()` or `AutoVern9(Rodas5())` are good choices.  For
+very loose tolerances, as when using `Float32`s, it might be better to use
+`OwrenZen3()`.
+
 """
 function noneccentric_evolution(
-    M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; Ω₁=Ωᵢ, Rᵢ=Rotor(true),
+    M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; Ω₁=Ωᵢ, Ωₑ=1, Rᵢ=Rotor(true),
     PNSys=TaylorT1, PNOrder=7//2,
-    check_up_down_instability=true,
+    check_up_down_instability=true, time_stepper=Tsit5(),
 )
     if Ω₁ > Ωᵢ
         error(
@@ -52,6 +64,7 @@ function noneccentric_evolution(
 
     vᵢ = v(Ω=Ωᵢ, M=M₁+M₂)
     v₁ = v(Ω=Ω₁, M=M₁+M₂)
+    vₑ = v(Ω=Ωₑ, M=M₁+M₂)
     uᵢ = [  # Initial conditions for the ODE integration
         M₁;
         M₂;
@@ -61,11 +74,9 @@ function noneccentric_evolution(
         vᵢ
     ]
     T = eltype(uᵢ)
-    dtmin = 10√eps(T)
+    dtmin = √eps(T)
     reltol = √eps(T)
     abstol = √eps(T)
-    Mₜₒₜ = M₁ + M₂
-    Ω⃗ᵢ = T(Ωᵢ) * ℓ̂(Rᵢ)
     pn = PNSys(PNOrder, T)
     unpack!(pn, uᵢ)
 
@@ -100,7 +111,7 @@ function noneccentric_evolution(
         out[2] = u[2]  # Terminate if M₂≤0
         out[3] = 1 - abs2vec(QuatVec{T}(u[3:5]...))  # Terminate if χ₁>1
         out[4] = 1 - abs2vec(QuatVec{T}(u[6:8]...))  # Terminate if χ₂>1
-        out[5] = 1 - u[end]  # Terminate at v = 1
+        out[5] = vₑ - u[end]  # Terminate at v = vₑ
     end
     function terminator!(integrator, event_index)
         if event_index == 1
@@ -114,7 +125,7 @@ function noneccentric_evolution(
         elseif event_index == 5
             @info (
                 "Terminating forwards evolution because the PN parameter 𝑣 "
-                * "has reached 1.  This is ideal."
+                * "has reached 𝑣ₑ=$vₑ.  This is ideal."
             )
         end
         terminate!(integrator)
@@ -127,7 +138,7 @@ function noneccentric_evolution(
     )
 
     solution_forwards = solve(
-        problem_forwards, AutoVern9(Rodas5()),
+        problem_forwards, time_stepper,
         reltol=reltol, abstol=abstol,
         callback=termination_criteria,
         dtmin=dtmin
@@ -149,17 +160,17 @@ function noneccentric_evolution(
         end
         function terminator_backwards!(integrator, event_index)
             if event_index == 1
-                @info "Terminating backwards evolution because M₁ has become non-positive.  This is unusual."
+                @warn "Terminating backwards evolution because M₁ has become non-positive.  Suggests problem with PN."
             elseif event_index == 2
-                @info "Terminating backwards evolution because M₂ has become non-positive.  This is unusual."
+                @warn "Terminating backwards evolution because M₂ has become non-positive.  Suggests problem with PN."
             elseif event_index == 3
-                @info "Terminating backwards evolution because χ₁>1.  Suggests early breakdown of PN."
+                @warn "Terminating backwards evolution because χ₁>1.  Suggests problem with PN."
             elseif event_index == 4
-                @info "Terminating backwards evolution because χ₂>1.  Suggests early breakdown of PN."
+                @warn "Terminating backwards evolution because χ₂>1.  Suggests problem with PN."
             elseif event_index == 5
                 @info (
                     "Terminating backwards evolution because the PN parameter 𝑣 "
-                    * "has reached 𝑣₁.  This is ideal."
+                    * "has reached 𝑣₁=$v₁.  This is ideal."
                 )
             end
             terminate!(integrator)
@@ -172,14 +183,14 @@ function noneccentric_evolution(
         )
 
         solution_backwards = solve(
-            problem_backwards, AutoVern9(Rodas5()),
+            problem_backwards, time_stepper;
             reltol=reltol, abstol=abstol,
             callback=termination_criteria_backwards,
             dtmin=dtmin
         )
 
         @warn "Failing to combine forwards and backwards!!!"
-        return solution_forwards, solution_backwards
+        return solution_backwards[end:-1:2], solution_forwards
     end
 
     solution_forwards
