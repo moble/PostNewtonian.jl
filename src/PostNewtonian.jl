@@ -28,6 +28,9 @@ export PNSystem, TaylorT1
 include("pn_dynamics/tidal_heating.jl")
 export tidal_heating
 
+include("pn_dynamics/precession.jl")
+export Ω⃗ₚ, Ω⃗ᵪ₁, Ω⃗ᵪ₂, Ω⃗ᵪ, 𝛡, γ, aₗ
+
 include("noneccentric_orbit.jl")
 export noneccentric_evolution
 

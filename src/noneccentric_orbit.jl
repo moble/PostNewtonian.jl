@@ -100,7 +100,7 @@ function noneccentric_evolution(
 
     estimated_time_to_merger = 5/(256ν(M₁, M₂) * T(vᵢ)^8) # Lowest-order PN time-to-merger
     tspan = (T(0), 4estimated_time_to_merger)
-    @warn "Need to complete precession_dynamics and orbital_dynamics in recalculate!"
+    @warn "Need to complete orbital_dynamics in recalculate!"
     problem_forwards = ODEProblem(noneccentric_RHS!, uᵢ, tspan, pn)
 
     # Triggers the `terminator!` whenever one of these conditions crosses 0.
