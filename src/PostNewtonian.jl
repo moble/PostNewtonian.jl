@@ -6,6 +6,8 @@ using Symbolics
 using DifferentialEquations
 
 
+include("constants.jl")
+
 include("masses.jl")
 export μ, reduced_mass,
     ν, reduced_mass_ratio,
@@ -30,6 +32,9 @@ export tidal_heating
 
 include("pn_dynamics/precession.jl")
 export Ω⃗ₚ, Ω⃗ᵪ₁, Ω⃗ᵪ₂, Ω⃗ᵪ, 𝛡, γ, aₗ
+
+include("pn_dynamics/flux.jl")
+export 𝓕, 𝓕EMRI, 𝓕NS
 
 include("noneccentric_orbit.jl")
 export noneccentric_evolution
