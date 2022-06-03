@@ -89,8 +89,7 @@ seems like overkill, so we'll just go up to 6pN.
 """
 function 𝓕EMRI(pn)
     @unpack pn
-    M = M₁ + M₂
-    let ν=ν(M₁,M₂), δ=δ(M₁,M₂), ℓ̂=ℓ̂(R), π=oftype(v, π), γₑ=oftype(v, eulergamma)
+    let ν=ν(M₁,M₂), ℓ̂=ℓ̂(R), π=oftype(v, π), γₑ=oftype(v, eulergamma)
         let log2=oftype(v, log2), log3=log(oftype(v, 3)), log5=log(oftype(v, 5)), ζ3=oftype(v, ζ3), logv=log(v)
 
             32ν^2/5 * v^10 * (
