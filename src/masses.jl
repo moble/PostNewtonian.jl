@@ -5,8 +5,8 @@
 Compute the reduced mass ``(M₁ M₂)/(M₁+M₂)``.
 
 """
-μ(M₁, M₂) = reduced_mass(M₁, M₂)
-reduced_mass(M₁, M₂) = (M₁ * M₂) / (M₁ + M₂)
+μ(M₁, M₂) = (M₁ * M₂) / (M₁ + M₂)
+const reduced_mass = μ
 
 
 """
@@ -18,8 +18,8 @@ Compute the reduced mass ratio ``(M₁ M₂)/(M₁+M₂)^2``.
 Note that the denominator is squared, unlike in the reduced mass [`μ`](@ref).
 
 """
-ν(M₁, M₂) = reduced_mass_ratio(M₁, M₂)
-reduced_mass_ratio(M₁, M₂) = (M₁ * M₂) / (M₁ + M₂)^2
+ν(M₁, M₂) = (M₁ * M₂) / (M₁ + M₂)^2
+const reduced_mass_ratio = ν
 ν(;q) = q / (1+q)^2
 
 
@@ -30,8 +30,8 @@ reduced_mass_ratio(M₁, M₂) = (M₁ * M₂) / (M₁ + M₂)^2
 Compute mass-difference ratio ``(M₁-M₂)/(M₁+M₂)``.
 
 """
-δ(M₁, M₂) = reduced_mass(M₁, M₂)
-mass_difference_ratio(M₁, M₂) = (M₁ - M₂) / (M₁ + M₂)
+δ(M₁, M₂) = (M₁ - M₂) / (M₁ + M₂)
+const mass_difference_ratio = δ
 δ(;q) = (q-1) / (q+1)
 
 
@@ -46,8 +46,8 @@ Note that we do not restrict to `M₁ ≥ M₂` or vice versa; if you prefer tha
 for ensuring that
 
 """
-q(M₁, M₂) = mass_ratio(M₁, M₂)
-mass_ratio(M₁, M₂) = M₁ / M₂
+q(M₁, M₂) = M₁ / M₂
+const mass_ratio = q
 
 
 """
@@ -63,7 +63,7 @@ The chirp mass is defined as
 ```
 
 """
-function chirp_mass(M₁, M₂)
+function ℳ(M₁, M₂)
     ((M₁ * M₂)^3 / (M₁ + M₂))^(1//5)
 end
-ℳ(M₁, M₂) = chirp_mass(M₁, M₂)
+const chirp_mass = ℳ

@@ -1,5 +1,6 @@
 """
     𝓕(pn)
+    gw_energy_flux(pn)
 
 Compute the gravitational-wave energy flux to infinity
 
@@ -74,10 +75,12 @@ function 𝓕(pn)
         end
     end
 end
+const gw_energy_flux = 𝓕
 
 
 """
     𝓕EMRI(pn)
+    gw_energy_flux_EMRI(pn)
 
 Compute the EMRI terms contributing to gravitational-wave energy flux to infinity
 
@@ -126,10 +129,12 @@ function 𝓕EMRI(pn)
         end
     end
 end
+const gw_energy_flux_EMRI = 𝓕EMRI
 
 
 """
     𝓕NS(pn, λ₁, λ₂)
+    gw_energy_flux_NS(pn, λ₁, λ₂)
 
 Compute tidal NS contribution to the gravitational-wave energy flux to infinity
 
@@ -158,3 +163,4 @@ function 𝓕NS(pn, λ₁, λ₂)
         )
     )
 end
+const gw_energy_flux_NS = 𝓕NS

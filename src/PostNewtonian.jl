@@ -5,8 +5,10 @@ using Quaternionic
 using Symbolics
 using DifferentialEquations
 
-
 include("constants.jl")
+
+include("PNSystems.jl")
+export PNSystem, TaylorT1
 
 include("masses.jl")
 export μ, reduced_mass,
@@ -21,23 +23,32 @@ export χ⃗, S, Σ, χₛ, χₐ
 include("orbital_elements.jl")
 export ℓ̂, n̂, λ̂, Ω, v
 
-include("up_down_instability.jl")
-export up_down_instability
-
-include("PNSystems.jl")
-export PNSystem, TaylorT1
-
 include("pn_dynamics/tidal_heating.jl")
 export tidal_heating
 
 include("pn_dynamics/precession.jl")
-export Ω⃗ₚ, Ω⃗ᵪ₁, Ω⃗ᵪ₂, Ω⃗ᵪ, 𝛡, γ, aₗ
+export Ω⃗ₚ, Omega_p,
+    Ω⃗ᵪ₁, Omega_chi1,
+    Ω⃗ᵪ₂, Omega_chi2,
+    Ω⃗ᵪ, 𝛡, γ, aₗ
 
 include("pn_dynamics/flux.jl")
-export 𝓕, 𝓕EMRI, 𝓕NS
+export 𝓕, gravitational_wave_flux,
+    𝓕EMRI, gravitational_wave_flux_EMRI,
+    𝓕NS, gravitational_wave_flux_NS
+
+include("pn_dynamics/binding_energy.jl")
+export 𝓔, binding_energy,
+    𝓔′, binding_energy_deriv,
+    𝓔NS, binding_energy_NS
+
+include("up_down_instability.jl")
+export up_down_instability
 
 include("noneccentric_orbit.jl")
 export noneccentric_evolution
+
+
 
 
 end

@@ -11,6 +11,7 @@ al. (2013)](https://arxiv.org/abs/1212.5520).  See [`𝛡`](@ref) for details.
 
 """
 Ω⃗ₚ(pn) = 𝛡(pn)
+const Omega_p = Ω⃗ₚ
 
 
 """
@@ -27,6 +28,7 @@ Note that this function simply calls [`Ω⃗ᵪ`](@ref) with the appropriate par
 function Ω⃗ᵪ₁(pn)
     Ω⃗ᵪ(pn.M₁, pn.M₂, pn.χ⃗₁, pn.χ⃗₂, pn.v, pn.R)
 end
+const Omega_chi1 = Ω⃗ᵪ₁
 
 
 """
@@ -43,6 +45,7 @@ Note that this function simply calls [`Ω⃗ᵪ`](@ref) with the appropriate par
 function Ω⃗ᵪ₂(pn)
     Ω⃗ᵪ(pn.M₂, pn.M₁, pn.χ⃗₂, pn.χ⃗₁, pn.v, pn.R)
 end
+const Omega_chi2 = Ω⃗ᵪ₂
 
 
 """
