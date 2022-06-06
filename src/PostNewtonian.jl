@@ -3,7 +3,8 @@ module PostNewtonian
 using StaticArrays
 using Quaternionic
 using Symbolics
-using DifferentialEquations
+using SymbolicUtils
+using OrdinaryDiffEq
 
 include("constants.jl")
 
