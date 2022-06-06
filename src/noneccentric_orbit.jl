@@ -1,8 +1,43 @@
+using Base: promote_typeof
+
 """
-    noneccentric_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, [Ω₁=Ωᵢ], [Rᵢ=Rotor(true)])
+    noneccentric_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; kwargs...)
 
 Integrate the orbital dynamics of a non-eccentric compact binary.
 
+## Keyword arguments
+
+  * `Ω₁=Ωᵢ`: First angular velocity in output data (see next section).
+  * `Ωₑ=1`: Final angular velocity at which to stop ODE integration.
+  * `Rᵢ=Rotor(true)`: Initial orientation of binary.
+  * `PNSys=TaylorT1`: Not actually used currently.
+  * `PNOrder=7//2`: Not actually used currently.
+  * `check_up_down_instability=true`: Warn if the [Up-down instability](@ref)
+    is likely to affect this system.
+  * `time_stepper=DP8()`: Choice of solver in OrdinaryDiffEq to integrate ODE.
+  * `abstol=eps(T)^(11//16)`: Absolute tolerance of ODE solver, where `T` is
+    the common type to which all the positional arguments are promoted.  This
+    is the tolerance on local error estimates, not necessarily the global
+    error.
+  * `reltol=eps(T)^(11//16)`: Relative tolerance of ODE solver.  (As above.)
+
+All remaining keyword arguments are passed to the [`solve`
+function](https://github.com/SciML/DiffEqBase.jl/blob/8e6173029c630f6908252f3fc28a69c1f0eab456/src/solve.jl#L393)
+of `DiffEqBase`.  See that function's documentation for details, including
+useful keyword arguments.  The most likely important ones are
+
+  * `saveat`: Denotes specific times to save the solution at, during the
+    solving phase.
+  * `adaptive`: Turns on adaptive timestepping for appropriate methods. Default
+    is true.
+  * `dt`: Sets the initial stepsize. Defaults to an automatic choice if the
+    method is adaptive.
+  * `dtmax`: Maximum dt for adaptive timestepping.
+  * `dtmin`: Minimum dt for adaptive timestepping.
+
+Note that `callback` is already used by this function (in addition to the
+`abstol` and `reltol` mentioned above), which currently makes it impossible to
+modify the callbacks.  Hacking will be required to change that.
 
 ## Initial frequency vs. first frequency vs. end frequency
 
@@ -53,12 +88,14 @@ very loose tolerances, as when using `Float32`s, it might be better to use
 function noneccentric_evolution(
     M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; Ω₁=Ωᵢ, Ωₑ=1, Rᵢ=Rotor(true),
     PNSys=TaylorT1, PNOrder=7//2,
-    check_up_down_instability=true, time_stepper=Tsit5(),
+    check_up_down_instability=true, time_stepper=DP8(),
+    reltol=eps(promote_typeof(M₁, M₂, χ⃗₁.vec..., χ⃗₂.vec..., Ωᵢ^(1//3), Rᵢ.components...))^(11//16),
+    abstol=eps(promote_typeof(M₁, M₂, χ⃗₁.vec..., χ⃗₂.vec..., Ωᵢ^(1//3), Rᵢ.components...))^(11//16),
+    solve_kwargs...
 )
     if Ω₁ > Ωᵢ
         error(
-            "Initial frequency Ωᵢ=$Ωᵢ should be greater"
-            * " than or equal to first frequency Ω₁=$Ω₁"
+            "Initial frequency Ωᵢ=$Ωᵢ should be greater than or equal to first frequency Ω₁=$Ω₁"
         )
     end
 
@@ -74,9 +111,6 @@ function noneccentric_evolution(
         vᵢ
     ]
     T = eltype(uᵢ)
-    dtmin = √eps(T)
-    reltol = √eps(T)
-    abstol = √eps(T)
     pn = PNSys(PNOrder, T)
     unpack!(pn, uᵢ)
 
@@ -139,15 +173,14 @@ function noneccentric_evolution(
 
     solution_forwards = solve(
         problem_forwards, time_stepper,
-        reltol=reltol, abstol=abstol,
         callback=termination_criteria,
-        dtmin=dtmin
+        reltol=reltol, abstol=abstol,
+        solve_kwargs...
     )
 
     if v₁ < vᵢ
         estimated_backwards_time = 5/(256ν(M₁, M₂) * T(v₁)^8) - estimated_time_to_merger
         tspan = (T(0), -3estimated_backwards_time)
-        # dtmin *= -1  # TODO: Figure out if this should happen
 
         problem_backwards = remake(problem_forwards; tspan=tspan)
 
@@ -184,9 +217,9 @@ function noneccentric_evolution(
 
         solution_backwards = solve(
             problem_backwards, time_stepper;
-            reltol=reltol, abstol=abstol,
             callback=termination_criteria_backwards,
-            dtmin=dtmin
+            reltol=reltol, abstol=abstol,
+            solve_kwargs...
         )
 
         @warn "Failing to combine forwards and backwards!!!"
@@ -208,23 +241,6 @@ could be used to pass un-evolved parameters through.
 
 """
 function noneccentric_RHS!(u̇, u, pn, t)
-    # recalculate!(u̇, u, pn)
-    unpack!(pn, u)
-    @unpack pn
-    χ₁ = absvec(χ⃗₁)
-    χ₂ = absvec(χ⃗₂)
-    (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(pn)
-    let ℓ̂=ℓ̂(R), Ω⃗ᵪ₁=Ω⃗ᵪ₁(pn), Ω⃗ᵪ₂=Ω⃗ᵪ₂(pn), Ω⃗ₚ=Ω⃗ₚ(pn), 𝓕=𝓕(pn), 𝓔′=𝓔′(pn)
-        v̇ = - (𝓕 + Ṁ₁ + Ṁ₂) / 𝓔′
-        #v̇ = 2//5 * v^10 / (v/4)
-        χ̂₁ = ifelse(iszero(χ₁), ℓ̂, χ⃗₁ / χ₁)
-        χ̂₂ = ifelse(iszero(χ₂), ℓ̂, χ⃗₂ / χ₂)
-        u̇[1] = Ṁ₁
-        u̇[2] = Ṁ₂
-        u̇[3:5] = ((Ṡ₁ / M₁^2 - 2χ₁ * Ṁ₁/M₁) * χ̂₁ + Ω⃗ᵪ₁ × χ⃗₁).vec
-        u̇[6:8] = ((Ṡ₂ / M₂^2 - 2χ₂ * Ṁ₂/M₂) * χ̂₂ + Ω⃗ᵪ₂ × χ⃗₂).vec
-        u̇[9:12] = (Ω⃗ₚ * R / 2).components
-        u̇[13] = v̇
-    end
+    recalculate!(u̇, u, pn)
     nothing
 end

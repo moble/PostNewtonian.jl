@@ -33,30 +33,30 @@ function unpack!(pn::PNSystem{PNOrder,T}, u) where {PNOrder,T}
     pn
 end
 
-# """
-#     recalculate!(u̇, u, pn)
+"""
+    recalculate!(u̇, u, pn)
 
-# Calculate the new values of `u̇` based on the values of `u`.  Note that this
-# modifies both `u̇` and `pn` in place.
+Calculate the new values of `u̇` based on the values of `u`.  Note that this
+modifies both `u̇` and `pn` in place.
 
-# """
-# function recalculate!(u̇, u, pn::TaylorT1{PNOrder,T}) where {PNOrder,T}
-#     unpack!(pn, u)
-#     @unpack pn
-#     χ₁ = absvec(χ⃗₁)
-#     χ₂ = absvec(χ⃗₂)
-#     (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(pn)
-#     let ℓ̂=ℓ̂(R), Ω⃗ᵪ₁=Ω⃗ᵪ₁(pn), Ω⃗ᵪ₂=Ω⃗ᵪ₂(pn), Ω⃗ₚ=Ω⃗ₚ(pn), 𝓕=𝓕(pn), 𝓔′=𝓔′(pn)
-#         v̇ = - (𝓕 + Ṁ₁ + Ṁ₂) / 𝓔′
-#         #v̇ = 2//5 * v^10 / (v/4)
-#         χ̂₁ = ifelse(iszero(χ₁), ℓ̂, χ⃗₁ / χ₁)
-#         χ̂₂ = ifelse(iszero(χ₂), ℓ̂, χ⃗₂ / χ₂)
-#         u̇[1] = Ṁ₁
-#         u̇[2] = Ṁ₂
-#         u̇[3:5] = ((Ṡ₁ / M₁^2 - 2χ₁ * Ṁ₁/M₁) * χ̂₁ + Ω⃗ᵪ₁ × χ⃗₁).vec
-#         u̇[6:8] = ((Ṡ₂ / M₂^2 - 2χ₂ * Ṁ₂/M₂) * χ̂₂ + Ω⃗ᵪ₂ × χ⃗₂).vec
-#         u̇[9:12] = (Ω⃗ₚ * R / 2).components
-#         u̇[13] = v̇
-#     end
-#     pn
-# end
+"""
+function recalculate!(u̇, u, pn::TaylorT1{PNOrder,T}) where {PNOrder,T}
+    unpack!(pn, u)
+    @unpack pn
+    χ₁ = absvec(χ⃗₁)
+    χ₂ = absvec(χ⃗₂)
+    (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(pn)
+    let ℓ̂=ℓ̂(R), Ω⃗ᵪ₁=Ω⃗ᵪ₁(pn), Ω⃗ᵪ₂=Ω⃗ᵪ₂(pn), Ω⃗ₚ=Ω⃗ₚ(pn), 𝓕=𝓕(pn), 𝓔′=𝓔′(pn)
+        v̇ = - (𝓕 + Ṁ₁ + Ṁ₂) / 𝓔′
+        #v̇ = 2//5 * v^10 / (v/4)
+        χ̂₁ = ifelse(iszero(χ₁), ℓ̂, χ⃗₁ / χ₁)
+        χ̂₂ = ifelse(iszero(χ₂), ℓ̂, χ⃗₂ / χ₂)
+        u̇[1] = Ṁ₁
+        u̇[2] = Ṁ₂
+        u̇[3:5] = ((Ṡ₁ / M₁^2 - 2χ₁ * Ṁ₁/M₁) * χ̂₁ + Ω⃗ᵪ₁ × χ⃗₁).vec
+        u̇[6:8] = ((Ṡ₂ / M₂^2 - 2χ₂ * Ṁ₂/M₂) * χ̂₂ + Ω⃗ᵪ₂ × χ⃗₂).vec
+        u̇[9:12] = (Ω⃗ₚ * R / 2).components
+        u̇[13] = v̇
+    end
+    pn
+end
