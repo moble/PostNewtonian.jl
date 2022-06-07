@@ -273,10 +273,10 @@ function noneccentric_evolution(
         vᵢ
     ]
     T = eltype(uᵢ)
-    if reltol === nothing
+    if isnothing(reltol)
         reltol = eps(T)^(11//16)
     end
-    if abstol === nothing
+    if isnothing(abstol)
         abstol = eps(T)^(11//16)
     end
     pn = PNSys(PNOrder, T)
@@ -303,7 +303,7 @@ function noneccentric_evolution(
     estimated_time_to_merger = 5/(256ν(M₁, M₂) * T(vᵢ)^8) # Lowest-order PN time-to-merger
     tspan = (T(0), 4estimated_time_to_merger)
     problem_forwards = ODEProblem(noneccentric_RHS!, uᵢ, tspan, pn)
-    if termination_criteria_forwards === nothing
+    if isnothing(termination_criteria_forwards)
         termination_criteria_forwards = CallbackSet(
             termination_forwards(vₑ),
             dtmin_terminator(T)
@@ -318,6 +318,7 @@ function noneccentric_evolution(
             @error "Found a NaN with initial parameters:" value.(uᵢ) value.(u̇) pn value.(tspan)
             flush(stdout)
             flush(stderr)
+            error("Found NaN")
         end
     end
 
@@ -332,7 +333,7 @@ function noneccentric_evolution(
         estimated_backwards_time = 5/(256ν(M₁, M₂) * T(v₁)^8) - estimated_time_to_merger
         tspan = (T(0), -3estimated_backwards_time)
         problem_backwards = remake(problem_forwards; tspan=tspan)
-        if termination_criteria_backwards === nothing
+        if isnothing(termination_criteria_backwards)
             termination_criteria_backwards = CallbackSet(
                 termination_backwards(v₁),
                 dtmin_terminator(T)
@@ -365,8 +366,5 @@ could be used to pass un-evolved parameters through.
 """
 function noneccentric_RHS!(u̇, u, pn, t)
     recalculate!(u̇, u, pn)
-    # if any(isnan, u̇) ||  any(isnan, u)
-    #     @error "Found a NaN during RHS evaluation:" value.(u) value.(u̇)
-    # end
     nothing
 end
