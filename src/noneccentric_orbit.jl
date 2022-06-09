@@ -51,7 +51,7 @@ function termination_forwards(vₑ)
         conditions,
         terminator!,
         5;  # We have 5 criteria above
-        save_positions=(true,false)  # Only save before the termination, not after
+        save_positions=(false,false)  # Only save before the termination, not after
     )
 end
 
@@ -95,7 +95,7 @@ function termination_backwards(v₁)
         terminators_backwards,
         terminator_backwards!,
         5;  # We have 5 criteria above
-        save_positions=(true,false)  # Only save before the termination, not after
+        save_positions=(false,false)  # Only save before the termination, not after
     )
 end
 
@@ -103,13 +103,18 @@ end
 """
     dtmin_terminator(T)
 
-Construct termination criterion to terminate when `dt` drops below `10eps(T)`.
+Construct termination criterion to terminate when `dt` drops below `√eps(T)`.
+
+Pass `force_dtmin=true` to `solve` when using this callback.  Otherwise, the
+time-step size may decrease too much *within* a single time step, so that the
+integrator itself will quit before reaching this callback, leading to a less
+graceful exit.
 
 """
 function dtmin_terminator(T)
     # Triggers the `discrete_terminator!` whenever this condition is true after
     # an integration step
-    ϵ = 10eps(T)
+    ϵ = √eps(T)
     function discrete_condition(u,t,integrator)
         abs(integrator.dt) < ϵ
     end
@@ -120,7 +125,33 @@ function dtmin_terminator(T)
     DiscreteCallback(
         discrete_condition,
         discrete_terminator!;
-        save_positions=(true,false)
+        save_positions=(false,false)
+    )
+end
+
+
+"""
+    nonfinite_terminator()
+
+Construct termination criterion to terminate when any NaN or Inf is found in
+the data after an integration step.
+
+"""
+function nonfinite_terminator()
+    # Triggers the `discrete_terminator!` whenever this condition is true after
+    # an integration step
+    function discrete_condition(u,t,integrator)
+        # any(isnan, u) || isnan(t) || isnan(integrator.dt)
+        !(all(isfinite, u) && isfinite(t) && isfinite(integrator.dt))
+    end
+    function discrete_terminator!(integrator)
+        @info "Terminating forwards evolution because a non-finite number was found"
+        terminate!(integrator)
+    end
+    DiscreteCallback(
+        discrete_condition,
+        discrete_terminator!;
+        save_positions=(false,false)
     )
 end
 
@@ -151,6 +182,11 @@ Integrate the orbital dynamics of a non-eccentric compact binary.
     forwards-in-time evolution.  See below for discussion of the default value.
   * `termination_criteria_backwards=nothing`: Callbacks to `solve` for
     backwards-in-time evolution.  See below for discussion of the default value.
+  * `force_dtmin=true`: If `dt` decreases below the integrator's own minimum,
+    and this is false, the integrator will immediately raise an error, before
+    the termination criteria have the chance to exit gracefully.  Note that a
+    true value here is critical if the `dtmin_terminator` callback is to have
+    any effect.
 
 All remaining keyword arguments are passed to the [`solve`
 function](https://github.com/SciML/DiffEqBase.jl/blob/8e6173029c630f6908252f3fc28a69c1f0eab456/src/solve.jl#L393)
@@ -193,7 +229,10 @@ backwards with `Ω₁`.  In either case, element `1` of the output solution will
 have frequency `Ω₁` — though by default it is equal to `Ωᵢ`.
 
 Similarly, the optional argument `Ωₑ=1` is the frequency of the `end` element
-of the solution — that is Julia's notation for the last element.
+of the solution — that is Julia's notation for the last element.  Note that
+this is automatically reduced if necessary so that the corresponding PN
+parameter ``v`` is no greater than 1, which may be the case whenever the total
+mass is greater than 1.
 
 
 ## Up-down instability
@@ -228,14 +267,16 @@ backwards-in-time evolution, respectively, are
 ```julia
 CallbackSet(
     termination_forwards(v(Ω=Ωₑ, M=M₁+M₂)),
-    dtmin_terminator(T)
+    dtmin_terminator(T),
+    nonfinite_terminator()
 )
 ```
 and
 ```julia
 CallbackSet(
     termination_backwards(v(Ω=Ω₁, M=M₁+M₂)),
-    dtmin_terminator(T)
+    dtmin_terminator(T),
+    nonfinite_terminator()
 )
 ```
 where `T` is the common float type of the input arguments.  If any additional
@@ -253,6 +294,7 @@ function noneccentric_evolution(
     reltol=nothing, abstol=nothing,
     termination_criteria_forwards=nothing,
     termination_criteria_backwards=nothing,
+    force_dtmin=true,
     solve_kwargs...
 )
     if Ω₁ > Ωᵢ
@@ -262,8 +304,16 @@ function noneccentric_evolution(
     end
 
     vᵢ = v(Ω=Ωᵢ, M=M₁+M₂)
+    if vᵢ ≥ 1
+        error(
+            "The input Ωᵢ=$Ωᵢ is too large; with these masses, it corresponds to "
+            * "vᵢ=$vᵢ, which is beyond the reach of post-Newtonian methods."
+        )
+    end
+
     v₁ = v(Ω=Ω₁, M=M₁+M₂)
-    vₑ = v(Ω=Ωₑ, M=M₁+M₂)
+    vₑ = min(v(Ω=Ωₑ, M=M₁+M₂), 1)
+
     uᵢ = [  # Initial conditions for the ODE integration
         M₁;
         M₂;
@@ -306,7 +356,8 @@ function noneccentric_evolution(
     if isnothing(termination_criteria_forwards)
         termination_criteria_forwards = CallbackSet(
             termination_forwards(vₑ),
-            dtmin_terminator(T)
+            dtmin_terminator(T),
+            nonfinite_terminator()
         )
     end
 
@@ -326,6 +377,7 @@ function noneccentric_evolution(
         problem_forwards, time_stepper;
         callback=termination_criteria_forwards,
         reltol=reltol, abstol=abstol,
+        force_dtmin=force_dtmin,
         solve_kwargs...
     )
 
@@ -336,7 +388,8 @@ function noneccentric_evolution(
         if isnothing(termination_criteria_backwards)
             termination_criteria_backwards = CallbackSet(
                 termination_backwards(v₁),
-                dtmin_terminator(T)
+                dtmin_terminator(T),
+                nonfinite_terminator()
             )
         end
 
@@ -344,6 +397,7 @@ function noneccentric_evolution(
             problem_backwards, time_stepper;
             callback=termination_criteria_backwards,
             reltol=reltol, abstol=abstol,
+            force_dtmin=force_dtmin,
             solve_kwargs...
         )
 
