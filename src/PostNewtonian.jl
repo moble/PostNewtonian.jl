@@ -35,9 +35,9 @@ export Ω⃗ₚ, Omega_p,
     Ω⃗ᵪ, 𝛡, γ, aₗ
 
 include("pn_dynamics/flux.jl")
-export 𝓕, gravitational_wave_flux,
-    𝓕EMRI, gravitational_wave_flux_EMRI,
-    𝓕NS, gravitational_wave_flux_NS
+export 𝓕, gw_energy_flux,
+    𝓕EMRI, gw_energy_flux_EMRI,
+    𝓕NS, gw_energy_flux_NS
 
 include("pn_dynamics/binding_energy.jl")
 export 𝓔, binding_energy,
@@ -48,9 +48,11 @@ include("up_down_instability.jl")
 export up_down_instability
 
 include("noneccentric_orbit.jl")
-export noneccentric_evolution
+export noneccentric_evolution,
+    termination_forwards, termination_backwards,
+    dtmin_terminator, nonfinite_terminator
 
-
-
+include("mode_weights.jl")
+export h!, mode_weights!
 
 end
