@@ -1,5 +1,6 @@
 """
-    up_down_instability(pn)
+    up_down_instability(u)
+    up_down_instability(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
 
 Compute the range of frequencies over which the system is unstable to
 increasing precession.
@@ -21,19 +22,22 @@ frequency.  The result is also "clamped" between 0 and 1, because sometimes the
 PN approximations involved break down and return unphysical values.
 
 """
-function up_down_instability(pn)
-    let ℓ̂=ℓ̂(pn.R)
-        if pn.M₁ > pn.M₂
-            q = pn.M₂ / pn.M₁
-            χ₁ = pn.χ⃗₁ ⋅ ℓ̂
-            χ₂ = pn.χ⃗₂ ⋅ ℓ̂
+function up_down_instability(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
+    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
+    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
+    let ℓ̂=ℓ̂(R)
+        if M₁ > M₂
+            q = M₂ / M₁
+            χ₁ = χ⃗₁ ⋅ ℓ̂
+            χ₂ = χ⃗₂ ⋅ ℓ̂
         else
-            q = pn.M₁ / pn.M₂
-            χ₂ = pn.χ⃗₁ ⋅ ℓ̂
-            χ₁ = pn.χ⃗₂ ⋅ ℓ̂
+            q = M₁ / M₂
+            χ₂ = χ⃗₁ ⋅ ℓ̂
+            χ₁ = χ⃗₂ ⋅ ℓ̂
         end
         if χ₁ > 0 && χ₂ < 0
-            M = pn.M₁ + pn.M₂
+            M = M₁ + M₂
             r₊ = M * (√(χ₁) + √(q*χ₂))^4 / (1-q)^2
             r₋ = M * (√(χ₁) - √(q*χ₂))^4 / (1-q)^2
             Ω₊ = √(M/r₊)^3
@@ -45,3 +49,4 @@ function up_down_instability(pn)
         end
     end
 end
+up_down_instability(u) = up_down_instability(u...)

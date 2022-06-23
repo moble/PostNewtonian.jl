@@ -1,6 +1,8 @@
 """
-    𝓕(pn)
-    gw_energy_flux(pn)
+    𝓕(u)
+    𝓕(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    gw_energy_flux(u)
+    gw_energy_flux(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
 
 Compute the gravitational-wave energy flux to infinity
 
@@ -18,8 +20,10 @@ The spin-orbit terms in the flux are now known to 4.0pN.  These terms come from
 Eq. (4.9) of [Marsat et al. (2013)](https://arxiv.org/abs/1307.6793v1)
 
 """
-function 𝓕(pn)
-    @unpack pn
+function 𝓕(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
+    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
+    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
     M = M₁ + M₂
     let ν=ν(M₁,M₂), δ=δ(M₁,M₂), ℓ̂=ℓ̂(R), logv=log(v)
         let log2=oftype(logv, log2), π=oftype(logv, π), γₑ=oftype(logv, eulergamma)
@@ -75,12 +79,15 @@ function 𝓕(pn)
         end
     end
 end
+𝓕(u) = 𝓕(u...)
 const gw_energy_flux = 𝓕
 
 
 """
-    𝓕EMRI(pn)
-    gw_energy_flux_EMRI(pn)
+    𝓕EMRI(u)
+    𝓕EMRI(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    gw_energy_flux_EMRI(u)
+    gw_energy_flux_EMRI(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
 
 Compute the EMRI terms contributing to gravitational-wave energy flux to infinity
 
@@ -90,8 +97,8 @@ limit.  These terms are given in Appendix A of [Fujita
 seems like overkill, so we'll just go up to 6pN.
 
 """
-function 𝓕EMRI(pn)
-    @unpack pn
+function 𝓕EMRI(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
     let ν=ν(M₁,M₂), ℓ̂=ℓ̂(R), logv=log(v)
         let π=oftype(logv, π), γₑ=oftype(logv, eulergamma), ζ3=oftype(logv, ζ3)
             let log2=oftype(logv, log2), log3=oftype(logv, log3), log5=oftype(logv, log5)
@@ -130,12 +137,15 @@ function 𝓕EMRI(pn)
         end
     end
 end
+𝓕EMRI(u) = 𝓕EMRI(u...)
 const gw_energy_flux_EMRI = 𝓕EMRI
 
 
 """
-    𝓕NS(pn, λ₁, λ₂)
-    gw_energy_flux_NS(pn, λ₁, λ₂)
+    𝓕NS(u, λ₁, λ₂)
+    𝓕NS(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, λ₁, λ₂)
+    gw_energy_flux_NS(u, λ₁, λ₂)
+    gw_energy_flux_NS(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, λ₁, λ₂)
 
 Compute tidal NS contribution to the gravitational-wave energy flux to infinity
 
@@ -149,8 +159,7 @@ notation; in particular, ``χ`` is not a spin parameter.  Also note that ``λ̂ 
 factor is used, leading to a sign difference.
 
 """
-function 𝓕NS(pn, λ₁, λ₂)
-    @unpack pn
+function 𝓕NS(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, λ₁, λ₂)
     M = M₁ + M₂
 
     32ν^2/5 * v^10 * (
@@ -164,4 +173,5 @@ function 𝓕NS(pn, λ₁, λ₂)
         )
     )
 end
+𝓕NS(u, λ₁, λ₂) = 𝓕NS(u..., λ₁, λ₂)
 const gw_energy_flux_NS = 𝓕NS

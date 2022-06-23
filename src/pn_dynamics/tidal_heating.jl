@@ -1,5 +1,6 @@
 """
-    tidal_heating(pn)
+    tidal_heating(u)
+    tidal_heating(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
 
 Compute the rate of energy and angular-momentum absorption into each black hole
 in a binary.
@@ -24,8 +25,10 @@ See also
   - [Chatziioannou et al. (2012)](https://arxiv.org/abs/1211.1686)
 
 """
-function tidal_heating(pn)
-    @unpack pn
+function tidal_heating(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
+    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
+    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
     M = M₁ + M₂
     χ₁² = abs2vec(χ⃗₁)
     χ₂² = abs2vec(χ⃗₂)
@@ -104,3 +107,4 @@ function tidal_heating(pn)
         (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂)
     end
 end
+tidal_heating(u) = tidal_heating(u...)

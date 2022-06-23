@@ -3,35 +3,9 @@ abstract type PNSystem{PNOrder,T} end
 
 
 mutable struct TaylorT1{PNOrder,T} <: PNSystem{PNOrder,T}
-    M₁::T
-    M₂::T
-    χ⃗₁::QuatVec{T}
-    χ⃗₂::QuatVec{T}
-    R::Quaternion{T}
-    v::T
     TaylorT1{PNOrder,T}() where {PNOrder,T} = new()
 end
 
-macro unpack(pn)
-    esc(quote
-            M₁ = $(pn).M₁
-            M₂ = $(pn).M₂
-            χ⃗₁ = $(pn).χ⃗₁
-            χ⃗₂ = $(pn).χ⃗₂
-            R = $(pn).R
-            v = $(pn).v
-    end)
-end
-
-function unpack!(pn::PNSystem{PNOrder,T}, u) where {PNOrder,T}
-    pn.M₁ = u[1]
-    pn.M₂ = u[2]
-    pn.χ⃗₁ = QuatVec{T}(u[3:5]...)
-    pn.χ⃗₂ = QuatVec{T}(u[6:8]...)
-    pn.R = Quaternion{T}(u[9:12]...)
-    pn.v = u[13]
-    pn
-end
 
 """
     recalculate!(u̇, u, pn)
@@ -41,15 +15,16 @@ modifies both `u̇` and `pn` in place.
 
 """
 function recalculate!(u̇, u, pn::TaylorT1{PNOrder,T}) where {PNOrder,T}
-    unpack!(pn, u)
-    @unpack pn
+    M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v = u
+    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
+    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
+    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
     χ₁ = absvec(χ⃗₁)
     χ₂ = absvec(χ⃗₂)
-    (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(pn)
-    let ℓ̂=ℓ̂(R), Ω⃗ᵪ₁=Ω⃗ᵪ₁(pn), Ω⃗ᵪ₂=Ω⃗ᵪ₂(pn), Ω⃗ₚ=Ω⃗ₚ(pn), 𝓕=𝓕(pn), 𝓔′=𝓔′(pn)
+    (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(u)
+    let ℓ̂=ℓ̂(R), Ω⃗ᵪ₁=Ω⃗ᵪ₁(u), Ω⃗ᵪ₂=Ω⃗ᵪ₂(u), Ω⃗ₚ=Ω⃗ₚ(u), 𝓕=𝓕(u), 𝓔′=𝓔′(u)
         Ω⃗ = Ω⃗ₚ + Ω(v=v, M=M₁+M₂) * ℓ̂
         v̇ = - (𝓕 + Ṁ₁ + Ṁ₂) / 𝓔′
-        #v̇ = 2//5 * v^10 / (v/4)
         χ̂₁ = ifelse(iszero(χ₁), ℓ̂, χ⃗₁ / χ₁)
         χ̂₂ = ifelse(iszero(χ₂), ℓ̂, χ⃗₂ / χ₂)
         u̇[1] = Ṁ₁

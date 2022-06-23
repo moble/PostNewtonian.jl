@@ -8,8 +8,10 @@ const a_7__c1 = 0 # not yet known
 
 
 """
-    𝓔(pn)
-    binding_energy(pn)
+    𝓔(u)
+    𝓔(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    binding_energy(u)
+    binding_energy(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
 
 Compute the binding energy of a compact binary.
 
@@ -120,8 +122,10 @@ function 𝓔(
     )
 end
 
-function 𝓔(pn)
-    @unpack pn
+function 𝓔(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
+    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
+    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
     let ν=ν(M₁,M₂), δ=δ(M₁,M₂), ℓ̂=ℓ̂(R), logv=log(v)
         let γₑ=oftype(logv, eulergamma), π=oftype(logv, π), log2=oftype(logv, log2), log3=oftype(logv, log3)
             𝓔(
@@ -132,6 +136,7 @@ function 𝓔(pn)
         end
     end
 end
+𝓔(u) = 𝓔(u...)
 
 const binding_energy = 𝓔
 
@@ -156,8 +161,10 @@ end
 
 
 """
-    𝓔′(pn)
-    binding_energy_deriv(pn)
+    𝓔′(u)
+    𝓔′(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    binding_energy_deriv(u)
+    binding_energy_deriv(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
 
 Compute the derivative with respect to ``v`` of the binding energy of a compact
 binary.
@@ -165,20 +172,25 @@ binary.
 This is computed symbolically from [`𝓔`](@ref); see that function for details.
 
 """
-function 𝓔′(pn)
-    @unpack pn
+function 𝓔′(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
+    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
+    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
     let ν=ν(M₁,M₂), δ=δ(M₁,M₂), ℓ̂=ℓ̂(R), logv=log(v)
         let γₑ=oftype(logv, eulergamma), π=oftype(logv, π), log2=oftype(logv, log2), log3=oftype(logv, log3)
             binding_energy_symbolic_deriv(M₁, M₂, χ⃗₁, χ⃗₂, R, v, ν, δ, ℓ̂, logv, γₑ, π, log2, log3)
         end
     end
 end
+𝓔′(u) = 𝓔′(u...)
 const binding_energy_deriv = 𝓔′
 
 
 """
-    𝓔NS(pn)
-    binding_energy_NS(pn)
+    𝓔NS(u)
+    𝓔NS(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    binding_energy_NS(u)
+    binding_energy_NS(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
 
 Compute tidal NS contribution to the gravitational binding energy
 
@@ -192,8 +204,10 @@ Finally, note the normalization difference, where a different overall factor is
 used, leading to a sign difference.
 
 """
-function 𝓔NS(pn)
-    @unpack pn
+function 𝓔NS(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
+    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
+    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
     M = M₁ + M₂
     let ν=ν(M₁,M₂), δ=δ(M₁,M₂), ℓ̂=ℓ̂(R), π=oftype(v, π), γₑ=oftype(v, eulergamma)
         let log2=oftype(v, log2), logv=log(v)
@@ -219,4 +233,5 @@ function 𝓔NS(pn)
         end
     end
 end
+𝓔NS(u) = 𝓔NS(u...)
 const binding_energy_NS = 𝓔NS

@@ -167,7 +167,7 @@ Integrate the orbital dynamics of a non-eccentric compact binary.
   * `Ω₁=Ωᵢ`: First angular velocity in output data (see next section).
   * `Ωₑ=1`: Final angular velocity at which to stop ODE integration.
   * `Rᵢ=Rotor(true)`: Initial orientation of binary.
-  * `PNSys=TaylorT1`: Not actually used currently.
+  * `PNSys=TaylorT1`: Currently the only possibility.
   * `PNOrder=7//2`: Not actually used currently.
   * `check_up_down_instability=true`: Warn if the [Up-down instability](@ref)
     is likely to affect this system.
@@ -314,14 +314,15 @@ function noneccentric_evolution(
     v₁ = v(Ω=Ω₁, M=M₁+M₂)
     vₑ = min(v(Ω=Ωₑ, M=M₁+M₂), 1)
 
-    uᵢ = [  # Initial conditions for the ODE integration
-        M₁;
-        M₂;
-        χ⃗₁.vec;
-        χ⃗₂.vec;
-        Rᵢ.components;
-        vᵢ
-    ]
+    # Initial conditions for the ODE integration
+    uᵢ = [M₁; M₂; χ⃗₁.vec; χ⃗₂.vec; Rᵢ.components; vᵢ]
+
+    # Unpack them again, because that gave everything the same type
+    M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, vᵢ = uᵢ
+    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
+    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
+    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
+
     T = eltype(uᵢ)
     if isnothing(reltol)
         reltol = eps(T)^(11//16)
@@ -330,14 +331,13 @@ function noneccentric_evolution(
         abstol = eps(T)^(11//16)
     end
     pn = PNSys(PNOrder, T)
-    unpack!(pn, uᵢ)
 
     if check_up_down_instability
-        χₚₑᵣₚ = let n̂=n̂(pn.R), λ̂=λ̂(pn.R)
-            √((pn.χ⃗₁ ⋅ n̂)^2 + (pn.χ⃗₁ ⋅ λ̂)^2 + (pn.χ⃗₂ ⋅ n̂)^2 + (pn.χ⃗₂ ⋅ λ̂)^2)
+        χₚₑᵣₚ = let n̂=n̂(R), λ̂=λ̂(R)
+            √((χ⃗₁ ⋅ n̂)^2 + (χ⃗₁ ⋅ λ̂)^2 + (χ⃗₂ ⋅ n̂)^2 + (χ⃗₂ ⋅ λ̂)^2)
         end
         if χₚₑᵣₚ ≤ 1e-2
-            (Ω₊, Ω₋) = up_down_instability(pn)
+            (Ω₊, Ω₋) = up_down_instability(uᵢ)
             if Ω₁ < Ω₋ < 1//4 || Ω₁ < Ω₊ < 1//4
                 @warn (
                     "This system is likely to encounter the up-down instability in the\n"
@@ -366,9 +366,9 @@ function noneccentric_evolution(
         u̇ = similar(uᵢ)
         noneccentric_RHS!(u̇, uᵢ, pn, tspan[1])
         if any(isnan, u̇) ||  any(isnan, uᵢ) ||  any(isnan, tspan)
-            @error "Found a NaN with initial parameters:" value.(uᵢ) value.(u̇) pn value.(tspan)
             flush(stdout)
             flush(stderr)
+            @error "Found a NaN with initial parameters:" value.(uᵢ) value.(u̇) pn value.(tspan)
             error("Found NaN")
         end
     end

@@ -3,8 +3,10 @@
 
 
 """
-    h!(h, pn, ℓmin=0)
-    mode_weights!(h, pn, ℓmin=0)
+    h!(h, u; ℓmin=0)
+    h!(h, M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v; ℓmin=0)
+    mode_weights!(h, u; ℓmin=0)
+    mode_weights!(h, M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v; ℓmin=0)
 
 Compute mode weights of gravitational waves emitted by `pn` system, modifying
 `h` in place.
@@ -24,8 +26,10 @@ that these modes are nonetheless included in `h`.  If that is not the case, set
 `ℓmin=2` being the most reasonable alternative.
 
 """
-function h!(h, pn, ℓmin=0)
-    @unpack pn
+function h!(h, M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v; ℓmin=0)
+    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
+    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
+    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
     h .= 0  # Set everything to 0 just to be safe
     M = M₁ + M₂
     let ν=ν(M₁,M₂), δ=δ(M₁,M₂), ℓ̂=ℓ̂(R), n̂=n̂(R), λ̂=λ̂(R), logv=log(v)
@@ -255,4 +259,5 @@ function h!(h, pn, ℓmin=0)
     end
     h
 end
+h!(h, u; ℓmin=0) = h!(h, u...; ℓmin=ℓmin)
 const mode_weights! = h!

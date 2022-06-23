@@ -1,5 +1,6 @@
 """
-    Ω⃗ₚ(pn)
+    Ω⃗ₚ(u)
+    Ω⃗ₚ(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
 
 Compute the angular velocity of orbital precession.
 
@@ -10,12 +11,15 @@ At the moment, this is computed solely by expressions from [Bohé et
 al. (2013)](https://arxiv.org/abs/1212.5520).  See [`𝛡`](@ref) for details.
 
 """
-Ω⃗ₚ(pn) = 𝛡(pn)
+Ω⃗ₚ(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v) =
+    𝛡(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+Ω⃗ₚ(u) = Ω⃗ₚ(u...)
 const Omega_p = Ω⃗ₚ
 
 
 """
-    Ω⃗ᵪ₁(pn)
+    Ω⃗ᵪ₁(u)
+    Ω⃗ᵪ₁(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
 
 Compute the angular velocity of precession of χ⃗₁
 
@@ -25,14 +29,19 @@ of ``χ⃗₁`` is due to its rotation alone, and is given by ``Ω⃗ᵪ₁ × �
 Note that this function simply calls [`Ω⃗ᵪ`](@ref) with the appropriate parameters.
 
 """
-function Ω⃗ᵪ₁(pn)
-    Ω⃗ᵪ(pn.M₁, pn.M₂, pn.χ⃗₁, pn.χ⃗₂, pn.v, pn.R)
+function Ω⃗ᵪ₁(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
+    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
+    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
+    Ω⃗ᵪ(M₁, M₂, χ⃗₁, χ⃗₂, v, R)
 end
+Ω⃗ᵪ₁(u) = Ω⃗ᵪ₁(u...)
 const Omega_chi1 = Ω⃗ᵪ₁
 
 
 """
-    Ω⃗ᵪ₂(pn)
+    Ω⃗ᵪ₂(u)
+    Ω⃗ᵪ₂(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
 
 Compute the angular velocity of precession of χ⃗₂
 
@@ -42,9 +51,13 @@ of ``χ⃗₂`` is due to its rotation alone, and is given by ``Ω⃗ᵪ₂ × �
 Note that this function simply calls [`Ω⃗ᵪ`](@ref) with the appropriate parameters.
 
 """
-function Ω⃗ᵪ₂(pn)
-    Ω⃗ᵪ(pn.M₂, pn.M₁, pn.χ⃗₂, pn.χ⃗₁, pn.v, pn.R)
+function Ω⃗ᵪ₂(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
+    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
+    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
+    Ω⃗ᵪ(M₂, M₁, χ⃗₂, χ⃗₁, v, R)
 end
+Ω⃗ᵪ₂(u) = Ω⃗ᵪ₂(u...)
 const Omega_chi2 = Ω⃗ᵪ₂
 
 
@@ -57,7 +70,7 @@ In the approximation that the spin *magnitude* is constant, the time derivative
 of ``χ⃗ⱼ`` is due to its rotation alone, and is given by ``Ω⃗ᵪ × χ⃗ⱼ``.
 
 Note that this function is called by [`Ω⃗ᵪ₁`](@ref) and [`Ω⃗ᵪ₂`](@ref) with the
-appropriate parameters; you may want to use those instead.
+appropriate parameters; you probably want to use those instead of this one.
 
 The spin-spin term is given by Eq. (2.4) of [Kidder
 (1995)](http://link.aps.org/doi/10.1103/PhysRevD.52.821); the spin-orbit terms
@@ -91,7 +104,8 @@ end
 
 
 """
-    𝛡(pn)
+    𝛡(u)
+    𝛡(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
 
 Compute the angular velocity of orbital precession according to Bohé et al.
 
@@ -105,15 +119,22 @@ Then, they define the PN parameter ``γ≔M/r`` and we have ``Mω = v³`` so tha
 (4.4), and given here by the functions [`γ`](@ref) and  [`aₗ`](@ref).
 
 """
-function 𝛡(pn)
-    let n̂ = n̂(pn.R), v=pn.v
-        (γ(pn) * aₗ(pn) / v^3) * n̂
+function 𝛡(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
+    let n̂ = n̂(R)
+        (
+            γ(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+            * aₗ(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+            / v^3
+        ) * n̂
     end
 end
+𝛡(u) = 𝛡(u...)
 
 
 """
-    γ(pn)
+    γ(u)
+    γ(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
 
 Eq. (4.3) of [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520).  This term
 contributes to [`𝛡`](@ref).
@@ -122,8 +143,10 @@ Note that there is a 3PN term of ``-22ν\\ln(r/r₀′)/3`` that is simply ignor
 here.
 
 """
-function γ(pn)
-    @unpack pn
+function γ(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
+    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
+    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
     M = M₁ + M₂
     let ν=ν(M₁,M₂), δ=δ(M₁,M₂), ℓ̂=ℓ̂(R), π=oftype(v, π)
         Sₗ = S(M₁,M₂,χ⃗₁,χ⃗₂) ⋅ ℓ̂
@@ -139,17 +162,21 @@ function γ(pn)
         )
     end
 end
+γ(u) = γ(u...)
 
 
 """
-    aₗ(pn)
+    aₗ(u)
+    aₗ(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
 
 Eq. (4.4) of [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520).  This term
 contributes to [`𝛡`](@ref).
 
 """
-function aₗ(pn)
-    @unpack pn
+function aₗ(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
+    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
+    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
     M = M₁ + M₂
     let ν=ν(M₁,M₂), δ=δ(M₁,M₂), n̂=n̂(R)
         Sₙ = S(M₁,M₂,χ⃗₁,χ⃗₂) ⋅ n̂
@@ -164,4 +191,4 @@ function aₗ(pn)
         )
     end
 end
-
+aₗ(u) = aₗ(u...)
