@@ -42,7 +42,6 @@ export Ω⃗ₚ, Omega_p,
 
 include("pn_dynamics/flux.jl")
 export 𝓕, gw_energy_flux,
-    𝓕EMRI, gw_energy_flux_EMRI,
     𝓕NS, gw_energy_flux_NS
 
 include("pn_dynamics/binding_energy.jl")
