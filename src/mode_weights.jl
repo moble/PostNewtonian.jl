@@ -30,7 +30,7 @@ function h!(h, M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ�
     χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
     χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
     R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
-    h .= 0  # Set everything to 0 just to be safe
+    fill!(h, 0)  # Set everything to 0 just to be safe
     M = M₁ + M₂
     let ν=ν(M₁,M₂), δ=δ(M₁,M₂), ℓ̂=ℓ̂(R), n̂=n̂(R), λ̂=λ̂(R), logv=log(v)
         T = typeof(logv)
