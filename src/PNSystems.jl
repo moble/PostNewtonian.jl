@@ -14,7 +14,7 @@ Calculate the new values of `u̇` based on the values of `u`.  Note that this
 modifies both `u̇` and `pn` in place.
 
 """
-function recalculate!(u̇, u, pn::TaylorT1{PNOrder,T}) where {PNOrder,T}
+function recalculate!(u̇, u, ::TaylorT1{PNOrder,T}) where {PNOrder,T}
     M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v = u
     χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
     χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
@@ -34,5 +34,5 @@ function recalculate!(u̇, u, pn::TaylorT1{PNOrder,T}) where {PNOrder,T}
         u̇[9:12] = (Ω⃗ * R / 2).components
         u̇[13] = v̇
     end
-    pn
+    nothing
 end
