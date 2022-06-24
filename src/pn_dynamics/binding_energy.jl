@@ -187,10 +187,10 @@ const binding_energy_deriv = 𝓔′
 
 
 """
-    𝓔NS(u)
-    𝓔NS(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
-    binding_energy_NS(u)
-    binding_energy_NS(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    𝓔NS(u, λ₁, λ₂)
+    𝓔NS(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, λ₁, λ₂)
+    binding_energy_NS(u, λ₁, λ₂)
+    binding_energy_NS(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, λ₁, λ₂)
 
 Compute tidal NS contribution to the gravitational binding energy
 
@@ -204,7 +204,7 @@ Finally, note the normalization difference, where a different overall factor is
 used, leading to a sign difference.
 
 """
-function 𝓔NS(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+function 𝓔NS(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, λ₁, λ₂)
     χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
     χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
     R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
@@ -233,5 +233,5 @@ function 𝓔NS(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ�
         end
     end
 end
-𝓔NS(u) = 𝓔NS(u...)
+𝓔NS(u, λ₁, λ₂) = 𝓔NS(u..., λ₁, λ₂)
 const binding_energy_NS = 𝓔NS
