@@ -25,6 +25,16 @@ that these modes are nonetheless included in `h`.  If that is not the case, set
 `ℓmin` to the smallest ``ℓ`` value that should be present in the output data —
 `ℓmin=2` being the most reasonable alternative.
 
+All non-spinning terms are taken from [Blanchet
+(2014)](https://doi-org.proxy.library.cornell.edu/10.12942/lrr-2014-2).  The
+1PN spin-orbit term is from Eq. (3.22d) of [Kidder
+(1995)](https://link.aps.org/doi/10.1103/PhysRevD.52.821).  The 1.5PN
+spin-orbit term is from Eq. (3.22f) of Kidder (1995) and Eq. (F15b) of [Will
+and Wiseman (1996)](https://link.aps.org/doi/10.1103/PhysRevD.54.4813).  The
+2PN spin-orbit term is from Eq. (4.13) of [Buonanno, Faye, Hinderer
+(2013)](https://link.aps.org/doi/10.1103/PhysRevD.87.044009), while the 2PN
+spin-spin term is from Eq. (4.15) of that reference.
+
 """
 function h!(h, M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v; ℓmin=0)
     χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
@@ -199,11 +209,17 @@ function h!(h, M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ�
             h[Yindex(8,8,ℓmin)] = c * v^6 * ((16384√T(2//85085) * (-1 + (-1 + ν)^2 * 7ν)) / 63)
 
             # Symmetric spin terms
-            h[Yindex(2,0,ℓmin)] += c * v^4 * (√T(6) * (-S₁λ*S₂λ + S₁n*S₂n) / (3M^4*ν))
+            #h[Yindex(2,0,ℓmin)] += c * v^4 * (√T(6) * (-S₁λ*S₂λ + S₁n*S₂n) / (3M^4*ν))
+            h[Yindex(2,0,ℓmin)] += c * v^4 * -((M₂*(S₁λ - S₁n) + M₁*(S₂λ - S₂n)) * (M₂*(S₁λ + S₁n) + M₁*(S₂λ + S₂n))) / (√T(6) * M^4 * ν^2)
             h[Yindex(2,1,ℓmin)] += c * v^2 * (𝒾 * Σℓ / 2M^2)
             h[Yindex(2,1,ℓmin)] += c * v^4 * (𝒾 * (-86*Sℓ*δ + Σℓ*(139ν - 79)) / 42M^2)
             h[Yindex(2,2,ℓmin)] += c * v^3 * (-(6Sℓ + 2Σℓ*δ) / 3M^2)
-            h[Yindex(2,2,ℓmin)] += c * v^4 * ((12S₁ℓ*S₂ℓ + 10S₁λ*S₂λ - 15𝒾*S₁λ*S₂n - 15𝒾*S₁n*S₂λ - 22*S₁n*S₂n) / (6M^4*ν))
+            #h[Yindex(2,2,ℓmin)] += c * v^4 * ((12S₁ℓ*S₂ℓ + 10S₁λ*S₂λ - 15𝒾*S₁λ*S₂n - 15𝒾*S₁n*S₂λ - 22*S₁n*S₂n) / (6M^4*ν))
+            h[Yindex(2,2,ℓmin)] += c * v^4 * (
+                M₂^2 * (6S₁ℓ^2 + 5S₁λ^2 - 15𝒾*S₁λ*S₁n - 11S₁n^2)
+                + M₁*M₂ * (12S₁ℓ*S₂ℓ + 10*S₁λ*S₂λ - 15𝒾*S₁n*S₂λ - 15𝒾*S₁λ*S₂n - 22*S₁n*S₂n)
+                + M₁^2 * (6S₂ℓ^2 + 5*S₂λ^2 - 15𝒾*S₂λ*S₂n - 11*S₂n^2)
+            ) / (6M^4 * ν^2)
             h[Yindex(3,1,ℓmin)] += c * v^4 * (√T(14)𝒾 * (Sℓ*δ - 5Σℓ*(3ν - 1)) / 336M^2)
             h[Yindex(3,2,ℓmin)] += c * v^3 * (2√T(35) * (Sℓ + Σℓ*δ) / 21M^2)
             h[Yindex(3,3,ℓmin)] += c * v^4 * (3√T(210)𝒾 * (7Sℓ*δ - 3Σℓ*(3ν - 1)) / 112M^2)
@@ -225,7 +241,8 @@ function h!(h, M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ�
             h[Yindex(2,0,ℓmin)] += h̃_2_0
             h̃_2_1 = c * (
                 v^3 * ((4𝒾*Sλ + 25*Sn + 4𝒾*Σλ*δ + 13*Σn*δ) / 6M^2)
-                + v^4 * (-(3*S₁ℓ*S₂n + 3*S₁n*S₂ℓ) / (2M^4*ν))
+                #+ v^4 * (-(3*S₁ℓ*S₂n + 3*S₁n*S₂ℓ) / (2M^4*ν))
+                + v^4 * -3 * (M₂*S₁ℓ + M₁*S₂ℓ) * (M₂*S₁n + M₁*S₂n) / (2M^4 * ν^2)
             )
             h[Yindex(2,1,ℓmin)] += h̃_2_1
             h[Yindex(2,-1,ℓmin)] += -conj(h̃_2_1)
