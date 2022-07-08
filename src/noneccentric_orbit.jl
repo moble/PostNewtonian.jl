@@ -315,13 +315,7 @@ function noneccentric_evolution(
     vₑ = min(v(Ω=Ωₑ, M=M₁+M₂), 1)
 
     # Initial conditions for the ODE integration
-    uᵢ = [M₁; M₂; χ⃗₁.vec; χ⃗₂.vec; Rᵢ.components; vᵢ]
-
-    # Unpack them again, because that gave everything the same type
-    M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, vᵢ = uᵢ
-    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
-    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
-    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
+    uᵢ = [M₁; M₂; χ⃗₁.components[2:4]; χ⃗₂.components[2:4]; Rᵢ.components; vᵢ]
 
     T = eltype(uᵢ)
     if isnothing(reltol)
@@ -330,7 +324,36 @@ function noneccentric_evolution(
     if isnothing(abstol)
         abstol = eps(T)^(11//16)
     end
-    pn = PNSys(PNOrder, T)
+
+    noneccentric_evolution(
+        uᵢ,
+        v₁, vₑ,
+        PNSys(PNOrder, T),
+        check_up_down_instability, time_stepper,
+        reltol, abstol,
+        termination_criteria_forwards,
+        termination_criteria_backwards,
+        force_dtmin;
+        solve_kwargs...
+    )
+end
+
+function noneccentric_evolution(
+    uᵢ, v₁, vₑ,
+    pn::PNSystem,
+    check_up_down_instability, time_stepper,
+    reltol, abstol,
+    termination_criteria_forwards,
+    termination_criteria_backwards,
+    force_dtmin;
+    solve_kwargs...
+)
+
+    # Unpack them again, because that gave everything the same type
+    M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, vᵢ = uᵢ
+    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
+    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
+    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
 
     if check_up_down_instability
         χₚₑᵣₚ = let n̂=n̂(R), λ̂=λ̂(R)
@@ -366,8 +389,6 @@ function noneccentric_evolution(
         u̇ = similar(uᵢ)
         noneccentric_RHS!(u̇, uᵢ, pn, tspan[1])
         if any(isnan, u̇) ||  any(isnan, uᵢ) ||  any(isnan, tspan)
-            flush(stdout)
-            flush(stderr)
             @error "Found a NaN with initial parameters:" value.(uᵢ) value.(u̇) pn value.(tspan)
             error("Found NaN")
         end

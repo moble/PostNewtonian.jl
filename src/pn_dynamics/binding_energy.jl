@@ -156,7 +156,7 @@ binding_energy_symbolic_deriv = let
     eval(build_function(
         E′,
         :M₁, :M₂, :χ⃗₁, :χ⃗₂, :R, :v, :ν, :δ, :ℓ̂, :logv, :γₑ, :π, :log2, :log3
-    ))
+    ))::Function
 end
 
 
