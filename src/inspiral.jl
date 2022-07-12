@@ -32,13 +32,13 @@ function termination_forwards(vₑ)
     end
     function terminator!(integrator, event_index)
         if event_index == 1
-            @info "Terminating forwards evolution because M₁ has become non-positive.  This is unusual."
+            @warn "Terminating forwards evolution because M₁ has become non-positive.  This is unusual."
         elseif event_index == 2
-            @info "Terminating forwards evolution because M₂ has become non-positive.  This is unusual."
+            @warn "Terminating forwards evolution because M₂ has become non-positive.  This is unusual."
         elseif event_index == 3
-            @info "Terminating forwards evolution because χ₁>1.  Suggests early breakdown of PN."
+            @warn "Terminating forwards evolution because χ₁>1.  Suggests early breakdown of PN."
         elseif event_index == 4
-            @info "Terminating forwards evolution because χ₂>1.  Suggests early breakdown of PN."
+            @warn "Terminating forwards evolution because χ₂>1.  Suggests early breakdown of PN."
         elseif event_index == 5
             @info (
                 "Terminating forwards evolution because the PN parameter 𝑣 "
@@ -195,14 +195,18 @@ useful keyword arguments.  The most likely important ones are
 
   * `saveat`: Denotes specific times to save the solution at, during the
     solving phase.
-  * `adaptive`: Turns on adaptive timestepping for appropriate methods. Default
-    is true.
-  * `dt`: Sets the initial stepsize. Defaults to an automatic choice if the
+  * `dt`: Sets the *initial* stepsize. Defaults to an automatic choice if the
     method is adaptive.
   * `dtmax`: Maximum dt for adaptive timestepping.
   * `dtmin`: Minimum dt for adaptive timestepping.
 
-Note that `callback` is already used by this function (in addition to the
+Note that if you want the solution to be output with specifically spaced time
+steps, you *don't* want `dt`, which is just the initial suggestion for adaptive
+systems; you want to set `saveat` to the desired spacing.  [The `saveat`
+argument could be a vector of specific times at which to save, but because we
+don't know when the PN evolution ends, this probably isn't useful.]
+
+Also note that `callback` is already used by this function (in addition to the
 `abstol` and `reltol` mentioned above), which currently makes it impossible to
 modify the callbacks.  Hacking will be required to change that.
 
@@ -424,10 +428,10 @@ function inspiral(
             solve_kwargs...
         )
 
-        return solution_backwards[end:-1:2], solution_forwards
+        combine_solutions(solution_backwards, solution_forwards)
+    else
+        solution_forwards
     end
-
-    solution_forwards
 end
 
 

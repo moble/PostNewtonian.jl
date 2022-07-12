@@ -4,6 +4,9 @@ using StaticArrays
 using Quaternionic
 using Symbolics
 using SymbolicUtils
+using SciMLBase
+using DiffEqBase
+using RecursiveArrayTools
 using OrdinaryDiffEq
 
 # This ensures that when we ask for, e.g., `π` with the same type as, e.g.,
@@ -12,6 +15,8 @@ using OrdinaryDiffEq
 # Float64 at the first possible chance.
 Base.oftype(x::Num, y::Irrational) = Symbolics.Term(identity, y)
 
+
+include("combine_solutions.jl")
 
 include("constants.jl")
 
