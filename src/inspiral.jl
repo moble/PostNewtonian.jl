@@ -157,7 +157,7 @@ end
 
 
 """
-    noneccentric_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; kwargs...)
+    inspiral(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; kwargs...)
 
 Integrate the orbital dynamics of a non-eccentric compact binary.
 
@@ -286,7 +286,7 @@ documentation](https://diffeq.sciml.ai/stable/features/callback_functions/) for
 details.
 
 """
-function noneccentric_evolution(
+function inspiral(
     M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ;
     Ω₁=Ωᵢ, Ωₑ=1, Rᵢ=Rotor(true),
     PNSys=TaylorT1, PNOrder=7//2,
@@ -316,6 +316,9 @@ function noneccentric_evolution(
 
     # Initial conditions for the ODE integration
     uᵢ = [M₁; M₂; χ⃗₁.components[2:4]; χ⃗₂.components[2:4]; Rᵢ.components; vᵢ]
+    # We pack this up here, to get everything into the same type, and permit easier
+    # passing to the other form of this function; we'll unpack it again there,
+    # which makes sure everything has the same type and the function is type stable.
 
     T = eltype(uᵢ)
     if isnothing(reltol)
@@ -325,10 +328,10 @@ function noneccentric_evolution(
         abstol = eps(T)^(11//16)
     end
 
-    noneccentric_evolution(
+    inspiral(
         uᵢ,
         v₁, vₑ,
-        PNSys(PNOrder, T),
+        PNSys(PNOrder, T), T,
         check_up_down_instability, time_stepper,
         reltol, abstol,
         termination_criteria_forwards,
@@ -338,9 +341,9 @@ function noneccentric_evolution(
     )
 end
 
-function noneccentric_evolution(
+function inspiral(
     uᵢ, v₁, vₑ,
-    pn::PNSystem,
+    pn::PNSystem, T,
     check_up_down_instability, time_stepper,
     reltol, abstol,
     termination_criteria_forwards,
@@ -349,7 +352,6 @@ function noneccentric_evolution(
     solve_kwargs...
 )
 
-    # Unpack them again, because that gave everything the same type
     M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, vᵢ = uᵢ
     χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
     χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)

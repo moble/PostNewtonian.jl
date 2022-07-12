@@ -52,8 +52,8 @@ export 𝓔, binding_energy,
 include("up_down_instability.jl")
 export up_down_instability
 
-include("noneccentric_orbit.jl")
-export noneccentric_evolution,
+include("inspiral.jl")
+export inspiral,
     termination_forwards, termination_backwards,
     dtmin_terminator, nonfinite_terminator
 
