@@ -208,7 +208,9 @@ don't know when the PN evolution ends, this probably isn't useful.]
 
 Also note that `callback` is already used by this function (in addition to the
 `abstol` and `reltol` mentioned above), which currently makes it impossible to
-modify the callbacks.  Hacking will be required to change that.
+modify the callbacks.  Hacking will be required to change that.  (Note: I think
+this may be easy, if we add the current callbacks to the *problem*, and just
+pass any input callbacks to **`solve`**.  I haven't tested it though.)
 
 
 ## Initial frequency vs. first frequency vs. end frequency
