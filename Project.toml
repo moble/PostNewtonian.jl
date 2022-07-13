@@ -14,5 +14,12 @@ SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
+DiffEqBase = "6"
+OrdinaryDiffEq = "6"
+Quaternionic = "1"
+RecursiveArrayTools = "2"
+SciMLBase = "1"
+StaticArrays = "1"
+SymbolicUtils = "0.19"
 Symbolics = "4"
 julia = "1.6"
