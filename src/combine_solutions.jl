@@ -5,21 +5,27 @@ struct CombinedInterpolationData <: SciMLBase.AbstractDiffEqInterpolation
     tᵢ
 end
 function (interp::CombinedInterpolationData)(tvals, idxs, deriv, p, continuity::Symbol=:left)
-    val = similar(interp.sol₊.u, length(tvals))
+    #val = similar(interp.sol₊.u, length(tvals))
+    val = fill(interp.sol₊.u[1], length(tvals))
     interp(val, tvals, idxs, deriv, p, continuity)
 end
 function (interp::CombinedInterpolationData)(val, tvals, idxs, deriv, p, continuity::Symbol=:left)
+    interp(val, [tvals], idxs, deriv, p, continuity)
+end
+function (interp::CombinedInterpolationData)(val, tvals::Vector, idxs, deriv, p, continuity::Symbol=:left)
     i₊ = tvals .≥ interp.tᵢ
     i₋ = tvals .< interp.tᵢ
     if any(i₊)
         val₊ = interp.sol₊.interp(tvals[i₊], idxs, deriv, p, continuity)
         val[i₊] .= val₊.u
+        syms, indepsym, observed, p = val₊.syms, val₊.indepsym, val₊.observed, val₊.p
     end
     if any(i₋)
         val₋ = interp.sol₋.interp(tvals[i₋], idxs, deriv, p, continuity)
         val[i₋] .= val₋.u
+        syms, indepsym, observed, p = val₋.syms, val₋.indepsym, val₋.observed, val₋.p
     end
-    RecursiveArrayTools.DiffEqArray(val, tvals, val₊.syms, val₊.indepsym, val₊.observed, val₊.p)
+    RecursiveArrayTools.DiffEqArray(val, tvals, syms, indepsym, observed, p)
 end
 
 
@@ -41,7 +47,7 @@ function combine_solutions(sol₋, sol₊)
     t = [reverse(sol₋.t); sol₊.t]
     u = [reverse(sol₋.u); sol₊.u]
     retcode = sol₊.retcode  # Could be something more clever; maybe the worse retcode?
-    problem = ODEProblem(sol₊.prob.f, u[1], (t[1], t[end]))
+    problem = ODEProblem(sol₊.prob.f, u[1], (t[1], t[end]), sol₊.prob.p)
     if sol₊.dense
         interp = CombinedInterpolationData(sol₋, sol₊, sol₊.t[1])
         DiffEqBase.build_solution(problem, alg, t, u, dense=true, retcode=retcode, interp=interp)
