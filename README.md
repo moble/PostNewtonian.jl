@@ -8,6 +8,12 @@
 [![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
 [![PkgEval](https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/P/PostNewtonian.svg)](https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/report.html)
 
+This package computes orbital dynamics of and waveforms from binary black-hole
+systems, in the post-Newtonian approximation.  See [the
+documentation](https://moble.github.io/PostNewtonian.jl/stable) for details.
+
+
+
 ## Citing
 
 See [`CITATION.bib`](CITATION.bib) for the relevant reference(s).
