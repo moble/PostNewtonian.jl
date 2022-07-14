@@ -15,6 +15,9 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
+        "PN Expressions" => "pn_expressions.md",
+        "Termination criteria" => "termination_criteria.md",
+        "Utilities" => "utilities.md",
     ],
 )
 

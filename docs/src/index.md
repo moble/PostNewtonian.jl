@@ -10,12 +10,26 @@ approximation](https://en.wikipedia.org/wiki/Post-Newtonian_expansion).
 Currently, there is no support for eccentric systems, but general precessing
 quasicircular systems are supported.
 
+## Integrating inspiral dynamics
 
-
-
-```@index
+```@docs
+inspiral
 ```
 
-```@autodocs
-Modules = [PostNewtonian]
+## Computing mode weights from the inspiral data
+
+```@docs
+h!
+```
+
+## Detecting up-down instability
+
+```@docs
+up_down_instability
+```
+
+
+## Index of all functions
+
+```@index
 ```

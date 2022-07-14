@@ -169,8 +169,8 @@ Integrate the orbital dynamics of a non-eccentric compact binary.
   * `Rᵢ=Rotor(true)`: Initial orientation of binary.
   * `PNSys=TaylorT1`: Currently the only possibility.
   * `PNOrder=7//2`: Not actually used currently.
-  * `check_up_down_instability=true`: Warn if the [Up-down instability](@ref)
-    is likely to affect this system.
+  * `check_up_down_instability=true`: Warn if the "up-down instability" (see
+    below) is likely to affect this system.
   * `time_stepper=AutoVern9(Rodas5())`: Choice of solver in OrdinaryDiffEq to
     integrate ODE.
   * `abstol=eps(T)^(11//16)`: Absolute tolerance of ODE solver, where `T` is
