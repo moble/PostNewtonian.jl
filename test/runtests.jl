@@ -26,6 +26,7 @@ using Random
 using OrdinaryDiffEq
 using Quaternionic
 
+using Aqua
 
 enabled_tests = lowercase.(ARGS)
 
@@ -47,6 +48,7 @@ function addtests(fname)
 end
 
 @testset verbose=true "PostNewtonian" begin
+    addtests("aqua.jl")
     addtests("inspiral.jl")
 end
 
