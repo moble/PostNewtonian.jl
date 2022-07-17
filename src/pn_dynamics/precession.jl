@@ -111,12 +111,12 @@ Compute the angular velocity of orbital precession according to Bohé et al.
 
 As [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520) explain above their
 Eq. (4.1), the orbital precession is given by the time derivative of the
-orbital axis: ``𝓵̇ = 𝛡 × 𝓵``, where the angular velocity is along the separation
-vector ``𝓷``, so that ``𝛡 = ϖ 𝓷``.  And in turn, they define ``aₗ ≔ r ω ϖ``,
-where ``r`` is the separation and ``ω`` is the orbital angular frequency.
-Then, they define the PN parameter ``γ≔M/r`` and we have ``Mω = v³`` so that
-``ϖ = γ aₗ / v³``.  The parameters ``γ`` and ``aₗ`` are given by Eqs. (4.3) and
-(4.4), and given here by the functions [`γ`](@ref) and  [`aₗ`](@ref).
+orbital axis: 𝓵̇ = 𝛡 × 𝓵, where the angular velocity is along the separation
+vector 𝓷, so that 𝛡 = ϖ 𝓷.  And in turn, they define aₗ ≔ r ω ϖ, where r is the
+separation and ω is the orbital angular frequency.  Then, they define the PN
+parameter γ≔M/r and we have Mω = v³ so that ϖ = γ aₗ / v³.  The parameters γ
+and aₗ are given by Eqs. (4.3) and (4.4), and given here by the functions
+[`γ`](@ref) and [`aₗ`](@ref).
 
 """
 function 𝛡(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)

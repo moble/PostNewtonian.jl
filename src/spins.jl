@@ -28,7 +28,7 @@ Differential spin vector ``M(a⃗₂-a⃗₁)``.
 """
     χₛ(M₁, M₂, χ⃗₁, χ⃗₂)
 
-Symmetric spin vector (χ⃗₁+χ⃗₂)/2.
+Symmetric spin vector ``(χ⃗₁+χ⃗₂)/2``.
 
 """
 χₛ(M₁, M₂, χ⃗₁, χ⃗₂) = (χ⃗₁ + χ⃗₂) / 2
@@ -37,7 +37,7 @@ Symmetric spin vector (χ⃗₁+χ⃗₂)/2.
 """
     χₐ(M₁, M₂, χ⃗₁, χ⃗₂)
 
-Antisymmetric spin vector (χ⃗₁-χ⃗₂)/2.
+Antisymmetric spin vector ``(χ⃗₁-χ⃗₂)/2``.
 
 """
 χₐ(M₁, M₂, χ⃗₁, χ⃗₂) = (χ⃗₁ - χ⃗₂) / 2

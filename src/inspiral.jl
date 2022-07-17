@@ -159,7 +159,7 @@ end
 """
     inspiral(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; kwargs...)
 
-Integrate the orbital dynamics of a non-eccentric compact binary.
+Integrate the orbital dynamics of an inspiraling non-eccentric compact binary.
 
 
 ## Keyword arguments

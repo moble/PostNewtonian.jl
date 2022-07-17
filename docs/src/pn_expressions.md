@@ -29,12 +29,3 @@ Modules = [PostNewtonian]
 Pages   = ["pn_dynamics/precession.jl"]
 Order   = [:module, :type, :constant, :function, :macro]
 ```
-
-# Angular momentum
-
-```@autodocs
-Modules = [PostNewtonian]
-Pages   = ["pn_dynamics/angular_momentum.jl"]
-Order   = [:module, :type, :constant, :function, :macro]
-```
-

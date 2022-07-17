@@ -6,9 +6,9 @@ Compute the rate of energy and angular-momentum absorption into each black hole
 in a binary.
 
 The returned quantity is a tuple `(Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂)`, representing the
-corresponding rates of change of spin (magnitude) and mass on black holes 1 and
-2.  These apply to general — possibly precessing — non-eccentric binaries.
-This collection of terms comes from [Alvi
+corresponding rates of change of spin (magnitude) and mass on black hole 1 and
+black hole 2.  These apply to general — possibly precessing — non-eccentric
+binaries.  This collection of terms comes from [Alvi
 (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  It probably
 wouldn't be too hard to extend Alvi's analysis to eccentric systems.
 
