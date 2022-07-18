@@ -8,13 +8,12 @@ end
 
 
 """
-    recalculate!(u̇, u, pn)
+    recalculate!(u̇, u, p)
 
-Calculate the new values of `u̇` based on the values of `u`.  Note that this
-modifies both `u̇` and `pn` in place.
+Calculate the new values of `u̇` based on the values of `u`.
 
 """
-function recalculate!(u̇, u, ::TaylorT1{PNOrder,T}) where {PNOrder,T}
+function recalculate!(u̇, u, p)
     u = u[1:13]
     M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v = u
     χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
