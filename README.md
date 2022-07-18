@@ -13,7 +13,7 @@
 
 This package computes orbital dynamics of and waveforms from binary black-hole
 systems, in the post-Newtonian approximation.  See [the
-documentation](https://moble.github.io/PostNewtonian.jl/stable) for details.
+documentation](https://moble.github.io/PostNewtonian.jl/dev) for details.
 
 
 
