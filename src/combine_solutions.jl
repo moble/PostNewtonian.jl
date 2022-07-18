@@ -44,8 +44,8 @@ interpolation, and iterations should behave exactly as [described in the
 """
 function combine_solutions(sol₋, sol₊)
     alg = sol₊.alg
-    t = [reverse(sol₋.t); sol₊.t]
-    u = [reverse(sol₋.u); sol₊.u]
+    t = [reverse(sol₋.t[2:end]); sol₊.t]
+    u = [reverse(sol₋.u[2:end]); sol₊.u]
     retcode = sol₊.retcode  # Could be something more clever; maybe the worse retcode?
     problem = ODEProblem(sol₊.prob.f, u[1], (t[1], t[end]), sol₊.prob.p)
     if sol₊.dense
