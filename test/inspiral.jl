@@ -41,7 +41,7 @@
 
     @test sol2.retcode == :Terminated
     @test sol2[end, 1] ≈ v₁
-    iᵢ = argmin(abs.(sol2.t - 0.0))  # Assuming uᵢ corresponds to t==0.0
+    iᵢ = argmin(abs.(sol2.t .- 0.0))  # Assuming uᵢ corresponds to t==0.0
     @test sol2[iᵢ] ≈ uᵢ
     @test sol2[end, end] ≈ vₑ
 
