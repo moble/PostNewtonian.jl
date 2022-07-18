@@ -4,27 +4,54 @@ struct CombinedInterpolationData <: SciMLBase.AbstractDiffEqInterpolation
     sol₊
     tᵢ
 end
+function (interp::CombinedInterpolationData)(tvals::AbstractFloat, idxs, deriv, p, continuity::Symbol=:left)
+    if tvals ≥ interp.tᵢ
+        interp.sol₊.interp(tvals, idxs, deriv, p, continuity)
+    else
+        interp.sol₊.interp(tvals, idxs, deriv, p, continuity)
+    end
+end
+function (interp::CombinedInterpolationData)(val, tvals::AbstractFloat, idxs, deriv, p, continuity::Symbol=:left)
+    if tvals ≥ interp.tᵢ
+        interp.sol₊.interp(val, tvals, idxs, deriv, p, continuity)
+    else
+        interp.sol₊.interp(val, tvals, idxs, deriv, p, continuity)
+    end
+end
 function (interp::CombinedInterpolationData)(tvals, idxs, deriv, p, continuity::Symbol=:left)
-    #val = similar(interp.sol₊.u, length(tvals))
-    val = fill(interp.sol₊.u[1], length(tvals))
+    val = if idxs isa Integer
+        Vector{eltype(interp.sol₊)}(undef, length(tvals))
+    elseif isnothing(idxs)
+        [Vector{eltype(interp.sol₊)}(undef, size(interp.sol₊, 1)) for _ in eachindex(tvals)]
+    else
+        [Vector{eltype(interp.sol₊)}(undef, length(idxs)) for _ in eachindex(tvals)]
+    end
     interp(val, tvals, idxs, deriv, p, continuity)
 end
 function (interp::CombinedInterpolationData)(val, tvals, idxs, deriv, p, continuity::Symbol=:left)
-    interp(val, [tvals], idxs, deriv, p, continuity)
-end
-function (interp::CombinedInterpolationData)(val, tvals::Vector, idxs, deriv, p, continuity::Symbol=:left)
     i₊ = tvals .≥ interp.tᵢ
     i₋ = tvals .< interp.tᵢ
-    if any(i₊)
-        val₊ = interp.sol₊.interp(tvals[i₊], idxs, deriv, p, continuity)
-        val[i₊] .= val₊.u
-        syms, indepsym, observed, p = val₊.syms, val₊.indepsym, val₊.observed, val₊.p
+    if idxs isa Integer
+        for i in eachindex(tvals)
+            if tvals[i] ≥ interp.tᵢ
+                val[i] = interp.sol₊.interp(tvals[i], idxs, deriv, p, continuity)
+            else
+                val[i] = interp.sol₋.interp(tvals[i], idxs, deriv, p, continuity)
+            end
+        end
+    else
+        for i in eachindex(tvals)
+            if tvals[i] ≥ interp.tᵢ
+                val[i] .= interp.sol₊.interp(tvals[i], idxs, deriv, p, continuity)
+            else
+                val[i] .= interp.sol₋.interp(tvals[i], idxs, deriv, p, continuity)
+            end
+        end
     end
-    if any(i₋)
-        val₋ = interp.sol₋.interp(tvals[i₋], idxs, deriv, p, continuity)
-        val[i₋] .= val₋.u
-        syms, indepsym, observed, p = val₋.syms, val₋.indepsym, val₋.observed, val₋.p
-    end
+    syms = interp.sol₊.prob.f.syms
+    indepsym = interp.sol₊.prob.f.indepsym
+    observed = interp.sol₊.prob.f.observed
+    p = interp.sol₊.prob.p
     RecursiveArrayTools.DiffEqArray(val, tvals, syms, indepsym, observed, p)
 end
 
