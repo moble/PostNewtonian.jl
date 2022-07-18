@@ -10,7 +10,7 @@ makedocs(;
     sitename="PostNewtonian.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://moble.github.io/PostNewtonian.jl",
+        canonical="https://moble.github.io/PostNewtonian.jl/stable/",
         assets=String[],
     ),
     pages=[
