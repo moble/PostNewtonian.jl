@@ -21,8 +21,9 @@ this function accepts optional arguments either as positional arguments (which
     We do *not* expect the result of this function to be identical to the
     result from `GWFrames`.  In particular, this package uses more general
     expressions for the tidal heating terms, fixes an error in the 2PN
-    quadratic-spin terms for the waveform modes, and uses more accurate (and
-    efficient) ODE integration.
+    quadratic-spin terms for the waveform modes, uses a more accurate method to
+    compute the number of steps per orbit (by default), and uses more accurate
+    (and efficient) ODE integration.
 
 The Julia interface is more detailed, flexible, and efficient than the simple
 `GWFrames` interface that this function emulates.  In particular,
@@ -56,10 +57,10 @@ arguments.
     in data.  If this is less than `Omega_orb_i`, the system is integrated
     backwards in time from the latter value to this value.
   * `R_frame_i=Rotor(1)`: Initial orientation of the frame.
-  * `MinStepsPerOrbit=32`: (Approximate) minimum number of time steps in the
-    output data per orbit.  Because the waveform modes go as high as ``m=8``,
-    this number should be at least 16 to avoid Nyquist aliasing in those modes.
-    Note that this value may be overridden by `dt` (see below).
+  * `MinStepsPerOrbit=32`: Number of time steps in the output data per orbit.
+    Because the waveform modes go as high as ``m=8``, this number should be at
+    least 16 to avoid Nyquist aliasing in those modes.  Note that this value
+    may be overridden by `dt` (see below).
   * `PNWaveformModeOrder=3.5`: Maximum PN order of terms in the
     waveform formulas.  Currently, only 3.5 is supported.
   * `PNOrbitalEvolutionOrder=4.0`: Maximum PN order of terms in the
@@ -77,16 +78,16 @@ arguments.
 This function returns a NamedTuple with the following keys:
 
   * `t`: The vector of time steps at which the data are evaluated
-  * `data`: Matrix of complex values of the mode weights.  Note that this
-    matrix is essentially transposed in python.  The first dimension enumerates
-    the modes, starting with ``(2,-2)``, then ``(2,-1)``, up to ``(2,2)`,
-    followed by ``(3,-3)``, and so on up to ``(8,8)``.  The second dimension
-    enumerates the values at each instant of time.  This is the same ordering
-    as results from `GWFrames`, but opposite to the ordering used by the `sxs`
-    and `scri` packages.  However, also note that conversion between Julia and
-    Python will frequently automatically transpose matrices, because Julia is
-    Fortran-ordered by default, whereas numpy is C-ordered.  It is best to
-    check the shape manually to be sure.
+  * `data`: Matrix of complex values of the mode weights.  The shape is 77 x
+    length(t).  The first dimension enumerates the modes, starting with
+    ``(2,-2)``, then ``(2,-1)``, up to ``(2,2)``, followed by ``(3,-3)``, and
+    so on up to ``(8,8)``.  The second dimension enumerates the values at each
+    instant of time.  This is the same ordering as results from `GWFrames`, but
+    opposite to the ordering used by the `sxs` and `scri` packages.  However,
+    also note that conversion between Julia and Python will frequently
+    automatically transpose matrices, because Julia is Fortran-ordered by
+    default, whereas numpy is C-ordered.  It is best to check the shape
+    manually to be sure which dimension is which.
   * `frame`: Matrix of shape 4 x length(t) representing the frame-orientation
     quaternion as a function of time `t`.
   * `M1`, `M2`: Vectors of the respective masses as functions of time `t`.
@@ -105,7 +106,7 @@ of a `WaveformModes` object in the `scri` or `sxs` python packages — as in
 """
 function PNWaveform(
     Approximant::String, delta::Float64, chi1_i::Vector{Float64}, chi2_i::Vector{Float64}, Omega_orb_i::Float64,
-    Omega_orb_0::Float64=Omega_orb_i, R_frame_i::Vector{Float64}=[1.0], MinStepsPerOrbit::Integer=32,
+    Omega_orb_0::Float64, R_frame_i::Vector{Float64}=[1.0], MinStepsPerOrbit::Integer=32,
     PNWaveformModeOrder::Float64=3.5, PNOrbitalEvolutionOrder::Float64=4.0, dt::Float64=0.0, quiet::Bool=true
 )
     PNWaveform(
