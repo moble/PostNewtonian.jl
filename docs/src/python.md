@@ -12,7 +12,7 @@
    
    Make sure that the `julia` binary is on your `PATH`.
    
-2. Create a conda<sup>(*)</sup> env just for this task
+2. Create a conda[^1] env just for this task
    ```bash
    conda create -n julia_pn python numpy matplotlib
    conda activate julia_pn
@@ -48,9 +48,8 @@
 The last line above uses the [`PNWaveform`](@ref) function from this package,
 which is meant to emulate the original syntax from the `GWFrames` package.
 
----
 
-<sup>(*)</sup> In general, it's better to `conda install -y mamba` in your
-"base" conda env, and then just use `mamba` wherever you would have used
-`conda`; `mamba` is a complete drop-in replacement, but is much faster because
-it's written in C instead of python.
+[^1]: In general, it's better to `conda install -y mamba` in your "base" conda
+      env, and then just use `mamba` wherever you would have used `conda`;
+      `mamba` is a complete drop-in replacement, but is much faster because
+      it's written in C instead of python.
