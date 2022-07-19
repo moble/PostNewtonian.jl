@@ -8,13 +8,13 @@ end
 
 
 """
-    recalculate!(u̇, u, pn)
+    recalculate!(u̇, u, p)
 
-Calculate the new values of `u̇` based on the values of `u`.  Note that this
-modifies both `u̇` and `pn` in place.
+Calculate the new values of `u̇` based on the values of `u`.
 
 """
-function recalculate!(u̇, u, ::TaylorT1{PNOrder,T}) where {PNOrder,T}
+function recalculate!(u̇, u, p)
+    u = u[1:13]
     M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v = u
     χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
     χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
@@ -22,8 +22,8 @@ function recalculate!(u̇, u, ::TaylorT1{PNOrder,T}) where {PNOrder,T}
     χ₁ = absvec(χ⃗₁)
     χ₂ = absvec(χ⃗₂)
     (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(u)
-    let ℓ̂=ℓ̂(R), Ω⃗ᵪ₁=Ω⃗ᵪ₁(u), Ω⃗ᵪ₂=Ω⃗ᵪ₂(u), Ω⃗ₚ=Ω⃗ₚ(u), 𝓕=𝓕(u), 𝓔′=𝓔′(u)
-        Ω⃗ = Ω⃗ₚ + Ω(v=v, M=M₁+M₂) * ℓ̂
+    let ℓ̂=ℓ̂(R), Ω=Ω(v=v, M=M₁+M₂), Ω⃗ᵪ₁=Ω⃗ᵪ₁(u), Ω⃗ᵪ₂=Ω⃗ᵪ₂(u), Ω⃗ₚ=Ω⃗ₚ(u), 𝓕=𝓕(u), 𝓔′=𝓔′(u)
+        Ω⃗ = Ω⃗ₚ + Ω * ℓ̂
         v̇ = - (𝓕 + Ṁ₁ + Ṁ₂) / 𝓔′
         χ̂₁ = ifelse(iszero(χ₁), ℓ̂, χ⃗₁ / χ₁)
         χ̂₂ = ifelse(iszero(χ₂), ℓ̂, χ⃗₂ / χ₂)
@@ -33,6 +33,9 @@ function recalculate!(u̇, u, ::TaylorT1{PNOrder,T}) where {PNOrder,T}
         u̇[6:8] = ((Ṡ₂ / M₂^2 - 2χ₂ * Ṁ₂/M₂) * χ̂₂ + Ω⃗ᵪ₂ × χ⃗₂).vec
         u̇[9:12] = (Ω⃗ * R / 2).components
         u̇[13] = v̇
+        if length(u̇) == 14
+            u̇[14] = Ω
+        end
     end
     nothing
 end

@@ -18,6 +18,7 @@ makedocs(;
         "PN Expressions" => "pn_expressions.md",
         "Termination criteria" => "termination_criteria.md",
         "Utilities" => "utilities.md",
+        "GWFrames" => "gwframes.md",
     ],
 )
 

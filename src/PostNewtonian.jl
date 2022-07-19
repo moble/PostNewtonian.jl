@@ -65,4 +65,7 @@ export inspiral,
 include("mode_weights.jl")
 export h!, mode_weights!
 
-end
+include("gwframes.jl")
+export GWFrames
+
+end  # module PostNewtonian
