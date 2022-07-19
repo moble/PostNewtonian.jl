@@ -1,6 +1,6 @@
 @testset verbose=true "Inspiral" begin
     Random.seed!(1234)
-    T, stepper = Float64, AutoVern9(Rodas5())
+    T = Float64
     M₁ = T(5//8)
     M₂ = T(3//8)
     χ⃗₁ = normalize(randn(QuatVec{T})) * rand(T(0):T(1//1_000_000):T(1))

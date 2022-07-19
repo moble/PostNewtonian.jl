@@ -12,7 +12,9 @@ Compute a PN waveform, with the same call signature as `GWFrames.PNWaveform`
 
 This is essentially a compatibility layer for the corresponding function in
 [`GWFrames`](https://github.com/moble/GWFrames/blob/01b39bfe/Code/PNWaveforms.cpp#L83-L88),
-with one additional optional argument: `dt` (see below).
+with one additional optional argument: `dt` (see below).  Also, this function
+accepts optional arguments either as positional arguments (which `GWFrames`
+requires) or as keyword arguments.
 
 !!! warning
 
@@ -44,7 +46,10 @@ returned by this function.
   * `Omega_orb_i`: Orbital angular frequency at initial instant
 
 
-## Keyword arguments
+## Optional arguments
+
+As mentioned above, the following may be given *either* as positional arguments
+in this order (like `GWFrames` requires), or as keyword arguments.
 
   * `Omega_orb_0=Omega_orb_i`: Orbital angular frequency at first instant found
     in data.  If this is less than `Omega_orb_i`, the system is integrated
@@ -87,6 +92,10 @@ This function returns a NamedTuple with the following keys:
     functions of time `t`.
   * `v`: PN velocity parameter as a function of time `t`.
   * `Phi`: Orbital phase as a function of time `t`.
+
+Because this is a NamedTuple, the fields can be accessed much like the fields
+of a `WaveformModes` object in the `scri` or `sxs` python packages — as in
+`w.t` and `w.data`, where `w` is the object returned by this function.
 
 """
 function PNWaveform(

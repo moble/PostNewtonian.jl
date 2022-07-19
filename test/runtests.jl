@@ -50,6 +50,7 @@ end
 @testset verbose=true "PostNewtonian" begin
     addtests("aqua.jl")
     addtests("inspiral.jl")
+    addtests("gwframes.jl")
 end
 
 if help
