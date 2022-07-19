@@ -12,6 +12,9 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 jobs:
   test:
+    if: >-
+        !contains(github.event.head_commit.message, '[skip ci]')
+        && !contains(github.event.head_commit.message, '[skip tests]')
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -45,6 +48,8 @@ jobs:
         with:
           files: lcov.info
   docs:
+    if: >-
+        !contains(github.event.head_commit.message, '[skip ci]')
     name: Documentation
     runs-on: ubuntu-latest
     steps:
