@@ -22,6 +22,7 @@ code you don't want to measure:
 using PostNewtonian
 using Test
 
+using Logging
 using Random
 using OrdinaryDiffEq
 using Quaternionic
@@ -50,6 +51,7 @@ end
 @testset verbose=true "PostNewtonian" begin
     addtests("aqua.jl")
     addtests("inspiral.jl")
+    addtests("up_down_instability.jl")
     addtests("gwframes.jl")
 end
 
