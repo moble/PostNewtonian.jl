@@ -77,24 +77,26 @@ arguments.
 
 This function returns a NamedTuple with the following keys:
 
-  * `t`: The vector of time steps at which the data are evaluated
+  * `t`: The vector of time steps at which the data are evaluated.  The time
+    ``t=0`` corresponds to the initial values that are arguments to this
+    function.
   * `data`: Matrix of complex values of the mode weights.  The shape is 77 x
-    length(t).  The first dimension enumerates the modes, starting with
+    length(t) x 77.  The first dimension enumerates the values at each instant
+    of time.  The second dimension enumerates the modes, starting with
     ``(2,-2)``, then ``(2,-1)``, up to ``(2,2)``, followed by ``(3,-3)``, and
-    so on up to ``(8,8)``.  The second dimension enumerates the values at each
-    instant of time.  This is the same ordering as results from `GWFrames`, but
-    opposite to the ordering used by the `sxs` and `scri` packages.  However,
-    also note that conversion between Julia and Python will frequently
-    automatically transpose matrices, because Julia is Fortran-ordered by
+    so on up to ``(8,8)``.  This is the opposite ordering as results from
+    `GWFrames`, but the same as the ordering used by the `sxs` and `scri`
+    packages.  However, also note that certain conversions between Julia and
+    Python *may* transpose matrices, because Julia is Fortran-ordered by
     default, whereas numpy is C-ordered.  It is best to check the shape
     manually to be sure which dimension is which.
-  * `frame`: Matrix of shape 4 x length(t) representing the frame-orientation
+  * `frame`: Matrix of shape length(t) x 4 representing the frame-orientation
     quaternion as a function of time `t`.
   * `M1`, `M2`: Vectors of the respective masses as functions of time `t`.
     Note that only at the time corresponding to `Omega_orb_i` will the total
     mass be precisely 1.  Generally, tidal heating will lead to time-dependent
     masses.
-  * `chi1`, `chi2`: Matrices of shape 3 x length(t) representing the spins as
+  * `chi1`, `chi2`: Matrices of shape length(t) x 3 representing the spins as
     functions of time `t`.
   * `v`: PN velocity parameter as a function of time `t`.
   * `Phi`: Orbital phase as a function of time `t`.
@@ -166,13 +168,13 @@ function PNWaveform(
 
     # Return
     (
-        t=solution.t .- solution.t[end],
-        data=h,
-        frame=solution[9:12, :], # R
+        t=solution.t,
+        data=h',
+        frame=solution[9:12, :]', # R
         M1=solution[1, :], # M₁
         M2=solution[2, :], # M₂
-        chi1=solution[3:5, :], # χ⃗₁
-        chi2=solution[6:8, :], # χ⃗₂
+        chi1=solution[3:5, :]', # χ⃗₁
+        chi2=solution[6:8, :]', # χ⃗₂
         v=solution[13, :], # v
         Phi=solution[14, :], # Φ
     )
