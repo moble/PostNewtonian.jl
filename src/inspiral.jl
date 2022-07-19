@@ -10,7 +10,7 @@ value(x) = hasproperty(x, :value) ? getproperty(x, :value) : x
 
 
 """
-    termination_forwards(vₑ)
+    termination_forwards(vₑ, [quiet])
 
 Construct termination criteria of solving PN evolution forwards in time
 
@@ -18,8 +18,19 @@ These criteria include checking that the masses are positive and the
 dimensionless spins are less than 1, as well as ensuring that the evolution
 will terminate at `vₑ`.
 
+The optional `quiet` argument will silence informational messages about
+reaching the target value of `vₑ` if set to `true`, but warnings will still be
+issued when terminating for other reasons.  If you want to quiet warnings also,
+you can do something like this:
+```julia
+using Logging
+with_logger(SimpleLogger(Logging.Error)) do
+    <your code goes here>
+end
+```
+
 """
-function termination_forwards(vₑ)
+function termination_forwards(vₑ, quiet=false)
     # Triggers the `continuous_terminator!` whenever one of these conditions crosses 0.
     # More precisely, the integrator performs a root find to finish precisely
     # when one of these conditions crosses 0.
@@ -40,7 +51,7 @@ function termination_forwards(vₑ)
         elseif event_index == 4
             @warn "Terminating forwards evolution because χ₂>1.  Suggests early breakdown of PN."
         elseif event_index == 5
-            @info (
+            quiet || @info (
                 "Terminating forwards evolution because the PN parameter 𝑣 "
                 * "has reached 𝑣ₑ=$(value(vₑ)).  This is ideal."
             )
@@ -57,7 +68,7 @@ end
 
 
 """
-    termination_backwards(v₁)
+    termination_backwards(v₁, [quiet])
 
 Construct termination criteria of solving PN evolution backwards in time
 
@@ -65,8 +76,19 @@ These criteria include checking that the masses are positive and the
 dimensionless spins are less than 1, as well as ensuring that the evolution
 will terminate at `v₁`.
 
+The optional `quiet` argument will silence informational messages about
+reaching the target value of `v₁` if set to `true`, but warnings will still be
+issued when terminating for other reasons.  If you want to quiet warnings also,
+you can do something like this:
+```julia
+using Logging
+with_logger(SimpleLogger(Logging.Error)) do
+    <your code goes here>
+end
+```
+
 """
-function termination_backwards(v₁)
+function termination_backwards(v₁, quiet=false)
     function terminators_backwards(out,u,t,integrator)
         out[1] = u[1]  # Terminate if M₁≤0
         out[2] = u[2]  # Terminate if M₂≤0
@@ -84,7 +106,7 @@ function termination_backwards(v₁)
         elseif event_index == 4
             @warn "Terminating backwards evolution because χ₂>1.  Suggests problem with PN."
         elseif event_index == 5
-            @info (
+            quiet || @info (
                 "Terminating backwards evolution because the PN parameter 𝑣 "
                 * "has reached 𝑣₁=$(value(v₁)).  This is ideal."
             )
@@ -119,7 +141,7 @@ function dtmin_terminator(T)
         abs(integrator.dt) < ϵ
     end
     function discrete_terminator!(integrator)
-        @info "Terminating forwards evolution because |dt=$(integrator.dt)| < ϵ=$(ϵ)"
+        @warn "Terminating forwards evolution because |dt=$(integrator.dt)| < ϵ=$(ϵ)"
         terminate!(integrator)
     end
     DiscreteCallback(
@@ -145,7 +167,7 @@ function nonfinite_terminator()
         !(all(isfinite, u) && isfinite(t) && isfinite(integrator.dt))
     end
     function discrete_terminator!(integrator)
-        @info "Terminating forwards evolution because a non-finite number was found"
+        @warn "Terminating forwards evolution because a non-finite number was found"
         terminate!(integrator)
     end
     DiscreteCallback(
@@ -187,6 +209,17 @@ Integrate the orbital dynamics of an inspiraling non-eccentric compact binary.
     the termination criteria have the chance to exit gracefully.  Note that a
     true value here is critical if the `dtmin_terminator` callback is to have
     any effect.
+  * `quiet=false`: If set to `true`, informational messages about successful
+    terminations of the ODE integrations (which occur when the target ``v`` is
+    reached in either direction) will be silenced.  Warnings will still be
+    issued when terminating for other reasons; if you wish to silence them too,
+    you should do something like
+    ```julia
+    using Logging
+    with_logger(SimpleLogger(Logging.Error)) do
+        <your code goes here>
+    end
+    ```
 
 All remaining keyword arguments are passed to the [`solve`
 function](https://github.com/SciML/DiffEqBase.jl/blob/8e6173029c630f6908252f3fc28a69c1f0eab456/src/solve.jl#L393)
@@ -302,6 +335,7 @@ function inspiral(
     termination_criteria_forwards=nothing,
     termination_criteria_backwards=nothing,
     force_dtmin=true, integrate_orbital_phase=false,
+    quiet=false,
     solve_kwargs...
 )
     if Ω₁ > Ωᵢ
@@ -336,26 +370,27 @@ function inspiral(
     end
 
     inspiral(
-        uᵢ,
-        v₁, vₑ,
+        uᵢ, Ω₁, Ωₑ, v₁, vₑ,
         PNSys(PNOrder, T), T,
         check_up_down_instability, time_stepper,
         reltol, abstol,
         termination_criteria_forwards,
         termination_criteria_backwards,
-        force_dtmin, integrate_orbital_phase;
+        force_dtmin, integrate_orbital_phase,
+        quiet;
         solve_kwargs...
     )
 end
 
 function inspiral(
-    uᵢ, v₁, vₑ,
+    uᵢ, Ω₁, Ωₑ, v₁, vₑ,
     pn::PNSystem, T,
     check_up_down_instability, time_stepper,
     reltol, abstol,
     termination_criteria_forwards,
     termination_criteria_backwards,
-    force_dtmin, integrate_orbital_phase;
+    force_dtmin, integrate_orbital_phase,
+    quiet;
     solve_kwargs...
 )
 
@@ -370,7 +405,7 @@ function inspiral(
         end
         if χₚₑᵣₚ ≤ 1e-2
             (Ω₊, Ω₋) = up_down_instability(uᵢ)
-            if Ω₁ < Ω₋ < 1//4 || Ω₁ < Ω₊ < 1//4
+            if Ω₁ < min(Ω₋, 1//2) && min(Ωₑ, 1//2) > Ω₊
                 @warn (
                     "This system is likely to encounter the up-down instability in the\n"
                     * "frequency range (Ω₊, Ω₋)=$((Ω₊, Ω₋)).\n"
@@ -386,7 +421,7 @@ function inspiral(
     tspan = (T(0), 4estimated_time_to_merger)
     if isnothing(termination_criteria_forwards)
         termination_criteria_forwards = CallbackSet(
-            termination_forwards(vₑ),
+            termination_forwards(vₑ, quiet),
             dtmin_terminator(T),
             nonfinite_terminator()
         )
@@ -420,7 +455,7 @@ function inspiral(
         tspan = (T(0), -3estimated_backwards_time)
         if isnothing(termination_criteria_backwards)
             termination_criteria_backwards = CallbackSet(
-                termination_backwards(v₁),
+                termination_backwards(v₁, quiet),
                 dtmin_terminator(T),
                 nonfinite_terminator()
             )

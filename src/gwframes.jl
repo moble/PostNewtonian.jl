@@ -12,15 +12,15 @@ Compute a PN waveform, with the same call signature as `GWFrames.PNWaveform`
 
 This is essentially a compatibility layer for the corresponding function in
 [`GWFrames`](https://github.com/moble/GWFrames/blob/01b39bfe/Code/PNWaveforms.cpp#L83-L88),
-with one additional optional argument: `dt` (see below).  Also, this function
-accepts optional arguments either as positional arguments (which `GWFrames`
-requires) or as keyword arguments.
+with two additional optional arguments: `dt` and `quiet` (see below).  Also,
+this function accepts optional arguments either as positional arguments (which
+`GWFrames` requires) or as keyword arguments.
 
 !!! warning
 
     We do *not* expect the result of this function to be identical to the
     result from `GWFrames`.  In particular, this package uses more general
-    expressions for the tidal heating terms, fixed an error in the 2PN
+    expressions for the tidal heating terms, fixes an error in the 2PN
     quadratic-spin terms for the waveform modes, and uses more accurate (and
     efficient) ODE integration.
 
@@ -49,7 +49,8 @@ returned by this function.
 ## Optional arguments
 
 As mentioned above, the following may be given *either* as positional arguments
-in this order (like `GWFrames` requires), or as keyword arguments.
+in this order (though any number of them may be omitted), or as keyword
+arguments.
 
   * `Omega_orb_0=Omega_orb_i`: Orbital angular frequency at first instant found
     in data.  If this is less than `Omega_orb_i`, the system is integrated
@@ -65,6 +66,10 @@ in this order (like `GWFrames` requires), or as keyword arguments.
     orbital-evolution formulas.  Currently, only 4.0 is supported.
   * `dt=0`: Uniform time step size of the output.  If this is not a strictly
     positive number, `MinStepsPerOrbit` will be used instead.
+  * `quiet=true`: If `false`, show informational messages about the reasons for
+    terminating the ODE integration.  In either case, warnings will still be
+    issued if terminating for bad or suspicious reasons.  See the documentation
+    of [`inspiral`](@ref) for an example of how to filter warnings also.
 
 
 ## Returned values
@@ -101,18 +106,18 @@ of a `WaveformModes` object in the `scri` or `sxs` python packages — as in
 function PNWaveform(
     Approximant::String, delta::Float64, chi1_i::Vector{Float64}, chi2_i::Vector{Float64}, Omega_orb_i::Float64,
     Omega_orb_0::Float64=Omega_orb_i, R_frame_i::Vector{Float64}=[1.0], MinStepsPerOrbit::Integer=32,
-    PNWaveformModeOrder::Float64=3.5, PNOrbitalEvolutionOrder::Float64=4.0, dt::Float64=0.0
+    PNWaveformModeOrder::Float64=3.5, PNOrbitalEvolutionOrder::Float64=4.0, dt::Float64=0.0, quiet::Bool=true
 )
     PNWaveform(
         Approximant, delta, chi1_i, chi2_i, Omega_orb_i;
         Omega_orb_0, R_frame_i, MinStepsPerOrbit,
-        PNWaveformModeOrder, PNOrbitalEvolutionOrder, dt
+        PNWaveformModeOrder, PNOrbitalEvolutionOrder, dt, quiet
     )
 end
 function PNWaveform(
     Approximant::String, delta::Float64, chi1_i::Vector{Float64}, chi2_i::Vector{Float64}, Omega_orb_i::Float64;
     Omega_orb_0::Float64=Omega_orb_i, R_frame_i::Vector{Float64}=[1.0], MinStepsPerOrbit::Integer=32,
-    PNWaveformModeOrder::Float64=3.5, PNOrbitalEvolutionOrder::Float64=4.0, dt::Float64=0.0
+    PNWaveformModeOrder::Float64=3.5, PNOrbitalEvolutionOrder::Float64=4.0, dt::Float64=0.0, quiet::Bool=true
 )
     if Approximant != "TaylorT1"
         @error "`Approximant` other than \"TaylorT1\" is not yet supported"
@@ -137,6 +142,7 @@ function PNWaveform(
         Ω₁=Ω₁, Rᵢ=Rᵢ,
         PNSys=TaylorT1, PNOrder=7//2,
         integrate_orbital_phase=true,
+        quiet=quiet,
         saveat=dt > 0 ? dt : []
     )
     if dt ≤ 0

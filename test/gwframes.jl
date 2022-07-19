@@ -27,11 +27,35 @@
     Omega_orb_i = Ωᵢ
     Omega_orb_0 = Ω₁
 
-    for MinStepsPerOrbit ∈ [17, 31, 32, 33, 64]
-        w = GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0, MinStepsPerOrbit)
-        for Φᵢ ∈ w.Phi[begin:end-MinStepsPerOrbit]
-            NSteps = sum(@. Φᵢ ≤ w.Phi ≤ Φᵢ + 2π * (1 - 1/100MinStepsPerOrbit))
-            @test NSteps == MinStepsPerOrbit
+    # Just make sure we don't get any errors
+    GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i)
+    GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i, Omega_orb_0)
+    GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i, Omega_orb_0, [Rᵢ.components...])
+    GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i, Omega_orb_0, [Rᵢ.components...], 37)
+
+    # Test to ensure we don't get info with default value of `quiet`, and we *do* when `quiet=false`
+    @test_logs min_level=Logging.Info GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i, Omega_orb_0)
+    @test_logs min_level=Logging.Info GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0)
+    @test_logs min_level=Logging.Info GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0, quiet=true)
+    @test_logs (:info,r"Terminating forwards") (:info,r"Terminating backwards") GWFrames.PNWaveform(
+        Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0, quiet=false)
+
+    @testset verbose=true "MinStepsPerOrbit" begin
+        for MinStepsPerOrbit ∈ [17, 31, 32, 33, 64]
+            w = GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0, MinStepsPerOrbit)
+            for Φᵢ ∈ w.Phi[begin:end-MinStepsPerOrbit]
+                NSteps = sum(@. Φᵢ ≤ w.Phi ≤ Φᵢ + 2π * (1 - 1/100MinStepsPerOrbit))
+                @test NSteps == MinStepsPerOrbit
+            end
+        end
+    end
+
+    @testset verbose=true "Uniform time steps" begin
+        for dt in [1, 0.3, 0.1]
+            w = GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0, dt)
+            difft = diff(w.t)
+            @test dt-minimum(difft) < length(w.t)*10eps(dt)
+            @test maximum(difft)-dt < length(w.t)*10eps(dt)
         end
     end
 
