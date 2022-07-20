@@ -64,11 +64,11 @@ in each of the different environments.
    # Call into Julia to run some function
    w = jl.GWFrames.PNWaveform("TaylorT1", delta, chi1, chi2, Omega_i)
    ```
-   The last line above uses the [`PNWaveform`](@ref) function from this
-   package, which is meant to emulate the original syntax from the `GWFrames`
-   package.  The resulting `w` will have various fields, like `t`, `data`, and
-   `frame`, similar to those attached to `WaveformModes` objects in the `scri`
-   and `sxs` packages.
+   The last line above uses the [`GWFrames.PNWaveform`](@ref) function from
+   this package, which is meant to emulate the original syntax from the
+   `GWFrames` package.  The resulting `w` will have various fields, like `t`,
+   `data`, and `frame`, similar to those attached to `WaveformModes` objects in
+   the `scri` and `sxs` packages.
 
 In general, you can now call any Julia function by prepending `jl.` to the call
 you would make in Julia.  As a fallback, you can evaluate actual Julia code in
