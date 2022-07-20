@@ -19,7 +19,7 @@ makedocs(;
         "Termination criteria" => "termination_criteria.md",
         "Utilities" => "utilities.md",
         "GWFrames" => "gwframes.md",
-        "Python" => "python.md",
+        "Calling from Python" => "python.md",
     ],
 )
 

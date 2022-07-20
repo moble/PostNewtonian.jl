@@ -10,20 +10,21 @@ using DataInterpolations: CubicSpline
 
 Compute a PN waveform, with the same call signature as `GWFrames.PNWaveform`
 
-This is essentially a compatibility layer for the corresponding function in
-[`GWFrames`](https://github.com/moble/GWFrames/blob/01b39bfe/Code/PNWaveforms.cpp#L83-L88),
-with two additional optional arguments: `dt` and `quiet` (see below).  Also,
-this function accepts optional arguments either as positional arguments (which
-`GWFrames` requires) or as keyword arguments.
+This is essentially a compatibility layer for the corresponding function in the
+original
+[`GWFrames`](https://github.com/moble/GWFrames/blob/01b39bfe/Code/PNWaveforms.cpp#L83-L88)
+Python package, with two additional optional arguments: `dt` and `quiet` (see
+below).  Also, this function accepts optional arguments either as positional
+arguments (which the original `GWFrames` requires) or as keyword arguments.
 
 !!! warning
 
     We do *not* expect the result of this function to be identical to the
-    result from `GWFrames`.  In particular, this package uses more general
-    expressions for the tidal heating terms, fixes an error in the 2PN
-    quadratic-spin terms for the waveform modes, uses a more accurate method to
-    compute the number of steps per orbit (by default), and uses more accurate
-    (and efficient) ODE integration.
+    result from the `GWFrames` Python package.  In particular, this package
+    uses more general expressions for the tidal-heating terms, fixes an error
+    in the 2PN quadratic-spin terms for the waveform modes, uses a more
+    accurate method to compute the number of steps per orbit (by default), and
+    uses more accurate (and efficient) ODE integration.
 
 The Julia interface is more detailed, flexible, and efficient than the simple
 `GWFrames` interface that this function emulates.  In particular,
@@ -50,8 +51,8 @@ returned by this function.
 ## Optional arguments
 
 As mentioned above, the following may be given *either* as positional arguments
-in this order (though any number of them may be omitted), or as keyword
-arguments.
+in this order (though any number of them may be omitted from the end), or as
+keyword arguments.
 
   * `Omega_orb_0=Omega_orb_i`: Orbital angular frequency at first instant found
     in data.  If this is less than `Omega_orb_i`, the system is integrated
@@ -80,7 +81,7 @@ This function returns a NamedTuple with the following keys:
   * `t`: The vector of time steps at which the data are evaluated.  The time
     ``t=0`` corresponds to the initial values that are arguments to this
     function.
-  * `data`: Matrix of complex values of the mode weights.  The shape is 77 x
+  * `data`: Matrix of complex values of the mode weights.  The shape is
     length(t) x 77.  The first dimension enumerates the values at each instant
     of time.  The second dimension enumerates the modes, starting with
     ``(2,-2)``, then ``(2,-1)``, up to ``(2,2)``, followed by ``(3,-3)``, and
@@ -102,7 +103,7 @@ This function returns a NamedTuple with the following keys:
   * `Phi`: Orbital phase as a function of time `t`.
 
 Because this is a NamedTuple, the fields can be accessed much like the fields
-of a `WaveformModes` object in the `scri` or `sxs` python packages — as in
+of a `WaveformModes` object in the `scri` or `sxs` Python packages — as in
 `w.t` and `w.data`, where `w` is the object returned by this function.
 
 """
@@ -111,6 +112,10 @@ function PNWaveform(
     Omega_orb_0::Float64, R_frame_i::Vector{Float64}=[1.0], MinStepsPerOrbit::Integer=32,
     PNWaveformModeOrder::Float64=3.5, PNOrbitalEvolutionOrder::Float64=4.0, dt::Float64=0.0, quiet::Bool=true
 )
+    # Note that this method's signature is missing the `Omega_orb_0` default
+    # value; if it is not given, Julia selects the other (keyword-based)
+    # method, which does have a default method for it.
+
     PNWaveform(
         Approximant, delta, chi1_i, chi2_i, Omega_orb_i;
         Omega_orb_0, R_frame_i, MinStepsPerOrbit,

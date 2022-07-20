@@ -21,7 +21,7 @@ in each of the different environments.
    Otherwise, the official method is to just download a binary from the
    [official download page](https://julialang.org/downloads/).
    
-   Make sure that the `julia` binary is on your `PATH`.
+   Make sure that the `julia` executable is on your `PATH`.
    
 2. Optionally, create a conda[^1] env just for this task
    ```bash
@@ -46,14 +46,14 @@ in each of the different environments.
    import numpy as np
    import matplotlib.pyplot as plt
    
-   # Start the Julia session and import the crucial jlconvert function
-   from juliacall import Main as jl, convert as jlconvert
-
-   # Convenience function for constructing Vector in Julia
-   Vector = lambda a: jlconvert(jl.Vector, a)
+   # Start the Julia session
+   from juliacall import Main as jl
    
    # Import `PostNewtonian` in the Julia session
    jl.seval("using PostNewtonian")
+
+   # Convenience function for converting to a Julia `Vector`
+   Vector = lambda a: jl.convert(jl.Vector, a)
 
    # Declare some parameters
    delta = 0.0
@@ -87,7 +87,7 @@ parametric types, replacing braces `{}` with brackets `[]`.  For example, to
 specify that the conversion should be to the Julia type `Vector{Float64}`, we
 could define
 ```python
-VectorF64 = lambda a: jlconvert(jl.Vector[jl.Float64], a)
+VectorF64 = lambda a: jl.convert(jl.Vector[jl.Float64], a)
 ```
 Note that `Vector([0, 0, 0])` will result in a `Vector{Int64}`, whereas
 `VectorF64([0, 0, 0])` will result in a `Vector{Float64}`.
