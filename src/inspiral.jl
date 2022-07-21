@@ -220,6 +220,13 @@ Integrate the orbital dynamics of an inspiraling non-eccentric compact binary.
         <your code goes here>
     end
     ```
+  * `integrate_orbital_phase=false`: If set to `true`, integrate the orbital
+    phase ``Φ`` along with the rest of the system.  Note that this may slow the
+    system down because the absolute value of ``Φ`` may grow to very large
+    values, so that the `abstol` will strain to keep its evolution far more
+    accurate than is really needed.  If this is a problem, you can loosen
+    `abstol` and/or pass vectors of separate tolerances for each variable in
+    the ODE system (see below).
 
 All remaining keyword arguments are passed to the [`solve`
 function](https://github.com/SciML/DiffEqBase.jl/blob/8e6173029c630f6908252f3fc28a69c1f0eab456/src/solve.jl#L393)
@@ -245,6 +252,75 @@ documentation](https://diffeq.sciml.ai/dev/features/callback_functions/) for
 more details, but note that if you want to make your own callbacks, you will
 need to add `OrdinaryDiffEq` to your project — or possibly even
 `DifferentialEquations` for some of the fancier built-in callbacks.
+
+
+## ODE system
+
+The evolved variables, in order, are
+
+  * `M₁`: Mass of black hole 1
+  * `M₂`: Mass of black hole 2
+  * `χ⃗₁ˣ`: ``x`` component of dimensionless spin of black hole 1
+  * `χ⃗₁ʸ`: ``y`` component...
+  * `χ⃗₁ᶻ`: ``z`` component...
+  * `χ⃗₂ˣ`: ``x`` component of dimensionless spin of black hole 2
+  * `χ⃗₂ʸ`: ``y`` component...
+  * `χ⃗₂ᶻ`: ``z`` component...
+  * `Rʷ`: Scalar component of frame rotor
+  * `Rˣ`: ``x`` component...
+  * `Rʸ`: ``y`` component...
+  * `Rᶻ`: ``z`` component...
+  * `v`: PN "velocity" parameter related to the total mass ``M`` and orbital
+    angular velocity ``Ω`` by ``v = (M Ω)^{1/3}``
+  * `Φ`: Orbital phase given by integrating ``Ω`` (optional; only appears if
+    `integrate_orbital_phase` is `true`)
+
+The masses and spin magnitudes evolve according to [`tidal_heating`](@ref).
+The spin directions evolve according to [`Ω⃗ᵪ₁`](@ref) and [`Ω⃗ᵪ₂`](@ref).  The
+frame rotor ``R`` is given by integrating the angular velocity as described in
+[Boyle (2016)](https://arxiv.org/abs/1604.08139), while the angular velocity
+itself is given by [`Ω⃗ₚ`](@ref).  And finally, the PN parameter ``v`` evolves
+according to something like
+```math
+\\dot{v} = - \\frac{\\mathcal{F} + \\dot{M}_1 + \\dot{M}_2} {\\mathcal{E}'}
+```
+where [`𝓕`](@ref) is the flux of gravitational-wave energy out of the system
+and [`𝓔′`](@ref) is the derivative of the binding energy with respect to ``v``.
+For `"TaylorT1"`, the right-hand side of this equation is evaluated as given;
+for `"TaylorT4"`, the right-hand side is first expanded as a Taylor series in
+``v`` and then truncated at some desired order; for `"TaylorT5"`, the *inverse*
+of the right-hand side is expanded as a Taylor series in ``v``, truncated at
+some desired order, and then inverted to obtain an expression in terms of
+``v``.
+
+
+## Returned solution
+
+The returned quantity is an
+[`ODESolution`](https://diffeq.sciml.ai/dev/basics/solution/) object, which has
+various features for extracting and interpolating the data.  We'll call this
+object `sol`.
+
+!!! note
+    
+    The solution comes with data at the time points the ODE integrator happened
+    to step to.  However, it *also* comes with dense output (unless you
+    manually turn it off when calling `inspiral`).  This means that you can
+    interpolate the solution to any other set of time points you want simply by
+    calling it as `sol(t)` for some vector of time points `t`.  The quantity
+    returned by that will have the following features, just like the original
+    solution.  Note that if you only want some of the data you can provide the
+    optional keyword argument `idxs` to specify which of the elements described
+    below you want to interpolate.  For example, if you only want to
+    interpolate the values of `M₁` and `M₂`, you can use `sol(t, idxs=[1,2])`.
+
+The field `sol.t` is the set of time points at which the solution is given.  To
+access the `i`th variable at time step `j`, use `sol[i, j]`.[^1] You can also
+use colons.  For example, `sol[:, j]` is a vector of all the data at time step
+`j`, and `sol[i, :]` is a vector of the `i`th variable at all times.
+
+[^1]: Here, the `i`th variable just refers to which number it has in the list
+      of evolved variables in the ODE system, as described under "ODE system".
 
 
 ## Initial frequency vs. first frequency vs. end frequency
