@@ -60,4 +60,17 @@
     @test sol3(0.0, idxs=14) ≈ 0.0  # Initial phase should be ≈0
     @test minimum(diff(sol3[end, :])) > 0  # Ensure that the phase is strictly increasing
 
+    # Ensure that non-precessing systems don't precess
+    Rᵢ = Rotor(one(T))
+    sol_np = inspiral(M₁, M₂, QuatVec(0, 0, χ⃗₁.z), QuatVec(0, 0, χ⃗₂.z), Ωᵢ; Ω₁, Rᵢ, quiet=true)
+    @test all(sol_np[3:4, :] .== 0)
+    @test all(sol_np[6:7, :] .== 0)
+    @test all(sol_np[10:11, :] .== 0)
+
+    # Test that non-precessing rotors evolve like orbital phase
+    sol_np = inspiral(M₁, M₂, QuatVec(0, 0, χ⃗₁.z), QuatVec(0, 0, χ⃗₂.z), Ωᵢ; Ω₁, Rᵢ, integrate_orbital_phase=true, quiet=true);
+    sincosΦ = cat(map(Φ -> [sincos(Φ/2)...], sol_np[14,:])..., dims=2)
+    Rwz = sol_np[[12,9], :]
+    @test sincosΦ ≈ Rwz atol=√eps(T)
+
 end

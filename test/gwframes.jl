@@ -27,7 +27,7 @@
     Omega_orb_i = Ωᵢ
     Omega_orb_0 = Ω₁
 
-    # Just make sure we don't get any errors
+    # Just make sure we don't get any errors with various signatures
     GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i)
     GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i, Omega_orb_0)
     GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i, Omega_orb_0, [Rᵢ.components...])
@@ -38,8 +38,10 @@
     @test_logs min_level=Logging.Info GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0)
     @test_logs min_level=Logging.Info GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0, quiet=true)
     @test_logs (:info,r"Terminating forwards") (:info,r"Terminating backwards") GWFrames.PNWaveform(
-        Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0, quiet=false)
+        Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0, quiet=false
+    )
 
+    # Make sure that `MinStepsPerOrbit` gives us what we want
     @testset verbose=true "MinStepsPerOrbit" begin
         for MinStepsPerOrbit ∈ [17, 31, 32, 33, 64]
             w = GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0, MinStepsPerOrbit)
@@ -50,13 +52,23 @@
         end
     end
 
+    # Make sure the `dt` gives us what we want
     @testset verbose=true "Uniform time steps" begin
-        for dt in [1, 0.3, 0.1]
+        for dt in T[1, 1//3, 1//10]
             w = GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0, dt)
             difft = diff(w.t)
             @test dt-minimum(difft) < length(w.t)*10eps(dt)
             @test maximum(difft)-dt < length(w.t)*10eps(dt)
         end
     end
+
+    # Test initial conditions
+    w = GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0, dt=one(T))
+    iᵢ = argmin(abs.(w.t))
+    @test w.M1[iᵢ] == M₁  # Because 0.625 happens to be exact in Float64
+    @test w.M2[iᵢ] == M₂  # Because 0.375 happens to be exact in Float64
+    @test w.chi1[iᵢ, :] == χ⃗₁.vec
+    @test w.chi2[iᵢ, :] == χ⃗₂.vec
+    @test w.frame[iᵢ, :] == Rotor(1).components
 
 end
