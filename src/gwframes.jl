@@ -108,9 +108,9 @@ of a `WaveformModes` object in the `scri` or `sxs` Python packages — as in
 
 """
 function PNWaveform(
-    Approximant::String, delta::Float64, chi1_i::Vector{Float64}, chi2_i::Vector{Float64}, Omega_orb_i::Float64,
-    Omega_orb_0::Float64, R_frame_i::Vector{Float64}=[1.0], MinStepsPerOrbit::Integer=32,
-    PNWaveformModeOrder::Float64=3.5, PNOrbitalEvolutionOrder::Float64=4.0, dt::Float64=0.0, quiet::Bool=true
+    Approximant::String, delta, chi1_i, chi2_i, Omega_orb_i,
+    Omega_orb_0, R_frame_i=[1.0], MinStepsPerOrbit=32,
+    PNWaveformModeOrder=3.5, PNOrbitalEvolutionOrder=4.0, dt=0.0, quiet=true
 )
     # Note that this method's signature is missing the `Omega_orb_0` default
     # value; if it is not given, Julia selects the other (keyword-based)
@@ -123,9 +123,9 @@ function PNWaveform(
     )
 end
 function PNWaveform(
-    Approximant::String, delta::Float64, chi1_i::Vector{Float64}, chi2_i::Vector{Float64}, Omega_orb_i::Float64;
-    Omega_orb_0::Float64=Omega_orb_i, R_frame_i::Vector{Float64}=[1.0], MinStepsPerOrbit::Integer=32,
-    PNWaveformModeOrder::Float64=3.5, PNOrbitalEvolutionOrder::Float64=4.0, dt::Float64=0.0, quiet::Bool=true
+    Approximant, delta, chi1_i, chi2_i, Omega_orb_i;
+    Omega_orb_0=Omega_orb_i, R_frame_i=[1.0], MinStepsPerOrbit=32,
+    PNWaveformModeOrder=3.5, PNOrbitalEvolutionOrder=4.0, dt=0.0, quiet=true
 )
     if Approximant != "TaylorT1"
         @error "`Approximant` other than \"TaylorT1\" is not yet supported"
