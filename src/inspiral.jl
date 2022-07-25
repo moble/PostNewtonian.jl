@@ -184,6 +184,23 @@ end
 Integrate the orbital dynamics of an inspiraling non-eccentric compact binary.
 
 
+## Required arguments
+
+  * `M₁`: Initial mass of black hole 1
+  * `M₂`: Initial mass of black hole 2
+  * `χ⃗₁`: Initial dimensionless spin of black hole 1, S⃗₁/M₁²
+  * `χ⃗₂`: Initial dimensionless spin of black hole 2, S⃗₂/M₂²
+  * `Ωᵢ`: Initial orbital angular velocity
+
+These parameters all describe the "initial" conditions.  See below for an
+explanation of the different meanings of "initial" and "first" in this context.
+Note that the masses change in time as a result of tidal heating — though the
+changes are quite small throughout most of the inspiral.  The spins change
+direction due to precession, but also change in magnitude due to tidal heating.
+Therefore, the values passed here are only precisely as given *precisely at*
+the moment of the initial data corresponding to the frequency `Ωᵢ`.
+
+
 ## Keyword arguments
 
   * `Ω₁=Ωᵢ`: First angular velocity in output data (see next section).

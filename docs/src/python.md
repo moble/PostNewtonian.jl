@@ -32,7 +32,8 @@ in each of the different environments.
 
 3. Install `juliacall` and install `PostNewtonian`
    ```bash
-   python -m pip install juliacall
+   # python -m pip install pythoncall  # Temporarily not working...
+   python -m pip install git+https://github.com/cjdoris/PythonCall.jl.git@1126b561
    python -c 'from juliacall import Main as jl; jl.seval("""using Pkg; Pkg.add("PostNewtonian")""")'
    ```
    (Yes, you should use `pip` from inside a conda env.)  This will take a few
@@ -45,24 +46,24 @@ in each of the different environments.
    # Any python imports you need go here
    import numpy as np
    import matplotlib.pyplot as plt
-   
+
    # Start the Julia session
    from juliacall import Main as jl
-   
+
    # Import `PostNewtonian` in the Julia session
    jl.seval("using PostNewtonian")
 
-   # Convenience function for converting to a Julia `Vector`
-   Vector = lambda a: jl.convert(jl.Vector, a)
-
    # Declare some parameters
    delta = 0.0
-   chi1 = Vector([0.1, 0.2, 0.3])
-   chi2 = Vector([-0.2, 0.1, -0.3])
+   chi1 = np.array([0.1, 0.2, 0.3])
+   chi2 = np.array([-0.2, 0.1, -0.3])
    Omega_i = 0.01
-   
+
    # Call into Julia to run some function
    w = jl.GWFrames.PNWaveform("TaylorT1", delta, chi1, chi2, Omega_i)
+
+   # Plot the magnitudes of all the modes as functions of time
+   plt.semilogy(w.t, np.abs(w.data))
    ```
    The last line above uses the [`GWFrames.PNWaveform`](@ref) function from
    this package, which is meant to emulate the original syntax from the
@@ -77,25 +78,20 @@ whatever the Julia code would return.  A simple example is `x =
 jl.seval("1+2")`.  See the [documentation for `juliacall`
 here](https://github.com/cjdoris/PythonCall.jl#readme) for more details.
 
-The main stumbling block is converting Python lists and numpy arrays to Julia
-arrays when calling Julia functions.  In the code above, we see an example of
-how to do this conveniently: by defining a Python function `Vector` that
-converts Python lists (or 1-D numpy arrays) to Julia `Vector`s.  Note that this
-will try to automatically infer the type of the list — `float` in the case
-shown above.  If you want to be more specific, you can use Julia's standard
-parametric types, replacing braces `{}` with brackets `[]`.  For example, to
-specify that the conversion should be to the Julia type `Vector{Float64}`, we
-could define
-```python
-VectorF64 = lambda a: jl.convert(jl.Vector[jl.Float64], a)
-```
-Note that `Vector([0, 0, 0])` will result in a `Vector{Int64}`, whereas
-`VectorF64([0, 0, 0])` will result in a `Vector{Float64}`.
+Typically, the main stumbling block is converting Python lists to Julia
+`Vector`s when calling Julia functions.  Frequently, Julia code will have
+difficulty if you try to pass a Python `list`, because `list`s do not have any
+specific type that Julia can understand.  Instead, you should always convert a
+list to a numpy array with `np.asarray`.  It is still possible that numpy will
+not understand the type of the list, and you'll still get an error from Julia;
+in this case you need to figure out [the `dtype` to tell numpy
+about.](https://numpy.org/doc/stable/reference/generated/numpy.asarray.html).
 
 Fortunately, conversion back to Python objects is more automatic.  In
-particular, if Julia returns a `Vector`, you can usually just use that quantity
-in calls to Python functions.  If you really need a numpy array, the returned
-object will have a `.to_numpy()` method.
+particular, if Julia returns a `Vector`, `Matrix`, or more generally shaped
+`Array`, you can usually just use that quantity in calls to Python functions.
+If you really need a numpy array, the returned object will have a `.to_numpy()`
+method.
 
 Of course, it is *much* simpler to call Python code from Julia, so if you find
 yourself using a lot of Julia code, you may want to consider flipping your
