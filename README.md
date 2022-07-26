@@ -11,10 +11,11 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6847321.svg)](https://doi.org/10.5281/zenodo.6847321)
 
+> :warning: **Warning**: This package has not yet reached version 1.0, and is still missing quite a few capabilities.  In particular, only `TaylorT1` is supported, and it is not yet possible to select PN orders — all terms use the maximum implemented orders.  Also, pre-compilation is not yet optimized; it may take some time to compile on each use.
+
 This package computes orbital dynamics of and waveforms from binary black-hole
 systems, in the post-Newtonian approximation.  See [the
 documentation](https://moble.github.io/PostNewtonian.jl/dev) for details.
-
 
 
 ## Citing
