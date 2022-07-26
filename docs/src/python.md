@@ -32,7 +32,6 @@ in each of the different environments.
 
 3. Install `juliacall` and install `PostNewtonian`
    ```bash
-   # python -m pip install pythoncall  # Temporarily not working...
    python -m pip install git+https://github.com/cjdoris/PythonCall.jl.git@1126b561
    python -c 'from juliacall import Main as jl; jl.seval("""using Pkg; Pkg.add("PostNewtonian")""")'
    ```
