@@ -9,12 +9,6 @@ using DiffEqBase
 using RecursiveArrayTools
 using OrdinaryDiffEq
 
-# This ensures that when we ask for, e.g., `π` with the same type as, e.g.,
-# `log(v)`, and `log(v)` happens to be a Symbolics variable, we get something
-# that will behave like a Symbolics variable, rather than converting to a
-# Float64 at the first possible chance.
-Base.oftype(x::Num, y::Irrational) = Symbolics.Term(identity, y)
-
 
 include("combine_solutions.jl")
 
