@@ -55,10 +55,12 @@ export h!, mode_weights!
 include("pn_dynamics/up_down_instability.jl")
 export up_down_instability
 
-include("pn_dynamics/inspiral.jl")
-export inspiral,
-    termination_forwards, termination_backwards,
+include("pn_dynamics/termination_criteria.jl")
+export termination_forwards, termination_backwards,
     dtmin_terminator, nonfinite_terminator
+
+include("pn_dynamics/inspiral.jl")
+export inspiral
 
 include("compatibility_layers/gwframes.jl")
 export GWFrames
