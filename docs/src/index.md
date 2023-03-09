@@ -16,7 +16,7 @@ quasicircular systems are supported.
 inspiral
 ```
 
-## Computing mode weights from the inspiral data
+## Computing mode weights from inspiral data
 
 ```@docs
 h!

@@ -4,7 +4,7 @@ using Base: @irrational
 
 # When defining @irrationals, if the third argument is a symbol, it is expected
 # to name an existing constant compiled into MPFR, with prefix `mpfr_const_`,
-# which is a very limited set.  All such constants except `log2` already exist
+# which is a very limited set.  All MPFR constants except `log2` already exist
 # in `Base.MathConstants`.  Otherwise, it should be a BigFloat; it cannot be a
 # variable name.
 
