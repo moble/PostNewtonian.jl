@@ -2,11 +2,10 @@ import Base.MathConstants: eulergamma
 
 using Base: @irrational
 
-# When defining @irrationals, if the third argument is a symbol, it is expected
-# to name an existing constant compiled into MPFR, with prefix `mpfr_const_`,
-# which is a very limited set.  All MPFR constants except `log2` already exist
-# in `Base.MathConstants`.  Otherwise, it should be a BigFloat; it cannot be a
-# variable name.
+# When defining @irrationals, if the third argument is a symbol, it is expected to name an
+# existing constant compiled into MPFR, with prefix `mpfr_const_`, which is a very limited
+# set.  All MPFR constants except `log2` already exist in `Base.MathConstants`.  Otherwise,
+# that third argument should be a literal BigFloat; it cannot be a variable name.
 
 Base.@irrational log2 0.6931471805599453 log2
 """
