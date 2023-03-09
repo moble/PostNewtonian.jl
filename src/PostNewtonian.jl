@@ -10,9 +10,9 @@ using RecursiveArrayTools
 using OrdinaryDiffEq
 
 
-include("combine_solutions.jl")
+include("utilities/combine_solutions.jl")
 
-include("constants.jl")
+include("utilities/constants.jl")
 
 include("PNSystems.jl")
 export PNSystem, TaylorT1
