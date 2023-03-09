@@ -48,6 +48,9 @@ export 𝓔, binding_energy,
     𝓔′, binding_energy_deriv,
     𝓔NS, binding_energy_NS
 
+include("pn_expressions/mode_weights.jl")
+export h!, mode_weights!
+
 include("up_down_instability.jl")
 export up_down_instability
 
@@ -55,9 +58,6 @@ include("inspiral.jl")
 export inspiral,
     termination_forwards, termination_backwards,
     dtmin_terminator, nonfinite_terminator
-
-include("mode_weights.jl")
-export h!, mode_weights!
 
 include("gwframes.jl")
 export GWFrames
