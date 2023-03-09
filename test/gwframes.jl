@@ -18,20 +18,20 @@
     v₁ = v(Ω=Ω₁,M=M₁+M₂)
     vₑ = min(v(Ω=Ωₑ, M=M₁+M₂), 1)
 
-    uᵢ = [M₁; M₂; χ⃗₁.vec; χ⃗₂.vec; Rᵢ.components; vᵢ]
+    uᵢ = [M₁; M₂; vec(χ⃗₁); vec(χ⃗₂); components(Rᵢ); vᵢ]
 
     Approximant = "TaylorT1"
     delta = δ(M₁, M₂)
-    chi1_i = χ⃗₁.vec
-    chi2_i = χ⃗₂.vec
+    chi1_i = vec(χ⃗₁)
+    chi2_i = vec(χ⃗₂)
     Omega_orb_i = Ωᵢ
     Omega_orb_0 = Ω₁
 
     # Just make sure we don't get any errors with various signatures
     GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i)
     GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i, Omega_orb_0)
-    GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i, Omega_orb_0, [Rᵢ.components...])
-    GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i, Omega_orb_0, [Rᵢ.components...], 37)
+    GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i, Omega_orb_0, [components(Rᵢ)...])
+    GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i, Omega_orb_0, [components(Rᵢ)...], 37)
 
     # Test to ensure we don't get info with default value of `quiet`, and we *do* when `quiet=false`
     @test_logs min_level=Logging.Info GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i, Omega_orb_0)
@@ -67,8 +67,8 @@
     iᵢ = argmin(abs.(w.t))
     @test w.M1[iᵢ] == M₁  # Because 0.625 happens to be exact in Float64
     @test w.M2[iᵢ] == M₂  # Because 0.375 happens to be exact in Float64
-    @test w.chi1[iᵢ, :] == χ⃗₁.vec
-    @test w.chi2[iᵢ, :] == χ⃗₂.vec
-    @test w.frame[iᵢ, :] == Rotor(1).components
+    @test w.chi1[iᵢ, :] == vec(χ⃗₁)
+    @test w.chi2[iᵢ, :] == vec(χ⃗₂)
+    @test w.frame[iᵢ, :] == components(Rotor(1))
 
 end

@@ -7,7 +7,7 @@
     χ⃗₂ = QuatVec( 3.39881185355e-08,  5.92671870568e-08, -0.799746224993)
     R = Rotor(1.0)
     v = 0.25
-    u = [M₁, M₂, χ⃗₁.vec..., χ⃗₂.vec..., R.components..., v]
+    u = [M₁, M₂, vec(χ⃗₁)..., vec(χ⃗₂)..., components(R)..., v]
 
     Ω₊, Ω₋ = up_down_instability(u)
     @test 0 ≤ Ω₊ ≤ Ω₋ ≤ 1  # General property

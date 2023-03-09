@@ -18,7 +18,7 @@
     v₁ = v(Ω=Ω₁,M=M₁+M₂)
     vₑ = min(v(Ω=Ωₑ, M=M₁+M₂), 1)
 
-    uᵢ = [M₁; M₂; χ⃗₁.vec; χ⃗₂.vec; Rᵢ.components; vᵢ]
+    uᵢ = [M₁; M₂; vec(χ⃗₁); vec(χ⃗₂); components(Rᵢ); vᵢ]
 
     forwards_termination = (
         "Terminating forwards evolution because the PN parameter 𝑣 "

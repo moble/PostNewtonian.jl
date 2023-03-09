@@ -319,7 +319,7 @@ various features for extracting and interpolating the data.  We'll call this
 object `sol`.
 
 !!! note
-    
+
     The solution comes with data at the time points the ODE integrator happened
     to step to.  However, it *also* comes with dense output (unless you
     manually turn it off when calling `inspiral`).  This means that you can
@@ -449,7 +449,7 @@ function inspiral(
     vₑ = min(v(Ω=Ωₑ, M=M₁+M₂), 1)
 
     # Initial conditions for the ODE integration
-    uᵢ = [M₁; M₂; χ⃗₁.components[2:4]; χ⃗₂.components[2:4]; Rᵢ.components; vᵢ]
+    uᵢ = [M₁; M₂; vec(χ⃗₁); vec(χ⃗₂); components(Rᵢ); vᵢ]
     # We pack this up here, to get everything into the same type, and permit easier
     # passing to the other form of this function; we'll unpack it again there,
     # which makes sure everything has the same type and the function is type stable.
