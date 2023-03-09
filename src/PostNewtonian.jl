@@ -59,7 +59,7 @@ export inspiral,
     termination_forwards, termination_backwards,
     dtmin_terminator, nonfinite_terminator
 
-include("gwframes.jl")
+include("compatibility_layers/gwframes.jl")
 export GWFrames
 
 end  # module PostNewtonian
