@@ -24,10 +24,10 @@ export μ, reduced_mass,
 include("utilities/spins.jl")
 export χ⃗, S, Σ, χₛ, χₐ
 
-include("PNSystems.jl")
+include("pn_dynamics/PNSystems.jl")
 export PNSystem, TaylorT1
 
-include("orbital_elements.jl")
+include("pn_dynamics/orbital_elements.jl")
 export ℓ̂, n̂, λ̂, Ω, v
 
 include("pn_expressions/tidal_heating.jl")
@@ -51,10 +51,10 @@ export 𝓔, binding_energy,
 include("pn_expressions/mode_weights.jl")
 export h!, mode_weights!
 
-include("up_down_instability.jl")
+include("pn_dynamics/up_down_instability.jl")
 export up_down_instability
 
-include("inspiral.jl")
+include("pn_dynamics/inspiral.jl")
 export inspiral,
     termination_forwards, termination_backwards,
     dtmin_terminator, nonfinite_terminator
