@@ -4,32 +4,36 @@ using StaticArrays
 using Quaternionic
 using Symbolics
 using SymbolicUtils
+using MacroTools
 using SciMLBase
 using DiffEqBase
 using RecursiveArrayTools
 using OrdinaryDiffEq
+using Reexport
 
 include("utilities/misc.jl")
 
-include("utilities/combine_solutions.jl")
+include("utilities/mathconstants.jl")
+using .MathConstants
 
-include("utilities/constants.jl")
+include("pn_state.jl")
+export PNState, TaylorT1
 
-include("utilities/masses.jl")
-export μ, reduced_mass,
-    ν, reduced_mass_ratio,
-    δ, mass_difference_ratio,
-    q, mass_ratio,
-    ℳ, chirp_mass
+include("pn_variables/fundamental_variables.jl")
+using .FundamentalVariables
+#export M₁, M₂, χ⃗₁, χ⃗₂, R, v
 
-include("utilities/spins.jl")
-export χ⃗, S, Σ, χₛ, χₐ
+include("pn_variables/derived_variables.jl")
+using .DerivedVariables
+export total_mass, reduced_mass, reduced_mass_ratio,
+    mass_difference_ratio, mass_ratio, chirp_mass,
+    n̂, λ̂, ℓ̂, Ω,
+    S⃗₁, S⃗₂, S⃗, Σ⃗, χ⃗, χ⃗ₛ, χ⃗ₐ,
+    Sₙ, Σₙ, Sλ, Σλ, Sₗ, Σₗ
+#@reexport using .DerivedVariables
 
 include("pn_dynamics/PNSystems.jl")
-export PNSystem, TaylorT1
-
-include("pn_dynamics/orbital_elements.jl")
-export ℓ̂, n̂, λ̂, Ω, v
+#export PNSystem, TaylorT1
 
 include("pn_expressions/tidal_heating.jl")
 export tidal_heating
@@ -58,6 +62,8 @@ export up_down_instability
 include("pn_dynamics/termination_criteria.jl")
 export termination_forwards, termination_backwards,
     dtmin_terminator, nonfinite_terminator
+
+include("utilities/combine_solutions.jl")
 
 include("pn_dynamics/inspiral.jl")
 export inspiral

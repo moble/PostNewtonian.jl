@@ -1,11 +1,22 @@
 """
+    M(M₁, M₂)
+    total_mass(M₁, M₂)
+
+Compute the total mass ``M₁+M₂``.
+"""
+M(M₁, M₂) = M₁ + M₂
+M(s::PNState) = M(M₁(s), M₂(s))
+const total_mass = M
+
+
+"""
     μ(M₁, M₂)
     reduced_mass(M₁, M₂)
 
 Compute the reduced mass ``(M₁ M₂)/(M₁+M₂)``.
-
 """
 μ(M₁, M₂) = (M₁ * M₂) / (M₁ + M₂)
+μ(s::PNState) = μ(M₁(s), M₂(s))
 const reduced_mass = μ
 
 
@@ -16,11 +27,11 @@ const reduced_mass = μ
 Compute the reduced mass ratio ``(M₁ M₂)/(M₁+M₂)^2``.
 
 Note that the denominator is squared, unlike in the reduced mass [`μ`](@ref).
-
 """
 ν(M₁, M₂) = (M₁ * M₂) / (M₁ + M₂)^2
-const reduced_mass_ratio = ν
+ν(s::PNState) = ν(M₁(s), M₂(s))
 ν(;q) = q / (1+q)^2
+const reduced_mass_ratio = ν
 
 
 """
@@ -32,11 +43,11 @@ Compute mass-difference ratio ``(M₁-M₂)/(M₁+M₂)``.
 Note that we do not restrict to ``M₁ ≥ M₂`` or vice versa; if you prefer that
 ``δ`` always be positive (or always negative), you are responsible for ensuring
 that.
-
 """
 δ(M₁, M₂) = (M₁ - M₂) / (M₁ + M₂)
-const mass_difference_ratio = δ
+δ(s::PNState) = δ(M₁(s), M₂(s))
 δ(;q) = (q-1) / (q+1)
+const mass_difference_ratio = δ
 
 
 """
@@ -48,9 +59,9 @@ Compute mass ratio ``M₁/M₂``.
 Note that we do not restrict to ``M₁ ≥ M₂`` or vice versa; if you prefer that
 ``q`` always be greater than or equal to 1 (or vice versa), you are responsible
 for ensuring that.
-
 """
 q(M₁, M₂) = M₁ / M₂
+q(s::PNState) = q(M₁(s), M₂(s))
 const mass_ratio = q
 
 
@@ -65,9 +76,7 @@ The chirp mass is defined as
 ```math
   \\mathcal{M} = \\frac{(M₁ M₂)^{3/5}} {(M₁ + M₂)^{1/5}}.
 ```
-
 """
-function ℳ(M₁, M₂)
-    ((M₁ * M₂)^3 / (M₁ + M₂))^(1//5)
-end
+ℳ(M₁, M₂) = ((M₁ * M₂)^3 / (M₁ + M₂))^(1//5)
+ℳ(s::PNState) = ℳ(M₁(s), M₂(s))
 const chirp_mass = ℳ
