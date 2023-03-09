@@ -14,15 +14,13 @@ Calculate the new values of `u̇` based on the values of `u`.
 
 """
 function recalculate!(u̇, u, p)
-    u = u[1:13]
-    M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v = u
-    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
-    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
-    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
-    χ₁ = absvec(χ⃗₁)
-    χ₂ = absvec(χ⃗₂)
+    M₁, M₂, χ⃗₁, χ⃗₂, R, v = (
+        u[1], u[2], QuatVec(u[3:5]...), QuatVec(u[6:8]...), Rotor(u[9:12]...), u[13]
+    )
+    χ₁, χ₂ = absvec(χ⃗₁), absvec(χ⃗₂)
     (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(u)
-    let ℓ̂=ℓ̂(R), Ω=Ω(v=v, M=M₁+M₂), Ω⃗ᵪ₁=Ω⃗ᵪ₁(u), Ω⃗ᵪ₂=Ω⃗ᵪ₂(u), Ω⃗ₚ=Ω⃗ₚ(u), 𝓕=𝓕(u), 𝓔′=𝓔′(u)
+    let ℓ̂=ℓ̂(R), Ω=Ω(v=v, M=M₁+M₂), Ω⃗ₚ=Ω⃗ₚ(u),
+        Ω⃗ᵪ₁=Ω⃗ᵪ₁(u), Ω⃗ᵪ₂=Ω⃗ᵪ₂(u), 𝓕=𝓕(u), 𝓔′=𝓔′(u)
         Ω⃗ = Ω⃗ₚ + Ω * ℓ̂
         v̇ = - (𝓕 + Ṁ₁ + Ṁ₂) / 𝓔′
         χ̂₁ = ifelse(iszero(χ₁), ℓ̂, χ⃗₁ / χ₁)
