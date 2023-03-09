@@ -9,6 +9,7 @@ using DiffEqBase
 using RecursiveArrayTools
 using OrdinaryDiffEq
 
+include("utilities/misc.jl")
 
 include("utilities/combine_solutions.jl")
 
