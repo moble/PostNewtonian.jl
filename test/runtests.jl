@@ -24,6 +24,7 @@ using Test
 
 using Logging
 using Random
+using SciMLBase
 using OrdinaryDiffEq
 using Quaternionic
 
