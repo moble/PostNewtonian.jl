@@ -1,6 +1,6 @@
 module MathConstants
 
-export log2, log3, log5, log3halves, log5halves, apery, ζ3, eulergamma
+export log2, log3, log5, log3halves, log³╱₂, log5halves, log⁵╱₂, apery, ζ3, eulergamma, γₑ, 𝒾
 
 Base.@irrational log2 0.6931471805599453 log2
 Base.@irrational log3 1.0986122886681097 big"1.098612288668109691395245236922525704647490557822749451734694333637494293218608966873615754813732088787970029"
@@ -9,6 +9,8 @@ Base.@irrational log3halves 0.4054651081081644 big"0.405465108108164381978013115
 Base.@irrational log5halves 0.9162907318741551 big"0.91629073187415506518352721176801107145010121990826246779196788198078536573796304902427055109676092"
 Base.@irrational apery 1.2020569031595942 big"1.20205690315959428539973816151144999076498629234049888179227155534183820578631309018645587360933525814619915"
 import Base.MathConstants: eulergamma
+const γₑ=eulergamma
+const 𝒾 = im
 
 # When defining @irrationals, if the third argument is a symbol, it is expected to name an
 # existing constant compiled into MPFR, with prefix `mpfr_const_`, which is a very limited
@@ -76,6 +78,7 @@ julia> exp(big(PostNewtonian.log5))
 log5
 
 """
+    log³╱₂
     log3halves
 
 The natural logarithm of 3//2.  This is OEIS sequence
@@ -93,9 +96,10 @@ julia> exp(big(PostNewtonian.log3halves))
 ```
 
 """
-log3halves
+log3halves, const log³╱₂=log3halves
 
 """
+    log⁵╱₂
     log5halves
 
 The natural logarithm of 5//2.  This is OEIS sequence
@@ -113,7 +117,7 @@ julia> exp(big(PostNewtonian.log5halves))
 ```
 
 """
-log5halves
+log5halves, const log⁵╱₂=log5halves
 
 """
     ζ3

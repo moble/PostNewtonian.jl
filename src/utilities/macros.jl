@@ -8,25 +8,47 @@ pnvariables = filter(v->v!=:eval, [
     find_symbols_of_type(DerivedVariables, Function)
 ])
 
-macro expand_variables(func)
+unary_funcs = [:√, :sqrt]
+
+macro compute_pn_variables(func)
+    :(@compute_pn_variables 1 $func)
+end
+
+"""
+    @compute_pn_variables [arg_index=1] func
+
+This macro takes the function `func`, looks for various symbols inside that function, and if
+present defines them appropriately inside that function.  In particular, it defines PN
+variables based on the value of a `PNState` argument to the function (located at position
+`arg_index` in the argument list).  It also redefines `Irrational`s to have the type
+relevant for that `PNState` object.
+"""
+macro compute_pn_variables(arg_index, func)
     splitfunc = MacroTools.splitdef(func)
-    arg1 = splitfunc[:args][1]
+    pnstate = splitfunc[:args][arg_index]
     body = splitfunc[:body]
 
     pnvariables_exprs = [
-        :($v=PNVariables.$v($arg1))
-        for v ∈ filter(v->MacroTools.inexpr(splitfunc[:body], v), pnvariables)
+        :($v=PNVariables.$v($pnstate))
+        for v ∈ filter(v->MacroTools.inexpr(body, v), pnvariables)
     ]
     irrationals_exprs = [
-        :($v=oftype(eltype($arg1), $v))
-        for v ∈ filter(v->MacroTools.inexpr(splitfunc[:body], v), irrationals)
+        :($v=convert(eltype($pnstate), $v))
+        for v ∈ filter(v->MacroTools.inexpr(body, v), irrationals)
+    ]
+    # unary_funcs_exprs = [
+    #     :($v=(x->$v(convert(eltype($pnstate), x)))
+    #     for v ∈ filter(v->MacroTools.inexpr(body, v), unary_funcs)
+    # ]
+    exprs = [
+        pnvariables_exprs;
+        irrationals_exprs;
+        # unary_funcs_exprs
     ]
 
     new_body = quote
-        let $(pnvariables_exprs...)
-            let $(irrationals_exprs...)
-                $body
-            end
+        let $(exprs...)
+            $body
         end
     end
 

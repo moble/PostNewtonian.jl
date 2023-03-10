@@ -67,3 +67,6 @@ The parameter `Ω` is the orbital angular frequency, and must be passed as a key
 — as in `v(Ω=0.1)`.  The parameter `M` is the total mass of the binary.
 """
 v(;Ω, M=1) = (M*Ω)^(1//3)
+
+
+logv(s::PNState) = log(v(s))
