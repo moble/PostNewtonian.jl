@@ -30,10 +30,6 @@ export total_mass, reduced_mass, reduced_mass_ratio,
     n̂, λ̂, ℓ̂, Ω,
     S⃗₁, S⃗₂, S⃗, Σ⃗, χ⃗, χ⃗ₛ, χ⃗ₐ,
     Sₙ, Σₙ, Sλ, Σλ, Sₗ, Σₗ
-#@reexport using .DerivedVariables
-
-include("pn_dynamics/PNSystems.jl")
-#export PNSystem, TaylorT1
 
 include("pn_expressions/tidal_heating.jl")
 export tidal_heating
@@ -62,6 +58,9 @@ export up_down_instability
 include("pn_dynamics/termination_criteria.jl")
 export termination_forwards, termination_backwards,
     dtmin_terminator, nonfinite_terminator
+
+include("pn_dynamics/PNSystems.jl")
+#export PNSystem, TaylorT1
 
 include("utilities/combine_solutions.jl")
 
