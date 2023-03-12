@@ -11,11 +11,11 @@ pnvariables = filter(v->v!=:eval, [
 unary_funcs = [:√, :sqrt, :log, :sin, :cos]
 
 macro compute_pn_variables(func)
-    :(@compute_pn_variablesn 1 $func)
+    compute_pn_variables(1, func)
 end
 
 macro compute_pn_variables(arg_index, func)
-    :(@compute_pn_variablesn $arg_index $func)
+    compute_pn_variables(arg_index, func)
 end
 
 """
@@ -27,7 +27,7 @@ variables based on the value of a `PNState` argument to the function (located at
 `arg_index` in the argument list).  It also redefines `Irrational`s to have the type
 relevant for that `PNState` object.
 """
-macro compute_pn_variablesn(arg_index, func)
+function compute_pn_variables(arg_index, func)
     splitfunc = MacroTools.splitdef(func)
     pnstate = splitfunc[:args][arg_index]
     body = splitfunc[:body]
@@ -57,5 +57,5 @@ macro compute_pn_variablesn(arg_index, func)
     end
 
     splitfunc[:body] = new_body
-    esc(MacroTools.combinedef(splitfunc))
+    MacroTools.combinedef(splitfunc)
 end
