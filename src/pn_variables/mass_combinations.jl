@@ -40,9 +40,8 @@ const reduced_mass_ratio = ν
 
 Compute mass-difference ratio ``(M₁-M₂)/(M₁+M₂)``.
 
-Note that we do not restrict to ``M₁ ≥ M₂`` or vice versa; if you prefer that
-``δ`` always be positive (or always negative), you are responsible for ensuring
-that.
+Note that we do not restrict to ``M₁ ≥ M₂`` or vice versa; if you prefer that ``δ`` always
+be positive (or always negative), you are responsible for ensuring that.
 """
 δ(M₁, M₂) = (M₁ - M₂) / (M₁ + M₂)
 δ(s::PNState) = δ(M₁(s), M₂(s))
@@ -56,9 +55,8 @@ const mass_difference_ratio = δ
 
 Compute mass ratio ``M₁/M₂``.
 
-Note that we do not restrict to ``M₁ ≥ M₂`` or vice versa; if you prefer that
-``q`` always be greater than or equal to 1 (or vice versa), you are responsible
-for ensuring that.
+Note that we do not restrict to ``M₁ ≥ M₂`` or vice versa; if you prefer that ``q`` always
+be greater than or equal to 1 (or vice versa), you are responsible for ensuring that.
 """
 q(M₁, M₂) = M₁ / M₂
 q(s::PNState) = q(M₁(s), M₂(s))
@@ -69,8 +67,8 @@ const mass_ratio = q
     ℳ(M₁, M₂)
     chirp_mass(M₁, M₂)
 
-Compute the chirp mass ℳ, which determines the leading-order orbital evolution
-of a binary system due to energy loss by gravitational-wave emission.
+Compute the chirp mass ℳ, which determines the leading-order orbital evolution of a binary
+system due to energy loss by gravitational-wave emission.
 
 The chirp mass is defined as
 ```math
