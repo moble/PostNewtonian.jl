@@ -1,6 +1,5 @@
 """
-    up_down_instability(u)
-    up_down_instability(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    up_down_instability(pnstate)
 
 Compute the range of frequencies over which the system is unstable to
 increasing precession.
@@ -22,31 +21,19 @@ frequency.  The result is also "clamped" between 0 and 1, because sometimes the
 PN approximations involved break down and return unphysical values.
 
 """
-function up_down_instability(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
-    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
-    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
-    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
-    let ℓ̂=ℓ̂(R)
-        if M₁ > M₂
-            q = M₂ / M₁
-            χ₁ = χ⃗₁ ⋅ ℓ̂
-            χ₂ = χ⃗₂ ⋅ ℓ̂
-        else
-            q = M₁ / M₂
-            χ₂ = χ⃗₁ ⋅ ℓ̂
-            χ₁ = χ⃗₂ ⋅ ℓ̂
-        end
-        if χ₁ > 0 && χ₂ < 0
-            M = M₁ + M₂
-            r₊ = M * (√(χ₁) + √abs(q*χ₂))^4 / (1-q)^2
-            r₋ = M * (√(χ₁) - √abs(q*χ₂))^4 / (1-q)^2
-            Ω₊ = √(M/r₊)^3
-            Ω₋ = √(M/r₋)^3
-            clamp.((Ω₊, Ω₋), 0, 1)
-        else
-            T = typeof(χ₁)
-            (T(1), T(1))
-        end
+@compute_pn_variables function up_down_instability(pnstate)
+    T = typeof(χ₁ₗ)
+    if M₂ ≤ M₁
+        q = 1 / q
+        χ₂ₗ, χ₁ₗ = χ₁ₗ, χ₂ₗ
+    end
+    if χ₁ₗ > 0 && χ₂ₗ < 0
+        r₊ = M * (√(χ₁ₗ) + √abs(q*χ₂ₗ))^4 / (1-q)^2
+        r₋ = M * (√(χ₁ₗ) - √abs(q*χ₂ₗ))^4 / (1-q)^2
+        Ω₊ = √(M/r₊)^3
+        Ω₋ = √(M/r₋)^3
+        clamp.((Ω₊, Ω₋), T(0), T(1))
+    else
+        (T(1), T(1))
     end
 end
-up_down_instability(u) = up_down_instability(u...)

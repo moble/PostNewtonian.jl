@@ -47,6 +47,8 @@ Antisymmetric spin vector ``(χ⃗₁-χ⃗₂)/2``.
 χ₁(s::PNState) = absvec(χ⃗₁(s))
 χ₂(s::PNState) = absvec(χ⃗₂(s))
 χ₁₂(s::PNState) = χ⃗₁(s) ⋅ χ⃗₂(s)
+χ₁ₗ(s::PNState) = χ⃗₁(s) ⋅ ℓ̂(s)
+χ₂ₗ(s::PNState) = χ⃗₂(s) ⋅ ℓ̂(s)
 χₛₗ(s::PNState) = χ⃗ₛ(s) ⋅ ℓ̂(s)
 χₐₗ(s::PNState) = χ⃗ₐ(s) ⋅ ℓ̂(s)
 
