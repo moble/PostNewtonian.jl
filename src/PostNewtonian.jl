@@ -9,7 +9,6 @@ using SciMLBase
 using DiffEqBase
 using RecursiveArrayTools
 using OrdinaryDiffEq
-using Reexport
 
 include("utilities/misc.jl")
 
@@ -30,6 +29,8 @@ export total_mass, reduced_mass, reduced_mass_ratio,
     n̂, λ̂, ℓ̂, Ω,
     S⃗₁, S⃗₂, S⃗, Σ⃗, χ⃗, χ⃗ₛ, χ⃗ₐ,
     Sₙ, Σₙ, Sλ, Σλ, Sₗ, Σₗ
+
+include("utilities/macros.jl")
 
 include("pn_expressions/tidal_heating.jl")
 export tidal_heating

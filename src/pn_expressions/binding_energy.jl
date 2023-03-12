@@ -22,9 +22,9 @@ The 4pN term from Eq. (5.2d) of [Jaranowski and Schäfer](https://arxiv.org/abs/
 is known exactly, now that the ``ν``-linear piece is given as Eq. (32) of [Bini and Damour
 (2013a)](https://arxiv.org/abs/1305.4884v1).  The remaining terms are not known exactly, but
 [Bini and Damour (2013b)](https://arxiv.org/abs/1312.2503v1) have derived some terms, though
-there is incomplete information, which are noted as the constants in the following cell.
-Note that, though the notation is confusing, Bini and Damour claim they did not calculate
-the coefficient they call ``a_6^{\\ln 1}``; but it seems to be given in their Eq. (64).
+there is incomplete information, which are noted as the constants in this code.  Note that,
+though the notation is confusing, Bini and Damour claim they did not calculate the
+coefficient they call ``a_6^{\\ln 1}``; but it seems to be given in their Eq. (64).
 
 The spin-squared terms (by which I mean both spin-spin and spin-orbit squared terms) in the
 energy are known only at 2pN order (from [Kidder
@@ -52,7 +52,7 @@ terms come from Eq. (4.6) of [Bohé et al. (2012)](https://arxiv.org/abs/1212.55
             -45927//512
             + (-228916843//115200 - 9976γₑ/35 + 729log3/7 - 23672log2/35 + 126779π^2/512)ν
             + (189745//576 + -21337π^2/1024 + 3a₆ᶜ¹ - 896log2/5 - 448γₑ/5 + 2a₆ˡⁿ¹/3)ν^2
-            + (-1353π^2/256 + 69423//512)*ν^3
+            + (-1353π^2/256 + 69423//512)ν^3
             + 55ν^4/512
             + ν^5/512
             + logv * (-9976ν/35 + (-448//5 + 6a₆ˡⁿ¹)ν^2)
@@ -71,7 +71,7 @@ terms come from Eq. (4.6) of [Bohé et al. (2012)](https://arxiv.org/abs/1212.55
             )ν^2
             + (
                 -75018547//51840 + 1232γₑ/27 + 6634243π^2/110592
-                - 11a_6__c1/2 + 2464log2/27 - 20a₆ˡⁿ¹/9
+                - 11a₆ᶜ¹/2 + 2464log2/27 - 20a₆ˡⁿ¹/9
             )ν^3
             + (272855π^2/124416 - 20543435//373248)ν^4
             + 5159ν^5/248832
@@ -100,46 +100,37 @@ end
 const binding_energy = 𝓔
 
 
-binding_energy_symbolic_deriv = let
-    @variables M₁ M₂ χ⃗₁[1:4] χ⃗₂[1:4] R[1:4] v
-    χ⃗₁ = QuatVec(χ⃗₁...)
-    χ⃗₂ = QuatVec(χ⃗₂...)
-    R = Quaternion(R...)
-    E = 𝓔(
-        M₁, M₂, χ⃗₁, χ⃗₂, R, v;
-        ν=ν(M₁,M₂), δ=δ(M₁,M₂), ℓ̂=ℓ̂(R), logv=log(v),
-        γₑ=SymbolicUtils.Sym{Real}(:γₑ), π=SymbolicUtils.Sym{Real}(:π),
-        log2=SymbolicUtils.Sym{Real}(:log2), log3=SymbolicUtils.Sym{Real}(:log3)
-    )
-    E′ = expand_derivatives(Differential(v)(E))
-    eval(build_function(
-        E′,
-        :M₁, :M₂, :χ⃗₁, :χ⃗₂, :R, :v, :ν, :δ, :ℓ̂, :logv, :γₑ, :π, :log2, :log3
-    ))::Function
-end
+# binding_energy_symbolic_deriv = let
+#     @variables M₁ M₂ χ⃗₁[1:4] χ⃗₂[1:4] R[1:4] v
+#     χ⃗₁ = QuatVec(χ⃗₁...)
+#     χ⃗₂ = QuatVec(χ⃗₂...)
+#     R = Quaternion(R...)
+#     E = 𝓔(
+#         M₁, M₂, χ⃗₁, χ⃗₂, R, v;
+#         ν=ν(M₁,M₂), δ=δ(M₁,M₂), ℓ̂=ℓ̂(R), logv=log(v),
+#         γₑ=SymbolicUtils.Sym{Real}(:γₑ), π=SymbolicUtils.Sym{Real}(:π),
+#         log2=SymbolicUtils.Sym{Real}(:log2), log3=SymbolicUtils.Sym{Real}(:log3)
+#     )
+#     E′ = expand_derivatives(Differential(v)(E))
+#     eval(build_function(
+#         E′,
+#         :M₁, :M₂, :χ⃗₁, :χ⃗₂, :R, :v, :ν, :δ, :ℓ̂, :logv, :γₑ, :π, :log2, :log3
+#     ))::Function
+# end
 
 
 """
-    𝓔′(u)
-    𝓔′(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
-    binding_energy_deriv(u)
-    binding_energy_deriv(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
+    𝓔′(pnstate)
+    binding_energy_deriv(pnstate)
 
 Compute the derivative with respect to ``v`` of the binding energy of a compact binary.
 
 This is computed symbolically from [`𝓔`](@ref); see that function for details.
 """
-function 𝓔′(M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v)
-    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
-    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
-    R = Quaternion(Rʷ, Rˣ, Rʸ, Rᶻ)
-    let ν=ν(M₁,M₂), δ=δ(M₁,M₂), ℓ̂=ℓ̂(R), logv=log(v)
-        let γₑ=oftype(logv, γₑ), π=oftype(logv, π), log2=oftype(logv, log2), log3=oftype(logv, log3)
-            binding_energy_symbolic_deriv(M₁, M₂, χ⃗₁, χ⃗₂, R, v, ν, δ, ℓ̂, logv, γₑ, π, log2, log3)
-        end
-    end
+function 𝓔′(pnstate)
+    @warn "Temporarily returning nonsense while I fix this, so that I can check everything else in this package"
+    𝓔(pnstate)
 end
-𝓔′(u) = 𝓔′(u...)
 const binding_energy_deriv = 𝓔′
 
 
@@ -157,7 +148,7 @@ parameter.  Also note that ``λ̂ = λ₂ v^{10}/(m₁+m₂)^5``, and we need to
 terms again with ``1 ↔ 2``.  Finally, note the normalization difference, where a different
 overall factor is used, leading to a sign difference.
 """
-function 𝓔NS(pnstate, λ₁, λ₂)
+@compute_pn_variables function 𝓔NS(pnstate, λ₁, λ₂)
     -M * ν * v^2 / 2 * (
         v^10 * (-9*((M₁/M₂)λ₂ + (M₂/M₁)λ₁) / M^5)
         + v^12 * (

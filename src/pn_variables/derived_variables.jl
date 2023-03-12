@@ -1,5 +1,8 @@
 module DerivedVariables
 
+using ..PostNewtonian: PNState
+using Quaternionic: 𝐢, 𝐣, 𝐤
+
 include("mass_combinations.jl")
 export M, total_mass,
     μ, reduced_mass,
