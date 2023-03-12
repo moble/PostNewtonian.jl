@@ -1,5 +1,7 @@
 module FundamentalVariables
 
+using ..PostNewtonian: PNState
+
 export M₁, M₂, χ⃗₁, χ⃗₂, R, v
 
 M₁(s::PNState) = s.u[1]
