@@ -7,8 +7,8 @@ const a₇ˡⁿ¹ = 0 # not yet known
 const a₇ᶜ¹ = 0 # not yet known
 
 """
-    𝓔(pnstate)
-    binding_energy(pnstate)
+    𝓔(pnsystem)
+    binding_energy(pnsystem)
 
 Compute the binding energy of a compact binary.
 
@@ -35,48 +35,48 @@ given in Eq. (C4) of [Arun et al.](https://arxiv.org/abs/0810.5336v3)
 The spin-orbit terms in the energy are now complete to 4.0pN (the last term is zero).  These
 terms come from Eq. (4.6) of [Bohé et al. (2012)](https://arxiv.org/abs/1212.5520v2):
 """
-@compute_pn_variables function 𝓔(pnstate)
+@compute_pn_variables function 𝓔(pnsystem)
     -M * ν * v^2 / 2 * (
         1
         + v^2 * (-3//4 - ν/12)
         + v^4 * (-27//8 + 19ν/8 - ν^2/24)
         + v^6 * (-675//64 + (34445//576 - 205π^2/96)ν - 155ν^2/96 - 35ν^3/5184)
         + v^8 * (
-            -3969//128 + (-123671//5760 + 9037π^2/1536 + 1792log2/15 + 896γₑ/15)ν
+            -3969//128 + (-123671//5760 + 9037π^2/1536 + 1792ln2/15 + 896γₑ/15)ν
             + (-498449//3456 + 3157π^2/576)ν^2 + 301ν^3/1728 + 77ν^4/31104
-            + logv * (896ν/15)
+            + lnv * (896ν/15)
         )
 
         # Below are the incomplete terms
         + v^10 * (
             -45927//512
-            + (-228916843//115200 - 9976γₑ/35 + 729log3/7 - 23672log2/35 + 126779π^2/512)ν
-            + (189745//576 + -21337π^2/1024 + 3a₆ᶜ¹ - 896log2/5 - 448γₑ/5 + 2a₆ˡⁿ¹/3)ν^2
+            + (-228916843//115200 - 9976γₑ/35 + 729ln3/7 - 23672ln2/35 + 126779π^2/512)ν
+            + (189745//576 + -21337π^2/1024 + 3a₆ᶜ¹ - 896ln2/5 - 448γₑ/5 + 2a₆ˡⁿ¹/3)ν^2
             + (-1353π^2/256 + 69423//512)ν^3
             + 55ν^4/512
             + ν^5/512
-            + logv * (-9976ν/35 + (-448//5 + 6a₆ˡⁿ¹)ν^2)
+            + lnv * (-9976ν/35 + (-448//5 + 6a₆ˡⁿ¹)ν^2)
         )
         + v^11 * (10ν/3 * (13696π/525 + ν*a₆₅ᶜ¹))
         + v^12 * (
             -264627//1024
             + (
-                -389727504721//43545600 + 74888log2/243 - 7128log3/7
+                -389727504721//43545600 + 74888ln2/243 - 7128ln3/7
                 - 3934568γₑ/8505 + 9118627045π^2/5308416 - 30809603π^4/786432
             )ν
             + (
                 113594718743//14515200 + 18491π^4/2304
-                + 246004log2/105 + 112772γₑ/105 + 11a₆ᶜ¹/2 + a₆ˡⁿ¹ + 2a₇ˡⁿ¹/3
-                + 11a₇ᶜ¹/3 - 86017789π^2/110592 - 2673log3/14
+                + 246004ln2/105 + 112772γₑ/105 + 11a₆ᶜ¹/2 + a₆ˡⁿ¹ + 2a₇ˡⁿ¹/3
+                + 11a₇ᶜ¹/3 - 86017789π^2/110592 - 2673ln3/14
             )ν^2
             + (
                 -75018547//51840 + 1232γₑ/27 + 6634243π^2/110592
-                - 11a₆ᶜ¹/2 + 2464log2/27 - 20a₆ˡⁿ¹/9
+                - 11a₆ᶜ¹/2 + 2464ln2/27 - 20a₆ˡⁿ¹/9
             )ν^3
             + (272855π^2/124416 - 20543435//373248)ν^4
             + 5159ν^5/248832
             + 2717ν^6/6718464
-            + 2logv * (
+            + 2lnv * (
                 11a₇ˡⁿ¹/3
                 - 1967284ν/8505
                 + (56386//105 + 11a₆ˡⁿ¹/2)ν^2
@@ -107,36 +107,36 @@ const binding_energy = 𝓔
 #     R = Quaternion(R...)
 #     E = 𝓔(
 #         M₁, M₂, χ⃗₁, χ⃗₂, R, v;
-#         ν=ν(M₁,M₂), δ=δ(M₁,M₂), ℓ̂=ℓ̂(R), logv=log(v),
+#         ν=ν(M₁,M₂), δ=δ(M₁,M₂), ℓ̂=ℓ̂(R), lnv=ln(v),
 #         γₑ=SymbolicUtils.Sym{Real}(:γₑ), π=SymbolicUtils.Sym{Real}(:π),
-#         log2=SymbolicUtils.Sym{Real}(:log2), log3=SymbolicUtils.Sym{Real}(:log3)
+#         ln2=SymbolicUtils.Sym{Real}(:ln2), ln3=SymbolicUtils.Sym{Real}(:ln3)
 #     )
 #     E′ = expand_derivatives(Differential(v)(E))
 #     eval(build_function(
 #         E′,
-#         :M₁, :M₂, :χ⃗₁, :χ⃗₂, :R, :v, :ν, :δ, :ℓ̂, :logv, :γₑ, :π, :log2, :log3
+#         :M₁, :M₂, :χ⃗₁, :χ⃗₂, :R, :v, :ν, :δ, :ℓ̂, :lnv, :γₑ, :π, :ln2, :ln3
 #     ))::Function
 # end
 
 
 """
-    𝓔′(pnstate)
-    binding_energy_deriv(pnstate)
+    𝓔′(pnsystem)
+    binding_energy_deriv(pnsystem)
 
 Compute the derivative with respect to ``v`` of the binding energy of a compact binary.
 
 This is computed symbolically from [`𝓔`](@ref); see that function for details.
 """
-function 𝓔′(pnstate)
+function 𝓔′(pnsystem)
     @warn "Temporarily returning nonsense while I fix this, so that I can check everything else in this package"
-    𝓔(pnstate)
+    𝓔(pnsystem)
 end
 const binding_energy_deriv = 𝓔′
 
 
 """
-    𝓔NS(pnstate, λ₁, λ₂)
-    binding_energy_NS(pnstate, λ₁, λ₂)
+    𝓔NS(pnsystem, λ₁, λ₂)
+    binding_energy_NS(pnsystem, λ₁, λ₂)
 
 Compute tidal NS contribution to the gravitational binding energy
 
@@ -148,7 +148,7 @@ parameter.  Also note that ``λ̂ = λ₂ v^{10}/(m₁+m₂)^5``, and we need to
 terms again with ``1 ↔ 2``.  Finally, note the normalization difference, where a different
 overall factor is used, leading to a sign difference.
 """
-@compute_pn_variables function 𝓔NS(pnstate, λ₁, λ₂)
+@compute_pn_variables function 𝓔NS(pnsystem, λ₁, λ₂)
     -M * ν * v^2 / 2 * (
         v^10 * (-9*((M₁/M₂)λ₂ + (M₂/M₁)λ₁) / M^5)
         + v^12 * (

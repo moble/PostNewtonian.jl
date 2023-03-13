@@ -1,5 +1,5 @@
 """
-    Ω⃗ₚ(pnstate)
+    Ω⃗ₚ(pnsystem)
 
 Compute the angular velocity of orbital precession.
 
@@ -9,12 +9,12 @@ the time derivative of that *unit* vector is ``Ω⃗ₚ × ℓ̂``.
 At the moment, this is computed solely by expressions from [Bohé et al.
 (2013)](https://arxiv.org/abs/1212.5520).  See [`𝛡`](@ref) for details.
 """
-Ω⃗ₚ(pnstate) = 𝛡(pnstate)
+Ω⃗ₚ(pnsystem) = 𝛡(pnsystem)
 const Omega_p = Ω⃗ₚ
 
 
 """
-    Ω⃗ᵪ₁(pnstate)
+    Ω⃗ᵪ₁(pnsystem)
 
 Compute the angular velocity of precession of χ⃗₁
 
@@ -23,14 +23,14 @@ is due to its rotation alone, and is given by ``Ω⃗ᵪ₁ × χ⃗₁``.
 
 Note that this function simply calls [`Ω⃗ᵪ`](@ref) with the appropriate parameters.
 """
-@compute_pn_variables function Ω⃗ᵪ₁(pnstate)
+@compute_pn_variables function Ω⃗ᵪ₁(pnsystem)
     Ω⃗ᵪ(M₁, M₂, χ⃗₁, χ⃗₂, v, R)
 end
 const Omega_chi1 = Ω⃗ᵪ₁
 
 
 """
-    Ω⃗ᵪ₂(pnstate)
+    Ω⃗ᵪ₂(pnsystem)
 
 Compute the angular velocity of precession of χ⃗₂
 
@@ -39,7 +39,7 @@ is due to its rotation alone, and is given by ``Ω⃗ᵪ₂ × χ⃗₂``.
 
 Note that this function simply calls [`Ω⃗ᵪ`](@ref) with the appropriate parameters.
 """
-@compute_pn_variables function Ω⃗ᵪ₂(pnstate)
+@compute_pn_variables function Ω⃗ᵪ₂(pnsystem)
     Ω⃗ᵪ(M₂, M₁, χ⃗₂, χ⃗₁, v, R)
 end
 const Omega_chi2 = Ω⃗ᵪ₂
@@ -85,7 +85,7 @@ end
 
 
 """
-    𝛡(pnstate)
+    𝛡(pnsystem)
 
 Compute the angular velocity of orbital precession according to Bohé et al.
 
@@ -97,20 +97,20 @@ Then, they define the PN parameter γ≔M/r and we have Mω = v³ so that ϖ = �
 parameters γ and aₗ are given by Eqs. (4.3) and (4.4), and given here by the functions
 [`γ`](@ref) and [`aₗ`](@ref).
 """
-@compute_pn_variables function 𝛡(pnstate)
-    (γ(pnstate) * aₗ(pnstate) / v^3) * n̂
+@compute_pn_variables function 𝛡(pnsystem)
+    (γ(pnsystem) * aₗ(pnsystem) / v^3) * n̂
 end
 
 
 """
-    γ(pnstate)
+    γ(pnsystem)
 
 Eq. (4.3) of [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520).  This term contributes
 to [`𝛡`](@ref).
 
 Note that there is a 3PN term of ``-22ν\\ln(r/r₀′)/3`` that is simply ignored here.
 """
-@compute_pn_variables function γ(pnstate)
+@compute_pn_variables function γ(pnsystem)
     v^2 * (
         1
         + v^2 * (1 - ν / 3)
@@ -124,12 +124,12 @@ end
 
 
 """
-    aₗ(pnstate)
+    aₗ(pnsystem)
 
 Eq. (4.4) of [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520).  This term contributes
 to [`𝛡`](@ref).
 """
-@compute_pn_variables function aₗ(pnstate)
+@compute_pn_variables function aₗ(pnsystem)
     v^7/M^3 * (
         (7Sₙ + 3δ*Σₙ)
         + v^2 * ((-10 - 29ν/3) * Sₙ + δ*(-6 - 9ν/2) * Σₙ)

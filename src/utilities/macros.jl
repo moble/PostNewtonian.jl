@@ -8,7 +8,7 @@ pnvariables = filter(v->v!=:eval, [
     find_symbols_of_type(DerivedVariables, Function)
 ])
 
-unary_funcs = [:√, :sqrt, :log, :sin, :cos]
+unary_funcs = [:√, :sqrt, :log, :ln, :sin, :cos]
 
 macro compute_pn_variables(func)
     compute_pn_variables(1, func)
@@ -23,25 +23,25 @@ end
 
 This macro takes the function `func`, looks for various symbols inside that function, and if
 present defines them appropriately inside that function.  In particular, it defines PN
-variables based on the value of a `PNState` argument to the function (located at position
+variables based on the value of a `PNSystem` argument to the function (located at position
 `arg_index` in the argument list).  It also redefines `Irrational`s to have the type
-relevant for that `PNState` object.
+relevant for that `PNSystem` object.
 """
 function compute_pn_variables(arg_index, func)
     splitfunc = MacroTools.splitdef(func)
-    pnstate = splitfunc[:args][arg_index]
+    pnsystem = splitfunc[:args][arg_index]
     body = splitfunc[:body]
 
     pnvariables_exprs = [
-        :($v=PNVariables.$v($pnstate))
+        :($v=PNVariables.$v($pnsystem))
         for v ∈ filter(v->MacroTools.inexpr(body, v), pnvariables)
     ]
     irrationals_exprs = [
-        :($v=convert(eltype($pnstate), $v))
+        :($v=convert(eltype($pnsystem), $v))
         for v ∈ filter(v->MacroTools.inexpr(body, v), irrationals)
     ]
     unary_funcs_exprs = [
-        :($v=($(esc(:x))->$v(convert(eltype($pnstate), x))))
+        :($v=($(esc(:x))->$v(convert(eltype($pnsystem), x))))
         for v ∈ filter(v->MacroTools.inexpr(body, v), unary_funcs)
     ]
     exprs = [
