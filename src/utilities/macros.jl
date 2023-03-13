@@ -23,9 +23,9 @@ end
 
 This macro takes the function `func`, looks for various symbols inside that function, and if
 present defines them appropriately inside that function.  In particular, it defines PN
-variables based on the value of a `PNSystem` argument to the function (located at position
-`arg_index` in the argument list).  It also redefines `Irrational`s to have the type
-relevant for that `PNSystem` object.
+variables based on the value of an `AbstractPNSystem` argument to the function (located at
+position `arg_index` in the argument list).  It also redefines `Irrational`s to have the
+type relevant for that `AbstractPNSystem` object.
 """
 function compute_pn_variables(arg_index, func)
     splitfunc = MacroTools.splitdef(func)

@@ -2,9 +2,9 @@ module PostNewtonian
 
 using StaticArrays
 using Quaternionic
+using MacroTools
 using Symbolics
 using SymbolicUtils
-using MacroTools
 using SciMLBase
 using DiffEqBase
 using RecursiveArrayTools
@@ -15,8 +15,8 @@ include("utilities/misc.jl")
 include("utilities/mathconstants.jl")
 using .MathConstants
 
-include("pn_system.jl")
-export PNSystem, TaylorT1
+include("pn_systems/pn_system.jl")
+export AbstractPNSystem, BBH
 
 include("pn_variables/fundamental_variables.jl")
 using .FundamentalVariables
@@ -61,7 +61,6 @@ export termination_forwards, termination_backwards,
     dtmin_terminator, nonfinite_terminator
 
 include("pn_dynamics/PNSystems.jl")
-#export PNSystem, TaylorT1
 
 include("utilities/combine_solutions.jl")
 

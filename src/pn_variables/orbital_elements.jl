@@ -9,7 +9,7 @@ n̂(R) = R x̂ R̄
 ```
 """
 n̂(R) = QuatVec(R(𝐢))
-n̂(s::PNSystem) = n̂(R(s))
+n̂(s::AbstractPNSystem) = n̂(R(s))
 const n_hat = n̂
 
 
@@ -25,7 +25,7 @@ the frame is given by the rotor `R`.  This is equal to
 This also completes the right-handed triple of ``(n̂, λ̂, ℓ̂)``.
 """
 λ̂(R) = QuatVec(R(𝐣))
-λ̂(s::PNSystem) = λ̂(R(s))
+λ̂(s::AbstractPNSystem) = λ̂(R(s))
 const lambda_hat = λ̂
 
 
@@ -40,7 +40,7 @@ given by the rotor `R`.  This is equal to
 ```
 """
 ℓ̂(R) = QuatVec(R(𝐤))
-ℓ̂(s::PNSystem) = ℓ̂(R(s))
+ℓ̂(s::AbstractPNSystem) = ℓ̂(R(s))
 const ell_hat = ℓ̂
 
 
@@ -54,7 +54,7 @@ The parameter `v` is the PN velocity parameter, and must be passed as a keyword 
 as in `Ω(v=0.1)`.  The parameter `M` is the total mass of the binary.
 """
 Ω(;v, M=1) = v^3 / M
-Ω(s::PNSystem) = Ω(v=v(s), M=M(s))
+Ω(s::AbstractPNSystem) = Ω(v=v(s), M=M(s))
 const Omega = Ω
 
 
@@ -69,4 +69,4 @@ The parameter `Ω` is the orbital angular frequency, and must be passed as a key
 v(;Ω, M=1) = (M*Ω)^(1//3)
 
 
-lnv(s::PNSystem) = ln(v(s))
+lnv(s::AbstractPNSystem) = ln(v(s))

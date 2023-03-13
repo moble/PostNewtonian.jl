@@ -4,20 +4,21 @@
 
 There is a fairly simple hierarchy to the code:
 
-1. **State**
+1. **System and state**
 
-   Objects of type `PNState` represent the PN system itself and some information
+   Objects of type `AbstractPNSystem` represent the PN system itself and some information
    about it, including:
+   - The `Binary` type — `BBH`, `BHNS`, or `NSNS`
    - The float type `T` — `Float64`, etc.
    - The PN expansion order `PNOrder` — a `Rational`
-   - The `Binary` type — `BBH`, `BHNS`, or `NSNS`
    - The `Expansion` type — `TaylorT1`, `TaylorT4`, or `TaylorT5`
-   - The current state of the system, including the fundamental variables
+   - The current `state` of the system, including the fundamental variables
 
-   All but the last item are stored as type parameters; the last is stored as a vector inside the object.
+   The first of these is represented as the type itself, the last is stored as a
+   vector inside the object, and the rest are represented as type parameters.
 
    Note that basically everything below will be written as a function of such an
-   object, which we will denote `pnstate`.
+   object, which we will denote `pnsystem`.
 
 2. **Fundamental variables** 
    
@@ -26,7 +27,7 @@ There is a fairly simple hierarchy to the code:
    Love numbers `λ₁` and `λ₂`.
 
    It's important to note that these should all be accessed through functions
-   like `M₁(pnstate)` rather than directly like `pnstate.M₁`.  This allows
+   like `M₁(pnsystem)` rather than directly like `pnsystem.M₁`.  This allows
    Julia's type system to get involved, enabling important optimizations.
 
    Also, these variables can be automatically computed in functions that need
@@ -46,8 +47,9 @@ There is a fairly simple hierarchy to the code:
    variables used in articles providing the PN expressions in the code itself.
 
    Because they are defined solely in terms of fundamental variables, which can
-   be computed from a `PNState` alone, these are all written as functions of
-   such an object — such as `M(pnstate)`, `χ⃗ₐ(pnstate)`, and `n̂(pnstate)`.
+   be computed from an `AbstractAbstractPNSystem` alone, these are all written
+   as functions of such an object — such as `M(pnsystem)`, `χ⃗ₐ(pnsystem)`, and
+   `n̂(pnsystem)`.
 
    Again, these quantities will be automatically computed for you in any
    function wrapped in the `@compute_pn_variables` macro because they are
@@ -74,7 +76,7 @@ the hierarchy above.  Most likely, you will want to add new terms to existing PN
 expressions (item 4 above).  Existing code should be a good guide on how to do
 this, but note that if you will be using derived variables inside your
 expressions that don't yet exist inside this package, you should define
-functions that take exactly one `PNState` argument in the `DerivedVariables`
+functions that take exactly one `AbstractPNSystem` argument in the `DerivedVariables`
 submodule.
 
 Remember that it is *absolutely crucial* to record the source of any expressions
