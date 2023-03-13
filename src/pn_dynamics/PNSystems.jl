@@ -1,12 +1,3 @@
-# abstract type PNSystem{PNOrder,T} end
-# (PN::Type{PNS})(pnorder, t) where {PNS<:PNSystem} = PN{pnorder,t}()
-
-
-# mutable struct TaylorT1{PNOrder,T} <: PNSystem{PNOrder,T}
-#     TaylorT1{PNOrder,T}() where {PNOrder,T} = new()
-# end
-
-
 """
     recalculate!(u̇, u, p)
 

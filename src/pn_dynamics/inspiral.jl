@@ -281,7 +281,7 @@ end
 
 function inspiral(
     uᵢ, Ω₁, Ωₑ, v₁, vₑ,
-    pn::PNSystem, T,
+    pn::AbstractPNSystem, T,
     check_up_down_instability, time_stepper,
     reltol, abstol,
     termination_criteria_forwards,
