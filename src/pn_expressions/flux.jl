@@ -21,7 +21,7 @@ limit.  These terms are given in Appendix A of [Fujita
 (2012)](https://arxiv.org/abs/1211.5535v1).  He computed them up to 22pN.  That seems like
 overkill, so we'll just go up to 6pN.
 
-For systems with matter, the tidal-coupling terms come in at relative 5pN order, and are
+For systems with matter, the tidal-heating terms come in at relative 5pN order, and are
 known partially at 6pN order.  These terms come from Eq. (3.6) of [Vines et al.
 (2011)](https://prd.aps.org/abstract/PRD/v83/i8/e084051).  Note their unusual convention for
 mass ratios, where ``χ₁ = m₁/m`` in their notation; in particular, ``χ`` is not a spin
