@@ -39,11 +39,10 @@ include("pn_expressions/precession.jl")
 export Ω⃗ₚ, Omega_p,
     Ω⃗ᵪ₁, Omega_chi1,
     Ω⃗ᵪ₂, Omega_chi2,
-    Ω⃗ᵪ, 𝛡, γ, aₗ
+    𝛡, γ, aₗ
 
 include("pn_expressions/flux.jl")
-export 𝓕, gw_energy_flux,
-    𝓕NS, gw_energy_flux_NS
+export 𝓕, gw_energy_flux
 
 include("pn_expressions/binding_energy.jl")
 export 𝓔, binding_energy,

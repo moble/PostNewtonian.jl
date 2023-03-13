@@ -20,6 +20,14 @@ Beyond 3.5pN, terms other than the 4.0pN spin-orbit are only known in the extrem
 limit.  These terms are given in Appendix A of [Fujita
 (2012)](https://arxiv.org/abs/1211.5535v1).  He computed them up to 22pN.  That seems like
 overkill, so we'll just go up to 6pN.
+
+For systems with matter, the tidal-coupling terms come in at relative 5pN order, and are
+known partially at 6pN order.  These terms come from Eq. (3.6) of [Vines et al.
+(2011)](https://prd.aps.org/abstract/PRD/v83/i8/e084051).  Note their unusual convention for
+mass ratios, where ``χ₁ = m₁/m`` in their notation; in particular, ``χ`` is not a spin
+parameter.  Also note that ``λ̂ = λ₂ v^{10}/(m₁+m₂)^5``, and we need to add the coupling
+terms again with ``1 ↔ 2``.  Finally, note the normalization difference, where a different
+overall factor is used, leading to a sign difference.
 """
 @compute_pn_variables function 𝓕(pnsystem)
     32ν^2/5 * v^10 * (
@@ -88,29 +96,9 @@ overkill, so we'll just go up to 6pN.
                 + 1465472lnv/11025
             )
         )
-    )
-end
-const gw_energy_flux = 𝓕
 
-
-"""
-    𝓕NS(pnsystem, λ₁, λ₂)
-    gw_energy_flux_NS(pnsystem, λ₁, λ₂)
-
-Compute tidal NS contribution to the gravitational-wave energy flux to infinity
-
-For systems with matter, the tidal-coupling terms come in at relative 5pN order, and are
-known partially at 6pN order.  These terms come from Eq. (3.6) of [Vines et al.
-(2011)](https://prd.aps.org/abstract/PRD/v83/i8/e084051).  Note their unusual convention for
-mass ratios, where ``χ₁ = m₁/m`` in their notation; in particular, ``χ`` is not a spin
-parameter.  Also note that ``λ̂ = λ₂ v^{10}/(m₁+m₂)^5``, and we need to add the coupling
-terms again with ``1 ↔ 2``.  Finally, note the normalization difference, where a different
-overall factor is used, leading to a sign difference.
-"""
-@compute_pn_variables function 𝓕NS(pnsystem, λ₁, λ₂)
-    32ν^2/5 * v^10 * (
-        # NS tides; Eq. (3.6) of Vines et al. (2011)
-        v^10 * (((12 - 18M / M₂)λ₂ + (12 - 18M / M₁)λ₁) / M^5)
+        # NS tidal heating; Eq. (3.6) of Vines et al. (2011)
+        + v^10 * (((12 - 18M / M₂)λ₂ + (12 - 18M / M₁)λ₁) / M^5)
         + v^12 * (
             (
                 (704 + 1803M₂/M - 4501*(M₂/M)^2 + 2170*(M₂/M)^3)λ₂ / (28M₂/M)
@@ -119,4 +107,4 @@ overall factor is used, leading to a sign difference.
         )
     )
 end
-const gw_energy_flux_NS = 𝓕NS
+const gw_energy_flux = 𝓕
