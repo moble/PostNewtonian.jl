@@ -20,6 +20,7 @@ makedocs(;
         "Utilities" => "utilities.md",
         "GWFrames" => "gwframes.md",
         "Calling from Python" => "python.md",
+        "Code structure" => "code_structure.md",
     ],
 )
 
