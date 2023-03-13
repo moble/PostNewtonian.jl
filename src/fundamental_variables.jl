@@ -1,8 +1,8 @@
 module FundamentalVariables
 
-using ..PostNewtonian: AbstractPNSystem
+using ..PostNewtonian: AbstractPNSystem, BHNS, NSNS
 
-export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ
+export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, λ₁, λ₂
 
 M₁(s::AbstractPNSystem) = @inbounds s.state[1]
 M₂(s::AbstractPNSystem) = @inbounds s.state[2]
@@ -14,5 +14,8 @@ v(s::AbstractPNSystem) = @inbounds s.state[13]
 
 λ₁(::AbstractPNSystem) = 0
 λ₂(::AbstractPNSystem) = 0
+λ₂(pn::BHNS) = pn.λ₂
+λ₁(pn::NSNS) = pn.λ₁
+λ₂(pn::NSNS) = pn.λ₂
 
 end

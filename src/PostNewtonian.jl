@@ -10,62 +10,63 @@ using DiffEqBase
 using RecursiveArrayTools
 using OrdinaryDiffEq
 
-include("utilities/misc.jl")
+# See the "Code structure" section of the documentation for a description of the simple
+# hierarchy into which this code is organized.  The different levels of that hierarchy are
+# reflected cleanly in the files `include`d below.
 
-include("utilities/mathconstants.jl")
+
+include("utilities.jl")
+export termination_forwards, termination_backwards,
+    dtmin_terminator, nonfinite_terminator
 using .MathConstants
 
-include("pn_systems/pn_system.jl")
-export AbstractPNSystem, BBH
 
-include("pn_variables/fundamental_variables.jl")
+include("systems.jl")
+export AbstractPNSystem, BBH, BHNS, NSNS
+
+
+include("fundamental_variables.jl")
 using .FundamentalVariables
-#export M₁, M₂, χ⃗₁, χ⃗₂, R, v
+#export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, λ₁, λ₂  # Avoid clashes: don't export
 
-include("pn_variables/derived_variables.jl")
+
+include("derived_variables.jl")
 using .DerivedVariables
-export total_mass, reduced_mass, reduced_mass_ratio,
-    mass_difference_ratio, mass_ratio, chirp_mass,
-    n̂, λ̂, ℓ̂, Ω,
+export total_mass,  # M,  # Avoid clashes: don't export nicer names for important variables
+    reduced_mass,  # μ,
+    reduced_mass_ratio,  # ν,
+    mass_difference_ratio,  # δ,
+    mass_ratio,  # q,
+    chirp_mass,  # ℳ,
+    n_hat, n̂,
+    lambda_hat, λ̂,
+    ell_hat, ℓ̂,
+    Omega, Ω,
     S⃗₁, S⃗₂, S⃗, Σ⃗, χ⃗, χ⃗ₛ, χ⃗ₐ,
     Sₙ, Σₙ, Sλ, Σλ, Sₗ, Σₗ
 
-include("utilities/macros.jl")
 
-include("pn_expressions/tidal_heating.jl")
-export tidal_heating
+include("pn_expressions.jl")
+export gw_energy_flux, 𝓕,
+    tidal_heating,
+    binding_energy, 𝓔,
+    binding_energy_deriv, 𝓔′,
+    Omega_p, Ω⃗ₚ,
+    Omega_chi1, Ω⃗ᵪ₁,
+    Omega_chi2, Ω⃗ᵪ₂,
+    #𝛡, γ, aₗ, Ω⃗ᵪ  # Too obscure to bother with
+    mode_weights!, h!
 
-include("pn_expressions/precession.jl")
-export Ω⃗ₚ, Omega_p,
-    Ω⃗ᵪ₁, Omega_chi1,
-    Ω⃗ᵪ₂, Omega_chi2,
-    𝛡, γ, aₗ # Ω⃗ᵪ
 
-include("pn_expressions/flux.jl")
-export 𝓕, gw_energy_flux
+include("dynamics.jl")
+export up_down_instability, inspiral
 
-include("pn_expressions/binding_energy.jl")
-export 𝓔, binding_energy,
-    𝓔′, binding_energy_deriv
 
-include("pn_expressions/mode_weights.jl")
-export h!, mode_weights!
+include("evaluation.jl")
 
-include("pn_dynamics/up_down_instability.jl")
-export up_down_instability
 
-include("utilities/termination_criteria.jl")
-export termination_forwards, termination_backwards,
-    dtmin_terminator, nonfinite_terminator
-
-include("pn_dynamics/PNSystems.jl")
-
-include("utilities/combine_solutions.jl")
-
-include("pn_dynamics/inspiral.jl")
-export inspiral
-
-include("compatibility_layers/gwframes.jl")
+include("compatibility_layers.jl")
 export GWFrames
+
 
 end  # module PostNewtonian
