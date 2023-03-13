@@ -1,6 +1,7 @@
 module DerivedVariables
 
 using ..PostNewtonian: AbstractPNSystem
+import ..PostNewtonian.FundamentalVariables: v
 using Quaternionic: 𝐢, 𝐣, 𝐤
 
 include("derived_variables/mass_combinations.jl")

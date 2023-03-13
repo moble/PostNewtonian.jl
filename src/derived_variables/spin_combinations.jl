@@ -1,15 +1,28 @@
+"""
+    S⃗₁(pnsystem)
+
+Dimensionful spin vector of object 1.
+"""
 S⃗₁(s::AbstractPNSystem) = χ⃗₁(s) * M₁(s)^2
+
+"""
+    S⃗₂(pnsystem)
+
+Dimensionful spin vector of object 2.
+"""
 S⃗₂(s::AbstractPNSystem) = χ⃗₂(s) * M₂(s)^2
 
 """
+    S⃗(pnsystem)
     S⃗(M₁, M₂, χ⃗₁, χ⃗₂)
 
-Total spin vector ``S⃗₁+S⃗₂``.
+Total (dimensionful) spin vector ``S⃗₁+S⃗₂``.
 """
 S⃗(M₁, M₂, χ⃗₁, χ⃗₂) = χ⃗₁ * M₁^2 + χ⃗₂ * M₂^2
 S⃗(s::AbstractPNSystem) = S⃗(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
 
 """
+    Σ⃗(pnsystem)
     Σ⃗(M₁, M₂, χ⃗₁, χ⃗₂)
 
 Differential spin vector ``M(a⃗₂-a⃗₁)``.
@@ -18,6 +31,7 @@ Differential spin vector ``M(a⃗₂-a⃗₁)``.
 Σ⃗(s::AbstractPNSystem) = Σ⃗(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
 
 """
+    χ⃗(pnsystem)
     χ⃗(S⃗, M)
 
 Normalized spin vector ``S⃗/M²``.
