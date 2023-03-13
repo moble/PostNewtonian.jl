@@ -2,12 +2,14 @@
 
 ## Code hierarchy
 
-There is a fairly simple hierarchy to the code:
+There is a fairly simple hierarchy to the code.  Beyond some basic utilities,
+which are related to how we write the code, rather than post-Newtonian
+calculations *per se*, we have the following:
 
 1. **System and state**
 
-   Objects of type `AbstractPNSystem` represent the PN system itself and some information
-   about it, including:
+   Objects of type `AbstractPNSystem` represent the PN system itself and some
+   information about it, including:
    - The `Binary` type — `BBH`, `BHNS`, or `NSNS`
    - The float type `T` — `Float64`, etc.
    - The PN expansion order `PNOrder` — a `Rational`
@@ -63,19 +65,27 @@ There is a fairly simple hierarchy to the code:
    expansions — the most important examples being the flux [`𝓕`](@ref), binding
    energy [`𝓔`](@ref), and the waveform mode weights [`h!`](@ref) themselves.
 
-5. **Evaluation**
+5. **Dynamics**
 
    This is where the ODE integration actually occurs, to evolve the orbital
-   dynamics of the system, and the computation of the waveform mode weights in
-   terms of those dynamics.
+   dynamics of the system.
 
-6. **Compatibility layers**
+6. **Evaluation**
+
+   Finally, we construct the waveforms themselves.  This level contains the main
+   interface that will usually be used from Julia code, and should be restricted
+   to fairly high-level functions like `PNWaveform(M₁, M₂, ...)`, while still
+   handling the full range of options that will be present in "Dynamics", for
+   example.
+
+7. **Compatibility layers**
 
    This is an optional level of abstraction that allows us to wrap the
    evaluation layer in functions that are designed to look and act more like
    other packages' functions.  As of this writing, the only such layer is for
    [`GWFrames`](https://github.com/moble/GWFrames) compatibility, but similar
    wrappers could certainly be added.
+
 
 ## Adding new PN terms or expressions
 
