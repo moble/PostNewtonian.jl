@@ -15,12 +15,22 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
-        "PN expressions" => "pn_expressions.md",
-        "Termination criteria" => "termination_criteria.md",
-        "Utilities" => "utilities.md",
-        "GWFrames" => "gwframes.md",
-        "Calling from Python" => "python.md",
-        "Code structure" => "code_structure.md",
+        "Interface" => [
+            "High-level functions" => "interface.md",
+            "GWFrames" => "gwframes.md",
+            "Python" => "python.md",
+            "Termination criteria" => "termination_criteria.md",
+        ],
+        "Internals" => [
+            "Code structure" => "code_structure.md",
+            "systems.md",
+            "fundamental_variables.md",
+            "derived_variables.md",
+            "pn_expressions.md",
+            "dynamics.md",
+            "Evaluation" => "evaluation.md",
+            "utilities.md",
+        ],
     ],
 )
 

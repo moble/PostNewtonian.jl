@@ -1,4 +1,5 @@
 """
+    n̂(pnsystem)
     n̂(R)
     n_hat(R)
 
@@ -14,6 +15,7 @@ const n_hat = n̂
 
 
 """
+    λ̂(pnsystem)
     λ̂(R)
     lambda_hat(R)
 
@@ -30,6 +32,7 @@ const lambda_hat = λ̂
 
 
 """
+    ℓ̂(pnsystem)
     ℓ̂(R)
     ell_hat(R)
 
@@ -45,6 +48,7 @@ const ell_hat = ℓ̂
 
 
 """
+    Ω(pnsystem)
     Ω(;v, M=1)
     Omega(;v, M=1)
 
@@ -52,6 +56,8 @@ Orbital angular frequency.
 
 The parameter `v` is the PN velocity parameter, and must be passed as a keyword argument —
 as in `Ω(v=0.1)`.  The parameter `M` is the total mass of the binary.
+
+See also [`v`](@ref).
 """
 Ω(;v, M=1) = v^3 / M
 Ω(s::AbstractPNSystem) = Ω(v=v(s), M=M(s))
@@ -65,6 +71,8 @@ Post-Newtonian velocity parameter.
 
 The parameter `Ω` is the orbital angular frequency, and must be passed as a keyword argument
 — as in `v(Ω=0.1)`.  The parameter `M` is the total mass of the binary.
+
+See also [`Ω`](@ref).
 """
 v(;Ω, M=1) = (M*Ω)^(1//3)
 
