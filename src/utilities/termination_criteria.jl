@@ -22,12 +22,12 @@ function termination_forwards(vₑ, quiet=false)
     # Triggers the `continuous_terminator!` whenever one of these conditions crosses 0.
     # More precisely, the integrator performs a root find to finish precisely
     # when one of these conditions crosses 0.
-    function conditions(out,u,t,integrator)
-        out[1] = u[1]  # Terminate if M₁≤0
-        out[2] = u[2]  # Terminate if M₂≤0
-        out[3] = 1 - abs2vec(QuatVec{typeof(vₑ)}(u[3:5]...))  # Terminate if χ₁>1
-        out[4] = 1 - abs2vec(QuatVec{typeof(vₑ)}(u[6:8]...))  # Terminate if χ₂>1
-        out[5] = vₑ - u[13]  # Terminate at v = vₑ
+    function conditions(out,state,t,integrator)
+        out[1] = state[1]  # Terminate if M₁≤0
+        out[2] = state[2]  # Terminate if M₂≤0
+        out[3] = 1 - abs2vec(QuatVec{typeof(vₑ)}(state[3:5]...))  # Terminate if χ₁>1
+        out[4] = 1 - abs2vec(QuatVec{typeof(vₑ)}(state[6:8]...))  # Terminate if χ₂>1
+        out[5] = vₑ - state[13]  # Terminate at v = vₑ
     end
     function terminator!(integrator, event_index)
         if event_index == 1
@@ -76,12 +76,12 @@ end
 ```
 """
 function termination_backwards(v₁, quiet=false)
-    function terminators_backwards(out,u,t,integrator)
-        out[1] = u[1]  # Terminate if M₁≤0
-        out[2] = u[2]  # Terminate if M₂≤0
-        out[3] = 1 - abs2vec(QuatVec{typeof(v₁)}(u[3:5]...))  # Terminate if χ₁>1
-        out[4] = 1 - abs2vec(QuatVec{typeof(v₁)}(u[6:8]...))  # Terminate if χ₂>1
-        out[5] = v₁ - u[13]  # Terminate at v = v₁
+    function terminators_backwards(out,state,t,integrator)
+        out[1] = state[1]  # Terminate if M₁≤0
+        out[2] = state[2]  # Terminate if M₂≤0
+        out[3] = 1 - abs2vec(QuatVec{typeof(v₁)}(state[3:5]...))  # Terminate if χ₁>1
+        out[4] = 1 - abs2vec(QuatVec{typeof(v₁)}(state[6:8]...))  # Terminate if χ₂>1
+        out[5] = v₁ - state[13]  # Terminate at v = v₁
     end
     function terminator_backwards!(integrator, event_index)
         if event_index == 1
@@ -123,7 +123,7 @@ function dtmin_terminator(T)
     # Triggers the `discrete_terminator!` whenever this condition is true after
     # an integration step
     ϵ = √eps(T)
-    function discrete_condition(u,t,integrator)
+    function discrete_condition(state,t,integrator)
         abs(integrator.dt) < ϵ
     end
     function discrete_terminator!(integrator)
@@ -147,9 +147,9 @@ the data after an integration step.
 function nonfinite_terminator()
     # Triggers the `discrete_terminator!` whenever this condition is true after
     # an integration step
-    function discrete_condition(u,t,integrator)
-        # any(isnan, u) || isnan(t) || isnan(integrator.dt)
-        !(all(isfinite, u) && isfinite(t) && isfinite(integrator.dt))
+    function discrete_condition(state,t,integrator)
+        # any(isnan, state) || isnan(t) || isnan(integrator.dt)
+        !(all(isfinite, state) && isfinite(t) && isfinite(integrator.dt))
     end
     function discrete_terminator!(integrator)
         @warn "Terminating forwards evolution because a non-finite number was found"
