@@ -47,8 +47,7 @@ export 𝓕, gw_energy_flux,
 
 include("pn_expressions/binding_energy.jl")
 export 𝓔, binding_energy,
-    𝓔′, binding_energy_deriv,
-    𝓔NS, binding_energy_NS
+    𝓔′, binding_energy_deriv
 
 include("pn_expressions/mode_weights.jl")
 export h!, mode_weights!
