@@ -10,7 +10,7 @@ Integrate the orbital dynamics of an inspiraling non-eccentric compact binary.
   * `M₂`: Initial mass of black hole 2
   * `χ⃗₁`: Initial dimensionless spin of black hole 1, S⃗₁/M₁²
   * `χ⃗₂`: Initial dimensionless spin of black hole 2, S⃗₂/M₂²
-  * `Ωᵢ`: Initial orbital angular velocity
+  * `Ωᵢ`: Initial orbital angular frequency
 
 These parameters all describe the "initial" conditions.  See below for an explanation of the
 different meanings of "initial" and "first" in this context.  Note that the masses change in
@@ -22,8 +22,8 @@ due to tidal heating.  Therefore, the values passed here are only precisely as g
 
 ## Keyword arguments
 
-  * `Ω₁=Ωᵢ`: First angular velocity in output data (see next section).
-  * `Ωₑ=1`: Final angular velocity at which to stop ODE integration.
+  * `Ω₁=Ωᵢ`: First angular frequency in output data (see next section).
+  * `Ωₑ=1`: Final angular frequency at which to stop ODE integration.
   * `Rᵢ=Rotor(true)`: Initial orientation of binary.
   * `PNSys=TaylorT1`: Currently the only possibility.
   * `PNOrder=7//2`: Not actually used currently.
@@ -100,7 +100,7 @@ The evolved variables, in order, are
   * `Rʸ`: ``y`` component...
   * `Rᶻ`: ``z`` component...
   * `v`: PN "velocity" parameter related to the total mass ``M`` and orbital angular
-    velocity ``Ω`` by ``v = (M Ω)^{1/3}``
+    frequency ``Ω`` by ``v = (M Ω)^{1/3}``
   * `Φ`: Orbital phase given by integrating ``Ω`` (optional; only appears if
     `integrate_orbital_phase` is `true`)
 
@@ -152,15 +152,15 @@ The field `sol.t` is the set of time points at which the solution is given.  To 
 ## Initial frequency vs. first frequency vs. end frequency
 
 Note the distinction between `Ωᵢ` (with subscript `i`) and `Ω₁` (with subscript `1`).  The
-first, `Ωᵢ`, represents the angular velocity of the *initial condition* from which the ODE
-integrator will begin; the second, `Ω₁`, represents the target angular velocity of the first
+first, `Ωᵢ`, represents the angular frequency of the *initial condition* from which the ODE
+integrator will begin; the second, `Ω₁`, represents the target angular frequency of the first
 element of the output data.  That is, the ODE integration will run forwards in time from
 `Ωᵢ` to the merger, and then — if `Ωᵢ>Ω₁` — come back to `Ωᵢ` and run backwards in time to
 `Ω₁`.  The output data will stitch these two together to be one continuous
 (forwards-in-time) data series.
 
 For example, if you are trying to match to a numerical relativity (NR) simulation, you can
-read the masses and spins off of the NR data when the system is orbiting at angular velocity
+read the masses and spins off of the NR data when the system is orbiting at angular frequency
 `Ωᵢ`.  Integrating the post-Newtonian (PN) solution forwards in time from this point will
 allow you to compare the PN and NR waveforms.  However, you may want to know what the
 waveform was at *earlier* times than are present in the NR data.  For this, you also have to

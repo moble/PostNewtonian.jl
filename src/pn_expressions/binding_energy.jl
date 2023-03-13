@@ -1,8 +1,8 @@
-# Variable names refer to v2 of Bini and Damour (2013b)
-const a₆ᶜ¹ = 0 # not yet known
-const a₆₅ᶜ¹ = 0 # not yet known
-const a₇ˡⁿ¹ = 0 # not yet known
-const a₇ᶜ¹ = 0 # not yet known
+# Variable names refer to as-yet-unknown coefficients from v2 of Bini and Damour (2013b)
+const a₆ᶜ¹ = 0
+const a₆₅ᶜ¹ = 0
+const a₇ˡⁿ¹ = 0
+const a₇ᶜ¹ = 0
 
 """
     𝓔(pnsystem)
@@ -95,7 +95,7 @@ overall factor is used, leading to a sign difference.
             - δ*(χ₂²/2 + 3χₐₗ*χₛₗ) + (χ₁₂ + 6χₐₗ^2)ν
         )
 
-        # Tidal coupling
+        # NS tidal coupling
         + v^10 * (-9*((M₁/M₂)λ₂ + (M₂/M₁)λ₁) / M^5)
         + v^12 * (
             (
