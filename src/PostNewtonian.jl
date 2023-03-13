@@ -15,8 +15,8 @@ include("utilities/misc.jl")
 include("utilities/mathconstants.jl")
 using .MathConstants
 
-include("pn_state.jl")
-export PNState, TaylorT1
+include("pn_system.jl")
+export PNSystem, TaylorT1
 
 include("pn_variables/fundamental_variables.jl")
 using .FundamentalVariables

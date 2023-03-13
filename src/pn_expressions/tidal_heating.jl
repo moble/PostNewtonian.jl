@@ -1,5 +1,5 @@
 """
-    tidal_heating(pnstate)
+    tidal_heating(pnsystem)
 
 Compute the rate of energy and angular-momentum absorption into each black hole in a binary.
 
@@ -20,7 +20,7 @@ See also
   - [Tagoshi et al. (1997)](https://arxiv.org/abs/gr-qc/9711072)
   - [Chatziioannou et al. (2012)](https://arxiv.org/abs/1211.1686)
 """
-@compute_pn_variables function tidal_heating(pnstate)
+@compute_pn_variables function tidal_heating(pnsystem)
     # References to pages and equation numbers are from Alvi (2001)
 
     # Page 2, line 4

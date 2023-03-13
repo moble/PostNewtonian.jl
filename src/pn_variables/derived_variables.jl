@@ -1,6 +1,6 @@
 module DerivedVariables
 
-using ..PostNewtonian: PNState
+using ..PostNewtonian: PNSystem
 using Quaternionic: 𝐢, 𝐣, 𝐤
 
 include("mass_combinations.jl")

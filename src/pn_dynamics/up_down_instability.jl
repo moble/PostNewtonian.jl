@@ -1,5 +1,5 @@
 """
-    up_down_instability(pnstate)
+    up_down_instability(pnsystem)
 
 Compute the range of frequencies over which the system is unstable to increasing precession.
 
@@ -18,7 +18,7 @@ lowest-order approximation to convert binary separation to frequency.  The resul
 "clamped" between 0 and 1, because sometimes the PN approximations involved break down and
 return unphysical values.
 """
-@compute_pn_variables function up_down_instability(pnstate)
+@compute_pn_variables function up_down_instability(pnsystem)
     T = typeof(χ₁ₗ)
     if M₂ ≤ M₁
         q = inv(q)

@@ -1,9 +1,9 @@
-abstract type PNState{T, PNOrder} end
+abstract type PNSystem{T, PNOrder} end
 
-eltype(::PNState{T, PNOrder}) where {T, PNOrder} = T
-pn_order(::PNState{T, PNOrder}) where {T, PNOrder} = PNOrder
+eltype(::PNSystem{T, PNOrder}) where {T, PNOrder} = T
+pn_order(::PNSystem{T, PNOrder}) where {T, PNOrder} = PNOrder
 
-struct TaylorT1{T, PNOrder} <: PNState{T, PNOrder}
+struct TaylorT1{T, PNOrder} <: PNSystem{T, PNOrder}
     u::AbstractVector{T}
 end
 function TaylorT1(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing, PNOrder=typemax(Int))
