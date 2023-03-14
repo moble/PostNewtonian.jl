@@ -5,7 +5,7 @@ the hierarchy above.  Most likely, you will want to add new terms to existing PN
 expressions (item 4 above).  Existing code should be a good guide on how to do
 this, but note that if you will be using derived variables inside your
 expressions that don't yet exist inside this package, you should define
-functions that take exactly one `AbstractPNSystem` argument in the
+functions that take exactly one `PNSystem` argument in the
 `DerivedVariables` submodule.
 
 Remember that it is *absolutely crucial* to record the source of any expressions
@@ -39,4 +39,5 @@ There are, however, a few important exceptions to this rule:
    4. If you happen to use any other math functions, similarly ensure that their
       arguments are converted appropriately to retain precision.  For unary
       functions, this can be done automatically by including the function name
-      in the `unary_funcs` list used by [`@compute_pn_variables`](@ref).
+      in the `unary_funcs` list used by
+      [`@compute_pn_variables`](@ref PostNewtonian.@compute_pn_variables).

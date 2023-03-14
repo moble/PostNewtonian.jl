@@ -6,7 +6,7 @@ DocMeta.setdocmeta!(PostNewtonian, :DocTestSetup, :(using PostNewtonian); recurs
 makedocs(;
     modules=[PostNewtonian],
     authors="Michael Boyle <michael.oliver.boyle@gmail.com> and contributors",
-    repo="https://github.com/moble/PostNewtonian.jl/blob/{commit}{path}#{line}",
+    repo = Remotes.GitHub("moble", "PostNewtonian.jl"),
     sitename="PostNewtonian.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
@@ -37,4 +37,5 @@ makedocs(;
 deploydocs(;
     repo="github.com/moble/PostNewtonian.jl",
     devbranch="main",
+    push_preview=true,
 )

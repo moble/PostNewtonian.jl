@@ -1,5 +1,20 @@
 # Utilities
 
+## Macros
+
+Some of the most useful features of this package are the macros allowing us to
+write PN expressions in fairly natural form, without worrying about calculating
+all the variables needed for each expression, or manually accounting for the
+various PN orders to which we may need to truncate PN expansions.  To achieve
+this, we rely primarily on two macros.
+
+```@autodocs
+Modules = [PostNewtonian]
+Pages   = ["utilities/macros.jl"]
+Order   = [:module, :type, :constant, :function, :macro]
+```
+
+
 ## Manipulating ODE solutions
 
 ```@autodocs

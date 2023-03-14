@@ -1,6 +1,6 @@
 module DerivedVariables
 
-using ..PostNewtonian: AbstractPNSystem
+using ..PostNewtonian: PNSystem
 import ..PostNewtonian.FundamentalVariables: v
 using Quaternionic: 𝐢, 𝐣, 𝐤
 

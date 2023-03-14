@@ -10,23 +10,6 @@ pnvariables = filter(v->v!=:eval, [
 
 unary_funcs = [:√, :sqrt, :log, :ln, :sin, :cos]
 
-macro compute_pn_variables(func)
-    compute_pn_variables(1, func)
-end
-
-macro compute_pn_variables(arg_index, func)
-    compute_pn_variables(arg_index, func)
-end
-
-"""
-    @compute_pn_variables [arg_index=1] func
-
-This macro takes the function `func`, looks for various symbols inside that function, and if
-present defines them appropriately inside that function.  In particular, it defines PN
-variables based on the value of an `AbstractPNSystem` argument to the function (located at
-position `arg_index` in the argument list).  It also redefines `Irrational`s to have the
-type relevant for that `AbstractPNSystem` object.
-"""
 function compute_pn_variables(arg_index, func)
     splitfunc = MacroTools.splitdef(func)
     pnsystem = splitfunc[:args][arg_index]
@@ -58,4 +41,21 @@ function compute_pn_variables(arg_index, func)
 
     splitfunc[:body] = new_body
     MacroTools.combinedef(splitfunc)
+end
+
+"""
+    @compute_pn_variables [arg_index=1] func
+
+This macro takes the function `func`, looks for various symbols inside that function, and if
+present defines them appropriately inside that function.  In particular, it defines PN
+variables based on the value of an `PNSystem` argument to the function (located at
+position `arg_index` in the argument list).  It also redefines `Irrational`s to have the
+type relevant for that `PNSystem` object.
+"""
+macro compute_pn_variables(func)
+    compute_pn_variables(1, func)
+end
+
+macro compute_pn_variables(arg_index, func)
+    compute_pn_variables(arg_index, func)
 end
