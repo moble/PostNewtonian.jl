@@ -14,12 +14,11 @@ makedocs(;
         assets=String[],
     ),
     pages=[
-        "Home" => "index.md",
+        "Introduction" => "index.md",
         "Interface" => [
             "High-level functions" => "interface.md",
             "GWFrames" => "gwframes.md",
             "Python" => "python.md",
-            "Termination criteria" => "termination_criteria.md",
         ],
         "Internals" => [
             "Code structure" => "code_structure.md",
@@ -31,6 +30,7 @@ makedocs(;
             "Evaluation" => "evaluation.md",
             "utilities.md",
         ],
+        "Adding terms" => "adding_terms.md",
     ],
 )
 

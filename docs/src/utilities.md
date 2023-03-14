@@ -8,7 +8,23 @@ Pages   = ["utilities/combine_solutions.jl"]
 Order   = [:module, :type, :constant, :function, :macro]
 ```
 
-See also the [Termination criteria](#termination_criteria) page.
+
+## Termination criteria
+
+Hopefully, it should not be necessary to directly use these termination
+criteria.  They are used by default in the [`inspiral`](@ref) function.  But
+certain particularly extreme physical parameters may lead ODEs that are
+difficult to integrate — especially if new PN systems or terms are introduced.
+These, or similar functions may be helpful examples of
+["callbacks"](https://docs.sciml.ai/DiffEqDocs/stable/features/callback_functions/)
+that can be passed to the ODE integrator.
+
+```@docs
+termination_forwards
+termination_backwards
+dtmin_terminator
+nonfinite_terminator
+```
 
 
 ## Irrational constants
@@ -40,14 +56,14 @@ This can be quite awkward, so the macro
 things) automatically search for all `Irrational`s and replace them with the
 appropriate float values.
 
-```@autodocs
-Modules = [PostNewtonian]
-Filter = t -> typeof(t) !== Irrational{:apery}
-Pages   = ["utilities/mathconstants.jl"]
-Order   = [:module, :type, :constant, :function, :macro]
-```
 ```@docs
+PostNewtonian.γₑ
 PostNewtonian.ζ3
+PostNewtonian.ln2
+PostNewtonian.ln3
+PostNewtonian.ln5
+PostNewtonian.ln³╱₂
+PostNewtonian.ln⁵╱₂
 ```
 
 
