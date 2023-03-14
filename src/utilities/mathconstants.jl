@@ -60,7 +60,8 @@ julia> sum((1:10_000_000).^-3)
 1.2020569031595896
 ```
 """
-ζ3, const apery=ζ3
+ζ3
+const apery=ζ3
 
 """
     ln2
@@ -80,7 +81,8 @@ julia> exp(big(PostNewtonian.ln2))
 2.0
 ```
 """
-ln2, const log2=ln2
+ln2
+const log2=ln2
 
 """
     ln3
@@ -100,7 +102,8 @@ julia> exp(big(PostNewtonian.ln3))
 3.0
 ```
 """
-ln3, const log3=ln3
+ln3
+const log3=ln3
 
 """
     ln5
@@ -120,7 +123,8 @@ julia> exp(big(PostNewtonian.ln5))
 5.0
 ```
 """
-ln5, const log5=ln5
+ln5
+const log5=ln5
 
 """
     ln³╱₂
@@ -141,7 +145,9 @@ julia> exp(big(PostNewtonian.ln³╱₂))
 1.5
 ```
 """
-ln³╱₂, const log³╱₂=ln³╱₂, const log3halves=ln³╱₂
+ln³╱₂
+const log³╱₂=ln³╱₂
+const log3halves=ln³╱₂
 
 """
     ln⁵╱₂
@@ -162,6 +168,8 @@ julia> exp(big(PostNewtonian.ln⁵╱₂))
 2.5
 ```
 """
-ln⁵╱₂, const log⁵╱₂=ln⁵╱₂, const log5halves=ln⁵╱₂
+ln⁵╱₂
+const log⁵╱₂=ln⁵╱₂
+const log5halves=ln⁵╱₂
 
 end

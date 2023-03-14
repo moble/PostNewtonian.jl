@@ -281,7 +281,7 @@ end
 
 function inspiral(
     uᵢ, Ω₁, Ωₑ, v₁, vₑ,
-    pn::AbstractPNSystem, T,
+    pn::PNSystem, T,
     check_up_down_instability, time_stepper,
     reltol, abstol,
     termination_criteria_forwards,
@@ -379,9 +379,10 @@ end
 
 Compute the right-hand side for the orbital evolution of a non-eccentric binary
 
-Here, `u` is the ODE state vector, which can be unpacked with
-[`PNDynamicalVariables`](@ref).  The parameter `p` is currently unused, but
-could be used to pass un-evolved parameters through.
+Here, `u` is the ODE state vector, which is probably the `state` vector stored in a
+[`PNSystem`](@ref) object.  The parameter `p` is currently unused, but could be used to pass
+un-evolved parameters through.  The parameter `t` represents the time, and will surely
+always be unused in this package, but is part of the `DifferentialEquations` API.
 
 """
 @compute_pn_variables 3 function noneccentric_RHS!(u̇, u, p, t)

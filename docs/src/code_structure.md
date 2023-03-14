@@ -8,7 +8,7 @@ calculations *per se*, we have the following:
 
 1. **System and state**
 
-   Objects of type `AbstractPNSystem` represent the PN system itself and some
+   Objects of type `PNSystem` represent the PN system itself and some
    information about it, including:
    - The `Binary` type — `BBH`, `BHNS`, or `NSNS`
    - The float type `T` — `Float64`, etc.
@@ -49,7 +49,7 @@ calculations *per se*, we have the following:
    variables used in articles providing the PN expressions in the code itself.
 
    Because they are defined solely in terms of fundamental variables, which can
-   be computed from an `AbstractAbstractPNSystem` alone, these are all written
+   be computed from an `PNSystem` alone, these are all written
    as functions of such an object — such as `M(pnsystem)`, `χ⃗ₐ(pnsystem)`, and
    `n̂(pnsystem)`.
 
