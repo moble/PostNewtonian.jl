@@ -1,11 +1,21 @@
-irrationals = [
-    find_symbols_of_type(Base.MathConstants, Irrational);
-    find_symbols_of_type(MathConstants, Irrational)
-]
-
-pnvariables = filter(v->v!=:eval, [
+non_pnvariables = [:eval, :include]
+pnvariables = unique(filter(v->v∉non_pnvariables, [
     find_symbols_of_type(FundamentalVariables, Function);
     find_symbols_of_type(DerivedVariables, Function)
+]))
+
+
+for var ∈ pnvariables
+    @eval begin
+        function $var(v::PNSystem{T}) where {T<:Symbolics.Num}
+            Symbolics.wrap(SymbolicUtils.Sym{Real}(Symbol($var)))
+        end
+    end
+end
+
+irrationals = unique([
+    find_symbols_of_type(Base.MathConstants, Irrational);
+    find_symbols_of_type(MathConstants, Irrational)
 ])
 
 unary_funcs = [:√, :sqrt, :log, :ln, :sin, :cos]
