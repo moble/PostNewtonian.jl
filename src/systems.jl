@@ -12,7 +12,7 @@ the given type of system.
 """
 abstract type PNSystem{T, PNOrder, Expansion} end
 
-eltype(::PNSystem{T}) where {T} = T
+Base.eltype(::PNSystem{T}) where {T} = T
 pn_order(::PNSystem{T, PNOrder}) where {T, PNOrder} = PNOrder
 expansion_type(::PNSystem{T, P, Expansion}) where {T, P, Expansion} = Expansion
 
@@ -53,7 +53,7 @@ struct BBH{T, PNOrder, Expansion} <: PNSystem{T, PNOrder, Expansion}
 end
 function BBH(;
     M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing,
-    PNOrder=typemax(Int), Expansion=:TaylorT1
+    PNOrder=typemax(Int), Expansion=:TaylorT1, kwargs...
 )
     (T, PNOrder, Expansion, state) = prepare_system(;
         M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing,
@@ -79,7 +79,7 @@ struct BHNS{T, PNOrder, Expansion} <: PNSystem{T, PNOrder, Expansion}
 end
 function BHNS(;
     M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₂, Φ=nothing,
-    PNOrder=typemax(Int), Expansion=:TaylorT1
+    PNOrder=typemax(Int), Expansion=:TaylorT1, kwargs...
 )
     (T, PNOrder, Expansion, state) = prepare_system(;
         M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing,
@@ -105,11 +105,38 @@ struct NSNS{T, PNOrder, Expansion} <: PNSystem{T, PNOrder, Expansion}
 end
 function NSNS(;
     M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₁, λ₂, Φ=nothing,
-    PNOrder=typemax(Int), Expansion=:TaylorT1
+    PNOrder=typemax(Int), Expansion=:TaylorT1, kwargs...
 )
     (T, PNOrder, Expansion, state) = prepare_system(;
         M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing,
         PNOrder, Expansion
     )
     NSNS{T, PNOrder, Expansion}(state, λ₁, λ₂)
+end
+
+"""
+    symbolic_pnsystem(sys)
+
+Construct a symbolic `PNSystem`, specifically of the subtype given by `sys`.
+
+
+# Examples
+```jldoctest
+julia> using PostNewtonian: M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, λ₁, λ₂
+
+julia> pn = symbolic_pnsystem(BBH);
+
+julia> M₁(pn), M₂(pn)
+(M₁, M₂)
+
+julia> χ⃗₁(pn), χ⃗₂(pn)
+(χ⃗₁, χ⃗₂)
+```
+"""
+function symbolic_pnsystem(sys; PNOrder=typemax(Int), Expansion=:TaylorT1)
+    @variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ λ₁ λ₂
+    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
+    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
+    R = Rotor(Rʷ, Rˣ, Rʸ, Rᶻ)
+    sys(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, λ₁, λ₂)
 end

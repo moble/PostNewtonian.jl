@@ -57,10 +57,30 @@ end
     @compute_pn_variables [arg_index=1] func
 
 This macro takes the function `func`, looks for various symbols inside that function, and if
-present defines them appropriately inside that function.  In particular, it defines PN
-variables based on the value of an `PNSystem` argument to the function (located at
-position `arg_index` in the argument list).  It also redefines `Irrational`s to have the
-type relevant for that `PNSystem` object.
+present defines them appropriately inside that function.
+
+The first argument to this macro is `arg_index`, which just tells us which argument to the
+function `func` is a `PNSystem`.  For example, the variables defined in
+[`PostNewtonian.FundamentalVariables`](@ref Fundamental variables) all take a single
+argument of `pnsystem`, which is used to compute the values for those variables.  The macro
+just needs to know where to find `pnsystem`.
+
+Once it has this information, there are three types of transformations it will make:
+
+ 1. For every [fundamental](@ref Fundamental variables) or [derived](@ref Derived variables)
+    variable, the name of that variable used in the `func` will be replaced by its value
+    when called with `pnsystem`.  For example, you can simply use [`M₁`](@ref) or
+    [`μ`](@ref) in your code without have to call them as `M₁(pnsystem)` or `μ(pnsystem)`.
+ 2. Every `Irrational` defined in `Base.MathConstants` or `PostNewtonian.MathConstants` will
+    be transformed to the `eltype` of `pnsystem`.  This lets you naturally use such
+    constants in expressions like `2π/3` without automatically converting to `Float64`.
+ 3. Each of a short list of functions given by `unary_funcs` in `utilities/macros.jl` will
+    first convert their arguments to the `eltype` of `pnsystem`.  In particular, you can use
+    expressions like `√10` or `ln(2)` without the result being converted to a `Float64`.
+
+To be more precise, these are achieved by defining the relevant quantities in a `let` block
+placed around the body of `func`, so that the values may be used efficiently without
+recomputation.
 """
 macro compute_pn_variables(func)
     compute_pn_variables(1, func)
