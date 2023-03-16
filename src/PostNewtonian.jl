@@ -22,7 +22,7 @@ using .MathConstants
 
 
 include("systems.jl")
-export PNSystem, BBH, BHNS, NSNS
+export PNSystem, BBH, BHNS, NSNS, symbolic_pnsystem
 
 
 include("fundamental_variables.jl")
