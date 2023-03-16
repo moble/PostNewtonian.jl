@@ -115,28 +115,45 @@ function NSNS(;
 end
 
 """
-    symbolic_pnsystem(sys)
+    SymbolicPNSystem{T, PNOrder, Expansion}(state, λ₁, λ₂)
 
-Construct a symbolic `PNSystem`, specifically of the subtype given by `sys`.
+A `PNSystem` that contains information as variables from
+[`Symbolics.jl`](https://symbolics.juliasymbolics.org/).
 
+See also [`symbolic_pnsystem`](@ref) for a particular general instance of this type.
+"""
+struct SymbolicPNSystem{T, PNOrder, Expansion} <: PNSystem{T, PNOrder, Expansion}
+    state::Vector{T}
+    λ₁::T
+    λ₂::T
+end
+function SymbolicPNSystem(; PNOrder=typemax(Int), Expansion=:TaylorT1)
+    @variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ λ₁ λ₂
+    SymbolicPNSystem{typeof(M₁), PNOrder, Expansion}(
+        [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
+        λ₁, λ₂
+    )
+end
+
+"""
+    symbolic_pnsystem
+
+A symbolic `PNSystem` that contains symbolic information for all types of `PNSystem`s.
+
+In particular, note that this object has an (essentially) infinite `PNOrder`, uses the
+`TaylorT1` approximant, and has nonzero values for quantities like `λ₁` and `λ₂`.  If you
+want different choices, you may need to call [`SymbolicPNSystem`](@ref) yourself, or even
+construct a different specialized subtype of `PNSystem` (it's not hard).
 
 # Examples
 ```jldoctest
-julia> using PostNewtonian: M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, λ₁, λ₂
+julia> using PostNewtonian: M₁, M₂, χ⃗₁, χ⃗₂
 
-julia> pn = symbolic_pnsystem(BBH);
-
-julia> M₁(pn), M₂(pn)
+julia> M₁(symbolic_pnsystem), M₂(symbolic_pnsystem)
 (M₁, M₂)
 
-julia> χ⃗₁(pn), χ⃗₂(pn)
+julia> χ⃗₁(symbolic_pnsystem), χ⃗₂(symbolic_pnsystem)
 (χ⃗₁, χ⃗₂)
 ```
 """
-function symbolic_pnsystem(sys; PNOrder=typemax(Int), Expansion=:TaylorT1)
-    @variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ λ₁ λ₂
-    χ⃗₁ = QuatVec(χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ)
-    χ⃗₂ = QuatVec(χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ)
-    R = Rotor(Rʷ, Rˣ, Rʸ, Rᶻ)
-    sys(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, λ₁, λ₂)
-end
+const symbolic_pnsystem = SymbolicPNSystem()

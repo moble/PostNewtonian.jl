@@ -29,7 +29,7 @@ Eq. (4.13) of [Buonanno, Faye, Hinderer
 (2013)](https://link.aps.org/doi/10.1103/PhysRevD.87.044009), while the 2PN spin-spin term
 is from Eq. (4.15) of that reference.
 """
-@compute_pn_variables 2 function h!(h, pnsystem::PNSystem{T}; ℓmin=0, ℓmax=typemax(Int)) where T
+@compute_pn_variables 2 function h!(h, pnsystem; ℓmin=0, ℓmax=typemax(Int))
     h .= false  # Set everything to 0 just to be safe
 
     c = 2ν * v^2 * √(16π/5)
