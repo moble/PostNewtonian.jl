@@ -17,5 +17,5 @@ inside that module that are instances of the given type `T`.  The returned quant
 vector of `Symbol`s.
 """
 function find_symbols_of_type(mod, T)
-    filter(n->getproperty(mod, n) isa T, names(mod, all=true))
+    filter(n->getproperty(mod, n) isa T, names(mod))
 end
