@@ -1,10 +1,17 @@
 using PostNewtonian
 using Documenter
 
-DocMeta.setdocmeta!(PostNewtonian, :DocTestSetup, :(using PostNewtonian); recursive=true)
+DocMeta.setdocmeta!(
+    PostNewtonian, :DocTestSetup, :(using PostNewtonian);
+    recursive=true, warn=false
+)
 
 makedocs(;
-    modules=[PostNewtonian],
+    modules=[
+        PostNewtonian,
+        PostNewtonian.FundamentalVariables,
+        PostNewtonian.DerivedVariables
+    ],
     authors="Michael Boyle <michael.oliver.boyle@gmail.com> and contributors",
     repo = Remotes.GitHub("moble", "PostNewtonian.jl"),
     sitename="PostNewtonian.jl",

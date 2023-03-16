@@ -1,5 +1,5 @@
 ```@meta
-CurrentModule = PostNewtonian
+CurrentModule = PostNewtonian.FundamentalVariables
 ```
 
 # Fundamental variables
