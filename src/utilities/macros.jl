@@ -1,14 +1,16 @@
-non_pnvariables = [:eval, :include]
-pnvariables = unique(filter(v->v∉non_pnvariables, [
-    find_symbols_of_type(FundamentalVariables, Function);
-    find_symbols_of_type(DerivedVariables, Function)
-]))
+# TYPE PIRACY!!!
+Symbolics.Num(i::Integer) = Symbolics.Num(SymbolicUtils.Term(identity, [i]))
 
+fundamental_variables = methodswith(PNSystem, FundamentalVariables)
+derived_variables = methodswith(PNSystem, DerivedVariables)
+pnvariables = map(v->v.name, [fundamental_variables; derived_variables])
 
-for var ∈ pnvariables
+# Add symbolic capabilities to all derived variables (fundamental variables already work)
+for method ∈ derived_variables
+    name = method.name
     @eval begin
-        function $var(v::PNSystem{T}) where {T<:Symbolics.Num}
-            Symbolics.wrap(SymbolicUtils.Sym{Real}(Symbol($var)))
+        function PostNewtonian.$name(v::PNSystem{T}) where {T<:Symbolics.Num}
+            Symbolics.wrap(SymbolicUtils.Sym{Real}(Symbol($name)))
         end
     end
 end
@@ -20,35 +22,45 @@ irrationals = unique([
 
 unary_funcs = [:√, :sqrt, :log, :ln, :sin, :cos]
 
+function unary_converter(::PNSystem{T1}, x::T2) where {T1<:Num, T2<:Real}
+    Symbolics.Num(SymbolicUtils.Term(identity, [x]))
+end
+function unary_converter(pnsystem, x)
+    convert(eltype(pnsystem), x)
+end
+
 function compute_pn_variables(arg_index, func)
     splitfunc = MacroTools.splitdef(func)
-    pnsystem = splitfunc[:args][arg_index]
+    pnsystem = esc(MacroTools.namify(splitfunc[:args][arg_index]))
     body = splitfunc[:body]
 
-    pnvariables_exprs = [
-        :($v=PNVariables.$v($pnsystem))
-        for v ∈ filter(v->MacroTools.inexpr(body, v), pnvariables)
-    ]
+    x = esc(:x)  # Used as a dummy variable in anonymous functions below
+
     irrationals_exprs = [
         :($v=convert(eltype($pnsystem), $v))
-        for v ∈ filter(v->MacroTools.inexpr(body, v), irrationals)
+        for v ∈ esc.(filter(v->MacroTools.inexpr(body, v), irrationals))
+    ]
+    pnvariables_exprs = [
+        :($v=$v($pnsystem))
+        for v ∈ esc.(filter(v->MacroTools.inexpr(body, v), pnvariables))
     ]
     unary_funcs_exprs = [
-        :($v=($(esc(:x))->$v(convert(eltype($pnsystem), x))))
-        for v ∈ filter(v->MacroTools.inexpr(body, v), unary_funcs)
+        :($v=($x->$v(unary_converter($pnsystem, $x))))
+        for v ∈ esc.(filter(v->MacroTools.inexpr(body, v), unary_funcs))
     ]
     exprs = [
-        pnvariables_exprs;
         irrationals_exprs;
+        pnvariables_exprs;
         unary_funcs_exprs
     ]
 
     new_body = quote
         let $(exprs...)
-            $body
+            $(esc(body))
         end
     end
 
+    splitfunc[:args][arg_index] = pnsystem
     splitfunc[:body] = new_body
     MacroTools.combinedef(splitfunc)
 end

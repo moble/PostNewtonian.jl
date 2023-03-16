@@ -1,13 +1,14 @@
 module PostNewtonian
 
+using InteractiveUtils: methodswith
 using StaticArrays
 using Quaternionic
+using RecursiveArrayTools
 using MacroTools
 using Symbolics
 using SymbolicUtils
 using SciMLBase
 using DiffEqBase
-using RecursiveArrayTools
 using OrdinaryDiffEq
 
 # See the "Code structure" section of the documentation for a description of the simple
@@ -22,7 +23,7 @@ using .MathConstants
 
 
 include("systems.jl")
-export PNSystem, BBH, BHNS, NSNS, symbolic_pnsystem
+export PNSystem, BBH, BHNS, NSNS, SymbolicPNSystem, symbolic_pnsystem
 
 
 include("fundamental_variables.jl")
