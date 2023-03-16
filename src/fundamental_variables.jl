@@ -80,6 +80,7 @@ specializes on the type of `pnsystem`.
 """
 λ₁(::PNSystem) = 0
 λ₁(pn::NSNS) = pn.λ₁
+λ₁(pn::SymbolicPNSystem) = pn.λ₁
 
 """
     λ₂(pnsystem)
@@ -94,5 +95,6 @@ specializes on the type of `pnsystem`.
 λ₂(::PNSystem) = 0
 λ₂(pn::BHNS) = pn.λ₂
 λ₂(pn::NSNS) = pn.λ₂
+λ₂(pn::SymbolicPNSystem) = pn.λ₂
 
 end
