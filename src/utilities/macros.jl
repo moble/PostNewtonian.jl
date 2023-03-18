@@ -1,6 +1,3 @@
-# TYPE PIRACY!!!
-Symbolics.Num(i::Integer) = Symbolics.Num(SymbolicUtils.Term(identity, [i]))
-
 fundamental_variables = methodswith(PNSystem, FundamentalVariables)
 derived_variables = methodswith(PNSystem, DerivedVariables)
 pnvariables = map(v->v.name, [fundamental_variables; derived_variables])
@@ -10,7 +7,7 @@ for method ∈ derived_variables
     name = method.name
     @eval begin
         function PostNewtonian.$name(v::PNSystem{T}) where {T<:Symbolics.Num}
-            Symbolics.wrap(SymbolicUtils.Sym{Real}(Symbol($name)))
+            Symbolics.Num(SymbolicUtils.Sym{Real}(Symbol($name)))
         end
     end
 end
@@ -22,10 +19,13 @@ irrationals = unique([
 
 unary_funcs = [:√, :sqrt, :log, :ln, :sin, :cos]
 
-function unary_converter(::PNSystem{T1}, x::T2) where {T1<:Num, T2<:Real}
-    Symbolics.Num(SymbolicUtils.Term(identity, [x]))
+hold(x) = x
+@register_symbolic hold(x)
+Symbolics.derivative(::typeof(hold), args::NTuple{1,Any}, ::Val{1}) = 1
+function type_converter(::PNSystem{T1}, x::T2) where {T1<:Num, T2<:Real}
+    Symbolics.Num(SymbolicUtils.Term(hold, [x]))
 end
-function unary_converter(pnsystem, x)
+function type_converter(pnsystem, x)
     convert(eltype(pnsystem), x)
 end
 
@@ -37,7 +37,7 @@ function compute_pn_variables(arg_index, func)
     x = esc(:x)  # Used as a dummy variable in anonymous functions below
 
     irrationals_exprs = [
-        :($v=convert(eltype($pnsystem), $v))
+        :($v=type_converter($pnsystem, $v))
         for v ∈ esc.(filter(v->MacroTools.inexpr(body, v), irrationals))
     ]
     pnvariables_exprs = [
@@ -45,7 +45,7 @@ function compute_pn_variables(arg_index, func)
         for v ∈ esc.(filter(v->MacroTools.inexpr(body, v), pnvariables))
     ]
     unary_funcs_exprs = [
-        :($v=($x->$v(unary_converter($pnsystem, $x))))
+        :($v=($x->$v(type_converter($pnsystem, $x))))
         for v ∈ esc.(filter(v->MacroTools.inexpr(body, v), unary_funcs))
     ]
     exprs = [
