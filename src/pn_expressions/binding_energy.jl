@@ -108,24 +108,18 @@ end
 const binding_energy = 𝓔
 
 
-# binding_energy_symbolic_deriv = let
-#     @variables M₁ M₂ χ⃗₁[1:4] χ⃗₂[1:4] R[1:4] v
-#     χ⃗₁ = QuatVec(χ⃗₁...)
-#     χ⃗₂ = QuatVec(χ⃗₂...)
-#     R = Quaternion(R...)
-#     E = 𝓔(
-#         M₁, M₂, χ⃗₁, χ⃗₂, R, v;
-#         ν=ν(M₁,M₂), δ=δ(M₁,M₂), ℓ̂=ℓ̂(R), lnv=ln(v),
-#         γₑ=SymbolicUtils.Sym{Real}(:γₑ), π=SymbolicUtils.Sym{Real}(:π),
-#         ln2=SymbolicUtils.Sym{Real}(:ln2), ln3=SymbolicUtils.Sym{Real}(:ln3)
-#     )
-#     E′ = expand_derivatives(Differential(v)(E))
-#     eval(build_function(
-#         E′,
-#         :M₁, :M₂, :χ⃗₁, :χ⃗₂, :R, :v, :ν, :δ, :ℓ̂, :lnv, :γₑ, :π, :ln2, :ln3
-#     ))::Function
-# end
-
+binding_energy_deriv = let 𝓔=𝓔(symbolic_pnsystem),
+    v = v(symbolic_pnsystem)
+    ∂ᵥ = Differential(v)
+    𝓔′ = expand_derivatives(∂ᵥ(𝓔))
+    #eval(compute_pn_variables(1, build_function(
+    build_function(
+        𝓔′,
+        :pnsystem
+    )
+    #)))::Function
+end
+const 𝓔′=binding_energy_deriv
 
 """
     𝓔′(pnsystem)
@@ -135,8 +129,4 @@ Compute the derivative with respect to ``v`` of the binding energy of a compact 
 
 This is computed symbolically from [`𝓔`](@ref); see that function for details.
 """
-function 𝓔′(pnsystem)
-    @warn "Temporarily returning nonsense while I fix this, so that I can check everything else in this package"
-    𝓔(pnsystem)
-end
-const binding_energy_deriv = 𝓔′
+𝓔′
