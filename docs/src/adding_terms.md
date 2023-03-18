@@ -24,18 +24,19 @@ There are, however, a few important exceptions to this rule:
       this is important to simplify our treatment of PN expressions
       symbolically.  This isn't too difficult, because `v ↔ √x` is easy to do
       visually.  Just remember that `ln(x) = 2ln(v)`.
-   2. Due to problems in defining a Taylor series in `v` when the coefficients
-      include factors like `ln(v)`, we have to treat `ln(v)` as a constant
-      symbolically (even though it will get updated automatically at each step).
-      So just use `lnv` instead.
-   3. It should be possible to evaluate PN expressions using different
+   2. It should be possible to evaluate PN expressions using different
       precisions.  To ensure this, enter fractions as `Irrational`s — e.g.,
       `3//2` instead of `3/2`.  The latter would be immediately converted to the
       64-bit float `1.5`, which would poison other values.  Note that if you are
       multiplying by something else that already has general float type, as in
-      `3π/2`, you don't need to use `Irrational`.  In this case, `3π` is
+      `3π/2`, you don't need to use `Irrational`; in this case, `3π` is
       evaluated first and achieves full precision, and is then divided by the
       exact integer 2, so that it retains full precision.
+   3. A slight caveat to the above is that an expression like `3λ/2` could
+      *still* be converted to `Float64` if `λ` is defined at compile time to be
+      `0`.  For type-stability reasons, Julia will always treat `0/2` just like
+      it would treat `7/2`, which is converted to `Float64`.  Thus, it is
+      probably safest to write expressions like `3//2 * λ`.
    4. If you happen to use any other math functions, similarly ensure that their
       arguments are converted appropriately to retain precision.  For unary
       functions, this can be done automatically by including the function name
