@@ -10,8 +10,8 @@ from [Alvi (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  It prob
 wouldn't be too hard to extend Alvi's analysis to eccentric systems.
 
 Note that the validity of the result depends not only on the PN parameter ``v``, but also on
-that angles of the spins relative to the separation vector ``n̂``: the smaller the angle,
-the lower the ``v`` at which the approximations should be expected to break down.
+the angles of the spins relative to the separation vector ``n̂``: the smaller the angle, the
+lower the ``v`` at which the approximations should be expected to break down.
 
 See also
 
