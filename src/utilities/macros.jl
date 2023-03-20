@@ -58,8 +58,7 @@ function pn_expression(pnsystem::Symbol, body)
     ]
 
     new_body = quote
-        #@fastmath let $(exprs...)
-        let $(exprs...)
+        @fastmath let $(exprs...)
             $(body)
         end
     end
