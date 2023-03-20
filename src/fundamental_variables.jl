@@ -2,6 +2,7 @@ module FundamentalVariables
 
 using ..PostNewtonian
 using ..PostNewtonian: PNSystem, BHNS, NSNS
+using Quaternionic
 
 export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, λ₁, λ₂
 
@@ -24,14 +25,14 @@ M₂(s::PNSystem) = @inbounds s.state[2]
 
 Dimensionless spin vector of object 1 in this system, as a `QuatVec`.
 """
-χ⃗₁(s::PNSystem) = @inbounds QuatVec(s.state[3:5]...)
+χ⃗₁(s::PNSystem) = @inbounds QuatVec(view(s.state, 3:5)...)
 
 """
     χ⃗₂(pnsystem)
 
 Dimensionless spin vector of object 2 in this system, as a `QuatVec`.
 """
-χ⃗₂(s::PNSystem) = @inbounds QuatVec(s.state[6:8]...)
+χ⃗₂(s::PNSystem) = @inbounds QuatVec(view(s.state, 6:8)...)
 
 """
     R(pnsystem)
@@ -43,7 +44,7 @@ vector pointing from object 2 to object 1.
 See also [`n̂`](@ref PostNewtonian.n̂), [`λ̂`](@ref PostNewtonian.λ̂), [`ℓ̂`](@ref
 PostNewtonian.ℓ̂).
 """
-R(s::PNSystem) = @inbounds Rotor(s.state[9:12]...)
+R(s::PNSystem) = @inbounds Rotor(view(s.state, 9:12)...)
 
 @doc raw"""
     v(pnsystem)
