@@ -29,7 +29,7 @@ parameter.  Also note that ``λ̂ = λ₂ v^{10}/(m₁+m₂)^5``, and we need to
 terms again with ``1 ↔ 2``.  Finally, note the normalization difference, where a different
 overall factor is used, leading to a sign difference.
 """
-@compute_pn_variables function 𝓕(pnsystem)
+@pn_expression function 𝓕(pnsystem)
     32ν^2/5 * v^10 * (
         # Non-spinning terms; Eq. (314) of Blanchet (2014)
         1

@@ -39,7 +39,7 @@ parameter.  Also note that ``λ̂ = λ₂ v^{10}/(m₁+m₂)^5``, and we need to
 terms again with ``1 ↔ 2``.  Finally, note the normalization difference, where a different
 overall factor is used, leading to a sign difference.
 """
-@compute_pn_variables function 𝓔(pnsystem)
+@pn_expression function 𝓔(pnsystem)
     -M * ν * v^2 / 2 * (
         1
         + v^2 * (-ν/12 - 3//4)
@@ -118,7 +118,7 @@ const binding_energy = 𝓔
     # Remove `hold` (which we needed for Symbolics.jl to not collapse to Float64)
     𝓔′ = unhold(𝓔′)
     # Finally, apply the "macro" to it and get a full function out
-    eval(compute_pn_variables(1, 𝓔′))::Function
+    eval(pn_expression(1, 𝓔′))::Function
 end
 const binding_energy_deriv=𝓔′
 

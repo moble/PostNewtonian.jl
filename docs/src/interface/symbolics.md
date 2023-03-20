@@ -7,6 +7,6 @@ vector of symbols.  All of the variables defined in
 [`PostNewtonian.DerivedVariables`](@ref Derived variables) have methods defined
 automatically to generate symbols instead of values when called with a symbolic
 `PNSystem`.  In turn, any function modified by the
-[`@compute_pn_variables`](@ref PostNewtonian.@compute_pn_variables) macro should
+[`@pn_expression`](@ref PostNewtonian.@pn_expression) macro should
 also be able to return a symbolic result, including all functions described in
 the "[PN expressions](@ref)" section.

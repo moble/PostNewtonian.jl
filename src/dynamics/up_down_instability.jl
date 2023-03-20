@@ -18,7 +18,7 @@ lowest-order approximation to convert binary separation to frequency.  The resul
 "clamped" between 0 and 1, because sometimes the PN approximations involved break down and
 return unphysical values.
 """
-@compute_pn_variables function up_down_instability(pnsystem)
+@pn_expression function up_down_instability(pnsystem)
     T = typeof(χ₁ₗ)
     if M₂ ≤ M₁
         q = inv(q)

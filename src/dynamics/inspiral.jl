@@ -385,7 +385,7 @@ un-evolved parameters through.  The parameter `t` represents the time, and will 
 always be unused in this package, but is part of the `DifferentialEquations` API.
 
 """
-@compute_pn_variables 3 function noneccentric_RHS!(u̇, u, p, t)
+@pn_expression 3 function noneccentric_RHS!(u̇, u, p, t)
     (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(p)
     Ω⃗ = Ω⃗ₚ + Ω * ℓ̂
     v̇ = - (𝓕 + Ṁ₁ + Ṁ₂) / 𝓔′

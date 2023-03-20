@@ -1,5 +1,5 @@
 @testset verbose=true "macros" begin
-    @eval PostNewtonian PostNewtonian.@compute_pn_variables function macro_test(pnstate)
+    @eval PostNewtonian PostNewtonian.@pn_expression function macro_test(pnstate)
         v*π√10
     end
 

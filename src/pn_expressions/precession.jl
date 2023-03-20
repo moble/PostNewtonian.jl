@@ -23,7 +23,7 @@ is due to its rotation alone, and is given by ``Ω⃗ᵪ₁ × χ⃗₁``.
 
 Note that this function simply calls [`Ω⃗ᵪ`](@ref) with the appropriate parameters.
 """
-@compute_pn_variables function Ω⃗ᵪ₁(pnsystem)
+@pn_expression function Ω⃗ᵪ₁(pnsystem)
     Ω⃗ᵪ(M₁, M₂, χ⃗₁, χ⃗₂, v, R)
 end
 const Omega_chi1 = Ω⃗ᵪ₁
@@ -39,7 +39,7 @@ is due to its rotation alone, and is given by ``Ω⃗ᵪ₂ × χ⃗₂``.
 
 Note that this function simply calls [`Ω⃗ᵪ`](@ref) with the appropriate parameters.
 """
-@compute_pn_variables function Ω⃗ᵪ₂(pnsystem)
+@pn_expression function Ω⃗ᵪ₂(pnsystem)
     Ω⃗ᵪ(M₂, M₁, χ⃗₂, χ⃗₁, v, R)
 end
 const Omega_chi2 = Ω⃗ᵪ₂
@@ -97,7 +97,7 @@ Then, they define the PN parameter γ≔M/r and we have Mω = v³ so that ϖ = �
 parameters γ and aₗ are given by Eqs. (4.3) and (4.4), and given here by the functions
 [`γ`](@ref) and [`aₗ`](@ref).
 """
-@compute_pn_variables function 𝛡(pnsystem)
+@pn_expression function 𝛡(pnsystem)
     (γ(pnsystem) * aₗ(pnsystem) / v^3) * n̂
 end
 
@@ -110,7 +110,7 @@ to [`𝛡`](@ref).
 
 Note that there is a 3PN term of ``-22ν\\ln(r/r₀′)/3`` that is simply ignored here.
 """
-@compute_pn_variables function γ(pnsystem)
+@pn_expression function γ(pnsystem)
     v^2 * (
         1
         + v^2 * (1 - ν / 3)
@@ -129,7 +129,7 @@ end
 Eq. (4.4) of [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520).  This term contributes
 to [`𝛡`](@ref).
 """
-@compute_pn_variables function aₗ(pnsystem)
+@pn_expression function aₗ(pnsystem)
     v^7/M^3 * (
         (7Sₙ + 3δ*Σₙ)
         + v^2 * ((-10 - 29ν/3) * Sₙ + δ*(-6 - 9ν/2) * Σₙ)

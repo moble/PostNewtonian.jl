@@ -67,7 +67,7 @@ to whatever number type `x` is.  Thus, when multiplying by 2, it is not
 converted to a `Float64`; its precision matches that of `x`.
 
 This can be quite awkward, so the macro
-[`PostNewtonian.@compute_pn_variables`](@ref) is provided to (among other
+[`PostNewtonian.@pn_expression`](@ref) is provided to (among other
 things) automatically search for all `Irrational`s and replace them with the
 appropriate float values.
 

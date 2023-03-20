@@ -38,7 +38,7 @@ function unhold(expr)
     end
 end
 
-function compute_pn_variables(pnsystem::Symbol, body)
+function pn_expression(pnsystem::Symbol, body)
     irrationals_exprs = [
         :($v=type_converter($pnsystem, $v))
         for v ∈ filter(v->MacroTools.inexpr(body, v), irrationals)
@@ -65,16 +65,16 @@ function compute_pn_variables(pnsystem::Symbol, body)
     end
 end
 
-function compute_pn_variables(arg_index::Integer, func)
+function pn_expression(arg_index::Integer, func)
     splitfunc = MacroTools.splitdef(func)
     pnsystem = MacroTools.namify(splitfunc[:args][arg_index])
     body = splitfunc[:body]
-    splitfunc[:body] = compute_pn_variables(pnsystem, body)
+    splitfunc[:body] = pn_expression(pnsystem, body)
     MacroTools.combinedef(splitfunc)
 end
 
 """
-    @compute_pn_variables [arg_index=1] func
+    @pn_expression [arg_index=1] func
 
 This macro takes the function `func`, looks for various symbols inside that function, and if
 present defines them appropriately inside that function.
@@ -103,10 +103,10 @@ To be more precise, these are achieved by defining the relevant quantities in a 
 placed around the body of `func`, so that the values may be used efficiently without
 recomputation.
 """
-macro compute_pn_variables(func)
-    esc(compute_pn_variables(1, func))
+macro pn_expression(func)
+    esc(pn_expression(1, func))
 end
 
-macro compute_pn_variables(arg_index, func)
-    esc(compute_pn_variables(arg_index, func))
+macro pn_expression(arg_index, func)
+    esc(pn_expression(arg_index, func))
 end
