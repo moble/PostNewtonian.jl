@@ -1,6 +1,7 @@
 """
     n̂(pnsystem)
     n̂(R)
+    n_hat(pnsystem)
     n_hat(R)
 
 The unit vector pointing from object 2 to object 1, when the frame is given by the rotor
@@ -17,6 +18,7 @@ const n_hat = n̂
 """
     λ̂(pnsystem)
     λ̂(R)
+    lambda_hat(pnsystem)
     lambda_hat(R)
 
 The unit vector pointing in the direction of the instantaneous velocity of object 1, when
@@ -34,6 +36,7 @@ const lambda_hat = λ̂
 """
     ℓ̂(pnsystem)
     ℓ̂(R)
+    ell_hat(pnsystem)
     ell_hat(R)
 
 The unit vector pointing along the direction of orbital angular velocity, when the frame is
@@ -50,6 +53,7 @@ const ell_hat = ℓ̂
 """
     Ω(pnsystem)
     Ω(;v, M=1)
+    Omega(pnsystem)
     Omega(;v, M=1)
 
 Orbital angular frequency.
