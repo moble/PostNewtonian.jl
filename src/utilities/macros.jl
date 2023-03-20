@@ -22,11 +22,20 @@ unary_funcs = [:√, :sqrt, :log, :ln, :sin, :cos]
 hold(x) = x
 @register_symbolic hold(x)
 Symbolics.derivative(::typeof(hold), args::NTuple{1,Any}, ::Val{1}) = 1
-function type_converter(::PNSystem{T1}, x::T2) where {T1<:Num, T2<:Real}
+function type_converter(::PNSystem{T}, x) where {T<:Num}
     Symbolics.Num(SymbolicUtils.Term(hold, [x]))
+end
+function type_converter(::PNSystem{T}, x::Num) where {T<:Num}
+    x
 end
 function type_converter(pnsystem, x)
     convert(eltype(pnsystem), x)
+end
+function unhold(expr)
+    MacroTools.postwalk(expr) do x
+        m = MacroTools.trymatch(:(f_(i_)), x)
+        m === nothing || m[:f]!==hold ? x : Symbol(m[:i])
+    end
 end
 
 function compute_pn_variables(pnsystem::Symbol, body)

@@ -108,18 +108,19 @@ end
 const binding_energy = 𝓔
 
 
-binding_energy_deriv = let 𝓔=𝓔(symbolic_pnsystem),
-    v = v(symbolic_pnsystem)
+# We derive the function 𝓔′ analytically from 𝓔.  Documentation goes below.
+𝓔′ = let 𝓔=𝓔(symbolic_pnsystem), v=v(symbolic_pnsystem)
     ∂ᵥ = Differential(v)
-    𝓔′ = expand_derivatives(∂ᵥ(𝓔))
-    #eval(compute_pn_variables(1, build_function(
-    build_function(
-        𝓔′,
-        :pnsystem
-    )
-    #)))::Function
+    # Evaluate derivative symbolically
+    𝓔′ = simplify(expand_derivatives(∂ᵥ(𝓔)))
+    # Turn it into (an Expr of) a function taking one argument: `pnsystem`
+    𝓔′ = build_function(𝓔′, :pnsystem)
+    # Remove `hold` (which we needed for Symbolics.jl to not collapse to Float64)
+    𝓔′ = unhold(𝓔′)
+    # Finally, apply the "macro" to it and get a full function out
+    eval(compute_pn_variables(1, 𝓔′))::Function
 end
-const 𝓔′=binding_energy_deriv
+const binding_energy_deriv=𝓔′
 
 """
     𝓔′(pnsystem)
