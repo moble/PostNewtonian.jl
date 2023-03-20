@@ -41,4 +41,4 @@ There are, however, a few important exceptions to this rule:
       arguments are converted appropriately to retain precision.  For unary
       functions, this can be done automatically by including the function name
       in the `unary_funcs` list used by
-      [`@compute_pn_variables`](@ref PostNewtonian.@compute_pn_variables).
+      [`@pn_expression`](@ref PostNewtonian.@pn_expression).

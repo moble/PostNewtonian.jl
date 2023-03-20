@@ -33,7 +33,7 @@ calculations *per se*, we have the following:
    Julia's type system to get involved, enabling important optimizations.
 
    Also, these variables can be automatically computed in functions that need
-   them with the `@compute_pn_variables` macro.  For example, you can directly
+   them with the `@pn_expression` macro.  For example, you can directly
    use the symbols `M₁`, `M₂`, etc., in a function that is wrapped in that
    macro, without any qualifiers to specify where those variables are coming
    from, and the macro will automatically and efficiently evaluate them for you
@@ -54,7 +54,7 @@ calculations *per se*, we have the following:
    `n̂(pnsystem)`.
 
    Again, these quantities will be automatically computed for you in any
-   function wrapped in the `@compute_pn_variables` macro because they are
+   function wrapped in the `@pn_expression` macro because they are
    defined in the `PostNewtonian.DerivedVariables` module.
 
 4. **PN expressions**
