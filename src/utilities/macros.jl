@@ -113,17 +113,17 @@ present defines them appropriately inside that function.
 
 The first argument to this macro is `arg_index`, which just tells us which argument to the
 function `func` is a `PNSystem`.  For example, the variables defined in
-[`PostNewtonian.FundamentalVariables`](@ref Fundamental variables) all take a single
+[`PostNewtonian.FundamentalVariables`](@ref "Fundamental variables") all take a single
 argument of `pnsystem`, which is used to compute the values for those variables; this macro
 just needs to know where to find `pnsystem`.
 
 Once it has this information, there are three types of transformations it will make:
 
- 1. For every [fundamental](@ref Fundamental variables) or [derived](@ref Derived variables)
-    variable, the name of that variable used in the body of `func` will be replaced by its
-    value when called with `pnsystem`.  For example, you can simply use the symbols `M₁` or
-    `μ` in your code, rather than calling them as [`M₁(pnsystem)`](@ref M₁) or
-    [`μ(pnsystem)`](@ref μ) every time they appear.
+ 1. For every [fundamental](@ref "Fundamental variables") or [derived](@ref "Derived
+    variables") variable, the name of that variable used in the body of `func` will be
+    replaced by its value when called with `pnsystem`.  For example, you can simply use the
+    symbols `M₁` or `μ` in your code, rather than calling them as [`M₁(pnsystem)`](@ref M₁)
+    or [`μ(pnsystem)`](@ref μ) every time they appear.
  2. Every `Irrational` defined in `Base.MathConstants` or `PostNewtonian.MathConstants` will
     be transformed to the `eltype` of `pnsystem`.  This lets you naturally use such
     constants in expressions like `2π/3` without automatically converting to `Float64`.
