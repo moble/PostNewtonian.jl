@@ -27,13 +27,18 @@ function prepare_system(;
         state = [state; Φ]
     end
     T = eltype(state)
-    PNOrder = if PNOrder!=typemax(Int)
-        round(Int, 2PNOrder) // 2
-    else
-        typemax(Int) // 2
-    end
+    PNOrder = prepare_pn_order(PNOrder)
     (T, PNOrder, Expansion, state)
 end
+
+function prepare_pn_order(PNOrder)
+    if PNOrder!=typemax(Int)
+        round(Int, 2PNOrder) // 2
+    else
+        (typemax(Int)-1) // 2
+    end
+end
+
 
 """
     BBH{T, PNOrder, Expansion}
@@ -114,6 +119,7 @@ function NSNS(;
     NSNS{T, PNOrder, Expansion}(state, λ₁, λ₂)
 end
 
+
 """
     SymbolicPNSystem{T, PNOrder, Expansion}(state, λ₁, λ₂)
 
@@ -129,7 +135,7 @@ struct SymbolicPNSystem{T, PNOrder, Expansion} <: PNSystem{T, PNOrder, Expansion
 end
 function SymbolicPNSystem(; PNOrder=typemax(Int), Expansion=:TaylorT1)
     @variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ λ₁ λ₂
-    SymbolicPNSystem{typeof(M₁), PNOrder, Expansion}(
+    SymbolicPNSystem{typeof(M₁), prepare_pn_order(PNOrder), Expansion}(
         [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
         λ₁, λ₂
     )
