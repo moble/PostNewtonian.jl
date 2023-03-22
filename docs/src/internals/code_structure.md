@@ -13,7 +13,6 @@ calculations *per se*, we have the following:
    - The `Binary` type — `BBH`, `BHNS`, or `NSNS`
    - The float type `T` — `Float64`, etc.
    - The PN expansion order `PNOrder` — a `Rational`
-   - The `Expansion` type — `TaylorT1`, `TaylorT4`, or `TaylorT5`
    - The current `state` of the system, including the fundamental variables
 
    The first of these is represented as the type itself, the last is stored as a

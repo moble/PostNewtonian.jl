@@ -1,26 +1,24 @@
 """
-    PNSystem{T, PNOrder, Expansion}
+    PNSystem{T, PNOrder}
 
 Base type for all PN systems, such as `BBH`, `BHNS`, and `NSNS`.
 
 The parameter `T` is the basic float type of all variables — usually just `Float64`.
-`PNOrder` is a `Rational` giving the order to which PN expansions should be carried.  And
-`Expansion` describes the type of expansion — one of `TaylorT1`, `TaylorT4`, or `TaylorT5`.
+`PNOrder` is a `Rational` giving the order to which PN expansions should be carried.
 
 All subtypes should contain a `state` vector holding all of the fundamental variables for
 the given type of system.
 """
-abstract type PNSystem{T, PNOrder, Expansion} end
+abstract type PNSystem{T, PNOrder} end
 
 Base.eltype(::PNSystem{T}) where {T} = T
 pn_order(::PNSystem{T, PNOrder}) where {T, PNOrder} = PNOrder
-expansion_type(::PNSystem{T, P, Expansion}) where {T, P, Expansion} = Expansion
 
 order_index(pn::PNSystem) = 1 + Int(2pn_order(pn))
 
 function prepare_system(;
     M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing,
-    PNOrder=typemax(Int), Expansion=:TaylorT1
+    PNOrder=typemax(Int)
 )
     state = [M₁; M₂; vec(χ⃗₁); vec(χ⃗₂); components(R); v]
     if !isnothing(Φ)
@@ -28,7 +26,7 @@ function prepare_system(;
     end
     T = eltype(state)
     PNOrder = prepare_pn_order(PNOrder)
-    (T, PNOrder, Expansion, state)
+    (T, PNOrder, state)
 end
 
 function prepare_pn_order(PNOrder)
@@ -41,7 +39,7 @@ end
 
 
 """
-    BBH{T, PNOrder, Expansion}
+    BBH{T, PNOrder}
 
 The [`PNSystem`](@ref) subtype describing a binary black hole system.
 
@@ -53,23 +51,20 @@ Optionally, `Φ` may also be tracked as the 14th element of the `state` vector. 
 the integral of the orbital angular frequency `Ω`, and holds little interest for general
 systems beyond a convenient description of how "far" the system has evolved.
 """
-struct BBH{T, PNOrder, Expansion} <: PNSystem{T, PNOrder, Expansion}
+struct BBH{T, PNOrder} <: PNSystem{T, PNOrder}
     state::AbstractVector{T}
 end
 function BBH(;
     M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing,
-    PNOrder=typemax(Int), Expansion=:TaylorT1, kwargs...
+    PNOrder=typemax(Int), kwargs...
 )
-    (T, PNOrder, Expansion, state) = prepare_system(;
-        M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing,
-        PNOrder, Expansion
-    )
-    BBH{T, PNOrder, Expansion}(state)
+    (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing, PNOrder)
+    BBH{T, PNOrder}(state)
 end
 
 
 """
-    BHNS{T, PNOrder, Expansion}
+    BHNS{T, PNOrder}
 
 The [`PNSystem`](@ref) subtype describing a black-hole—neutron-star binary system.
 
@@ -78,24 +73,21 @@ holding the (constant) Love number, which describes the tidal-coupling parameter
 neutron star.  Note that the neutron star is *always* object 2 — meaning that `M₂`, `χ⃗₂`,
 and `λ₂` always refer to it; `M₁` and `χ⃗₁` always refer to the black hole.
 """
-struct BHNS{T, PNOrder, Expansion} <: PNSystem{T, PNOrder, Expansion}
+struct BHNS{T, PNOrder} <: PNSystem{T, PNOrder}
     state::AbstractVector{T}
     λ₂::T
 end
 function BHNS(;
     M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₂, Φ=nothing,
-    PNOrder=typemax(Int), Expansion=:TaylorT1, kwargs...
+    PNOrder=typemax(Int), kwargs...
 )
-    (T, PNOrder, Expansion, state) = prepare_system(;
-        M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing,
-        PNOrder, Expansion
-    )
-    BHNS{T, PNOrder, Expansion}(state, λ₂)
+    (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing, PNOrder)
+    BHNS{T, PNOrder}(state, λ₂)
 end
 
 
 """
-    NSNS{T, PNOrder, Expansion}
+    NSNS{T, PNOrder}
 
 The [`PNSystem`](@ref) subtype describing a neutron-star—neutron-star binary system.
 
@@ -103,39 +95,36 @@ The `state` vector is the same as for a [`BBH`](@ref).  There are two additional
 and `λ₂` holding the (constant) Love numbers, which describes the tidal-coupling parameter
 of the neutron stars.
 """
-struct NSNS{T, PNOrder, Expansion} <: PNSystem{T, PNOrder, Expansion}
+struct NSNS{T, PNOrder} <: PNSystem{T, PNOrder}
     state::AbstractVector{T}
     λ₁::T
     λ₂::T
 end
 function NSNS(;
     M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₁, λ₂, Φ=nothing,
-    PNOrder=typemax(Int), Expansion=:TaylorT1, kwargs...
+    PNOrder=typemax(Int), kwargs...
 )
-    (T, PNOrder, Expansion, state) = prepare_system(;
-        M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing,
-        PNOrder, Expansion
-    )
-    NSNS{T, PNOrder, Expansion}(state, λ₁, λ₂)
+    (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing, PNOrder)
+    NSNS{T, PNOrder}(state, λ₁, λ₂)
 end
 
 
 """
-    SymbolicPNSystem{T, PNOrder, Expansion}(state, λ₁, λ₂)
+    SymbolicPNSystem{T, PNOrder}(state, λ₁, λ₂)
 
 A `PNSystem` that contains information as variables from
 [`Symbolics.jl`](https://symbolics.juliasymbolics.org/).
 
 See also [`symbolic_pnsystem`](@ref) for a particular general instance of this type.
 """
-struct SymbolicPNSystem{T, PNOrder, Expansion} <: PNSystem{T, PNOrder, Expansion}
+struct SymbolicPNSystem{T, PNOrder} <: PNSystem{T, PNOrder}
     state::Vector{T}
     λ₁::T
     λ₂::T
 end
-function SymbolicPNSystem(; PNOrder=typemax(Int), Expansion=:TaylorT1)
+function SymbolicPNSystem(PNOrder=typemax(Int))
     @variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ λ₁ λ₂
-    SymbolicPNSystem{typeof(M₁), prepare_pn_order(PNOrder), Expansion}(
+    SymbolicPNSystem{typeof(M₁), prepare_pn_order(PNOrder)}(
         [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
         λ₁, λ₂
     )
