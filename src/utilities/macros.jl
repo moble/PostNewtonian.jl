@@ -268,7 +268,7 @@ function var_collect(expr, var)
         error("Input expression is not a call at its highest level: $expr")
     end
     terms = Dict{Int,Any}()
-    if expr.args[1] != :+
+    if expr.args[1] ∉ (:+, :-)
         # if expr.args[1] != :*
         #     error(
         #         "Input expression is neither a sum nor a simple product at its highest "
