@@ -97,7 +97,7 @@ function pn_expression(pnsystem::Symbol, body)
         end
     end
 
-    # Finally, and pnsystem as the argument to each @pn_expansion call
+    # Finally, add pnsystem as the argument to each @pn_expansion call
     MacroTools.postwalk(new_body) do x
         if MacroTools.isexpr(x, :macrocall) &&
             x.args[1]==Symbol("@pn_expansion") &&
