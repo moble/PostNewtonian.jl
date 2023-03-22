@@ -264,16 +264,27 @@ julia> PostNewtonian.var_collect(:(1 + a*v + b*v^2 + c*v^4), :v)
 `evalpoly`, for example.
 """
 function var_collect(expr, var)
-    if !MacroTools.isexpr(expr, :call) || expr.args[1] != :+
-        error("Input expression is not a sum at its highest level: $expr")
+    if !MacroTools.isexpr(expr, :call)
+        error("Input expression is not a call at its highest level: $expr")
     end
     terms = Dict{Int,Any}()
-    for term ∈ expr.args[2:end]
-        k, term = extract_var_factor(term, var)
-        if k ∈ keys(terms)
-            terms[k] = :($(terms[k]) + $(term))
-        else
-            terms[k] = term
+    if expr.args[1] != :+
+        # if expr.args[1] != :*
+        #     error(
+        #         "Input expression is neither a sum nor a simple product at its highest "
+        #         * "level: $expr"
+        #     )
+        # end
+        k, term = extract_var_factor(expr, var)
+        terms[k] = term
+    else
+        for term ∈ expr.args[2:end]
+            k, term = extract_var_factor(term, var)
+            if k ∈ keys(terms)
+                terms[k] = :($(terms[k]) + $(term))
+            else
+                terms[k] = term
+            end
         end
     end
     term_exprs = [get(terms, k, 0) for k ∈ 0:maximum(keys(terms))]
