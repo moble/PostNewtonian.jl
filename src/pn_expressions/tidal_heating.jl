@@ -23,6 +23,16 @@ See also
 @pn_expression function tidal_heating(pnsystem)
     # References to pages and equation numbers are from Alvi (2001)
 
+    # NOTE: Because Alvi's result is not written in the usual PN-expansion form, and because
+    # it's just a single term, I opt to just deal with the PN order here with a simple `if`
+    # switch, rather than `@pn_expansion` as usual.  In this case, the relevant order comes
+    # from the fact that Ṁ₁+Ṁ₂ gets added to the flux, so the 0PN term is v^10.  Note that
+    # b ∝ v^-2, and Ṁ₁ and Ṁ₂ ∝ v^12 (via I₀₁ and I₀₂).  So this is a 1PN term.  If
+    # higher-order terms are added in the future, this should be changed.
+    if pn_order(pnsystem) < 1
+        return eltype(pnsystem).((0,0,0,0))
+    end
+
     # Page 2, line 4
     rₕ₁ = M₁ * (1 + √(1-min(χ₁²,1)))
     rₕ₂ = M₂ * (1 + √(1-min(χ₂²,1)))
@@ -43,8 +53,9 @@ See also
     # (2013)](https://hal.inria.fr/hal-00790071), I actually find terrible numerical
     # accuracy if I compute sin²θ using Kahan's method.  Maybe Julia is optimizing
     # something that violates the order of operations Kahan prescribed.  But I find very
-    # good results using the simpler formula θ = atan √ |a⃗×b⃗|² / (a⃗⋅b⃗)², which is
-    # simpler in any case, so that's what I use.
+    # good results using the simpler formula θ = atan √( |a⃗×b⃗|² / (a⃗⋅b⃗)² ), which is
+    # simpler in any case, so that's what I use.  Or more precisely, I use
+    # sin²(atan(n/d)) = n²/(d²+n²) with that formula.
 
     sin²θ₁ = let cross2 = abs2vec(n̂×χ⃗₁)
         denominator = cross2 + (n̂⋅χ⃗₁)^2
