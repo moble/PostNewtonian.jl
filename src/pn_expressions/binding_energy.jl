@@ -40,7 +40,7 @@ terms again with ``1 ↔ 2``.  Finally, note the normalization difference, where
 overall factor is used, leading to a sign difference.
 """
 @pn_expression function 𝓔(pnsystem)
-    -M * ν * v^2 / 2 * (
+    -M * ν * v^2 / 2 * @pn_expansion(
         1
         + v^2 * (-ν/12 - 3//4)
         + v^4 * (-ν^2/24 + 19ν/8 - 27//8)
