@@ -159,7 +159,7 @@ function PNWaveform(
             t = solution.t
             δΦ = 2π / MinStepsPerOrbit
             Φrange = range(extrema(Φ)..., step=δΦ)
-            t_Φ = CubicSpline(t, Φ).(Φrange)
+            t_Φ = CubicSpline(t, Φ)(Φrange)
             solution(t_Φ)
         end
     end
