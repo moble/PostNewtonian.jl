@@ -111,7 +111,7 @@ to [`𝛡`](@ref).
 Note that there is a 3PN term of ``-22ν\\ln(r/r₀′)/3`` that is simply ignored here.
 """
 @pn_expression function γ(pnsystem)
-    v^2 * (
+    v^2 * @pn_expansion(
         1
         + v^2 * (1 - ν / 3)
         + v^4 * (1 - 65ν / 12)

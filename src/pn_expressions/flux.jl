@@ -30,7 +30,7 @@ terms again with ``1 ↔ 2``.  Finally, note the normalization difference, where
 overall factor is used, leading to a sign difference.
 """
 @pn_expression function 𝓕(pnsystem)
-    32ν^2/5 * v^10 * (
+    32ν^2/5 * v^10 * @pn_expansion(
         # Non-spinning terms; Eq. (314) of Blanchet (2014)
         1
         + v^2 * (-1247//336 - 35ν/12)
