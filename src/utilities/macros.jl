@@ -89,26 +89,30 @@ function pn_expression(pnsystem::Symbol, body)
         unary_funcs_exprs
     ]
 
-    # Now, just wrap `body` in a `let` block, where we include the exprs created above
-    new_body = quote
-        #@fastmath let $(exprs...)
-        let $(exprs...)
-            $(body)
+    # Next, add pnsystem as the argument to each @pn_expansion call
+    new_body = macroexpand(
+        @__MODULE__,
+        MacroTools.postwalk(body) do x
+            if MacroTools.isexpr(x, :macrocall) &&
+                x.args[1]==Symbol("@pn_expansion") &&
+                !isa(x.args[end-1], Symbol)
+                x′ = deepcopy(x)
+                insert!(x′.args, length(x′.args), pnsystem)
+                x′
+            else
+                x
+            end
+        end,
+        recursive=true
+    )
+
+    # Finally, just wrap `new_body` in a `let` block, where we include exprs created above
+    full_body = quote
+        @fastmath let $(exprs...)
+            $(new_body)
         end
     end
 
-    # Finally, add pnsystem as the argument to each @pn_expansion call
-    MacroTools.postwalk(new_body) do x
-        if MacroTools.isexpr(x, :macrocall) &&
-            x.args[1]==Symbol("@pn_expansion") &&
-            !isa(x.args[end-1], Symbol)
-            x′ = deepcopy(x)
-            insert!(x′.args, length(x′.args), pnsystem)
-            x′
-        else
-            x
-        end
-    end
 end
 
 function pn_expression(arg_index::Integer, func)
@@ -191,7 +195,6 @@ macro pn_expansion(pnsystem, expr)
 end
 
 function evalpolysafe(v, coefficients, pnsystem)
-    @show pnsystem order_index(pnsystem) length(coefficients) coefficients
     indices = 1:min(length(coefficients), order_index(pnsystem))
     evalpoly(v, coefficients[indices])
 end
