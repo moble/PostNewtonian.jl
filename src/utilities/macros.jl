@@ -190,13 +190,12 @@ be simplified or
 in sympy parlance.)
 """
 macro pn_expansion(pnsystem, expr)
-    coefficients = var_collect(expr, :v)
-    esc(:(evalpolysafe(v, $coefficients, $pnsystem)))
-end
-
-function evalpolysafe(v, coefficients, pnsystem)
-    indices = 1:min(length(coefficients), order_index(pnsystem))
-    evalpoly(v, coefficients[indices])
+    max_k, coefficients = var_collect(expr, :v)
+    max_index = max_k + 1
+    esc(:(evalpoly(
+        v,
+        $coefficients[1:min($max_index, order_index(pnsystem))]
+    )))
 end
 
 
@@ -208,7 +207,7 @@ Extract a factor of `var` from the product `term`.
 This is a helper function for [`var_collect`](@ref).
 """
 function extract_var_factor(term, var)
-    if !MacroTools.isexpr(term, :call) || term.args[1] != :*
+    if !MacroTools.isexpr(term, :call) || term.args[1] ∉ ((*), :*)
         if term == var
             return 1, 1
         end
@@ -254,11 +253,12 @@ The inputs should be an
 [`Expr`](https://docs.julialang.org/en/v1/manual/metaprogramming/#Program-representation)
 and a single `Symbol` to be found in that `Expr`.
 
-The return value is an `Expr` representing a `Tuple` of values corresponding to the
-coefficients of `var` to various powers.  For example,
+The return value is an `Int` representing the highest power of `v` in the expression, and an
+`Expr` representing a `Tuple` of values corresponding to the coefficients of `var` to
+various powers.  For example,
 ```jl-doctest
 julia> PostNewtonian.var_collect(:(1 + a*v + b*v^2 + c*v^4), :v)
-:((1, a, b, 0, c))
+4, :((1, a, b, 0, c))
 ```
 (Note that there was *no* factor in `v^3`.)  This result is convenient for passing to
 `evalpoly`, for example.
@@ -268,13 +268,7 @@ function var_collect(expr, var)
         error("Input expression is not a call at its highest level: $expr")
     end
     terms = Dict{Int,Any}()
-    if expr.args[1] ∉ (:+, :-)
-        # if expr.args[1] != :*
-        #     error(
-        #         "Input expression is neither a sum nor a simple product at its highest "
-        #         * "level: $expr"
-        #     )
-        # end
+    if expr.args[1] ∉ ((+), :+, (-), :-)
         k, term = extract_var_factor(expr, var)
         terms[k] = term
     else
@@ -287,8 +281,9 @@ function var_collect(expr, var)
             end
         end
     end
-    term_exprs = [get(terms, k, 0) for k ∈ 0:maximum(keys(terms))]
-    :(($(term_exprs...),))
+    max_k = maximum(keys(terms))
+    term_exprs = [get(terms, k, 0) for k ∈ 0:max_k]
+    max_k, :(($(term_exprs...),))
 end
 
 
