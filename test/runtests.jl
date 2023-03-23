@@ -28,6 +28,7 @@ using SciMLBase
 using OrdinaryDiffEq
 using Symbolics
 using SymbolicUtils
+using DoubleFloats
 using Quaternionic
 
 using Aqua
@@ -54,8 +55,9 @@ end
 @testset verbose=true "PostNewtonian" begin
     addtests("aqua.jl")
     addtests("macros.jl")
-    addtests("inspiral.jl")
+    addtests("binding_energy.jl")
     addtests("up_down_instability.jl")
+    addtests("inspiral.jl")
     addtests("gwframes.jl")
 end
 
