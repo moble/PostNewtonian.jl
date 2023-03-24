@@ -69,10 +69,19 @@ Note that if it is not available, a `BoundsError` will be raised by this functio
 """
 Φ(s::PNSystem) = s.state[14]  # NO @inbounds
 
-"""
+@doc raw"""
     λ₁(pnsystem)
 
-Love number (tidal coupling parameter) of object 1 in this system.
+Tidal coupling parameter of object 1 in this system.
+
+This is related to the Love number ``k_2`` and the star's radius ``R`` as
+```math
+\lambda_1 = \frac{2}{3} k_2 R^5.
+```
+There is another common parameter denoted
+```math
+\Lambda_1 = \frac{3}{2} \frac{M_1}{M_2} \lambda_1.
+```
 
 Note that — as of this writing — only `NSNS` systems can have a nonzero value for this
 quantity.  All other types return `0`, which Julia can use to eliminate code that would then
@@ -86,7 +95,16 @@ specializes on the type of `pnsystem`.
 """
     λ₂(pnsystem)
 
-Love number (tidal coupling parameter) of object 2 in this system.
+Tidal coupling parameter of object 2 in this system.
+
+This is related to the Love number ``k_2`` and the star's radius ``R`` as
+```math
+\lambda_2 = \frac{2}{3} k_2 R^5.
+```
+There is another common parameter denoted
+```math
+\Lambda_2 = \frac{3}{2} \frac{M_2}{M_1} \lambda_2.
+```
 
 Note that — as of this writing — only `BHNS` and `NSNS` systems can have a nonzero value for
 this quantity.  All other types return `0`, which Julia can use to eliminate code that would

@@ -69,9 +69,10 @@ end
 The [`PNSystem`](@ref) subtype describing a black-hole—neutron-star binary system.
 
 The `state` vector is the same as for a [`BBH`](@ref).  There is an additional field `λ₂`
-holding the (constant) Love number, which describes the tidal-coupling parameter of the
-neutron star.  Note that the neutron star is *always* object 2 — meaning that `M₂`, `χ⃗₂`,
-and `λ₂` always refer to it; `M₁` and `χ⃗₁` always refer to the black hole.
+holding the (constant) tidal-coupling parameter of the neutron star.
+
+Note that the neutron star is *always* object 2 — meaning that `M₂`, `χ⃗₂`, and `λ₂` always
+refer to it; `M₁` and `χ⃗₁` always refer to the black hole.  See also [`NSNS`](@ref).
 """
 struct BHNS{T, PNOrder} <: PNSystem{T, PNOrder}
     state::AbstractVector{T}
@@ -92,8 +93,8 @@ end
 The [`PNSystem`](@ref) subtype describing a neutron-star—neutron-star binary system.
 
 The `state` vector is the same as for a [`BBH`](@ref).  There are two additional fields `λ₁`
-and `λ₂` holding the (constant) Love numbers, which describes the tidal-coupling parameter
-of the neutron stars.
+and `λ₂` holding the (constant) tidal-coupling parameters of the neutron stars.  See also
+[`BHNS`](@ref).
 """
 struct NSNS{T, PNOrder} <: PNSystem{T, PNOrder}
     state::AbstractVector{T}
