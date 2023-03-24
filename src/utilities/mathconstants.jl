@@ -2,16 +2,15 @@ module MathConstants
 
 export log2, ln2, log3, ln3, log5, ln5,
     log3halves, log³╱₂, ln³╱₂, log5halves, log⁵╱₂, ln⁵╱₂,
-    apery, ζ3, eulergamma, γₑ, 𝒾
+    apery, ζ3, γₑ, 𝒾
 
 Base.@irrational ln2 0.6931471805599453 log2
+Base.@irrational γₑ 0.57721566490153286061  euler
 Base.@irrational ln3 1.0986122886681097 big"1.098612288668109691395245236922525704647490557822749451734694333637494293218608966873615754813732088787970029"
 Base.@irrational ln5 1.6094379124341003 big"1.60943791243410037460075933322618763952560135426851772191264789147417898770765776463013387809317961"
 Base.@irrational ln³╱₂ 0.4054651081081644 big"0.40546510810816438197801311546434913657199042346249419761401432414410067124891425126775242781731340"
 Base.@irrational ln⁵╱₂ 0.9162907318741551 big"0.91629073187415506518352721176801107145010121990826246779196788198078536573796304902427055109676092"
 Base.@irrational ζ3 1.2020569031595942 big"1.20205690315959428539973816151144999076498629234049888179227155534183820578631309018645587360933525814619915"
-import Base.MathConstants: eulergamma
-const γₑ = eulergamma
 const 𝒾 = im
 
 # When defining @irrationals, if the third argument is a symbol, it is expected to name an
@@ -21,7 +20,6 @@ const 𝒾 = im
 
 @doc raw"""
     γₑ
-    eulergamma
 
 [Euler's constant](https://en.wikipedia.org/wiki/Euler%27s_constant) (also known as the
 Euler–Mascheroni constant) is defined as the limit as ``n \to \infty`` of the difference
@@ -30,10 +28,7 @@ sequence [A001620](https://oeis.org/A001620).
 
 ```julia-repl
 julia> PostNewtonian.γₑ
-γ = 0.5772156649015...
-
-julia> PostNewtonian.eulergamma
-γ = 0.5772156649015...
+γₑ = 0.5772156649015...
 
 julia> n=10_000_000; sum(1 ./ (1:n))-log(n)
 0.5772157149015307
