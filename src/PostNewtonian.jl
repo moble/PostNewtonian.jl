@@ -1,5 +1,6 @@
 module PostNewtonian
 
+using Random: AbstractRNG, GLOBAL_RNG
 using InteractiveUtils: methodswith
 using StaticArrays
 using Quaternionic
@@ -23,7 +24,7 @@ using .MathConstants
 
 
 include("systems.jl")
-export PNSystem, BBH, BHNS, NSNS, SymbolicPNSystem, symbolic_pnsystem
+export PNSystem, BBH, BHNS, NSNS, SymbolicPNSystem, symbolic_pnsystem, pn_order
 
 
 include("fundamental_variables.jl")
@@ -55,7 +56,7 @@ export gw_energy_flux, 𝓕,
     Omega_p, Ω⃗ₚ,
     Omega_chi1, Ω⃗ᵪ₁,
     Omega_chi2, Ω⃗ᵪ₂,
-    #𝛡, γ, aₗ, Ω⃗ᵪ  # Too obscure to bother with
+    #𝛡, γₚ, aₗ, Ω⃗ᵪ  # Too obscure to bother with
     mode_weights!, h!
 
 
@@ -68,6 +69,9 @@ include("evaluation.jl")
 
 include("compatibility_layers.jl")
 export GWFrames
+
+
+include("examples.jl")
 
 
 end  # module PostNewtonian
