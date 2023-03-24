@@ -50,7 +50,7 @@ given by the rotor `R`.  This is equal to
 const ell_hat = ℓ̂
 
 
-"""
+@doc raw"""
     Ω(pnsystem)
     Ω(;v, M=1)
     Omega(pnsystem)
@@ -59,8 +59,11 @@ const ell_hat = ℓ̂
 Orbital angular frequency.
 
 The parameter `v` is the PN velocity parameter, and must be passed as a keyword argument —
-as in `Ω(v=0.1)`.  The parameter `M` is the total mass of the binary.
-
+as in `Ω(v=0.1)`.  The parameter `M` is the total mass of the binary.  They are related *by
+definition* as
+```math
+\Omega \coloneq \frac{v^3}{M}.
+```
 See also [`v`](@ref).
 """
 Ω(;v, M=1) = v^3 / M
@@ -75,7 +78,9 @@ Post-Newtonian velocity parameter.
 
 The parameter `Ω` is the orbital angular frequency, and must be passed as a keyword argument
 — as in `v(Ω=0.1)`.  The parameter `M` is the total mass of the binary.
-
+```math
+v \coloneq \left(M \Omega\right)^{1/3}.
+```
 See also [`Ω`](@ref).
 """
 v(;Ω, M=1) = (M*Ω)^(1//3)
