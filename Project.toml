@@ -15,7 +15,7 @@ SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
-DataInterpolations = "3.9"
+DataInterpolations = "3.9, 4"
 DiffEqBase = "6"
 OrdinaryDiffEq = "6"
 Quaternionic = "1"
