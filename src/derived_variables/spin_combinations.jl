@@ -55,6 +55,7 @@ Antisymmetric spin vector ``(χ⃗₁-χ⃗₂)/2``.
 χ⃗ₐ(M₁, M₂, χ⃗₁, χ⃗₂) = (χ⃗₁ - χ⃗₂) / 2
 χ⃗ₐ(s::PNSystem) = χ⃗ₐ(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
 
+χₚₑᵣₚ(s::PNSystem) = √(χ₁²(s) - (χ₁ₗ(s))^2 + χ₂²(s) - (χ₂ₗ(s))^2)
 
 χ₁²(s::PNSystem) = abs2vec(χ⃗₁(s))
 χ₂²(s::PNSystem) = abs2vec(χ⃗₂(s))
