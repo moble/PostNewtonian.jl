@@ -93,24 +93,24 @@ As [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520) explain above their Eq
 orbital precession is given by the time derivative of the orbital axis: 𝓵̇ = 𝛡 × 𝓵, where
 the angular velocity is along the separation vector 𝓷, so that 𝛡 = ϖ 𝓷.  And in turn,
 they define aₗ ≔ r ω ϖ, where r is the separation and ω is the orbital angular frequency.
-Then, they define the PN parameter γ≔M/r and we have Mω = v³ so that ϖ = γ aₗ / v³.  The
-parameters γ and aₗ are given by Eqs. (4.3) and (4.4), and given here by the functions
-[`γ`](@ref) and [`aₗ`](@ref).
+Then, they define the PN parameter γₚ≔M/r and we have Mω = v³ so that ϖ = γₚ aₗ / v³.  The
+parameters γₚ and aₗ are given by Eqs. (4.3) and (4.4), and given here by the functions
+[`γₚ`](@ref) and [`aₗ`](@ref).
 """
 @pn_expression function 𝛡(pnsystem)
-    (γ(pnsystem) * aₗ(pnsystem) / v^3) * n̂
+    (γₚ(pnsystem) * aₗ(pnsystem) / v^3) * n̂
 end
 
 
 """
-    γ(pnsystem)
+    γₚ(pnsystem)
 
 Eq. (4.3) of [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520).  This term contributes
 to [`𝛡`](@ref).
 
 Note that there is a 3PN term of ``-22ν\\ln(r/r₀′)/3`` that is simply ignored here.
 """
-@pn_expression function γ(pnsystem)
+@pn_expression function γₚ(pnsystem)
     v^2 * @pn_expansion(
         1
         + v^2 * (1 - ν / 3)
