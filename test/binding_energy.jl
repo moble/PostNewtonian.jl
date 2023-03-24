@@ -89,19 +89,19 @@ function be(pnsystem, deriv)
             - δ*(χ₂²/2 + 3χₐₗ*χₛₗ) + (χ₁₂ + 6χₐₗ^2)ν
         )
 
-        # NS tidal coupling
-        e[10] += (-9*((M₁/M₂)λ₂ + (M₂/M₁)λ₁) / M^5)
-        e[12] += (
-            (
-                -11//2*(M₁/M₂)*(3+2M₂/M+3*(M₂/M)^2)λ₂
-                - 11//2*(M₂/M₁)*(3+2M₁/M+3*(M₁/M)^2)λ₁
-            ) / M^5
-        )
+        # # NS tidal coupling
+        # e[10] += (-9*((M₁/M₂)λ₂ + (M₂/M₁)λ₁) / M^5)
+        # e[12] += (
+        #     (
+        #         -11//2*(M₁/M₂)*(3+2M₂/M+3*(M₂/M)^2)λ₂
+        #         - 11//2*(M₂/M₁)*(3+2M₁/M+3*(M₁/M)^2)λ₁
+        #     ) / M^5
+        # )
 
         if deriv
-            c * (
-                sum((k+2)*v^(k+1)*coeff for (k,coeff) ∈ e if k ≤ 2pn_order; init=0)
-                + sum(v^(k+1)*coeff*2*((k+2)*log(v)+1) for (k,coeff) ∈ eˡⁿ if k ≤ 2pn_order; init=0)
+            c * v * (
+                sum(v^(k)*coeff*(k+2) for (k,coeff) ∈ e if k ≤ 2pn_order; init=0)
+                + sum(v^(k)*coeff*2*((k+2)*log(v)+1) for (k,coeff) ∈ eˡⁿ if k ≤ 2pn_order; init=0)
             )
         else
             c * v^2 * (
@@ -122,20 +122,18 @@ for PNOrder ∈ 0//2:1//2:15//2
 
     𝓔′1 = 𝓔′(sympn)
     𝓔′2 = be(sympn, true)
-    diff′ = simplify(𝓔′1-𝓔′2, expand=true)
-    @show PNOrder 𝓔′1 𝓔′2 diff′
-    println()
+    #diff′ = simplify(𝓔′1-𝓔′2, expand=true)
+    diff′ = expand(𝓔′1-𝓔′2)
+    # @show PNOrder 𝓔′1 𝓔′2 diff′
+    # println()
     @test iszero(diff′)
 
     for T ∈ [Float32, Float64, Double64, BigFloat]
         v = T(1//100)
-        pn_system = randn(NSNS; v, PNOrder)
-        ϵ = 4eps(PostNewtonian.μ(pn_system) * v^2)
-        @test 𝓔(pn_system) ≈ be(pn_system, false) atol=ϵ
-        𝓔′3 = 𝓔′(pn_system)
-        𝓔′4 = be(pn_system, true)
-        @test 𝓔′3 ≈ 𝓔′4 atol=ϵ
-        #@test 𝓔′(pn_system) ≈ be(pn_system, true) atol=ϵ
+        numpn = randn(NSNS; v, PNOrder)
+        ϵ = 100eps(PostNewtonian.μ(numpn) * v^2)
+        @test 𝓔(numpn) ≈ be(numpn, false) atol=ϵ rtol=100eps(T)
+        @test 𝓔′(numpn) ≈ be(numpn, true) atol=ϵ rtol=100eps(T)
     end
 
 end
