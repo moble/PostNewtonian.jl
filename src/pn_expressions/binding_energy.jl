@@ -112,7 +112,7 @@ const binding_energy = 𝓔
 𝓔′ = let 𝓔=𝓔(symbolic_pnsystem), v=v(symbolic_pnsystem)
     ∂ᵥ = Differential(v)
     # Evaluate derivative symbolically
-    𝓔′ = expand_derivatives(∂ᵥ(𝓔))
+    𝓔′ = simplify(expand_derivatives(∂ᵥ(𝓔)), expand=true)#, simplify_fractions=false)
     # Turn it into (an Expr of) a function taking one argument: `pnsystem`
     𝓔′ = build_function(𝓔′, :pnsystem)
     # Remove `hold` (which we needed for Symbolics.jl to not collapse to Float64)
