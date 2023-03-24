@@ -165,7 +165,7 @@ end
 
 
 """
-    @pn_expansion [pnsystem] expansion
+    @pn_expansion [[offset] pnsystem] expansion
 
 Gather terms in `expansion` by the powers of `v` involved, the choose on the powers chosen
 by the `pnsystem`'s `PNOrder` parameter, and evaluate efficiently in Horner form.
@@ -189,13 +189,21 @@ be simplified or
 [`collect`](https://docs.sympy.org/latest/tutorials/intro-tutorial/simplification.html#collect)ed
 in sympy parlance.)
 """
+macro pn_expansion(offset, pnsystem, expr)
+    esc(pn_expansion(offset, pnsystem, expr))
+end
+
 macro pn_expansion(pnsystem, expr)
+    esc(pn_expansion(0, pnsystem, expr))
+end
+
+function pn_expansion(offset, pnsystem, expr)
     max_k, coefficients = var_collect(expr, :v)
     max_index = max_k + 1
-    esc(:(evalpoly(
+    :(evalpoly(
         v,
-        $coefficients[1:min($max_index, order_index(pnsystem))]
-    )))
+        $coefficients[1:min($max_index, order_index($pnsystem)+$offset)]
+    ))
 end
 
 
@@ -211,13 +219,14 @@ function extract_var_factor(term, var)
         if term == var
             return 1, 1
         end
-        m = MacroTools.trymatch(:(v_^k_), term)
+        m = MacroTools.trymatch(:((^)(v_, k_)), term)
+        m = !isnothing(m) ? m : MacroTools.trymatch(:($(^)(v_, k_)), term)
         if !isnothing(m) && m[:v] == var
             return m[:k], 1
         end
         return 0, term
     end
-    term = deepcopy(term)
+    term = flatten_mul!(deepcopy(term))
     k = 0
     indices = Int[]
     for (i,factor) ∈ enumerate(term.args)
@@ -229,7 +238,8 @@ function extract_var_factor(term, var)
             push!(indices, i)
             continue
         end
-        m = MacroTools.trymatch(:(v_^k_), factor)
+        m = MacroTools.trymatch(:((^)(v_, k_)), factor)
+        m = !isnothing(m) ? m : MacroTools.trymatch(:($(^)(v_, k_)), factor)
         if !isnothing(m) && m[:v] == var
             k += m[:k]
             push!(indices, i)
