@@ -40,7 +40,7 @@ terms again with ``1 ↔ 2``.  Finally, note the normalization difference, where
 overall factor is used, leading to a sign difference.
 """
 @pn_expression function 𝓔(pnsystem)
-    -M * ν * v^2 / 2 * @pn_expansion(
+    -1//2 * μ * v^2 * @pn_expansion(
         1
         + v^2 * (-ν/12 - 3//4)
         + v^4 * (-ν^2/24 + 19ν/8 - 27//8)
@@ -112,11 +112,20 @@ const binding_energy = 𝓔
 𝓔′ = let 𝓔=𝓔(symbolic_pnsystem), v=v(symbolic_pnsystem)
     ∂ᵥ = Differential(v)
     # Evaluate derivative symbolically
-    𝓔′ = simplify(expand_derivatives(∂ᵥ(𝓔)))
+    𝓔′ = expand_derivatives(∂ᵥ(𝓔))
     # Turn it into (an Expr of) a function taking one argument: `pnsystem`
     𝓔′ = build_function(𝓔′, :pnsystem)
     # Remove `hold` (which we needed for Symbolics.jl to not collapse to Float64)
     𝓔′ = unhold(𝓔′)
+    # "Flatten" the main sum, because Symbolics nests sums for some reason
+    𝓔′ = apply_to_first_add!(𝓔′, flatten_add!)
+    # Apply `@pn_expansion` to the main sum
+    splitfunc = MacroTools.splitdef(𝓔′)
+    splitfunc[:body] = apply_to_first_add!(
+        splitfunc[:body],
+        x->:(@pn_expansion(1, $x))
+    )
+    𝓔′ = MacroTools.combinedef(splitfunc)
     # Finally, apply the "macro" to it and get a full function out
     eval(pn_expression(1, 𝓔′))::Function
 end
