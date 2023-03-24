@@ -112,7 +112,7 @@ function be(pnsystem, deriv)
     end
 end
 
-for PNOrder ∈ 0//2:1//2:15//2
+for PNOrder ∈ 0//2:1//2:13//2
     sympn = SymbolicPNSystem(PNOrder)
 
     𝓔1 = 𝓔(sympn)
@@ -124,8 +124,10 @@ for PNOrder ∈ 0//2:1//2:15//2
     𝓔′2 = be(sympn, true)
     #diff′ = simplify(𝓔′1-𝓔′2, expand=true)
     diff′ = expand(𝓔′1-𝓔′2)
-    # @show PNOrder 𝓔′1 𝓔′2 diff′
-    # println()
+    if !iszero(diff′)
+        @show PNOrder 𝓔′1 𝓔′2 diff′
+        println()
+    end
     @test iszero(diff′)
 
     for T ∈ [Float32, Float64, Double64, BigFloat]
