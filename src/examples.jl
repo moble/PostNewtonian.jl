@@ -56,7 +56,7 @@ function Base.randn(
     R = randn(rng, Rotor{T})
     λ₁ = λₘₐₓ * rand(rng, T)
     λ₂ = λₘₐₓ * rand(rng, T)
-    pnclass(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₁, λ₂)
+    pnclass(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₁, λ₂, PNOrder)
 end
 
 Base.randn(pnclass::Type{P}; v::T=0.01, PNOrder=typemax(Int)) where {P<:PNSystem, T} =
