@@ -5,7 +5,7 @@ Compute the range of frequencies over which the system is unstable to increasing
 
 The returned value is a pair of dimensionless frequencies giving the lower and upper
 frequencies between which we can expect instability.  If there is no instability expected,
-the returned pair is just (1,1).
+the returned pair is just (1,1) — where 1 is the limit of physically reasonable frequencies.
 
 For compact binaries in which the spins are either aligned or anti-aligned with the orbital
 angular velocity, we do not expect any precession effects — simply by symmetry.  However, if
