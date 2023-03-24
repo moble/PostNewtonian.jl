@@ -11,8 +11,6 @@ So this test does all that a little more manually and compares the results at ea
 
 @testset verbose=true "binding_energy" begin
 
-# using PostNewtonian: pn_order, type_converter
-# using PostNewtonian: M₁, M₂, v, λ₁, λ₂, M, Sₗ, δ, μ, ν, Σₗ, χ₁², χ₁₂, χ₂², χₐₗ, χₛₗ
 using PostNewtonian: a₆ᶜ¹, a₆₅ᶜ¹, a₇ˡⁿ¹, a₇ᶜ¹
 
 function be(pnsystem, deriv)
@@ -116,25 +114,28 @@ end
 
 for PNOrder ∈ 0//2:1//2:15//2
     sympn = SymbolicPNSystem(PNOrder)
+
     𝓔1 = 𝓔(sympn)
     𝓔2 = be(sympn, false)
     diff = simplify(𝓔1-𝓔2, expand=true)
-    # @show PNOrder 𝓔1 𝓔2 diff
-    # println()
     @test iszero(diff)
-    # 𝓔′1 = 𝓔′(sympn)
-    # 𝓔′2 = be(sympn, true)
-    # diff′ = simplify(𝓔′1-𝓔′2, expand=true)
-    # @show PNOrder 𝓔′1 𝓔′2 diff′
-    # println()
-    # @test iszero(diff′)
+
+    𝓔′1 = 𝓔′(sympn)
+    𝓔′2 = be(sympn, true)
+    diff′ = simplify(𝓔′1-𝓔′2, expand=true)
+    @show PNOrder 𝓔′1 𝓔′2 diff′
+    println()
+    @test iszero(diff′)
 
     for T ∈ [Float32, Float64, Double64, BigFloat]
         v = T(1//100)
         pn_system = randn(NSNS; v, PNOrder)
         ϵ = 4eps(PostNewtonian.μ(pn_system) * v^2)
         @test 𝓔(pn_system) ≈ be(pn_system, false) atol=ϵ
-        # @test 𝓔′(pn_system) ≈ be(pn_system, true) atol=ϵ
+        𝓔′3 = 𝓔′(pn_system)
+        𝓔′4 = be(pn_system, true)
+        @test 𝓔′3 ≈ 𝓔′4 atol=ϵ
+        #@test 𝓔′(pn_system) ≈ be(pn_system, true) atol=ϵ
     end
 
 end
