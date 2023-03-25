@@ -48,15 +48,22 @@ R(s::PNSystem) = @inbounds Rotor(view(s.state, 9:12)...)
 
 @doc raw"""
     v(pnsystem)
+    v(;Ω, M=1)
 
 Post-Newtonian velocity parameter.  This is related to the orbital angular frequency
 ``\Omega`` as
 ```math
-v ≔ (M\,\Omega)^{1/3},
+v \coloneq (M\,\Omega)^{1/3},
 ```
-where ``M`` is the total mass of the binary
+where ``M`` is the total mass of the binary.
+
+Note that if you want to pass the value ``Ω`` (rather than a `PNSystem`), you must pass it
+as a keyword argument — as in `v(Ω=0.1)`.
+
+See also [`Ω`](@ref).
 """
 v(s::PNSystem) = @inbounds s.state[13]
+v(;Ω, M=1) = (M*Ω)^(1//3)
 
 """
     Φ(pnsystem)

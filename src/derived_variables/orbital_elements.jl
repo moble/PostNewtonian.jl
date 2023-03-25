@@ -71,19 +71,4 @@ See also [`v`](@ref).
 const Omega = Ω
 
 
-@doc raw"""
-    v(;Ω, M=1)
-
-Post-Newtonian velocity parameter.
-
-The parameter `Ω` is the orbital angular frequency, and must be passed as a keyword argument
-— as in `v(Ω=0.1)`.  The parameter `M` is the total mass of the binary.
-```math
-v \coloneq \left(M \Omega\right)^{1/3}.
-```
-See also [`Ω`](@ref).
-"""
-v(;Ω, M=1) = (M*Ω)^(1//3)
-
-
 lnv(s::PNSystem) = ln(v(s))
