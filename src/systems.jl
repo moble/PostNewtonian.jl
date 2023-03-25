@@ -58,7 +58,7 @@ function BBH(;
     M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing,
     PNOrder=typemax(Int), kwargs...
 )
-    (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing, PNOrder)
+    (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
     BBH{T, PNOrder}(state)
 end
 
@@ -82,7 +82,7 @@ function BHNS(;
     M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₂, Φ=nothing,
     PNOrder=typemax(Int), kwargs...
 )
-    (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing, PNOrder)
+    (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
     BHNS{T, PNOrder}(state, λ₂)
 end
 
@@ -105,7 +105,7 @@ function NSNS(;
     M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₁, λ₂, Φ=nothing,
     PNOrder=typemax(Int), kwargs...
 )
-    (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing, PNOrder)
+    (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
     NSNS{T, PNOrder}(state, λ₁, λ₂)
 end
 
