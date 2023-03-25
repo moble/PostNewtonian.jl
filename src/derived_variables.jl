@@ -2,7 +2,7 @@ module DerivedVariables
 
 using ..PostNewtonian: PNSystem
 using ..PostNewtonian.FundamentalVariables
-using Quaternionic: 𝐢, 𝐣, 𝐤, QuatVec, (⋅), abs2vec
+using Quaternionic: 𝐢, 𝐣, 𝐤, QuatVec, (⋅), abs2vec, absvec
 
 include("derived_variables/mass_combinations.jl")
 export total_mass, M,
@@ -20,10 +20,10 @@ export n_hat, n̂,
     lnv
 
 include("derived_variables/spin_combinations.jl")
-export S⃗₁, S⃗₂, S⃗, Σ⃗, χ⃗, χ⃗ₛ, χ⃗ₐ,
-    Sₙ, Σₙ, Sλ, Σλ, Sₗ, Σₗ,
+export S⃗₁, S⃗₂, S⃗, Σ⃗, χ⃗, χ⃗ₛ, χ⃗ₐ, χₚₑᵣₚ,
     χ₁², χ₂², χ₁, χ₂, χ₁₂,
     χ₁ₗ, χ₂ₗ, χₛₗ, χₐₗ,
+    Sₙ, Σₙ, Sλ, Σλ, Sₗ, Σₗ,
     S₁ₙ, S₁λ, S₁ₗ, S₂ₙ, S₂λ, S₂ₗ
 
 end

@@ -125,37 +125,32 @@ end
 function PNWaveform(
     Approximant, delta, chi1_i, chi2_i, Omega_orb_i;
     Omega_orb_0=Omega_orb_i, R_frame_i=[1.0], MinStepsPerOrbit=32,
-    PNWaveformModeOrder=3.5, PNOrbitalEvolutionOrder=4.0, dt=0.0, quiet=true
+    PNWaveformModeOrder=3.5, PNOrbitalEvolutionOrder=4.0, dt=0.0, quiet=true,
+    ell_min=2, ell_max=8, lambda1=0, lambda2=0
 )
-    if Approximant != "TaylorT1"
-        @error "`Approximant` other than \"TaylorT1\" is not yet supported"
-    end
     if PNWaveformModeOrder ≉ 3.5
         @error "`PNWaveformModeOrder` other than 3.5 is not yet supported"
     end
-    if PNOrbitalEvolutionOrder ≉ 4.0
-        @error "`PNOrbitalEvolutionOrder` other than 4.0 is not yet supported"
-    end
     M₁ = (1 + delta) / 2
     M₂ = (1 - delta) / 2
-    χ⃗₁ = QuatVec(chi1_i...)
-    χ⃗₂ = QuatVec(chi2_i...)
+    χ⃗₁ = QuatVec(chi1_i)
+    χ⃗₂ = QuatVec(chi2_i)
     Ωᵢ = Omega_orb_i
     Ω₁ = Omega_orb_0
-    Rᵢ = Rotor(R_frame_i...)
+    Rᵢ = Rotor(R_frame_i)
 
     # Inspiral
     solution = inspiral(
         M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ;
+        integrate_orbital_phase=true, λ₁=lambda1, λ₂=lambda2,
         Ω₁=Ω₁, Rᵢ=Rᵢ,
-        PNSys=TaylorT1, PNOrder=7//2,
-        integrate_orbital_phase=true,
+        expansion=Approximant, PNOrder=PNOrbitalEvolutionOrder,
         quiet=quiet,
         saveat=dt > 0 ? dt : []
     )
     if dt ≤ 0
         solution = let
-            Φ = solution[end, :]
+            Φ = solution[14, :]
             t = solution.t
             δΦ = 2π / MinStepsPerOrbit
             Φrange = range(extrema(Φ)..., step=δΦ)
@@ -165,10 +160,20 @@ function PNWaveform(
     end
 
     # Modes
-    n_modes = 77
+    ℓmin = ell_min
+    ℓmax = ell_max
+    n_modes = (ℓmax+1)^2 - ℓmin^2
+    pnsystem = if iszero(lambda1) && iszero(lambda2)
+        BBH{eltype(solution), PNOrbitalEvolutionOrder}(copy(solution.u[1]))
+    elseif iszero(lambda1)
+        BHNS{eltype(solution), PNOrbitalEvolutionOrder}(copy(solution.u[1]), lambda2)
+    else
+        NSNS{eltype(solution), PNOrbitalEvolutionOrder}(copy(solution.u[1]), lambda1, lambda2)
+    end
     h = Matrix{Complex{eltype(solution)}}(undef, n_modes, length(solution.t))
     for (hi, ui) in zip(axes(h, 2), solution.u)
-        h!(@view(h[:, hi]), ui[1:13]; ℓmin=2)
+        pnsystem.state[:] .= ui
+        h!(@view(h[:, hi]), pnsystem; ℓmin, ℓmax)
     end
 
     # Return

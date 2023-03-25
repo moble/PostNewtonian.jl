@@ -61,7 +61,7 @@ export gw_energy_flux, 𝓕,
 
 
 include("dynamics.jl")
-export up_down_instability, inspiral
+export estimated_time_to_merger, up_down_instability, inspiral
 
 
 include("evaluation.jl")
