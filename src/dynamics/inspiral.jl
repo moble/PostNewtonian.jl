@@ -24,9 +24,9 @@ due to tidal heating.  Therefore, the values passed here are only precisely as g
 
   * `Ω₁=Ωᵢ`: First angular frequency in output data (see next section).
   * `Ωₑ=1`: Final angular frequency at which to stop ODE integration.
-  * `Rᵢ=Rotor(true)`: Initial orientation of binary.
-  * `PNSys=TaylorT1`: Currently the only possibility.
-  * `PNOrder=7//2`: Not actually used currently.
+  * `Rᵢ=Rotor(1)`: Initial orientation of binary.
+  * `expansion="TaylorT1"`: Currently the only possibility.
+  * `PNOrder=4//1`: Order to which to retain powers of ``v^2`` in PN expansions.
   * `check_up_down_instability=true`: Warn if the "up-down instability" (see below) is
     likely to affect this system.
   * `time_stepper=AutoVern9(Rodas5())`: Choice of solver in OrdinaryDiffEq to integrate ODE.
@@ -112,13 +112,14 @@ given by integrating the angular velocity as described in [Boyle
 ```math
 \\dot{v} = - \\frac{\\mathcal{F} + \\dot{M}_1 + \\dot{M}_2} {\\mathcal{E}'}
 ```
-where [`𝓕`](@ref) is the flux of gravitational-wave energy out of the system and
-[`𝓔′`](@ref) is the derivative of the binding energy with respect to ``v``.  For
-`"TaylorT1"`, the right-hand side of this equation is evaluated as given; for `"TaylorT4"`,
-the right-hand side is first expanded as a Taylor series in ``v`` and then truncated at some
-desired order; for `"TaylorT5"`, the *inverse* of the right-hand side is expanded as a
-Taylor series in ``v``, truncated at some desired order, and then inverted to obtain an
-expression in terms of ``v``.
+where [`𝓕`](@ref) is the flux of gravitational-wave energy out of the system,
+``\\dot{M}_1`` and ``\\dot{M}_2`` are due to tidal coupling as computed by
+[`tidal_heating`](@ref), and [`𝓔′`](@ref) is the derivative of the binding energy with
+respect to ``v``.  For `"TaylorT1"`, the right-hand side of this equation is evaluated as
+given; for `"TaylorT4"`, the right-hand side is first expanded as a Taylor series in ``v``
+and then truncated at some desired order; for `"TaylorT5"`, the *inverse* of the right-hand
+side is expanded as a Taylor series in ``v``, truncated at some desired order, and then
+inverted to obtain an expression in terms of ``v``.
 
 
 ## Returned solution
@@ -153,20 +154,20 @@ The field `sol.t` is the set of time points at which the solution is given.  To 
 
 Note the distinction between `Ωᵢ` (with subscript `i`) and `Ω₁` (with subscript `1`).  The
 first, `Ωᵢ`, represents the angular frequency of the *initial condition* from which the ODE
-integrator will begin; the second, `Ω₁`, represents the target angular frequency of the first
-element of the output data.  That is, the ODE integration will run forwards in time from
-`Ωᵢ` to the merger, and then — if `Ωᵢ>Ω₁` — come back to `Ωᵢ` and run backwards in time to
-`Ω₁`.  The output data will stitch these two together to be one continuous
+integrator will begin; the second, `Ω₁`, represents the target angular frequency of the
+first element of the output data.  That is, the ODE integration will run forwards in time
+from `Ωᵢ` to the merger, and then — if `Ωᵢ>Ω₁` — come back to `Ωᵢ` and run backwards in time
+to `Ω₁`.  The output data will stitch these two together to be one continuous
 (forwards-in-time) data series.
 
 For example, if you are trying to match to a numerical relativity (NR) simulation, you can
-read the masses and spins off of the NR data when the system is orbiting at angular frequency
-`Ωᵢ`.  Integrating the post-Newtonian (PN) solution forwards in time from this point will
-allow you to compare the PN and NR waveforms.  However, you may want to know what the
-waveform was at *earlier* times than are present in the NR data.  For this, you also have to
-integrate backwards in time.  We parametrise the point to which you integrate backwards with
-`Ω₁`.  In either case, element `1` of the output solution will have frequency `Ω₁` — though
-by default it is equal to `Ωᵢ`.
+read the masses and spins off of the NR data when the system is orbiting at angular
+frequency `Ωᵢ`.  Integrating the post-Newtonian (PN) solution forwards in time from this
+point will allow you to compare the PN and NR waveforms.  However, you may want to know what
+the waveform was at *earlier* times than are present in the NR data.  For this, you also
+have to integrate backwards in time.  We parameterize the point to which you integrate
+backwards with `Ω₁`.  In either case, element `1` of the output solution will have frequency
+`Ω₁` — though by default it is equal to `Ωᵢ`.
 
 Similarly, the optional argument `Ωₑ=1` is the frequency of the `end` element of the
 solution — that is Julia's notation for the last element.  Note that this is automatically
@@ -224,40 +225,87 @@ for details.
 """
 function inspiral(
     M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ;
+    integrate_orbital_phase=false, λ₁=0, λ₂=0,
     Ω₁=Ωᵢ, Ωₑ=1, Rᵢ=Rotor(true),
-    PNSys=TaylorT1, PNOrder=7//2,
+    expansion="TaylorT1", PNOrder=4//1,
     check_up_down_instability=true, time_stepper=AutoVern9(Rodas5()),
     reltol=nothing, abstol=nothing,
     termination_criteria_forwards=nothing,
     termination_criteria_backwards=nothing,
-    force_dtmin=true, integrate_orbital_phase=false,
-    quiet=false,
+    quiet=false, force_dtmin=true,
     solve_kwargs...
 )
-    if Ω₁ > Ωᵢ
+    # Sanity checks for the inputs
+
+    if M₁ ≤ 0 || M₂ ≤ 0
+        error("Unphysical masses: M₁=$M₁, M₂=$M₂.")
+    end
+
+    χ⃗₁, χ⃗₂ = QuatVec(χ⃗₁), QuatVec(χ⃗₂)
+    if abs2vec(χ⃗₁) > 1 || abs2vec(χ⃗₂) > 1
         error(
-            "Initial frequency Ωᵢ=$Ωᵢ should be greater than or equal to first frequency Ω₁=$Ω₁"
+            "Unphysical spins: |χ⃗₁|=$(abs2vec(χ⃗₁)), |χ⃗₂|=$(abs2vec(χ⃗₂)).\n"
+            *"These are dimensionless spins, which should be less than 1.\n"
+            *"Perhaps you forgot to divide by M₁² or M₂², respectively."
         )
     end
+
+    Rᵢ = Rotor(Rᵢ)
 
     vᵢ = v(Ω=Ωᵢ, M=M₁+M₂)
     if vᵢ ≥ 1
         error(
-            "The input Ωᵢ=$Ωᵢ is too large; with these masses, it corresponds to "
+            "The input Ωᵢ=$Ωᵢ is too large; with these masses, it corresponds to\n"
             * "vᵢ=$vᵢ, which is beyond the reach of post-Newtonian methods."
+        )
+    end
+
+    if !iszero(λ₁) && iszero(λ₂)
+        error(
+            "By convention, the NS in a BHNS binary must be the second body,\n"
+            *"meaning that λ₁ should be zero, and only λ₂ should be nonzero.\n"
+            *"You may want to swap the masses, spins, and λ parameters.\n"
+            *"Alternatively, both can be nonzero, resulting in an NSNS binary."
+        )
+    end
+
+    if Ω₁ > Ωᵢ
+        error(
+            "Initial frequency Ωᵢ=$Ωᵢ should be greater than "
+            * "or equal to first frequency Ω₁=$Ω₁."
+        )
+    end
+
+    if Ωᵢ > Ωₑ
+        error(
+            "Initial frequency Ωᵢ=$Ωᵢ should be less than "
+            * "or equal to ending frequency Ωₑ=$Ωₑ."
         )
     end
 
     v₁ = v(Ω=Ω₁, M=M₁+M₂)
     vₑ = min(v(Ω=Ωₑ, M=M₁+M₂), 1)
+    Φ = integrate_orbital_phase ? 0 : nothing
 
     # Initial conditions for the ODE integration
-    uᵢ = [M₁; M₂; vec(χ⃗₁); vec(χ⃗₂); components(Rᵢ); vᵢ]
-    # We pack this up here, to get everything into the same type, and permit easier
-    # passing to the other form of this function; we'll unpack it again there,
-    # which makes sure everything has the same type and the function is type stable.
+    pnsystem = let R=Rᵢ, v=vᵢ
+        if !iszero(λ₁) && !iszero(λ₂)
+            NSNS(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₁, λ₂, Φ, PNOrder)
+        elseif !iszero(λ₂)
+            BHNS(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₂, Φ, PNOrder)
+        else
+            BBH(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
+        end
+    end
 
-    T = eltype(uᵢ)
+    if check_up_down_instability
+        up_down_instability_warn(pnsystem, v₁, vₑ)
+    end
+
+    # The choice of 11//16 here is just an easy way to get an idea that for Float64 this
+    # will give us around 11 digits of accuracy, and a similar fraction of the precision for
+    # other types.
+    T = eltype(pnsystem)
     if isnothing(reltol)
         reltol = eps(T)^(11//16)
     end
@@ -265,56 +313,6 @@ function inspiral(
         abstol = eps(T)^(11//16)
     end
 
-    inspiral(
-        uᵢ, Ω₁, Ωₑ, v₁, vₑ,
-        PNSys(PNOrder, T), T,
-        check_up_down_instability, time_stepper,
-        reltol, abstol,
-        termination_criteria_forwards,
-        termination_criteria_backwards,
-        force_dtmin, integrate_orbital_phase,
-        quiet;
-        solve_kwargs...
-    )
-end
-
-
-function inspiral(
-    uᵢ, Ω₁, Ωₑ, v₁, vₑ,
-    pn::PNSystem, T,
-    check_up_down_instability, time_stepper,
-    reltol, abstol,
-    termination_criteria_forwards,
-    termination_criteria_backwards,
-    force_dtmin, integrate_orbital_phase,
-    quiet;
-    solve_kwargs...
-)
-
-    M₁, M₂, χ⃗₁, χ⃗₂, R, vᵢ = (
-        uᵢ[1], uᵢ[2], QuatVec(uᵢ[3:5]...), QuatVec(uᵢ[6:8]...), Rotor(uᵢ[9:12]...), uᵢ[13]
-    )
-
-    if check_up_down_instability
-        χₚₑᵣₚ = let n̂=n̂(R), λ̂=λ̂(R)
-            √((χ⃗₁ ⋅ n̂)^2 + (χ⃗₁ ⋅ λ̂)^2 + (χ⃗₂ ⋅ n̂)^2 + (χ⃗₂ ⋅ λ̂)^2)
-        end
-        if χₚₑᵣₚ ≤ 1e-2
-            (Ω₊, Ω₋) = up_down_instability(uᵢ)
-            if Ω₁ < min(Ω₋, 1//2) && min(Ωₑ, 1//2) > Ω₊
-                @warn (
-                    "This system is likely to encounter the up-down instability in the\n"
-                    * "frequency range (Ω₊, Ω₋)=$((Ω₊, Ω₋)).\n"
-                    * "This is a true physical instability; not just a numerical issue.\n"
-                    * "Despite the initial conditions containing very small precession,\n"
-                    * "the system will likely evolve to have very large precession."
-                ) M₁ M₂ χ⃗₁ χ⃗₂ R vᵢ
-            end
-        end
-    end
-
-    estimated_time_to_merger = 5/(256ν(M₁, M₂) * T(vᵢ)^8) # Lowest-order PN time-to-merger
-    tspan = (T(0), 4estimated_time_to_merger)
     if isnothing(termination_criteria_forwards)
         termination_criteria_forwards = CallbackSet(
             termination_forwards(vₑ, quiet),
@@ -322,83 +320,109 @@ function inspiral(
             nonfinite_terminator()
         )
     end
-    problem_forwards = ODEProblem(
-        noneccentric_RHS!,
-        integrate_orbital_phase ? [uᵢ; zero(T)] : uᵢ,
-        tspan, pn,
-        callback=termination_criteria_forwards
-    )
+
+    if isnothing(termination_criteria_backwards)
+        termination_criteria_backwards = CallbackSet(
+            termination_backwards(v₁, quiet),
+            dtmin_terminator(T),
+            nonfinite_terminator()
+        )
+    end
+
+    RHS! = if expansion=="TaylorT1"
+        TaylorT1!
+    elseif expansion=="TaylorT4"
+        error("TaylorT4 has not yet been implemented")
+    elseif expansion=="TaylorT5"
+        error("TaylorT5 has not yet been implemented")
+    else
+        error("""Unknown expansion type "$expansion".""")
+    end
 
     # Log an error if the initial parameters return a NaN on the right-hand side
     let
+        uᵢ = pnsystem.state
         u̇ = similar(uᵢ)
-        noneccentric_RHS!(u̇, uᵢ, pn, tspan[1])
-        if any(isnan, u̇) ||  any(isnan, uᵢ) ||  any(isnan, tspan)
+        tᵢ = zero(T)
+        RHS!(u̇, uᵢ, pnsystem, tᵢ)
+        if any(isnan, u̇) ||  any(isnan, uᵢ)
             # COV_EXCL_START
-            @error "Found a NaN with initial parameters:" value.(uᵢ) value.(u̇) pn value.(tspan)
+            @error "Found a NaN with initial parameters:" value.(uᵢ) value.(u̇) pnsystem
             error("Found NaN")
             # COV_EXCL_STOP
         end
     end
 
+    inspiral(
+        pnsystem, Ω₁, Ωₑ, v₁, vₑ,
+        time_stepper, reltol, abstol,
+        termination_criteria_forwards,
+        termination_criteria_backwards,
+        force_dtmin, RHS!;
+        solve_kwargs...
+    )
+end
+
+
+function inspiral(
+    pnsystem, Ω₁, Ωₑ, v₁, vₑ,
+    time_stepper, reltol, abstol,
+    termination_criteria_forwards,
+    termination_criteria_backwards,
+    force_dtmin, RHS!;
+    solve_kwargs...
+)
+    pn₁ = deepcopy(pnsystem)
+    τ = estimated_time_to_merger(pnsystem)
+
+    # Note: This estimate for the time span over which to integrate may be very bad,
+    # especially close to merger.  An underestimate would lead to an inspiral ending too
+    # soon, but an overestimate can lead to integration continuing very slowly in a regime
+    # where PN has broken down.
+    problem_forwards = ODEProblem(
+        RHS!, pnsystem.state, (zero(τ), 4τ), pnsystem,
+        callback=termination_criteria_forwards
+    )
+
     solution_forwards = solve(
         problem_forwards, time_stepper;
-        reltol=reltol, abstol=abstol,
-        force_dtmin=force_dtmin,
+        reltol, abstol, force_dtmin,
         solve_kwargs...
     )
 
-    if v₁ < vᵢ
-        estimated_backwards_time = 5/(256ν(M₁, M₂) * T(v₁)^8) - estimated_time_to_merger
-        tspan = (T(0), -3estimated_backwards_time)
-        if isnothing(termination_criteria_backwards)
-            termination_criteria_backwards = CallbackSet(
-                termination_backwards(v₁, quiet),
-                dtmin_terminator(T),
-                nonfinite_terminator()
-            )
-        end
-        problem_backwards = remake(problem_forwards; tspan=tspan, callback=termination_criteria_backwards)
+    println("Phi solution:")
+    @show solution_forwards[14, :]
+    println()
+
+    if v₁ < v(pn₁)
+        # Reset state to initial conditions
+        pnsystem.state[:] .= pn₁.state
+
+        pn₁.state[13] = v₁
+        τ = estimated_time_to_merger(pn₁) - τ
+
+        # Note: Here again, we don't want to overestimate the time span by too much, but we
+        # also don't want to underestimate and get a shortened waveform.  This should be a
+        # better estimate, though, because it's dealing with lower speeds, at which PN
+        # approximation should be more accurate.
+        problem_backwards = remake(
+            problem_forwards; tspan=(zero(τ), -4τ),
+            callback=termination_criteria_backwards
+        )
 
         solution_backwards = solve(
             problem_backwards, time_stepper;
-            reltol=reltol, abstol=abstol,
-            force_dtmin=force_dtmin,
+            reltol, abstol, force_dtmin,
             solve_kwargs...
         )
+
+        println("Phi solutions:")
+        display(solution_forwards[14, :])
+        display(solution_backwards[14, :])
+        println()
 
         combine_solutions(solution_backwards, solution_forwards)
     else
         solution_forwards
     end
-end
-
-
-"""
-    noneccentric_RHS!(u̇, u, p, t)
-
-Compute the right-hand side for the orbital evolution of a non-eccentric binary
-
-Here, `u` is the ODE state vector, which is probably the `state` vector stored in a
-[`PNSystem`](@ref) object.  The parameter `p` is currently unused, but could be used to pass
-un-evolved parameters through.  The parameter `t` represents the time, and will surely
-always be unused in this package, but is part of the `DifferentialEquations` API.
-
-"""
-@pn_expression 3 function noneccentric_RHS!(u̇, u, p, t)
-    (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(p)
-    Ω⃗ = Ω⃗ₚ + Ω * ℓ̂
-    v̇ = - (𝓕 + Ṁ₁ + Ṁ₂) / 𝓔′
-    χ̂₁ = ifelse(iszero(χ₁), ℓ̂, χ⃗₁ / χ₁)
-    χ̂₂ = ifelse(iszero(χ₂), ℓ̂, χ⃗₂ / χ₂)
-    u̇[1] = Ṁ₁
-    u̇[2] = Ṁ₂
-    u̇[3:5] = vec((Ṡ₁ / M₁^2 - 2χ₁ * Ṁ₁/M₁) * χ̂₁ + Ω⃗ᵪ₁ × χ⃗₁)
-    u̇[6:8] = vec((Ṡ₂ / M₂^2 - 2χ₂ * Ṁ₂/M₂) * χ̂₂ + Ω⃗ᵪ₂ × χ⃗₂)
-    u̇[9:12] = components(Ω⃗ * R / 2)
-    u̇[13] = v̇
-    if length(u̇) > 13
-        u̇[14] = Ω
-    end
-    nothing
 end

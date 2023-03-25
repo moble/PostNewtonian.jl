@@ -191,7 +191,7 @@ is from Eq. (4.15) of that reference.
         )
         h[Yindex(7,3,ℓmin)] = c * @pn_expansion(
             v^5 * (-243𝒾 * √(3//2) * δ * (-1 + ν) * (-1 + 3ν) / 160160)
-    )
+        )
         h[Yindex(7,4,ℓmin)] = c * @pn_expansion(
             v^6 * (128√(2//33) * (-1 + (-1 + ν)^2 * 7ν) / 1365)
         )
