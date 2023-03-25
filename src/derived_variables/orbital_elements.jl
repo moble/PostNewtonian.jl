@@ -71,7 +71,7 @@ See also [`v`](@ref).
 const Omega = Ω
 
 
-"""
+@doc raw"""
     v(;Ω, M=1)
 
 Post-Newtonian velocity parameter.

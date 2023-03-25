@@ -92,7 +92,7 @@ specializes on the type of `pnsystem`.
 λ₁(pn::NSNS) = pn.λ₁
 λ₁(pn::SymbolicPNSystem) = pn.λ₁
 
-"""
+@doc raw"""
     λ₂(pnsystem)
 
 Tidal coupling parameter of object 2 in this system.
