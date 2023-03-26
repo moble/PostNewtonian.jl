@@ -144,7 +144,7 @@ function PNWaveform(
         M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ;
         integrate_orbital_phase=true, λ₁=lambda1, λ₂=lambda2,
         Ω₁=Ω₁, Rᵢ=Rᵢ,
-        expansion=Approximant, PNOrder=PNOrbitalEvolutionOrder,
+        approximant=Approximant, PNOrder=PNOrbitalEvolutionOrder,
         quiet=quiet,
         saveat=dt > 0 ? dt : []
     )
