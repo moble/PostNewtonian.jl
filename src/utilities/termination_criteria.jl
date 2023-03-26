@@ -127,7 +127,11 @@ function dtmin_terminator(T)
         abs(integrator.dt) < ϵ
     end
     function discrete_terminator!(integrator)
-        @warn "Terminating forwards evolution because |dt=$(integrator.dt)| < ϵ=$(ϵ)"
+        @warn (
+            "Terminating forwards evolution because time-step size is too small:\n"
+            * "|dt=$(integrator.dt)| < √ϵ=$(ϵ)\n"
+            * "This is probably fine if `v` ≳ 1/2."
+        )
         terminate!(integrator)
     end
     DiscreteCallback(
