@@ -387,13 +387,11 @@ function inspiral(
         callback=termination_criteria_forwards
     )
 
-    @show pnsystem
     solution_forwards = solve(
         problem_forwards, time_stepper;
         reltol, abstol, force_dtmin,
         solve_kwargs...
     )
-    @show pnsystem
 
     if v₁ < v(pn₁)
         # Reset state to initial conditions
