@@ -25,7 +25,8 @@ due to tidal heating.  Therefore, the values passed here are only precisely as g
   * `Ω₁=Ωᵢ`: First angular frequency in output data (see next section).
   * `Ωₑ=1`: Final angular frequency at which to stop ODE integration.
   * `Rᵢ=Rotor(1)`: Initial orientation of binary.
-  * `expansion="TaylorT1"`: Currently the only possibility.
+  * `approximant="TaylorT1"`: Method of evaluating the right-hand side of the evolution
+    equations.  Currently "TaylorT1" is the only possibility.
   * `PNOrder=4//1`: Order to which to retain powers of ``v^2`` in PN expansions.
   * `check_up_down_instability=true`: Warn if the "up-down instability" (see below) is
     likely to affect this system.
@@ -227,7 +228,7 @@ function inspiral(
     M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ;
     integrate_orbital_phase=false, λ₁=0, λ₂=0,
     Ω₁=Ωᵢ, Ωₑ=1, Rᵢ=Rotor(true),
-    expansion="TaylorT1", PNOrder=4//1,
+    approximant="TaylorT1", PNOrder=4//1,
     check_up_down_instability=true, time_stepper=AutoVern9(Rodas5()),
     reltol=nothing, abstol=nothing,
     termination_criteria_forwards=nothing,
@@ -329,14 +330,14 @@ function inspiral(
         )
     end
 
-    RHS! = if expansion=="TaylorT1"
+    RHS! = if approximant=="TaylorT1"
         TaylorT1!
-    elseif expansion=="TaylorT4"
+    elseif approximant=="TaylorT4"
         error("TaylorT4 has not yet been implemented")
-    elseif expansion=="TaylorT5"
+    elseif approximant=="TaylorT5"
         error("TaylorT5 has not yet been implemented")
     else
-        error("""Unknown expansion type "$expansion".""")
+        error("""Unknown approximant type "$approximant".""")
     end
 
     # Log an error if the initial parameters return a NaN on the right-hand side
@@ -384,11 +385,13 @@ function inspiral(
         callback=termination_criteria_forwards
     )
 
+    @show pnsystem
     solution_forwards = solve(
         problem_forwards, time_stepper;
         reltol, abstol, force_dtmin,
         solve_kwargs...
     )
+    @show pnsystem
 
     if v₁ < v(pn₁)
         # Reset state to initial conditions
