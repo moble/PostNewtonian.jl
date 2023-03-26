@@ -390,10 +390,6 @@ function inspiral(
         solve_kwargs...
     )
 
-    println("Phi solution:")
-    @show solution_forwards[14, :]
-    println()
-
     if v₁ < v(pn₁)
         # Reset state to initial conditions
         pnsystem.state[:] .= pn₁.state
@@ -415,11 +411,6 @@ function inspiral(
             reltol, abstol, force_dtmin,
             solve_kwargs...
         )
-
-        println("Phi solutions:")
-        display(solution_forwards[14, :])
-        display(solution_backwards[14, :])
-        println()
 
         combine_solutions(solution_backwards, solution_forwards)
     else
