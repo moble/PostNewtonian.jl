@@ -154,6 +154,10 @@ Once it has this information, there are four types of transformations it will ma
 To be more explicit, the first three are achieved by defining the relevant quantities in a
 `let` block placed around the body of `func`, so that the values may be used efficiently
 without recomputation.
+
+If you need to use one of the fundamental- or derived-variable functions as arguments of
+values other than those encapsulated in `pnsystem`, you'll need to address them explicitly
+with the module name — as in `PostNewtonian.v(;Ω, M)`.
 """
 macro pn_expression(func)
     esc(pn_expression(1, func))

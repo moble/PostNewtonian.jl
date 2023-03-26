@@ -63,7 +63,7 @@ as a keyword argument — as in `v(Ω=0.1)`.
 See also [`Ω`](@ref).
 """
 v(s::PNSystem) = @inbounds s.state[13]
-v(;Ω, M=1) = (M*Ω)^(1//3)
+v(;Ω, M=1) = ∛(M*Ω)
 
 """
     Φ(pnsystem)

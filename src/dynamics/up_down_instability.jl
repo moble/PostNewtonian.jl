@@ -21,10 +21,9 @@ down and return values outside of those physically plausible limits.
 """
 @pn_expression function up_down_instability(pnsystem)
     T = eltype(pnsystem)
-    Ωₘₐₓ = Ω(v=1, M=M)
+    Ωₘₐₓ = PostNewtonian.Ω(v=1, M=M)
     if M₂ ≤ M₁
-        q = inv(q)
-        χ₂ₗ, χ₁ₗ = χ₁ₗ, χ₂ₗ
+        q, χ₂ₗ, χ₁ₗ = inv(q), χ₁ₗ, χ₂ₗ
     end
     if χ₁ₗ > 0 && χ₂ₗ < 0
         r₊ = M * (√(χ₁ₗ) + √abs(q*χ₂ₗ))^4 / (1-q)^2
@@ -52,9 +51,9 @@ have broken down anyway.
 See [`up_down_instability`](@ref) for details of the calculation of the unstable region.
 """
 @pn_expression function up_down_instability_warn(pnsystem, v₁, vₑ, vₗᵢₘᵢₜ=1//2)
-    if χₚₑᵣₚ ≤ 1e-2
+    if χₚₑᵣₚ ≤ 1e-2 && !iszero(χₚₑᵣₚ)
         (Ω₊, Ω₋) = up_down_instability(pnsystem)
-        v₊, v₋ = v(Ω=Ω₊, M=M), v(Ω=Ω₋, M=M)
+        v₊, v₋ = PostNewtonian.v(Ω=Ω₊, M=M), PostNewtonian.v(Ω=Ω₋, M=M)
         if v₁ < min(v₋, vₗᵢₘᵢₜ) && min(vₑ, vₗᵢₘᵢₜ) > v₊
             @warn (
                 "This system is likely to encounter the up-down instability in the\n"
