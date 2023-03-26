@@ -20,7 +20,7 @@ function prepare_system(;
     M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing,
     PNOrder=typemax(Int)
 )
-    state = [M₁; M₂; vec(χ⃗₁); vec(χ⃗₂); components(R); v]
+    state = [M₁; M₂; vec(QuatVec(χ⃗₁)); vec(QuatVec(χ⃗₂)); components(Rotor(R)); v]
     if !isnothing(Φ)
         state = [state; Φ]
     end
