@@ -331,11 +331,13 @@ function inspiral(
     end
 
     RHS! = if approximant=="TaylorT1"
-        TaylorT1!
+        (u̇,u,p,t) -> (p.state.=u; TaylorT1!(u̇,p))
     elseif approximant=="TaylorT4"
         error("TaylorT4 has not yet been implemented")
+        (u̇,u,p,t) -> (p.state.=u; TaylorT4!(u̇,p))
     elseif approximant=="TaylorT5"
         error("TaylorT5 has not yet been implemented")
+        (u̇,u,p,t) -> (p.state.=u; TaylorT5!(u̇,p))
     else
         error("""Unknown approximant type "$approximant".""")
     end
