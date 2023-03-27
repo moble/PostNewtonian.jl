@@ -109,7 +109,7 @@ const binding_energy = 𝓔
 
 
 # We derive the function 𝓔′ analytically from 𝓔.  Documentation goes below.
-𝓔′ = let 𝓔=𝓔(symbolic_pnsystem), v=v(symbolic_pnsystem)
+const 𝓔′ = let 𝓔=𝓔(symbolic_pnsystem), v=v(symbolic_pnsystem)
     ∂ᵥ = Differential(v)
     # Evaluate derivative symbolically
     𝓔′ = simplify(expand_derivatives(∂ᵥ(𝓔)), expand=true)#, simplify_fractions=false)
