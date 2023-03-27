@@ -141,8 +141,7 @@ function PNWaveform(
 
     # Inspiral
     solution = inspiral(
-        M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ;
-        integrate_orbital_phase=true, λ₁=lambda1, λ₂=lambda2,
+        M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; λ₁=lambda1, λ₂=lambda2,
         Ω₁=Ω₁, Rᵢ=Rᵢ,
         approximant=Approximant, PNOrder=PNOrbitalEvolutionOrder,
         quiet=quiet,

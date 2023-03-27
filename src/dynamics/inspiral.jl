@@ -33,7 +33,10 @@ due to tidal heating.  Therefore, the values passed here are only precisely as g
   * `time_stepper=AutoVern9(Rodas5())`: Choice of solver in OrdinaryDiffEq to integrate ODE.
   * `abstol=eps(T)^(11//16)`: Absolute tolerance of ODE solver, where `T` is the common type
     to which all the positional arguments are promoted.  This is the tolerance on local
-    error estimates, not necessarily the global error.
+    error estimates, not necessarily the global error.  Note that `11//16` is just chosen to
+    suggest that we will have roughly 11 digits of accuracy (locally) for `Float64`
+    computations, and a similar accuracy for other float types *relative to* that type's
+    epsilon.
   * `reltol=eps(T)^(11//16)`: Relative tolerance of ODE solver.  (As above.)
   * `termination_criteria_forwards=nothing`: Callbacks to use for forwards-in-time
     evolution.  See below for discussion of the default value.
@@ -53,12 +56,6 @@ due to tidal heating.  Therefore, the values passed here are only precisely as g
         <your code goes here>
     end
     ```
-  * `integrate_orbital_phase=false`: If set to `true`, integrate the orbital phase ``Φ``
-    along with the rest of the system.  Note that this may slow the system down because the
-    absolute value of ``Φ`` may grow to very large values, so that the `abstol` will strain
-    to keep its evolution far more accurate than is really needed.  If this is a problem,
-    you can loosen `abstol` and/or pass vectors of separate tolerances for each variable in
-    the ODE system (see below).
 
 All remaining keyword arguments are passed to the [`solve`
 function](https://github.com/SciML/DiffEqBase.jl/blob/8e6173029c630f6908252f3fc28a69c1f0eab456/src/solve.jl#L393)
@@ -102,8 +99,7 @@ The evolved variables, in order, are
   * `Rᶻ`: ``z`` component...
   * `v`: PN "velocity" parameter related to the total mass ``M`` and orbital angular
     frequency ``Ω`` by ``v = (M Ω)^{1/3}``
-  * `Φ`: Orbital phase given by integrating ``Ω`` (optional; only appears if
-    `integrate_orbital_phase` is `true`)
+  * `Φ`: Orbital phase given by integrating ``Ω``
 
 The masses and spin magnitudes evolve according to [`tidal_heating`](@ref).  The spin
 directions evolve according to [`Ω⃗ᵪ₁`](@ref) and [`Ω⃗ᵪ₂`](@ref).  The frame rotor ``R`` is
@@ -225,8 +221,7 @@ for details.
 
 """
 function inspiral(
-    M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ;
-    integrate_orbital_phase=false, λ₁=0, λ₂=0,
+    M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; λ₁=0, λ₂=0,
     Ω₁=Ωᵢ, Ωₑ=1, Rᵢ=Rotor(true),
     approximant="TaylorT1", PNOrder=4//1,
     check_up_down_instability=true, time_stepper=AutoVern9(Rodas5()),
@@ -286,7 +281,7 @@ function inspiral(
 
     v₁ = v(Ω=Ω₁, M=M₁+M₂)
     vₑ = min(v(Ω=Ωₑ, M=M₁+M₂), 1)
-    Φ = integrate_orbital_phase ? 0 : nothing
+    Φ = 0
 
     # Initial conditions for the ODE integration
     pnsystem = let R=Rᵢ, v=vᵢ
@@ -330,17 +325,7 @@ function inspiral(
         )
     end
 
-    RHS! = if approximant=="TaylorT1"
-        (u̇,u,p,t) -> (p.state.=u; TaylorT1!(u̇,p))
-    elseif approximant=="TaylorT4"
-        error("TaylorT4 has not yet been implemented")
-        (u̇,u,p,t) -> (p.state.=u; TaylorT4!(u̇,p))
-    elseif approximant=="TaylorT5"
-        error("TaylorT5 has not yet been implemented")
-        (u̇,u,p,t) -> (p.state.=u; TaylorT5!(u̇,p))
-    else
-        error("""Unknown approximant type "$approximant".""")
-    end
+    RHS! = TaylorT1RHS!
 
     # Log an error if the initial parameters return a NaN on the right-hand side
     let

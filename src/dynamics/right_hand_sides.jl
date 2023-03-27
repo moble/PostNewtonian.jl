@@ -27,11 +27,14 @@ Here, `u̇` is the time-derivative of the state vector, which is stored in the
     u̇[6:8] = vec((Ṡ₂ / M₂^2 - 2χ₂ * Ṁ₂/M₂) * χ̂₂ + Ω⃗ᵪ₂(p) × χ⃗₂)
     u̇[9:12] = components(Ω⃗ * R / 2)
     u̇[13] = v̇
-    if length(u̇) > 13
-        u̇[14] = Ω
-    end
+    u̇[14] = Ω
     nothing
 end
+
+TaylorT1RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
+    (u̇,u,p,t) -> (p.state.=u; TaylorT1!(u̇,p)),
+    syms=[:M₁, :M₂, :χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ, :χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ, :Rʷ, :Rˣ, :Rʸ, :Rᶻ, :v, :Φ]
+)
 
 
 @doc raw"""
@@ -54,6 +57,11 @@ always be unused in this package, but is part of the `DifferentialEquations` API
 @pn_expression 3 function TaylorT4!(u̇, u, p, t)
     error("Not yet implemented")
 end
+
+const TaylorT4RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
+    (u̇,u,p,t) -> (p.state.=u; TaylorT4!(u̇,p)),
+    syms=[:M₁, :M₂, :χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ, :χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ, :Rʷ, :Rˣ, :Rʸ, :Rᶻ, :v, :Φ]
+)
 
 
 @doc raw"""
@@ -79,3 +87,8 @@ always be unused in this package, but is part of the `DifferentialEquations` API
 @pn_expression 3 function TaylorT5!(u̇, u, p, t)
     error("Not yet implemented")
 end
+
+const TaylorT5RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
+    (u̇,u,p,t) -> (p.state.=u; TaylorT5!(u̇,p)),
+    syms=[:M₁, :M₂, :χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ, :χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ, :Rʷ, :Rˣ, :Rʸ, :Rᶻ, :v, :Φ]
+)
