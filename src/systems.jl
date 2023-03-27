@@ -1,18 +1,17 @@
 """
-    PNSystem{T, PNOrder}
+    PNSystem{ST, PNOrder}
 
 Base type for all PN systems, such as `BBH`, `BHNS`, and `NSNS`.
 
-The parameter `T` is the basic float type of all variables — usually just `Float64`.
-`PNOrder` is a `Rational` giving the order to which PN expansions should be carried.
-
 All subtypes should contain a `state` vector holding all of the fundamental variables for
-the given type of system.
+the given type of system.  The parameter `ST` is the type of the `state` vector — for
+example, `Vector{Float64}`.  `PNOrder` is a `Rational` giving the order to which PN
+expansions should be carried.
 """
-abstract type PNSystem{T, PNOrder} end
+abstract type PNSystem{ST, PNOrder} end
 
-Base.eltype(::PNSystem{T}) where {T} = T
-pn_order(::PNSystem{T, PNOrder}) where {T, PNOrder} = PNOrder
+Base.eltype(::PNSystem{ST}) where {ST} = eltype(ST)
+pn_order(::PNSystem{ST, PNOrder}) where {ST, PNOrder} = PNOrder
 
 order_index(pn::PNSystem) = 1 + Int(2pn_order(pn))
 
@@ -21,9 +20,9 @@ function prepare_system(;
     PNOrder=typemax(Int)
 )
     state = [M₁; M₂; vec(QuatVec(χ⃗₁)); vec(QuatVec(χ⃗₂)); components(Rotor(R)); v; Φ]
-    T = eltype(state)
+    ST = typeof(state)
     PNOrder = prepare_pn_order(PNOrder)
-    (T, PNOrder, state)
+    (ST, PNOrder, state)
 end
 
 function prepare_pn_order(PNOrder)
@@ -49,7 +48,7 @@ the integral of the orbital angular frequency `Ω`, and holds little interest fo
 systems beyond a convenient description of how "far" the system has evolved.
 """
 struct BBH{T, PNOrder} <: PNSystem{T, PNOrder}
-    state::AbstractVector{T}
+    state::T
 end
 function BBH(;
     M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0,
@@ -72,8 +71,8 @@ Note that the neutron star is *always* object 2 — meaning that `M₂`, `χ⃗�
 refer to it; `M₁` and `χ⃗₁` always refer to the black hole.  See also [`NSNS`](@ref).
 """
 struct BHNS{T, PNOrder} <: PNSystem{T, PNOrder}
-    state::AbstractVector{T}
-    λ₂::T
+    state::T
+    λ₂::eltype(T)
 end
 function BHNS(;
     M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₂, Φ=0,
@@ -94,9 +93,9 @@ and `λ₂` holding the (constant) tidal-coupling parameters of the neutron star
 [`BHNS`](@ref).
 """
 struct NSNS{T, PNOrder} <: PNSystem{T, PNOrder}
-    state::AbstractVector{T}
-    λ₁::T
-    λ₂::T
+    state::T
+    λ₁::eltype(T)
+    λ₂::eltype(T)
 end
 function NSNS(;
     M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₁, λ₂, Φ=0,
@@ -116,13 +115,13 @@ A `PNSystem` that contains information as variables from
 See also [`symbolic_pnsystem`](@ref) for a particular general instance of this type.
 """
 struct SymbolicPNSystem{T, PNOrder} <: PNSystem{T, PNOrder}
-    state::Vector{T}
-    λ₁::T
-    λ₂::T
+    state::T
+    λ₁::eltype(T)
+    λ₂::eltype(T)
 end
 function SymbolicPNSystem(PNOrder=typemax(Int))
     @variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ λ₁ λ₂
-    SymbolicPNSystem{typeof(M₁), prepare_pn_order(PNOrder)}(
+    SymbolicPNSystem{Vector{typeof(M₁)}, prepare_pn_order(PNOrder)}(
         [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
         λ₁, λ₂
     )
