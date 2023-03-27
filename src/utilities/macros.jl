@@ -90,7 +90,7 @@ function pn_expression(pnsystem::Symbol, body)
     ]
 
     # Next, add pnsystem as the argument to each @pn_expansion call
-    new_body = macroexpand(
+    new_body = MacroTools.unblock(macroexpand(
         @__MODULE__,
         MacroTools.postwalk(body) do x
             if MacroTools.isexpr(x, :macrocall) &&
@@ -104,14 +104,14 @@ function pn_expression(pnsystem::Symbol, body)
             end
         end,
         recursive=true
-    )
+    ))
 
     # Finally, just wrap `new_body` in a `let` block, where we include exprs created above
-    full_body = quote
+    full_body = MacroTools.unblock(quote
         @fastmath let $(exprs...)
             $(new_body)
         end
-    end
+    end)
 
 end
 
@@ -178,20 +178,13 @@ Note that the `pnsystem` argument can be inserted automatically by [`@pn_express
 For simplicity of presentation, we will assume that this is done in the examples below.
 
 A "PN expansion" is a polynomial in ``v`` for which ``ln(v)`` factors may be present in
-coefficients of ``v^k`` for ``k≥1``.  This function additionally requires that the input
-should be a sum at its top level, meaning that this macro must be applied *after*
-multiplication by any overall factor:
-```julia
-# This WILL NOT work:
-@pn_expansion -M*ν*v^2/2 * (1 + v^2*(-ν/12-3//4))
-
-# This WILL work:
--M*ν*v^2/2 * @pn_expansion(1 + v^2*(-ν/12-3//4))
-```
-Multiple terms may involve the same power of ``v``.  (I.e., the expansion does not have to
-be simplified or
+coefficients of ``v^k`` for ``k≥1``.  The input may involve multiple terms with the same
+power of ``v``.  (I.e., the expansion does not have to be simplified or
 [`collect`](https://docs.sympy.org/latest/tutorials/intro-tutorial/simplification.html#collect)ed
 in sympy parlance.)
+
+However, note that the sum must appear together — as part of the same `:+` expression — rather
+than, say, factored into two sums that multiply each other.
 """
 macro pn_expansion(offset, pnsystem, expr)
     esc(pn_expansion(offset, pnsystem, expr))

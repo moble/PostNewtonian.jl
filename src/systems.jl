@@ -17,13 +17,10 @@ pn_order(::PNSystem{T, PNOrder}) where {T, PNOrder} = PNOrder
 order_index(pn::PNSystem) = 1 + Int(2pn_order(pn))
 
 function prepare_system(;
-    M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing,
+    M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0,
     PNOrder=typemax(Int)
 )
-    state = [M₁; M₂; vec(QuatVec(χ⃗₁)); vec(QuatVec(χ⃗₂)); components(Rotor(R)); v]
-    if !isnothing(Φ)
-        state = [state; Φ]
-    end
+    state = [M₁; M₂; vec(QuatVec(χ⃗₁)); vec(QuatVec(χ⃗₂)); components(Rotor(R)); v; Φ]
     T = eltype(state)
     PNOrder = prepare_pn_order(PNOrder)
     (T, PNOrder, state)
@@ -33,7 +30,7 @@ function prepare_pn_order(PNOrder)
     if PNOrder!=typemax(Int)
         round(Int, 2PNOrder) // 2
     else
-        (typemax(Int)-1) // 2
+        (typemax(Int)-2) // 2
     end
 end
 
@@ -55,7 +52,7 @@ struct BBH{T, PNOrder} <: PNSystem{T, PNOrder}
     state::AbstractVector{T}
 end
 function BBH(;
-    M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=nothing,
+    M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0,
     PNOrder=typemax(Int), kwargs...
 )
     (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
@@ -79,7 +76,7 @@ struct BHNS{T, PNOrder} <: PNSystem{T, PNOrder}
     λ₂::T
 end
 function BHNS(;
-    M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₂, Φ=nothing,
+    M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₂, Φ=0,
     PNOrder=typemax(Int), kwargs...
 )
     (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
@@ -102,7 +99,7 @@ struct NSNS{T, PNOrder} <: PNSystem{T, PNOrder}
     λ₂::T
 end
 function NSNS(;
-    M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₁, λ₂, Φ=nothing,
+    M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₁, λ₂, Φ=0,
     PNOrder=typemax(Int), kwargs...
 )
     (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)

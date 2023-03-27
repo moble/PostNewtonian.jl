@@ -68,13 +68,9 @@ v(;Ω, M=1) = ∛(M*Ω)
 """
     Φ(pnsystem)
 
-Integrated orbital phase of the system.  Note that by default, this is not available;
-additional arguments must be passed to ensure that `pnsystem` tracks this variable.  When it
-is available, it is given by the integral of `Ω`.
-
-Note that if it is not available, a `BoundsError` will be raised by this function.
+Integrated orbital phase of the system.  It is computed as the integral of [`Ω`](@ref).
 """
-Φ(s::PNSystem) = s.state[14]  # NO @inbounds
+Φ(s::PNSystem) = @inbounds s.state[14]
 
 @doc raw"""
     λ₁(pnsystem)
