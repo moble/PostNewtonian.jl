@@ -22,10 +22,10 @@ Symbolics.derivative(::typeof(hold), args::NTuple{1,Any}, ::Val{1}) = 1
 
 Convert `x` to a type appropriate for the float type of `pnsystem`.
 """
-function type_converter(::PNSystem{T}, x) where {T<:Num}
+function type_converter(::PNSystem{T}, x) where {T<:Vector{Symbolics.Num}}
     Symbolics.Num(SymbolicUtils.Term(hold, [x]))
 end
-function type_converter(::PNSystem{T}, x::Num) where {T<:Num}
+function type_converter(::PNSystem{T}, x::Num) where {T<:Vector{Symbolics.Num}}
     x
 end
 function type_converter(pnsystem, x)
@@ -53,7 +53,7 @@ pnvariables = map(v->v.name, [fundamental_variables; derived_variables])
 for method ∈ derived_variables
     name = method.name
     @eval begin
-        function PostNewtonian.$name(v::PNSystem{T}) where {T<:Symbolics.Num}
+        function PostNewtonian.$name(v::PNSystem{T}) where {T<:Vector{Symbolics.Num}}
             Symbolics.Num(SymbolicUtils.Sym{Real}(Symbol($name)))
         end
     end

@@ -6,6 +6,10 @@ using Quaternionic
 
 export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, λ₁, λ₂
 
+## NOTE:
+## This indices used below are intimately bound to choices made in the definitions of
+## the various `PNSystem`s.  Any changes there must be mirrored here, and vice versa.
+
 """
     M₁(pnsystem)
 
