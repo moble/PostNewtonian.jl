@@ -53,7 +53,7 @@
     @test sol1(t, idxs=7:13) == sol2(t, idxs=7:13)
 
     # Check that we can integrate orbital phase just as well
-    sol3 = @test_logs min_level=Logging.Info inspiral(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, Ω₁=Ωᵢ/2, Rᵢ=Rᵢ, integrate_orbital_phase=true, quiet=true)
+    sol3 = @test_logs min_level=Logging.Info inspiral(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, Ω₁=Ωᵢ/2, Rᵢ=Rᵢ, quiet=true)
     t₁, tₑ = extrema(sol3.t)
     t = sol2.t[t₁ .< sol2.t .< tₑ]
     @test sol2(t) ≈ sol3(t, idxs=1:13)
@@ -68,7 +68,7 @@
     @test all(sol_np[10:11, :] .== 0)
 
     # Test that non-precessing rotors evolve like orbital phase
-    sol_np = inspiral(M₁, M₂, QuatVec(0, 0, χ⃗₁.z), QuatVec(0, 0, χ⃗₂.z), Ωᵢ; Ω₁, Rᵢ, integrate_orbital_phase=true, quiet=true);
+    sol_np = inspiral(M₁, M₂, QuatVec(0, 0, χ⃗₁.z), QuatVec(0, 0, χ⃗₂.z), Ωᵢ; Ω₁, Rᵢ, quiet=true);
     sincosΦ = cat(map(Φ -> [sincos(Φ/2)...], sol_np[14,:])..., dims=2)
     Rwz = sol_np[[12,9], :]
     @test sincosΦ ≈ Rwz atol=√eps(T)
