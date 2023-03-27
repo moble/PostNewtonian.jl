@@ -341,25 +341,6 @@ function inspiral(
         end
     end
 
-    inspiral(
-        pnsystem, Ω₁, Ωₑ, v₁, vₑ,
-        time_stepper, reltol, abstol,
-        termination_criteria_forwards,
-        termination_criteria_backwards,
-        force_dtmin, RHS!;
-        solve_kwargs...
-    )
-end
-
-
-function inspiral(
-    pnsystem, Ω₁, Ωₑ, v₁, vₑ,
-    time_stepper, reltol, abstol,
-    termination_criteria_forwards,
-    termination_criteria_backwards,
-    force_dtmin, RHS!;
-    solve_kwargs...
-)
     pn₁ = deepcopy(pnsystem)
     τ = estimated_time_to_merger(pnsystem)
 
