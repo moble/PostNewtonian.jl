@@ -40,7 +40,6 @@ frequency, then sample based on mass ratio and spin magnitudes.
 Given these, it seems like the current state of the art would be well covered by choosing a
 random `q` ∈ [0.05, 1], `χᵢ` ∈ [0, 0.998], and `λᵢ` ∈ [0, 5000], with isotropic choices for
 orientations.
-
 """
 function Base.randn(
     rng::AbstractRNG, pnclass::Type{P}; v::T=0.01, PNOrder=typemax(Int)

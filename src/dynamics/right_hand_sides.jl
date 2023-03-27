@@ -21,11 +21,14 @@ Here, `u̇` is the time-derivative of the state vector, which is stored in the
     Ω⃗ = Ω⃗ₚ(p) + Ω * ℓ̂
     χ̂₁ = ifelse(iszero(χ₁), ℓ̂, χ⃗₁ / χ₁)
     χ̂₂ = ifelse(iszero(χ₂), ℓ̂, χ⃗₂ / χ₂)
+    χ⃗̇₁ = (Ṡ₁ / M₁^2 - 2χ₁ * Ṁ₁/M₁) * χ̂₁ + Ω⃗ᵪ₁(p) × χ⃗₁
+    χ⃗̇₂ = (Ṡ₂ / M₂^2 - 2χ₂ * Ṁ₂/M₂) * χ̂₂ + Ω⃗ᵪ₂(p) × χ⃗₂
+    Ṙ = Ω⃗ * R / 2
     u̇[1] = Ṁ₁
     u̇[2] = Ṁ₂
-    u̇[3:5] = vec((Ṡ₁ / M₁^2 - 2χ₁ * Ṁ₁/M₁) * χ̂₁ + Ω⃗ᵪ₁(p) × χ⃗₁)
-    u̇[6:8] = vec((Ṡ₂ / M₂^2 - 2χ₂ * Ṁ₂/M₂) * χ̂₂ + Ω⃗ᵪ₂(p) × χ⃗₂)
-    u̇[9:12] = components(Ω⃗ * R / 2)
+    u̇[3:5] = vec(χ⃗̇₁)
+    u̇[6:8] = vec(χ⃗̇₂)
+    u̇[9:12] = components(Ṙ)
     u̇[13] = v̇
     u̇[14] = Ω
     nothing
