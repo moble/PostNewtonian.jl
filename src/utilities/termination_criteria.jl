@@ -3,20 +3,12 @@
 
 Construct termination criteria of solving PN evolution forwards in time
 
-These criteria include checking that the masses are positive and the
-dimensionless spins are less than 1, as well as ensuring that the evolution
-will terminate at `vₑ`.
+These criteria include checking that the masses are positive and the dimensionless spins are
+less than 1, as well as ensuring that the evolution will terminate at `vₑ`.
 
-The optional `quiet` argument will silence informational messages about
-reaching the target value of `vₑ` if set to `true`, but warnings will still be
-issued when terminating for other reasons.  If you want to quiet warnings also,
-you can do something like this:
-```julia
-using Logging
-with_logger(SimpleLogger(Logging.Error)) do
-    <your code goes here>
-end
-```
+The optional `quiet` argument will silence informational messages about reaching the target
+value of `vₑ` if set to `true`, but warnings will still be issued when terminating for other
+reasons.
 """
 function termination_forwards(vₑ, quiet=false)
     # Triggers the `continuous_terminator!` whenever one of these conditions crosses 0.
@@ -60,20 +52,12 @@ end
 
 Construct termination criteria of solving PN evolution backwards in time
 
-These criteria include checking that the masses are positive and the
-dimensionless spins are less than 1, as well as ensuring that the evolution
-will terminate at `v₁`.
+These criteria include checking that the masses are positive and the dimensionless spins are
+less than 1, as well as ensuring that the evolution will terminate at `v₁`.
 
-The optional `quiet` argument will silence informational messages about
-reaching the target value of `v₁` if set to `true`, but warnings will still be
-issued when terminating for other reasons.  If you want to quiet warnings also,
-you can do something like this:
-```julia
-using Logging
-with_logger(SimpleLogger(Logging.Error)) do
-    <your code goes here>
-end
-```
+The optional `quiet` argument will silence informational messages about reaching the target
+value of `v₁` if set to `true`, but warnings will still be issued when terminating for other
+reasons.
 """
 function termination_backwards(v₁, quiet=false)
     function terminators_backwards(out,state,t,integrator)
@@ -110,30 +94,33 @@ end
 
 
 """
-    dtmin_terminator(T)
+    dtmin_terminator(T, [quiet])
 
 Construct termination criterion to terminate when `dt` drops below `√eps(T)`.
 
-Pass `force_dtmin=true` to `solve` when using this callback.  Otherwise, the
-time-step size may decrease too much *within* a single time step, so that the
-integrator itself will quit before reaching this callback, leading to a less
-graceful exit.
+Pass `force_dtmin=true` to `solve` when using this callback.  Otherwise, the time-step size
+may decrease too much *within* a single time step, so that the integrator itself will quit
+before reaching this callback, leading to a less graceful exit.
+
+If this terminator is triggered while `v` is less than 1/2, a warning will always be issued;
+otherwise an `info` message will be issued only if the `quiet` flag is set to `false`.
 """
-function dtmin_terminator(T)
-    # Triggers the `discrete_terminator!` whenever this condition is true after
-    # an integration step
+function dtmin_terminator(T, quiet=false)
     sqrtϵ = √eps(T)
     function discrete_condition(state,t,integrator)
         abs(integrator.dt) < sqrtϵ
     end
     function discrete_terminator!(integrator)
         v = integrator.u[13]
+        message = (
+            "Terminating evolution because time-step size is too small:\n"
+            * "|dt=$(integrator.dt)| < √ϵ=$(sqrtϵ)\n"
+            * "This is only unexpected for 𝑣 ≲ 1/2; the current value is 𝑣=$v."
+        )
         if v < 1//2
-            @warn (
-                "Terminating forwards evolution because time-step size is too small:\n"
-                * "|dt=$(integrator.dt)| < √ϵ=$(sqrtϵ)\n"
-                * "This is unexpected for `v` ≲ 1/2; the current value is v=$v."
-            )
+            @warn message
+        elseif !quiet
+            @info message
         end
         terminate!(integrator)
     end
@@ -145,24 +132,34 @@ function dtmin_terminator(T)
 end
 
 """
-    decreasing_v_terminator()
+    decreasing_v_terminator([quiet])
 
 Construct termination criterion to stop integration when `v` is decreasing.
+
+Note that some systems may truly have decreasing `v` as physical solutions — including
+eccentric systems and possibly precessing systems.  You may prefer to implement another
+solution, like detecting when `v` decreases below some threshold, or detecting when `v` is
+decreasing too quickly.  See this function's source code for a simple
+
+If this terminator is triggered while `v` is less than 1/2, a warning will always be issued;
+otherwise an `info` message will be issued only if the `quiet` flag is set to `false`.
 """
-function decreasing_v_terminator()
-    # Triggers the `discrete_terminator!` whenever this condition is true after
-    # an integration step
+function decreasing_v_terminator(quiet=false)
     function discrete_condition(state,t,integrator)
-        SciMLBase.get_du(integrator)[13] < 0
+        SciMLBase.get_du(integrator)[13] < 0  # This translates to v̇<0
     end
     function discrete_terminator!(integrator)
         v = integrator.u[13]
+        ∂ₜv = SciMLBase.get_du(integrator)[13]
+        message = (
+            "Terminating forwards evolution because 𝑣 is decreasing:\n"
+            * "This is only unusual if 𝑣 ≲ 1/2; the current value is\n"
+            * "∂ₜ𝑣=$∂ₜv."
+        )
         if v < 1//2
-            ∂ₜv = SciMLBase.get_du(integrator)[13]
-            @warn (
-                "Terminating forwards evolution because `v` is decreasing:\n"
-                * "This is unexpected for `v` ≲ 1/2; the current value is ∂ₜv=$∂ₜv."
-            )
+            @warn message
+        elseif !quiet
+            @info message
         end
         terminate!(integrator)
     end
@@ -177,14 +174,13 @@ end
 """
     nonfinite_terminator()
 
-Construct termination criterion to terminate when any NaN or Inf is found in the data after
-an integration step.
+Construct termination criterion to stop integration when any NaN or Inf is found in the data
+after an integration step.
+
+If this terminator is triggered, a warning will always be issued.
 """
 function nonfinite_terminator()
-    # Triggers the `discrete_terminator!` whenever this condition is true after
-    # an integration step
     function discrete_condition(state,t,integrator)
-        # any(isnan, state) || isnan(t) || isnan(integrator.dt)
         !(all(isfinite, state) && isfinite(t) && isfinite(integrator.dt))
     end
     function discrete_terminator!(integrator)

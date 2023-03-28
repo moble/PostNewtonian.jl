@@ -34,11 +34,21 @@ These, or similar functions may be helpful examples of
 ["callbacks"](https://docs.sciml.ai/DiffEqDocs/stable/features/callback_functions/)
 that can be passed to the ODE integrator.
 
-```@docs
-termination_forwards
-termination_backwards
-dtmin_terminator
-nonfinite_terminator
+Note that several of these will issue warnings, even if the `quiet` flag is set
+to `true`.  If you want to quiet those warnings also, you can wrap your code in
+a `Logging` block like this one:
+```julia
+using Logging
+
+with_logger(SimpleLogger(Logging.Error)) do
+    <your code goes here>
+end
+```
+
+```@autodocs
+Modules = [PostNewtonian]
+Pages   = ["utilities/termination_criteria.jl"]
+Order   = [:module, :type, :constant, :function, :macro]
 ```
 
 
