@@ -273,8 +273,8 @@ function inspiral(
     if abs2vec(χ⃗₁) > 1 || abs2vec(χ⃗₂) > 1
         error(
             "Unphysical spins: |χ⃗₁|=$(abs2vec(χ⃗₁)), |χ⃗₂|=$(abs2vec(χ⃗₂)).\n"
-            *"These are dimensionless spins, which should be less than 1.\n"
-            *"Perhaps you forgot to divide by M₁² or M₂², respectively."
+            * "These are dimensionless spins, which should be less than 1.\n"
+            * "Perhaps you forgot to divide by M₁² or M₂², respectively."
         )
     end
 
