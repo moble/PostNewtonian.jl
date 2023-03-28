@@ -10,6 +10,10 @@ expansions should be carried.
 """
 abstract type PNSystem{ST, PNOrder} end
 
+const pnsystem_symbols = (
+    :M₁, :M₂, :χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ, :χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ, :Rʷ, :Rˣ, :Rʸ, :Rᶻ, :v, :Φ
+)
+
 Base.eltype(::PNSystem{ST}) where {ST} = eltype(ST)
 pn_order(::PNSystem{ST, PNOrder}) where {ST, PNOrder} = PNOrder
 
