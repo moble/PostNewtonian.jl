@@ -61,12 +61,12 @@ end
 
 Combine ODESolutions
 
-This function is internal to this package.  It is not entirely general, but
-allows us to combine the backwards- and forwards-in-time solutions of the PN
-inspiral ODE equations into a single `ODESolution` object that should behave
-just as if it were the result of `solve`.  In particular, indexing,
-interpolation, and iterations should behave exactly as [described in the
-`DifferentialEquations` docs](https://diffeq.sciml.ai/stable/basics/solution/).
+This function is internal to this package.  It is not entirely general, but allows us to
+combine the backwards- and forwards-in-time solutions of the PN orbital-evolution ODE
+equations into a single `ODESolution` object that should behave just as if it were the
+result of `solve`.  In particular, indexing, interpolation, and iterations should behave
+exactly as [described in the `DifferentialEquations`
+docs](https://diffeq.sciml.ai/stable/basics/solution/).
 
 """
 function combine_solutions(sol₋, sol₊)

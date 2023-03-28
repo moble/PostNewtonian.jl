@@ -1,9 +1,9 @@
 # Dynamics
 
-## Integrating inspiral
+## Integrating orbital evolution
 
 ```@docs
-inspiral
+orbital_evolution
 estimated_time_to_merger
 ```
 
@@ -17,19 +17,20 @@ Order   = [:module, :type, :constant, :function, :macro]
 
 ## Approximants
 
-These compute the right-hand sides for the ODE integration of PN inspirals.  They only differ
-in how they compute the time dependence of the fundamental PN variable ``v``.  Fundamentally,
-we have
+These compute the right-hand sides for the ODE integration of PN orbital
+evolutions.  They only differ in how they compute the time dependence of the
+fundamental PN variable ``v``.  Fundamentally, we have
 ```math
 \frac{dv}{dt} = -\frac{\mathcal{F} + \dot{M}_1 + \dot{M}_2} {\mathcal{E}'}
 ```
-as the essential expression.  The various approximants differ simply in how they expand this
-expression.
+as the essential expression.  The various approximants differ simply in how they
+expand this expression.
 
 Note that `TaylorT2` and `TaylorT3` can also be [found in the
 literature](https://arxiv.org/abs/0710.0158), and are used to derive analytical
-expressions for the inspiral.[^2]  Unfortunately, this can only be accomplished for
-non-precessing systems, so we don't bother to implement them in this package.
+expressions for the orbital evolution.[^2]  Unfortunately, this can only be
+accomplished for non-precessing systems, so we don't bother to implement them in
+this package.
 
 [^2]: The second `T` in the `TaylorTn` names refers to the fact that these
     calculations provide the dynamics in the *time* domain.  In a manner

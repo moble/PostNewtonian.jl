@@ -22,8 +22,8 @@ The more current [GWTC-3 paper](https://arxiv.org/abs/2111.03606) searches with 
 following:
 
 > The PyCBC-BBH analysis focuses on a region ranging in primary component mass from 5M to
-  350M, with mass ratios from 1/3 to 1, and effective inspiral spins ranging from
-  ``\chi_\mathrm{eff} = −0.998`` to ``0.998``.
+  350M, with mass ratios from 1/3 to 1, and effective spins ranging from ``\chi_\mathrm{eff}
+  = −0.998`` to ``0.998``.
 
 (I suppose the search doesn't range over precessing systems.)  That paper's parameter
 estimation uses uniform priors over spin magnitudes and redshifted component masse;
