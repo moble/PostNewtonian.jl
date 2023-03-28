@@ -1,11 +1,11 @@
-"""
+@doc raw"""
     up_down_instability(pnsystem)
 
 Compute the range of frequencies over which the system is unstable to increasing precession.
 
 The returned value is a pair of dimensionless frequencies giving the lower and upper
 frequencies between which we can expect instability.  If there is no instability expected,
-the returned pair is just (1/M, 1/M) — where ``M`` is the total mass of the system, and
+the returned pair is just ``(1/M, 1/M)`` — where ``M`` is the total mass of the system, and
 ``1/M`` is the upper limit of physically reasonable frequencies.
 
 For compact binaries in which the spins are either aligned or anti-aligned with the orbital
@@ -18,13 +18,23 @@ over which the system is unstable is given by Eq. (2) of that reference.  We use
 lowest-order approximation to convert binary separation to frequency.  The result is also
 "clamped" between ``0`` and ``1/M``, because sometimes the PN approximations involved break
 down and return values outside of those physically plausible limits.
+
+Note that Gerosa et al. use the convention that ``q = M_2/M_1`` — which is opposite to the
+convention used in [this package](@ref q); which we account for internally in this function.
+They also assume that ``M_1 \geq M_2``, which we deal with by automatically swapping the
+relevant quantities.  Neither of these requires any adjustment by users of this function.
 """
 @pn_expression function up_down_instability(pnsystem)
     T = eltype(pnsystem)
     Ωₘₐₓ = PostNewtonian.Ω(v=1, M=M)
-    if M₂ ≤ M₁
-        q, χ₂ₗ, χ₁ₗ = inv(q), χ₁ₗ, χ₂ₗ
+
+    # Note that, as mentioned in the docstring, Gerosa et al. use q<1
+    if M₂ > M₁  # Just swap the relevant variables
+        χ₂ₗ, χ₁ₗ = χ₁ₗ, χ₂ₗ
+    else
+        q = inv(q)
     end
+
     if χ₁ₗ > 0 && χ₂ₗ < 0
         r₊ = M * (√(χ₁ₗ) + √abs(q*χ₂ₗ))^4 / (1-q)^2
         r₋ = M * (√(χ₁ₗ) - √abs(q*χ₂ₗ))^4 / (1-q)^2
@@ -55,13 +65,15 @@ See [`up_down_instability`](@ref) for details of the calculation of the unstable
         (Ω₊, Ω₋) = up_down_instability(pnsystem)
         v₊, v₋ = PostNewtonian.v(Ω=Ω₊, M=M), PostNewtonian.v(Ω=Ω₋, M=M)
         if v₁ < min(v₋, vₗᵢₘᵢₜ) && min(vₑ, vₗᵢₘᵢₜ) > v₊
-            @warn (
-                "This system is likely to encounter the up-down instability in the\n"
-                * "frequency range (Ω₊, Ω₋)=$((Ω₊, Ω₋)),\ncorresponding "
-                * "to the range of PN velocity parameters (v₊, v₋)=$((v₊, v₋)).\n"
-                * "This is a true physical instability; not just a numerical issue.\n"
-                * "Despite the initial conditions containing very small precession,\n"
-                * "the system will likely evolve to have very large precession."
+            @warn ("\n"
+                * "This system is likely to encounter the up-down instability in the frequency\n"
+                * "range (Ω₊, Ω₋)=$((Ω₊, Ω₋)), which corresponds to\n"
+                * "PN velocity parameters (v₊, v₋)=$((v₊, v₋)).\n"
+                * "This is a true physical instability, not just a numerical issue.  Despite the\n"
+                * "fact that the initial conditions contain very small precession, the system will\n"
+                * "likely evolve to have very large precession.  See `up_down_instability` docs\n"
+                * "for details."
+                * "\n\nParameters:"
             ) M₁ M₂ χ⃗₁ χ⃗₂ R v v₁ vₑ
         end
     end
