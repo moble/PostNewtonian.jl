@@ -27,3 +27,4 @@ Manifest.toml
 # Ignore my notes
 notes
 .vscode
+.VSCodeCounter
