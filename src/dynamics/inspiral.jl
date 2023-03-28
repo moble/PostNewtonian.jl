@@ -22,8 +22,14 @@ due to tidal heating.  Therefore, the values passed here are only precisely as g
 
 ## Keyword arguments
 
-  * `Ω₁=Ωᵢ`: First angular frequency in output data (see next section).
-  * `Ωₑ=1`: Final angular frequency at which to stop ODE integration.
+  * `Ω₁=Ωᵢ`: First angular frequency in output data.  This may be less than `Ωᵢ`, in which
+    case we integrate backwards to this point, and combine the backwards and forwards
+    solutions into one seamless output.  (See next section.)
+  * `Ωₑ=Ω(v=1,M=M₁+M₂)`: Final angular frequency at which to stop ODE integration.  Note
+    that integration may stop before the system reaches this frequency, if we detect that PN
+    has broken down irretrievably — for example, if one of the masses is no longer strictly
+    positive, if a spin is super-extremal, or the PN velocity parameter `v` is no longer in
+    the range `(0,1)`.
   * `Rᵢ=Rotor(1)`: Initial orientation of binary.
   * `approximant="TaylorT1"`: Method of evaluating the right-hand side of the evolution
     equations.  Currently "TaylorT1" is the only possibility.
@@ -146,6 +152,10 @@ The field `sol.t` is the set of time points at which the solution is given.  To 
 [^1]: Here, the `i`th variable just refers to which number it has in the list of evolved
       variables in the ODE system, as described under "ODE system".
 
+For convenience, you can also access the individual variables with their symbols.  For
+example, `sol[:v]` returns a vector of the PN velocity parameter at each time step.  Note
+the colon in `:v`, which is [Julia's notation for a
+`Symbol`](https://docs.julialang.org/en/v1/base/base/#Core.Symbol).
 
 ## Initial frequency vs. first frequency vs. end frequency
 
@@ -223,7 +233,7 @@ for details.
 """
 function inspiral(
     M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; λ₁=0, λ₂=0,
-    Ω₁=Ωᵢ, Ωₑ=1, Rᵢ=Rotor(true),
+    Ω₁=Ωᵢ, Ωₑ=Ω(v=1,M=M₁+M₂), Rᵢ=Rotor(true),
     approximant="TaylorT1", PNOrder=4//1,
     check_up_down_instability=true, time_stepper=AutoVern9(Rodas5()),
     reltol=nothing, abstol=nothing,
@@ -313,16 +323,8 @@ function inspiral(
     if isnothing(termination_criteria_forwards)
         termination_criteria_forwards = CallbackSet(
             termination_forwards(vₑ, quiet),
-            dtmin_terminator(T),
-            decreasing_v_terminator(),
-            nonfinite_terminator()
-        )
-    end
-
-    if isnothing(termination_criteria_backwards)
-        termination_criteria_backwards = CallbackSet(
-            termination_backwards(v₁, quiet),
-            dtmin_terminator(T),
+            dtmin_terminator(T, quiet),
+            decreasing_v_terminator(quiet),
             nonfinite_terminator()
         )
     end
@@ -343,7 +345,7 @@ function inspiral(
         end
     end
 
-    pn₁ = deepcopy(pnsystem)
+    pnsystemᵢ = deepcopy(pnsystem)
     τ = estimated_time_to_merger(pnsystem)
 
     # Note: This estimate for the time span over which to integrate may be very bad,
@@ -361,12 +363,20 @@ function inspiral(
         solve_kwargs...
     )
 
-    if v₁ < v(pn₁)
+    if v₁ < v(pnsystemᵢ)
         # Reset state to initial conditions
-        pnsystem.state[:] .= pn₁.state
+        pnsystem.state[:] .= pnsystemᵢ.state
 
-        pn₁.state[13] = v₁
-        τ = estimated_time_to_merger(pn₁) - τ
+        pnsystemᵢ.state[13] = v₁
+        τ = estimated_time_to_merger(pnsystemᵢ) - τ
+
+        if isnothing(termination_criteria_backwards)
+            termination_criteria_backwards = CallbackSet(
+                termination_backwards(v₁, quiet),
+                dtmin_terminator(T, quiet),
+                nonfinite_terminator()
+            )
+        end
 
         # Note: Here again, we don't want to overestimate the time span by too much, but we
         # also don't want to underestimate and get a shortened waveform.  This should be a
