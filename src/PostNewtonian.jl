@@ -19,7 +19,7 @@ using OrdinaryDiffEq
 
 include("utilities.jl")
 export termination_forwards, termination_backwards,
-    dtmin_terminator, nonfinite_terminator
+    dtmin_terminator, decreasing_v_terminator, nonfinite_terminator
 using .MathConstants
 
 

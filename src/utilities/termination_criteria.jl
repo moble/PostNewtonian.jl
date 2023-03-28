@@ -23,10 +23,10 @@ function termination_forwards(vₑ, quiet=false)
     # More precisely, the integrator performs a root find to finish precisely
     # when one of these conditions crosses 0.
     function conditions(out,state,t,integrator)
-        out[1] = state[1]  # Terminate if M₁≤0
-        out[2] = state[2]  # Terminate if M₂≤0
-        out[3] = 1 - abs2vec(QuatVec{typeof(vₑ)}(state[3:5]...))  # Terminate if χ₁>1
-        out[4] = 1 - abs2vec(QuatVec{typeof(vₑ)}(state[6:8]...))  # Terminate if χ₂>1
+        out[1] = state[1]  # Terminate if M₁ ≤ 0
+        out[2] = state[2]  # Terminate if M₂ ≤ 0
+        out[3] = 1 - abs2vec(QuatVec{typeof(vₑ)}(state[3:5]...))  # Terminate if χ₁ > 1
+        out[4] = 1 - abs2vec(QuatVec{typeof(vₑ)}(state[6:8]...))  # Terminate if χ₂ > 1
         out[5] = vₑ - state[13]  # Terminate at v = vₑ
     end
     function terminator!(integrator, event_index)
@@ -122,16 +122,48 @@ graceful exit.
 function dtmin_terminator(T)
     # Triggers the `discrete_terminator!` whenever this condition is true after
     # an integration step
-    ϵ = √eps(T)
+    sqrtϵ = √eps(T)
     function discrete_condition(state,t,integrator)
-        abs(integrator.dt) < ϵ
+        abs(integrator.dt) < sqrtϵ
     end
     function discrete_terminator!(integrator)
-        @warn (
-            "Terminating forwards evolution because time-step size is too small:\n"
-            * "|dt=$(integrator.dt)| < √ϵ=$(ϵ)\n"
-            * "This is probably fine if `v` ≳ 1/2."
-        )
+        v = integrator.u[13]
+        if v < 1//2
+            @warn (
+                "Terminating forwards evolution because time-step size is too small:\n"
+                * "|dt=$(integrator.dt)| < √ϵ=$(sqrtϵ)\n"
+                * "This is unexpected for `v` ≲ 1/2; the current value is v=$v."
+            )
+        end
+        terminate!(integrator)
+    end
+    DiscreteCallback(
+        discrete_condition,
+        discrete_terminator!;
+        save_positions=(false,false)
+    )
+end
+
+"""
+    decreasing_v_terminator()
+
+Construct termination criterion to stop integration when `v` is decreasing.
+"""
+function decreasing_v_terminator()
+    # Triggers the `discrete_terminator!` whenever this condition is true after
+    # an integration step
+    function discrete_condition(state,t,integrator)
+        SciMLBase.get_du(integrator)[13] < 0
+    end
+    function discrete_terminator!(integrator)
+        v = integrator.u[13]
+        if v < 1//2
+            ∂ₜv = SciMLBase.get_du(integrator)[13]
+            @warn (
+                "Terminating forwards evolution because `v` is decreasing:\n"
+                * "This is unexpected for `v` ≲ 1/2; the current value is ∂ₜv=$∂ₜv."
+            )
+        end
         terminate!(integrator)
     end
     DiscreteCallback(
@@ -145,8 +177,8 @@ end
 """
     nonfinite_terminator()
 
-Construct termination criterion to terminate when any NaN or Inf is found in
-the data after an integration step.
+Construct termination criterion to terminate when any NaN or Inf is found in the data after
+an integration step.
 """
 function nonfinite_terminator()
     # Triggers the `discrete_terminator!` whenever this condition is true after
