@@ -203,6 +203,7 @@ are
 CallbackSet(
     termination_forwards(v(Ω=Ωₑ, M=M₁+M₂)),
     dtmin_terminator(T),
+    decreasing_v_terminator(),
     nonfinite_terminator()
 )
 ```
@@ -313,6 +314,7 @@ function inspiral(
         termination_criteria_forwards = CallbackSet(
             termination_forwards(vₑ, quiet),
             dtmin_terminator(T),
+            decreasing_v_terminator(),
             nonfinite_terminator()
         )
     end
