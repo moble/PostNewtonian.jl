@@ -1,5 +1,5 @@
 @doc raw"""
-    TaylorT1!(u̇, p)
+    TaylorT1!(u̇, pnsystem)
 
 Compute the right-hand side for the orbital evolution of a non-eccentric binary in the
 "TaylorT1" approximant.
@@ -47,7 +47,7 @@ const TaylorT1RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
 
 
 @doc raw"""
-    TaylorT4!(u̇, u, p, t)
+    TaylorT4!(u̇, pnsystem)
 
 Compute the right-hand side for the orbital evolution of a non-eccentric binary in the
 "TaylorT4" approximant.
@@ -63,7 +63,7 @@ Here, `u` is the ODE state vector, which should just refer to the `state` vector
 the [`PNSystem`](@ref) object `p`.  The parameter `t` represents the time, and will surely
 always be unused in this package, but is part of the `DifferentialEquations` API.
 """
-@pn_expression 3 function TaylorT4!(u̇, u, p, t)
+@pn_expression 2 function TaylorT4!(u̇, p)
     error("Not yet implemented")
 end
 
@@ -73,7 +73,7 @@ const TaylorT4RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
 
 
 @doc raw"""
-    TaylorT5!(u̇, u, p, t)
+    TaylorT5!(u̇, pnsystem)
 
 Compute the right-hand side for the orbital evolution of a non-eccentric binary in the
 "TaylorT5" approximant.
@@ -92,7 +92,7 @@ Here, `u` is the ODE state vector, which should just refer to the `state` vector
 the [`PNSystem`](@ref) object `p`.  The parameter `t` represents the time, and will surely
 always be unused in this package, but is part of the `DifferentialEquations` API.
 """
-@pn_expression 3 function TaylorT5!(u̇, u, p, t)
+@pn_expression 2 function TaylorT5!(u̇, p)
     error("Not yet implemented")
 end
 

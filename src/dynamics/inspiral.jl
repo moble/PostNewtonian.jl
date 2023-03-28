@@ -1,4 +1,25 @@
 """
+    estimated_time_to_merger(ν, v)
+    estimated_time_to_merger(pnsystem)
+
+Compute the lowest-order PN approximation for the time to merger, starting from PN velocity
+parameter `v`.
+
+This can be a convenient way to estimate how long the inspiral integration should run for;
+we don't want it to integrate forever if PN has broken down.  However, it can be a very poor
+approximation, especially close to merger, and doubly so if the spins or eccentricity are
+significant.
+"""
+function estimated_time_to_merger(ν, v)
+    5/(256ν * v^8)
+end
+
+function estimated_time_to_merger(pnsystem)
+    estimated_time_to_merger(ν(pnsystem), v(pnsystem))
+end
+
+
+"""
     inspiral(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; kwargs...)
 
 Integrate the orbital dynamics of an inspiraling non-eccentric compact binary.
