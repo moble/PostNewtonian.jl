@@ -21,22 +21,28 @@ Here, `u̇` is the time-derivative of the state vector, which is stored in the
     Ω⃗ = Ω⃗ₚ(p) + Ω * ℓ̂
     χ̂₁ = ifelse(iszero(χ₁), ℓ̂, χ⃗₁ / χ₁)
     χ̂₂ = ifelse(iszero(χ₂), ℓ̂, χ⃗₂ / χ₂)
-    χ⃗̇₁ = (Ṡ₁ / M₁^2 - 2χ₁ * Ṁ₁/M₁) * χ̂₁ + Ω⃗ᵪ₁(p) × χ⃗₁
-    χ⃗̇₂ = (Ṡ₂ / M₂^2 - 2χ₂ * Ṁ₂/M₂) * χ̂₂ + Ω⃗ᵪ₂(p) × χ⃗₂
+    χ⃗̇₁ = (Ṡ₁ / M₁^2) * χ̂₁ - (2Ṁ₁ / M₁) * χ⃗₁ + Ω⃗ᵪ₁(p) × χ⃗₁
+    χ⃗̇₂ = (Ṡ₂ / M₂^2) * χ̂₂ - (2Ṁ₂ / M₂) * χ⃗₂ + Ω⃗ᵪ₂(p) × χ⃗₂
     Ṙ = Ω⃗ * R / 2
     u̇[1] = Ṁ₁
     u̇[2] = Ṁ₂
-    u̇[3:5] = vec(χ⃗̇₁)
-    u̇[6:8] = vec(χ⃗̇₂)
-    u̇[9:12] = components(Ṙ)
+    u̇[3] = χ⃗̇₁.x
+    u̇[4] = χ⃗̇₁.y
+    u̇[5] = χ⃗̇₁.z
+    u̇[6] = χ⃗̇₂.x
+    u̇[7] = χ⃗̇₂.y
+    u̇[8] = χ⃗̇₂.z
+    u̇[9] = Ṙ.w
+    u̇[10] = Ṙ.x
+    u̇[11] = Ṙ.y
+    u̇[12] = Ṙ.z
     u̇[13] = v̇
     u̇[14] = Ω
     nothing
 end
 
-TaylorT1RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
-    (u̇,u,p,t) -> (p.state.=u; TaylorT1!(u̇,p)),
-    syms=[:M₁, :M₂, :χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ, :χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ, :Rʷ, :Rˣ, :Rʸ, :Rᶻ, :v, :Φ]
+const TaylorT1RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
+    (u̇,u,p,t) -> (p.state.=u; TaylorT1!(u̇,p)), syms=pnsystem_symbols
 )
 
 
@@ -62,8 +68,7 @@ always be unused in this package, but is part of the `DifferentialEquations` API
 end
 
 const TaylorT4RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
-    (u̇,u,p,t) -> (p.state.=u; TaylorT4!(u̇,p)),
-    syms=[:M₁, :M₂, :χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ, :χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ, :Rʷ, :Rˣ, :Rʸ, :Rᶻ, :v, :Φ]
+    (u̇,u,p,t) -> (p.state.=u; TaylorT4!(u̇,p)), syms=pnsystem_symbols
 )
 
 
@@ -92,6 +97,5 @@ always be unused in this package, but is part of the `DifferentialEquations` API
 end
 
 const TaylorT5RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
-    (u̇,u,p,t) -> (p.state.=u; TaylorT5!(u̇,p)),
-    syms=[:M₁, :M₂, :χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ, :χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ, :Rʷ, :Rˣ, :Rʸ, :Rᶻ, :v, :Φ]
+    (u̇,u,p,t) -> (p.state.=u; TaylorT5!(u̇,p)), syms=pnsystem_symbols
 )
