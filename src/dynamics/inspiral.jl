@@ -20,6 +20,7 @@ end
 
 
 """
+    inspiral(pnsystem; kwargs...)
     inspiral(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; kwargs...)
 
 Integrate the orbital dynamics of an inspiraling non-eccentric compact binary.
@@ -27,11 +28,17 @@ Integrate the orbital dynamics of an inspiraling non-eccentric compact binary.
 
 ## Required arguments
 
+The first argument to this function may be a single `PNSystem` that encodes these required
+arguments (as well as `Rᵢ`, `λ₁`, and `λ₂` among the keyword arguments), or the following
+may be given explicitly:
+
   * `M₁`: Initial mass of black hole 1
   * `M₂`: Initial mass of black hole 2
   * `χ⃗₁`: Initial dimensionless spin of black hole 1, S⃗₁/M₁²
   * `χ⃗₂`: Initial dimensionless spin of black hole 2, S⃗₂/M₂²
   * `Ωᵢ`: Initial orbital angular frequency
+
+(Note that the explicit inputs require `Ωᵢ`, whereas `PNSystem`s require `vᵢ` as input.)
 
 These parameters all describe the "initial" conditions.  See below for an explanation of the
 different meanings of "initial" and "first" in this context.  Note that the masses change in
@@ -256,8 +263,17 @@ where `T` is the common float type of the input arguments.  If any additional te
 criteria are needed, they could be added as additional elements of the `CallbackSet`s.  See
 the [callback documentation](https://diffeq.sciml.ai/stable/features/callback_functions/)
 for details.
-
 """
+function inspiral(pnsystem::PNSystem; kwargs...)
+    inspiral(
+        M₁(pnsystem), M₂(pnsystem),
+        χ⃗₁(pnsystem), χ⃗₂(pnsystem),
+        Ω(v=v(pnsystem), M=M(pnsystem));
+        λ₁=λ₁(pnsystem), λ₂=λ₂(pnsystem),
+        Rᵢ=R(pnsystem), PNOrder=pn_order(pnsystem), kwargs...
+    )
+end
+
 function inspiral(
     M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ;
     lambda1=0, lambda2=0, Omega_1=Ωᵢ, Omega_e=Ω(v=1,M=M₁+M₂), R_i=Rotor(true),
