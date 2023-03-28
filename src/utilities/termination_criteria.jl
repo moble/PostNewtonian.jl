@@ -25,8 +25,8 @@ function termination_forwards(vₑ, quiet=false)
     function conditions(out,state,t,integrator)
         out[1] = state[1]  # Terminate if M₁ ≤ 0
         out[2] = state[2]  # Terminate if M₂ ≤ 0
-        out[3] = 1 - abs2vec(QuatVec{typeof(vₑ)}(state[3:5]...))  # Terminate if χ₁ > 1
-        out[4] = 1 - abs2vec(QuatVec{typeof(vₑ)}(state[6:8]...))  # Terminate if χ₂ > 1
+        out[3] = 1 - sum(x->x^2, @view state[3:5])  # Terminate if χ₁ > 1
+        out[4] = 1 - sum(x->x^2, @view state[6:8])  # Terminate if χ₂ > 1
         out[5] = vₑ - state[13]  # Terminate at v = vₑ
     end
     function terminator!(integrator, event_index)
@@ -79,8 +79,8 @@ function termination_backwards(v₁, quiet=false)
     function terminators_backwards(out,state,t,integrator)
         out[1] = state[1]  # Terminate if M₁≤0
         out[2] = state[2]  # Terminate if M₂≤0
-        out[3] = 1 - abs2vec(QuatVec{typeof(v₁)}(state[3:5]...))  # Terminate if χ₁>1
-        out[4] = 1 - abs2vec(QuatVec{typeof(v₁)}(state[6:8]...))  # Terminate if χ₂>1
+        out[3] = 1 - sum(x->x^2, @view state[3:5])  # Terminate if χ₁>1
+        out[4] = 1 - sum(x->x^2, @view state[6:8])  # Terminate if χ₂>1
         out[5] = v₁ - state[13]  # Terminate at v = v₁
     end
     function terminator_backwards!(integrator, event_index)
