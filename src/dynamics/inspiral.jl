@@ -43,15 +43,21 @@ due to tidal heating.  Therefore, the values passed here are only precisely as g
 
 ## Keyword arguments
 
-  * `Ω₁=Ωᵢ`: First angular frequency in output data.  This may be less than `Ωᵢ`, in which
-    case we integrate backwards to this point, and combine the backwards and forwards
-    solutions into one seamless output.  (See next section.)
-  * `Ωₑ=Ω(v=1,M=M₁+M₂)`: Final angular frequency at which to stop ODE integration.  Note
-    that integration may stop before the system reaches this frequency, if we detect that PN
-    has broken down irretrievably — for example, if one of the masses is no longer strictly
-    positive, if a spin is super-extremal, or the PN velocity parameter `v` is no longer in
-    the range `(0,1)`.
-  * `Rᵢ=Rotor(1)`: Initial orientation of binary.
+Note that several of these keywords are given as Unicode but can also be given as the ASCII
+string noted.  For example, `λ₁` may be input as `lambda1` equivalently; the default values
+are the same, regardless.
+
+  * `λ₁=0` or `lambda1`: Tidal-coupling parameter of object 1.
+  * `λ₂=0` or `lambda2`: Tidal-coupling parameter of object 2.
+  * `Ω₁=Ωᵢ` or `Omega_1`: First angular frequency in output data.  This may be less than
+    `Ωᵢ`, in which case we integrate backwards to this point, and combine the backwards and
+    forwards solutions into one seamless output.  (See next section.)
+  * `Ωₑ=Ω(v=1,M=M₁+M₂)` or `Omega_e`: Final angular frequency at which to stop ODE
+    integration.  Note that integration may stop before the system reaches this frequency,
+    if we detect that PN has broken down irretrievably — for example, if one of the masses
+    is no longer strictly positive, if a spin is super-extremal, or the PN velocity
+    parameter `v` is no longer in the range `(0,1)`.
+  * `Rᵢ=Rotor(1)` or `R_i`: Initial orientation of binary.
   * `approximant="TaylorT1"`: Method of evaluating the right-hand side of the evolution
     equations.
   * `PNOrder=4//1`: Order to which to retain powers of ``v^2`` in PN expansions.
@@ -253,8 +259,9 @@ for details.
 
 """
 function inspiral(
-    M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; λ₁=0, λ₂=0,
-    Ω₁=Ωᵢ, Ωₑ=Ω(v=1,M=M₁+M₂), Rᵢ=Rotor(true),
+    M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ;
+    lambda1=0, lambda2=0, Omega_1=Ωᵢ, Omega_e=Ω(v=1,M=M₁+M₂), R_i=Rotor(true),
+    λ₁=lambda1, λ₂=lambda2, Ω₁=Omega_1, Ωₑ=Omega_e, Rᵢ=R_i,
     approximant="TaylorT1", PNOrder=4//1,
     check_up_down_instability=true, time_stepper=AutoVern9(Rodas5()),
     reltol=nothing, abstol=nothing,
