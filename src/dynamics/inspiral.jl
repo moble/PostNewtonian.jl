@@ -5,10 +5,10 @@
 Compute the lowest-order PN approximation for the time to merger, starting from PN velocity
 parameter `v`.
 
-This can be a convenient way to estimate how long the inspiral integration should run for;
-we don't want it to integrate forever if PN has broken down.  However, it can be a very poor
-approximation, especially close to merger, and doubly so if the spins or eccentricity are
-significant.
+This is used internally as a convenient way to estimate how long the inspiral integration
+should run for; we don't want it to integrate forever if PN has broken down.  However, it
+can be a very poor approximation, especially close to merger, and doubly so if the spins or
+eccentricity are significant.
 """
 function estimated_time_to_merger(ν, v)
     5/(256ν * v^8)
@@ -53,7 +53,7 @@ due to tidal heating.  Therefore, the values passed here are only precisely as g
     the range `(0,1)`.
   * `Rᵢ=Rotor(1)`: Initial orientation of binary.
   * `approximant="TaylorT1"`: Method of evaluating the right-hand side of the evolution
-    equations.  Currently "TaylorT1" is the only possibility.
+    equations.
   * `PNOrder=4//1`: Order to which to retain powers of ``v^2`` in PN expansions.
   * `check_up_down_instability=true`: Warn if the "up-down instability" (see below) is
     likely to affect this system.

@@ -2,10 +2,9 @@
 
 ## Integrating inspiral
 
-```@autodocs
-Modules = [PostNewtonian]
-Pages   = ["dynamics/inspiral.jl"]
-Order   = [:module, :type, :constant, :function, :macro]
+```@docs
+inspiral
+estimated_time_to_merger
 ```
 
 ## Detecting the up-down instability
