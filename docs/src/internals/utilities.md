@@ -34,16 +34,11 @@ These, or similar functions may be helpful examples of
 ["callbacks"](https://docs.sciml.ai/DiffEqDocs/stable/features/callback_functions/)
 that can be passed to the ODE integrator.
 
-Note that several of these will issue warnings, even if the `quiet` flag is set
-to `true`.  If you want to quiet those warnings also, you can wrap your code in
-a `Logging` block like this one:
-```julia
-using Logging
-
-with_logger(SimpleLogger(Logging.Error)) do
-    <your code goes here>
-end
-```
+Note that several of these will issue warnings if the evolution has to be
+terminated for particularly bad or suspicious reasons, even if the `quiet` flag
+is set to `true`.  See the documentation of the `quiet` argument to the
+[`inspiral`](@ref) function for an example of how to use `Logging` to quiet even
+the warnings.
 
 ```@autodocs
 Modules = [PostNewtonian]
