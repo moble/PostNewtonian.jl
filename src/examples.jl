@@ -1,5 +1,5 @@
 @doc raw"""
-    randn([rng=GLOBAL_RNG], pnclass; [v=0.01], [PNOrder=typemax(Int)])
+    rand([rng=GLOBAL_RNG], pnclass; [v=0.01], [PNOrder=typemax(Int)])
 
 Generate a random PNSystem, specifically of class `pnclass` (one of `BBH`, `BHNS`, or
 `NSNS`), with parameters chosen to be consistent with typical LIGO/Virgo/KAGRA searches as
@@ -41,7 +41,7 @@ Given these, it seems like the current state of the art would be well covered by
 random `q` ∈ [0.05, 1], `χᵢ` ∈ [0, 0.998], and `λᵢ` ∈ [0, 5000], with isotropic choices for
 orientations.
 """
-function Base.randn(
+function Base.rand(
     rng::AbstractRNG, pnclass::Type{P}; v::T=0.01, PNOrder=typemax(Int)
 ) where {P<:PNSystem, T}
     qₘᵢₙ = T(big"0.05")  # Note that we're using q≤1 here for consistency with LIGO
@@ -58,5 +58,5 @@ function Base.randn(
     pnclass(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₁, λ₂, PNOrder)
 end
 
-Base.randn(pnclass::Type{P}; v::T=0.01, PNOrder=typemax(Int)) where {P<:PNSystem, T} =
-    randn(GLOBAL_RNG, pnclass; v, PNOrder)
+Base.rand(pnclass::Type{P}; v::T=0.01, PNOrder=typemax(Int)) where {P<:PNSystem, T} =
+    rand(GLOBAL_RNG, pnclass; v, PNOrder)
