@@ -20,16 +20,16 @@
     @test Ω₊ ≈ 5.46e-4 rtol=1e-2
     @test Ω₋ ≈ PostNewtonian.Ω(v=1, M=M₁+M₂)
 
-    ## Check on the test in `inspiral` to make sure it works as expected
+    ## Check on the test in `orbital_evolution` to make sure it works as expected
     # Ensure that even with `quiet=true`, we still get a warning for an unstable configuration
     udi_warning = r"\nThis system is likely to encounter the up-down instability in the"
-    @test_logs (:warn, udi_warning) inspiral(M₁, M₂, χ⃗₁, χ⃗₂, Ω(v=v), quiet=true)
+    @test_logs (:warn, udi_warning) orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ω(v=v), quiet=true)
 
     # Ensure that incorrect mass ordering gets handled properly
-    @test_logs (:warn, udi_warning) inspiral(M₂, M₁, χ⃗₂, χ⃗₁, Ω(v=v), quiet=true)
+    @test_logs (:warn, udi_warning) orbital_evolution(M₂, M₁, χ⃗₂, χ⃗₁, Ω(v=v), quiet=true)
 
     # Test that it doesn't warn if χ⃗₁ is downward or χ⃗₂ is upward
-    @test_logs min_level=Logging.Info inspiral(M₁, M₂, QuatVec(χ⃗₁.x, χ⃗₁.y, -χ⃗₁.z/2), χ⃗₂, Ω(v=v), Ωₑ=2Ω(v=v), quiet=true)
-    @test_logs min_level=Logging.Info inspiral(M₁, M₂, χ⃗₁, QuatVec(χ⃗₂.x, χ⃗₂.y, -χ⃗₂.z), Ω(v=v), quiet=true)
+    @test_logs min_level=Logging.Info orbital_evolution(M₁, M₂, QuatVec(χ⃗₁.x, χ⃗₁.y, -χ⃗₁.z/2), χ⃗₂, Ω(v=v), Ωₑ=2Ω(v=v), quiet=true)
+    @test_logs min_level=Logging.Info orbital_evolution(M₁, M₂, χ⃗₁, QuatVec(χ⃗₂.x, χ⃗₂.y, -χ⃗₂.z), Ω(v=v), quiet=true)
 
 end

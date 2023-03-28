@@ -26,15 +26,15 @@ this function accepts optional arguments either as positional arguments (which t
     uses more accurate (and efficient) ODE integration.
 
 The Julia interface is more detailed, flexible, and efficient than the simple `GWFrames`
-interface that this function emulates.  In particular, [`inspiral`](@ref) takes essentially
-all the same arguments that
+interface that this function emulates.  In particular, [`orbital_evolution`](@ref) takes
+essentially all the same arguments that
 [`DifferentialEquations.solve`](https://diffeq.sciml.ai/dev/basics/common_solver_opts/)
 takes, and returns a [`solution`](https://diffeq.sciml.ai/dev/basics/solution/) that
 provides dense output and more details about the ODE solution itself.  For example, one
 reason this function is more efficient than `GWFrames` is that we can use dense output to
 solve with fewer timesteps, while accurately and efficiently interpolating to the requested
-timesteps.  While `inspiral` solves for the dynamics, [`h!`](@ref) provides the actual mode
-weights, which are also returned by this function.
+timesteps.  While `orbital_evolution` solves for the dynamics, [`h!`](@ref) provides the
+actual mode weights, which are also returned by this function.
 
 
 ## Required arguments
@@ -65,8 +65,8 @@ order (though any number of them may be omitted from the end), or as keyword arg
     number, `MinStepsPerOrbit` will be used instead.
   * `quiet=true`: If `false`, show informational messages about the reasons for terminating
     the ODE integration.  In either case, warnings will still be issued if terminating for
-    bad or suspicious reasons.  See the documentation of [`inspiral`](@ref) for an example
-    of how to filter warnings also.
+    bad or suspicious reasons.  See the documentation of [`orbital_evolution`](@ref) for an
+    example of how to filter warnings also.
 
 
 ## Returned values
@@ -128,7 +128,7 @@ function PNWaveform(
     Rᵢ = Rotor(R_frame_i)
 
     # Inspiral
-    solution = inspiral(
+    solution = orbital_evolution(
         M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; λ₁=lambda1, λ₂=lambda2,
         Ω₁=Ω₁, Rᵢ=Rᵢ,
         approximant=Approximant, PNOrder=PNOrbitalEvolutionOrder,

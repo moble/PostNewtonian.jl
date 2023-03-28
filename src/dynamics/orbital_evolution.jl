@@ -20,8 +20,8 @@ end
 
 
 """
-    inspiral(pnsystem; kwargs...)
-    inspiral(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; kwargs...)
+    orbital_evolution(pnsystem; kwargs...)
+    orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; kwargs...)
 
 Integrate the orbital dynamics of an inspiraling non-eccentric compact binary.
 
@@ -169,7 +169,7 @@ this object `sol`.
 
     The solution comes with data at the time points the ODE integrator happened
     to step to.  However, it *also* comes with dense output (unless you
-    manually turn it off when calling `inspiral`).  This means that you can
+    manually turn it off when calling `orbital_evolution`).  This means that you can
     interpolate the solution to any other set of time points you want simply by
     calling it as `sol(t)` for some vector of time points `t`.  The quantity
     returned by that will have the following features, just like the original
@@ -264,8 +264,8 @@ criteria are needed, they could be added as additional elements of the `Callback
 the [callback documentation](https://diffeq.sciml.ai/stable/features/callback_functions/)
 for details.
 """
-function inspiral(pnsystem::PNSystem; kwargs...)
-    inspiral(
+function orbital_evolution(pnsystem::PNSystem; kwargs...)
+    orbital_evolution(
         M₁(pnsystem), M₂(pnsystem),
         χ⃗₁(pnsystem), χ⃗₂(pnsystem),
         Ω(v=v(pnsystem), M=M(pnsystem));
@@ -274,7 +274,7 @@ function inspiral(pnsystem::PNSystem; kwargs...)
     )
 end
 
-function inspiral(
+function orbital_evolution(
     M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ;
     lambda1=0, lambda2=0, Omega_1=Ωᵢ, Omega_e=Ω(v=1,M=M₁+M₂), R_i=Rotor(true),
     λ₁=lambda1, λ₂=lambda2, Ω₁=Omega_1, Ωₑ=Omega_e, Rᵢ=R_i,

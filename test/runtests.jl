@@ -57,7 +57,7 @@ end
     addtests("macros.jl")
     addtests("binding_energy.jl")
     addtests("up_down_instability.jl")
-    addtests("inspiral.jl")
+    addtests("orbital_evolution.jl")
     addtests("gwframes.jl")
 end
 
