@@ -113,7 +113,7 @@ function dtmin_terminator(T, quiet=false)
     function discrete_terminator!(integrator)
         v = integrator.u[13]
         message = (
-            "Terminating evolution because time-step size is too small:\n"
+            "Terminating evolution because the time-step size has become very small:\n"
             * "|dt=$(integrator.dt)| < √ϵ=$(sqrtϵ)\n"
             * "This is only unexpected for 𝑣 ≲ 1/2; the current value is 𝑣=$v."
         )
