@@ -63,7 +63,9 @@ are the same, regardless.
     integration.  Note that integration may stop before the system reaches this frequency,
     if we detect that PN has broken down irretrievably — for example, if one of the masses
     is no longer strictly positive, if a spin is super-extremal, or the PN velocity
-    parameter `v` is no longer in the range `(0,1)`.
+    parameter `v` is decreasing, or is no longer in the range `(0,1)`.  Warnings will
+    usually only be issued if `v < 1//2`, but if `quiet=true` informational messages will be
+    issued.
   * `Rᵢ=Rotor(1)` or `R_i`: Initial orientation of binary.
   * `approximant="TaylorT1"`: Method of evaluating the right-hand side of the evolution
     equations.
@@ -86,9 +88,9 @@ are the same, regardless.
     false, the integrator will immediately raise an error, before the termination criteria
     have the chance to exit gracefully.  Note that a true value here is critical if the
     `dtmin_terminator` callback is to have any effect.
-  * `quiet=false`: If set to `true`, informational messages about successful terminations of
+  * `quiet=true`: If set to `false`, informational messages about successful terminations of
     the ODE integrations (which occur when the target ``v`` is reached in either direction)
-    will be silenced.  Warnings will still be issued when terminating for other reasons; if
+    will be provided.  Warnings will still be issued when terminating for other reasons; if
     you wish to silence them too, you should do something like
     ```julia
     using Logging
@@ -283,7 +285,7 @@ function orbital_evolution(
     reltol=nothing, abstol=nothing,
     termination_criteria_forwards=nothing,
     termination_criteria_backwards=nothing,
-    quiet=false, force_dtmin=true,
+    quiet=true, force_dtmin=true,
     solve_kwargs...
 )
     # Sanity checks for the inputs
