@@ -10,6 +10,8 @@ expansions should be carried.
 """
 abstract type PNSystem{ST, PNOrder} end
 
+const VecOrPNSystem = Union{AbstractVector, PNSystem}
+
 const pnsystem_symbols = (
     :M₁, :M₂, :χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ, :χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ, :Rʷ, :Rˣ, :Rʸ, :Rᶻ, :v, :Φ
 )

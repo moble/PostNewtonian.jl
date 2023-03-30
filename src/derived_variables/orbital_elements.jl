@@ -11,7 +11,7 @@ n̂(R) = R x̂ R̄
 ```
 """
 n̂(R) = QuatVec(R(𝐢))
-n̂(s::PNSystem) = n̂(R(s))
+n̂(s::VecOrPNSystem) = n̂(R(s))
 const n_hat = n̂
 
 
@@ -29,7 +29,7 @@ the frame is given by the rotor `R`.  This is equal to
 This also completes the right-handed triple of ``(n̂, λ̂, ℓ̂)``.
 """
 λ̂(R) = QuatVec(R(𝐣))
-λ̂(s::PNSystem) = λ̂(R(s))
+λ̂(s::VecOrPNSystem) = λ̂(R(s))
 const lambda_hat = λ̂
 
 
@@ -46,7 +46,7 @@ given by the rotor `R`.  This is equal to
 ```
 """
 ℓ̂(R) = QuatVec(R(𝐤))
-ℓ̂(s::PNSystem) = ℓ̂(R(s))
+ℓ̂(s::VecOrPNSystem) = ℓ̂(R(s))
 const ell_hat = ℓ̂
 
 
@@ -67,8 +67,8 @@ definition* as
 See also [`v`](@ref).
 """
 Ω(;v, M=1) = v^3 / M
-Ω(s::PNSystem) = Ω(v=v(s), M=M(s))
+Ω(s::VecOrPNSystem) = Ω(v=v(s), M=M(s))
 const Omega = Ω
 
 
-lnv(s::PNSystem) = ln(v(s))
+lnv(s::VecOrPNSystem) = ln(v(s))

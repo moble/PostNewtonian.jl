@@ -46,7 +46,7 @@ end
 
 
 fundamental_variables = methodswith(PNSystem, FundamentalVariables)
-derived_variables = methodswith(PNSystem, DerivedVariables)
+derived_variables = methodswith(VecOrPNSystem, DerivedVariables)
 pnvariables = map(v->v.name, [fundamental_variables; derived_variables])
 
 # Add symbolic capabilities to all derived variables (fundamental variables already work)
@@ -54,6 +54,9 @@ for method ∈ derived_variables
     name = method.name
     @eval begin
         function PostNewtonian.$name(v::PNSystem{T}) where {T<:Vector{Symbolics.Num}}
+            Symbolics.Num(SymbolicUtils.Sym{Real}(Symbol($name)))
+        end
+        function PostNewtonian.$name(v::Vector{T}) where {T<:Symbolics.Num}
             Symbolics.Num(SymbolicUtils.Sym{Real}(Symbol($name)))
         end
     end
