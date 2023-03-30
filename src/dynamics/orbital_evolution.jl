@@ -169,16 +169,16 @@ this object `sol`.
 
 !!! note
 
-    The solution comes with data at the time points the ODE integrator happened
-    to step to.  However, it *also* comes with dense output (unless you
-    manually turn it off when calling `orbital_evolution`).  This means that you can
-    interpolate the solution to any other set of time points you want simply by
-    calling it as `sol(t)` for some vector of time points `t`.  The quantity
-    returned by that will have the following features, just like the original
-    solution.  Note that if you only want some of the data you can provide the
-    optional keyword argument `idxs` to specify which of the elements described
-    below you want to interpolate.  For example, if you only want to
-    interpolate the values of `M₁` and `M₂`, you can use `sol(t, idxs=[1,2])`.
+    The solution comes with data at the time points the ODE integrator happened to
+    step to.  However, it *also* comes with dense output (unless you manually turn it
+    off when calling `orbital_evolution`).  This means that you can interpolate the
+    solution to any other set of time points you want simply by calling it as
+    `sol(t)` for some vector of time points `t`.  The quantity returned by that will
+    have all the features described below, just like the original solution.  Note
+    that if you only want some of the data you can provide the optional keyword
+    argument `idxs` to specify which of the elements described below you want to
+    interpolate.  For example, if you only want to interpolate the values of `M₁` and
+    `M₂`, you can use `sol(t, idxs=[1,2])`.
 
 The field `sol.t` is the set of time points at which the solution is given.  To access the
 `i`th variable at time step `j`, use `sol[i, j]`.[^1] You can also use colons.  For example,
@@ -280,7 +280,7 @@ function orbital_evolution(
     M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ;
     lambda1=0, lambda2=0, Omega_1=Ωᵢ, Omega_e=Ω(v=1,M=M₁+M₂), R_i=Rotor(true),
     λ₁=lambda1, λ₂=lambda2, Ω₁=Omega_1, Ωₑ=Omega_e, Rᵢ=R_i,
-    approximant="TaylorT1", PNOrder=4//1,
+    approximant="TaylorT1", PNOrder=typemax(Int),
     check_up_down_instability=true, time_stepper=AutoVern9(Rodas5()),
     reltol=nothing, abstol=nothing,
     termination_criteria_forwards=nothing,
