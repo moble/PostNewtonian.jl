@@ -64,7 +64,8 @@ include("dynamics.jl")
 export estimated_time_to_merger, up_down_instability, orbital_evolution
 
 
-include("evaluation.jl")
+include("waveforms.jl")
+export waveform
 
 
 include("compatibility_layers.jl")
