@@ -36,7 +36,7 @@ makedocs(;
             "internals/derived_variables.md",
             "internals/pn_expressions.md",
             "internals/dynamics.md",
-            "Evaluation" => "internals/evaluation.md",
+            "Waveforms" => "internals/waveforms.md",
             "internals/utilities.md",
         ],
         "Adding terms" => "adding_terms.md",

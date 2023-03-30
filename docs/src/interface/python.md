@@ -6,25 +6,27 @@ any other Python package, other than installing Julia itself and any
 dependencies *within* Julia that you may need (both of which are much easier
 than similar tasks in Python).
 
-Note that the Julia packages are installed uniquely to your python environment
-— preferably a conda env.  For example, if you use two different conda envs to
+Note that the Julia packages are installed uniquely to your python environment —
+preferably a conda env.  For example, if you use two different conda envs to
 call into Julia, you'll need to install the Julia packages for each env.  This
-has the great advantage of allowing you to use different packages or versions
-in each of the different environments.
+has the great advantage of allowing you to use different packages or versions in
+each of the different environments.
 
 1. Install Julia
 
    There are several options here:
 
    * If you are already use [conda](https://conda.io/) to manage your python
-     installation (which is generally the recommended approach in python), you can just add `julia` to the list of packages to install in step 2.
+     installation (which is generally the recommended approach in python), you
+     can just add `julia` to the list of packages to install in step 2.
    * The [`juliaup`](https://github.com/JuliaLang/juliaup) installer has pretty
      broad support from some of the main Julia developers, and seems likely to
      be the main installation method in the not-too-distant future.
    * Otherwise, the official method is to just download a binary from the
-   [official download page](https://julialang.org/downloads/).
+     [official download page](https://julialang.org/downloads/).
    
-   Whichever method you choose, make sure that the `julia` executable is on your `PATH`.
+   Whichever method you choose, make sure that the `julia` executable is on your
+   `PATH`.
    
 2. Optionally, create a conda[^1] env just for this task
    ```bash
@@ -33,7 +35,7 @@ in each of the different environments.
    ```
    Add whatever other packages you use to that first line.
 
-3. Install `juliacall` and install `PostNewtonian`
+3. Install `juliacall` and `PostNewtonian`
    ```bash
    python -m pip install juliacall
    python -c 'from juliacall import Main as jl; jl.seval("""using Pkg; Pkg.add("PostNewtonian")""")'
@@ -67,8 +69,8 @@ in each of the different environments.
    # Plot the magnitudes of all the modes as functions of time
    plt.semilogy(w.t, np.abs(w.data))
    ```
-   The last line above uses the [`GWFrames.PNWaveform`](@ref) function from
-   this package, which is meant to emulate the original syntax from the
+   The second-to-last line above uses the [`GWFrames.PNWaveform`](@ref) function
+   from this package, which is meant to emulate the original syntax from the
    `GWFrames` package.  The resulting `w` will have various fields, like `t`,
    `data`, and `frame`, similar to those attached to `WaveformModes` objects in
    the `scri` and `sxs` packages.
@@ -104,6 +106,6 @@ approach.
       conda env, and then just use the command `mamba` wherever you would have
       used `conda`; `mamba` is a complete drop-in replacement, but is much
       faster because it's written in C instead of python.  For example, `mamba
-      create -n julia_pn python numpy matplotlib` will typically run faster
-      than the command given here.  This becomes a huge advantage when the env
-      has lots of dependencies.
+      create -n julia_pn python numpy matplotlib` will typically run faster than
+      the command given here.  This becomes a huge advantage when the env has
+      lots of dependencies.
