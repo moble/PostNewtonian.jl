@@ -16,8 +16,12 @@ If you intend to use this package via Python, see [this page](@ref
 Using-this-package-from-Python) for installation instructions.
 
 It is recommended to use this package with Julia version 1.9 or greater, because
-of that version's improved pre-compilation caching.  If you haven't installed
-Julia yet, you probably want to use
+of that version's improved pre-compilation caching.  If you find it very slow
+the first time you use functions from this package in a new Julia session, that
+is most likely because Julia has to compile a lot of code.  Version 1.9 does a
+better job of caching that compiled code, which speeds up your first-time usage.
+
+If you haven't installed Julia yet, you probably want to use
 [`juliaup`](https://github.com/JuliaLang/juliaup#readme) to do so.  You'll
 probably also want to use a Julia "project" specifically for this package.  An
 easy way to do this is to create a directory, `cd` into that directory, and then
@@ -43,9 +47,9 @@ using PostNewtonian
 # Initial values of the masses, spins, and orbital angular frequency
 M₁ = 0.6
 M₂ = 0.4
-χ⃗₁ = [0.1, 0.2, 0.3]
+χ⃗₁ = [0.1, 0.5, 0.3]
 χ⃗₂ = [-0.3, -0.1, 0.7]
-Ωᵢ = 0.005
+Ωᵢ = 0.01
 
 inspiral = orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ);
 nothing  # hide
@@ -79,13 +83,18 @@ savefig("inspiral_spins.html"); nothing  # hide
 <iframe src="inspiral_spins.html" style="height:500px;width:100%;"></iframe>
 ```
 
-Usually, we will also want the actual waveform from this system.  Using the
-`inspiral` object from above, we just call
+Usually, we will also want the actual waveform from this system.  We can just
+call [`inertial_waveform`](@ref) (or [`coorbital_waveform`](@ref) for the
+waveform in the "co-orbital" frame).  For nicer plotting, we'll first
+interpolate the inspiral to a finer set of time steps given by `t′`, going from
+``5,000M`` before the end of the inspiral, to the end of the inspiral, and
+evaluated every ``2M``:
 ```@example 1
-h = waveform(inspiral)
-plot(inspiral.t, real.(h[1, :]), label="Re{h₂,₂}")
-plot!(inspiral.t, imag.(h[1, :]), label="Im{h₂,₂}")
-plot!(xlabel="Time (M)", ylabel="Mode weights")
+t′ = inspiral.t[end]-5_000 : 0.5 : inspiral.t[end]
+h = inertial_waveform(inspiral(t′))
+plot(t′, real.(h[1, :]), label="Re{h₂,₂}")
+plot!(t′, imag.(h[1, :]), label="Im{h₂,₂}")
+plot!(xlabel="Time (M)", ylabel="Mode weights", ylim=(-1,1))
 savefig("waveform.html"); nothing  # hide
 ```
 ```@raw html
