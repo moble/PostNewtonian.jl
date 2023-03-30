@@ -61,7 +61,7 @@ function BBH(;
     (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
     BBH{T, PNOrder}(state)
 end
-function BBH(state; PNOrder=typemax(Int))
+function BBH(state; λ₁=0, λ₂=0, PNOrder=typemax(Int))
     @assert length(state) == 14
     BBH{typeof(state), prepare_pn_order(PNOrder)}(state)
 end
@@ -89,7 +89,7 @@ function BHNS(;
     (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
     BHNS{T, PNOrder}(state, λ₂)
 end
-function BHNS(state, λ₂; PNOrder=typemax(Int))
+function BHNS(state; λ₂, λ₁=0, PNOrder=typemax(Int))
     @assert length(state) == 14
     BHNS{typeof(state), prepare_pn_order(PNOrder)}(state, λ₂)
 end
@@ -116,7 +116,7 @@ function NSNS(;
     (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
     NSNS{T, PNOrder}(state, λ₁, λ₂)
 end
-function NSNS(state, λ₁, λ₂; PNOrder=typemax(Int))
+function NSNS(state; λ₁, λ₂, PNOrder=typemax(Int))
     @assert length(state) == 14
     NSNS{typeof(state), prepare_pn_order(PNOrder)}(state, λ₁, λ₂)
 end
