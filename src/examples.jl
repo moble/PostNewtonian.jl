@@ -60,3 +60,14 @@ end
 
 Base.rand(pnclass::Type{P}; v::T=0.01, PNOrder=typemax(Int)) where {P<:PNSystem, T} =
     rand(GLOBAL_RNG, pnclass; v, PNOrder)
+
+
+function hangup_superkick(
+    vᵢ=0.2, χ=0.99, θ=deg2rad(50.98), ϕ=deg2rad(30.0), PNOrder=typemax(Int)
+)
+    M₁ = M₂ = 0.5
+    χ⃗₁ = χ * [sin(ϕ)*sin(θ), cos(ϕ)*sin(θ), cos(θ)]
+    χ⃗₂ = χ * [-sin(ϕ)*sin(θ), -cos(ϕ)*sin(θ), cos(θ)]
+    R = Rotor(1)
+    BBH(;M₁, M₂, χ⃗₁, χ⃗₂, R, v=vᵢ, PNOrder)
+end
