@@ -6,6 +6,38 @@ any other Python package, other than installing Julia itself and any
 dependencies *within* Julia that you may need (both of which are much easier
 than similar tasks in Python).
 
+!!! warning
+    This package uses Unicode *internally*.  However, an effort is made to
+    ensure that *users* of this package can always use plain ASCII.  For
+    example, if keyword arguments are accepted as Unicode, ASCII equivalents
+    are usually also accepted.  Some function *names* are similarly in
+    Unicode, but have ASCII equivalents.  See the various functions'
+    documentation for acceptable replacements.
+    
+
+    It can be dangerous to use Unicode in Python in particular.  
+    Python only accepts a small subset of Unicode — so that `M₁` for example
+    is not valid input.  And what it does accept is automatically ["NFKC
+    normalized"](https://en.wikipedia.org/wiki/Unicode_equivalence#Normal_forms).
+    For example, variable names `Mₐ`, `Ma`, and `Mᵃ` are all treated
+    identically by Python.  To illustrate this, consider the following
+    python code:
+    ```python
+    >>> Mₐ = 1
+    >>> Mᵃ = 2
+    >>> Ma = 3
+    >>> (Mₐ, Mᵃ, Ma)
+    (3, 3, 3)
+    ```
+    We might have expected three different values `(1, 2, 3)` in the output,
+    but Python never even sees the variable names as different strings; it
+    interprets these expressions as setting and resetting the value of `Ma`.
+    
+    
+    If you find an example where ASCII substitutions are not possible,
+    please file a [bug
+    report](https://github.com/moble/PostNewtonian.jl/issues/new).
+
 Note that the Julia packages are installed uniquely to your python environment —
 preferably a conda env.  For example, if you use two different conda envs to
 call into Julia, you'll need to install the Julia packages for each env.  This
