@@ -15,28 +15,32 @@ export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, λ₁, λ₂
 
 Mass of object 1 in this system.
 """
-M₁(s::PNSystem) = @inbounds s.state[1]
+M₁(s::PNSystem) = M₁(s.state)
+M₁(state::AbstractVector) = @inbounds state[1]
 
 """
     M₂(pnsystem)
 
 Mass of object 2 in this system.
 """
-M₂(s::PNSystem) = @inbounds s.state[2]
+M₂(s::PNSystem) = M₂(s.state)
+M₂(state::AbstractVector) = @inbounds state[2]
 
 """
     χ⃗₁(pnsystem)
 
 Dimensionless spin vector of object 1 in this system, as a `QuatVec`.
 """
-χ⃗₁(s::PNSystem) = @inbounds QuatVec(view(s.state, 3:5)...)
+χ⃗₁(s::PNSystem) = χ⃗₁(s.state)
+χ⃗₁(state::AbstractVector) = @inbounds QuatVec(view(state, 3:5)...)
 
 """
     χ⃗₂(pnsystem)
 
 Dimensionless spin vector of object 2 in this system, as a `QuatVec`.
 """
-χ⃗₂(s::PNSystem) = @inbounds QuatVec(view(s.state, 6:8)...)
+χ⃗₂(s::PNSystem) = χ⃗₂(s.state)
+χ⃗₂(state::AbstractVector) = @inbounds QuatVec(view(state, 6:8)...)
 
 """
     R(pnsystem)
@@ -48,7 +52,8 @@ vector pointing from object 2 to object 1.
 See also [`n̂`](@ref PostNewtonian.n̂), [`λ̂`](@ref PostNewtonian.λ̂), [`ℓ̂`](@ref
 PostNewtonian.ℓ̂).
 """
-R(s::PNSystem) = @inbounds Rotor(view(s.state, 9:12)...)
+R(s::PNSystem) = R(s.state)
+R(state::AbstractVector) = @inbounds Rotor(view(state, 9:12)...)
 
 @doc raw"""
     v(pnsystem)
@@ -66,7 +71,8 @@ as a keyword argument — as in `v(Ω=0.1)`.
 
 See also [`Ω`](@ref).
 """
-v(s::PNSystem) = @inbounds s.state[13]
+v(s::PNSystem) = v(s.state)
+v(state::AbstractVector) = @inbounds state[13]
 v(;Ω, M=1) = ∛(M*Ω)
 
 """
@@ -74,7 +80,8 @@ v(;Ω, M=1) = ∛(M*Ω)
 
 Integrated orbital phase of the system.  It is computed as the integral of [`Ω`](@ref).
 """
-Φ(s::PNSystem) = @inbounds s.state[14]
+Φ(s::PNSystem) = Φ(s.state)
+Φ(state::AbstractVector) = @inbounds state[14]
 
 @doc raw"""
     λ₁(pnsystem)
