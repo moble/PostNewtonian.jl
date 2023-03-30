@@ -2,8 +2,10 @@ module PostNewtonian
 
 using Random: AbstractRNG, GLOBAL_RNG
 using InteractiveUtils: methodswith
+using LinearAlgebra: mul!
 using StaticArrays
 using Quaternionic
+using SphericalFunctions
 using RecursiveArrayTools
 using MacroTools
 using Symbolics
@@ -65,7 +67,7 @@ export estimated_time_to_merger, up_down_instability, orbital_evolution
 
 
 include("waveforms.jl")
-export waveform
+export coorbital_waveform, inertial_waveform
 
 
 include("compatibility_layers.jl")
