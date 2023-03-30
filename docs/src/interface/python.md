@@ -13,15 +13,18 @@ has the great advantage of allowing you to use different packages or versions
 in each of the different environments.
 
 1. Install Julia
-   
-   The [`juliaup`](https://github.com/JuliaLang/juliaup) installer has pretty
-   broad support from some of the main Julia developers, and seems likely to be
-   the main installation method in the not-too-distant future.
-   
-   Otherwise, the official method is to just download a binary from the
+
+   There are several options here:
+
+   * If you are already use [conda](https://conda.io/) to manage your python
+     installation (which is generally the recommended approach in python), you can just add `julia` to the list of packages to install in step 2.
+   * The [`juliaup`](https://github.com/JuliaLang/juliaup) installer has pretty
+     broad support from some of the main Julia developers, and seems likely to
+     be the main installation method in the not-too-distant future.
+   * Otherwise, the official method is to just download a binary from the
    [official download page](https://julialang.org/downloads/).
    
-   Make sure that the `julia` executable is on your `PATH`.
+   Whichever method you choose, make sure that the `julia` executable is on your `PATH`.
    
 2. Optionally, create a conda[^1] env just for this task
    ```bash
@@ -32,7 +35,7 @@ in each of the different environments.
 
 3. Install `juliacall` and install `PostNewtonian`
    ```bash
-   python -m pip install git+https://github.com/cjdoris/PythonCall.jl.git@1126b561
+   python -m pip install juliacall
    python -c 'from juliacall import Main as jl; jl.seval("""using Pkg; Pkg.add("PostNewtonian")""")'
    ```
    (Yes, you should use `pip` from inside a conda env.)  This will take a few
