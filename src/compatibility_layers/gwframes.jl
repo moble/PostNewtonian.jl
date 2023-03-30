@@ -151,11 +151,11 @@ function PNWaveform(
     ℓmax = ell_max
     n_modes = (ℓmax+1)^2 - ℓmin^2
     pnsystem = if iszero(lambda1) && iszero(lambda2)
-        BBH(copy(solution.u[1]))
+        BBH(copy(solution.u[1]), PNOrder=PNWaveformModeOrder)
     elseif iszero(lambda1)
-        BHNS(copy(solution.u[1]), lambda2)
+        BHNS(copy(solution.u[1]); lambda2, PNOrder=PNWaveformModeOrder)
     else
-        NSNS(copy(solution.u[1]), lambda1, lambda2)
+        NSNS(copy(solution.u[1]); lambda1, lambda2, PNOrder=PNWaveformModeOrder)
     end
     h = Matrix{Complex{eltype(solution)}}(undef, n_modes, length(solution.t))
     for (hi, ui) in zip(axes(h, 2), solution.u)
