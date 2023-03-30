@@ -78,8 +78,8 @@ as `inspiral.t`, and the evolved variables are available as `inspiral.u`, or by
 their names as in `inspiral[:v]` or `inspiral[:Φ]`.  For example, we can plot
 the components of the spin of object 1 like this:
 ```@example 1
-using Plots
-plotlyjs()  # Requires also adding `PlotlyJS` to your project
+using Plots  # Requires also installing `Plots` in your project
+plotlyjs()  # hide
 default(size=(800,480), linewidth=2, leg=:top)  # hide
 
 plot(
