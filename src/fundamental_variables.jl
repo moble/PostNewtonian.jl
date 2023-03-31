@@ -4,7 +4,8 @@ using ..PostNewtonian
 using ..PostNewtonian: PNSystem, BHNS, NSNS
 using Quaternionic
 
-export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, λ₁, λ₂
+export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, λ₁, λ₂,
+    M1, M2, chi1, chi2, Phi, lambda1, lambda2
 
 ## NOTE:
 ## This indices used below are intimately bound to choices made in the definitions of
@@ -12,35 +13,43 @@ export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, λ₁, λ₂
 
 """
     M₁(pnsystem)
+    M1(pnsystem)
 
 Mass of object 1 in this system.
 """
 M₁(s::PNSystem) = M₁(s.state)
 M₁(state::AbstractVector) = @inbounds state[1]
+const M1 = M₁
 
 """
     M₂(pnsystem)
+    M2(pnsystem)
 
 Mass of object 2 in this system.
 """
 M₂(s::PNSystem) = M₂(s.state)
 M₂(state::AbstractVector) = @inbounds state[2]
+const M2 = M₂
 
 """
     χ⃗₁(pnsystem)
+    chi1(pnsystem)
 
 Dimensionless spin vector of object 1 in this system, as a `QuatVec`.
 """
 χ⃗₁(s::PNSystem) = χ⃗₁(s.state)
 χ⃗₁(state::AbstractVector) = @inbounds QuatVec(view(state, 3:5)...)
+const chi1 = χ⃗₁
 
 """
     χ⃗₂(pnsystem)
+    chi2(pnsystem)
 
 Dimensionless spin vector of object 2 in this system, as a `QuatVec`.
 """
 χ⃗₂(s::PNSystem) = χ⃗₂(s.state)
 χ⃗₂(state::AbstractVector) = @inbounds QuatVec(view(state, 6:8)...)
+const chi2 = χ⃗₂
 
 """
     R(pnsystem)
@@ -77,14 +86,17 @@ v(;Ω, M=1) = ∛(M*Ω)
 
 """
     Φ(pnsystem)
+    Phi(pnsystem)
 
 Integrated orbital phase of the system.  It is computed as the integral of [`Ω`](@ref).
 """
 Φ(s::PNSystem) = Φ(s.state)
 Φ(state::AbstractVector) = @inbounds state[14]
+const Phi = Φ
 
 @doc raw"""
     λ₁(pnsystem)
+    lambda1(pnsystem)
 
 Tidal coupling parameter of object 1 in this system.
 
@@ -105,9 +117,11 @@ specializes on the type of `pnsystem`.
 λ₁(::PNSystem) = 0
 λ₁(pn::NSNS) = pn.λ₁
 λ₁(pn::SymbolicPNSystem) = pn.λ₁
+const lambda1 = λ₁
 
 @doc raw"""
     λ₂(pnsystem)
+    lambda2(pnsystem)
 
 Tidal coupling parameter of object 2 in this system.
 
@@ -129,5 +143,6 @@ specializes on the type of `pnsystem`.
 λ₂(pn::BHNS) = pn.λ₂
 λ₂(pn::NSNS) = pn.λ₂
 λ₂(pn::SymbolicPNSystem) = pn.λ₂
+const lambda2 = λ₂
 
 end

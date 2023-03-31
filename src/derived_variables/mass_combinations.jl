@@ -2,7 +2,7 @@
     M(pnsystem)
     M(M₁, M₂)
     total_mass(pnsystem)
-    total_mass(M₁, M₂)
+    total_mass(M1, M2)
 
 Compute the total mass ``M₁+M₂``.
 """
@@ -15,7 +15,7 @@ const total_mass = M
     μ(pnsystem)
     μ(M₁, M₂)
     reduced_mass(pnsystem)
-    reduced_mass(M₁, M₂)
+    reduced_mass(M1, M2)
 
 Compute the reduced mass ``(M₁ M₂)/(M₁+M₂)``.
 """
@@ -28,7 +28,7 @@ const reduced_mass = μ
     ν(pnsystem)
     ν(M₁, M₂)
     reduced_mass_ratio(pnsystem)
-    reduced_mass_ratio(M₁, M₂)
+    reduced_mass_ratio(M1, M2)
 
 Compute the reduced mass ratio ``(M₁ M₂)/(M₁+M₂)^2``.
 
@@ -44,7 +44,7 @@ const reduced_mass_ratio = ν
     δ(pnsystem)
     δ(M₁, M₂)
     mass_difference_ratio(pnsystem)
-    mass_difference_ratio(M₁, M₂)
+    mass_difference_ratio(M1, M2)
 
 Compute mass-difference ratio ``(M₁-M₂)/(M₁+M₂)``.
 
@@ -61,7 +61,7 @@ const mass_difference_ratio = δ
     q(pnsystem)
     q(M₁, M₂)
     mass_ratio(pnsystem)
-    mass_ratio(M₁, M₂)
+    mass_ratio(M1, M2)
 
 Compute mass ratio ``M₁/M₂``.
 
@@ -77,7 +77,7 @@ const mass_ratio = q
     ℳ(pnsystem)
     ℳ(M₁, M₂)
     chirp_mass(pnsystem)
-    chirp_mass(M₁, M₂)
+    chirp_mass(M1, M2)
 
 Compute the chirp mass ℳ, which determines the leading-order orbital evolution of a binary
 system due to energy loss by gravitational-wave emission.
