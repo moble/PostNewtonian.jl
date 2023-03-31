@@ -24,20 +24,20 @@ Here, `u̇` is the time-derivative of the state vector, which is stored in the
     χ⃗̇₁ = (Ṡ₁ / M₁^2) * χ̂₁ - (2Ṁ₁ / M₁) * χ⃗₁ + Ω⃗ᵪ₁(p) × χ⃗₁
     χ⃗̇₂ = (Ṡ₂ / M₂^2) * χ̂₂ - (2Ṁ₂ / M₂) * χ⃗₂ + Ω⃗ᵪ₂(p) × χ⃗₂
     Ṙ = Ω⃗ * R / 2
-    u̇[1] = Ṁ₁
-    u̇[2] = Ṁ₂
-    u̇[3] = χ⃗̇₁.x
-    u̇[4] = χ⃗̇₁.y
-    u̇[5] = χ⃗̇₁.z
-    u̇[6] = χ⃗̇₂.x
-    u̇[7] = χ⃗̇₂.y
-    u̇[8] = χ⃗̇₂.z
-    u̇[9] = Ṙ.w
-    u̇[10] = Ṙ.x
-    u̇[11] = Ṙ.y
-    u̇[12] = Ṙ.z
-    u̇[13] = v̇
-    u̇[14] = Ω
+    u̇[M₁index] = Ṁ₁
+    u̇[M₂index] = Ṁ₂
+    u̇[χ⃗₁ˣindex] = χ⃗̇₁.x
+    u̇[χ⃗₁ʸindex] = χ⃗̇₁.y
+    u̇[χ⃗₁ᶻindex] = χ⃗̇₁.z
+    u̇[χ⃗₂ˣindex] = χ⃗̇₂.x
+    u̇[χ⃗₂ʸindex] = χ⃗̇₂.y
+    u̇[χ⃗₂ᶻindex] = χ⃗̇₂.z
+    u̇[Rʷindex] = Ṙ.w
+    u̇[Rˣindex] = Ṙ.x
+    u̇[Rʸindex] = Ṙ.y
+    u̇[Rᶻindex] = Ṙ.z
+    u̇[vindex] = v̇
+    u̇[Φindex] = Ω
     nothing
 end
 

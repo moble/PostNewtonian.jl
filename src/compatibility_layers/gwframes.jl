@@ -148,7 +148,7 @@ function PNWaveform(
     )
     if dt ≤ 0
         solution = let
-            Φ = solution[14, :]
+            Φ = solution[:Φ]
             t = solution.t
             δΦ = 2π / MinStepsPerOrbit
             Φrange = range(extrema(Φ)..., step=δΦ)
@@ -157,7 +157,7 @@ function PNWaveform(
         end
     end
 
-    # Modes
+    # Waveform
     h = coorbital_waveform(
         solution; ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max,
         inertial, PNOrder=PNWaveformModeOrder
@@ -167,13 +167,13 @@ function PNWaveform(
     (
         t=solution.t,
         data=h',
-        frame=solution[9:12, :]', # R
-        M1=solution[1, :], # M₁
-        M2=solution[2, :], # M₂
-        chi1=solution[3:5, :]', # χ⃗₁
-        chi2=solution[6:8, :]', # χ⃗₂
-        v=solution[13, :], # v
-        Phi=solution[14, :], # Φ
+        frame=solution[Rindices, :]', # R
+        M1=solution[:M₁],
+        M2=solution[:M₂],
+        chi1=solution[χ⃗₁indices, :]', # χ⃗₁
+        chi2=solution[χ⃗₂indices, :]', # χ⃗₂
+        v=solution[:v],
+        Phi=solution[:Φ],
     )
 end
 

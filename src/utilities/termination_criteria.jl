@@ -15,11 +15,11 @@ function termination_forwards(vₑ, quiet=false)
     # More precisely, the integrator performs a root find to finish precisely
     # when one of these conditions crosses 0.
     function conditions(out,state,t,integrator)
-        out[1] = state[1]  # Terminate if M₁ ≤ 0
-        out[2] = state[2]  # Terminate if M₂ ≤ 0
-        out[3] = 1 - sum(x->x^2, @view state[3:5])  # Terminate if χ₁ > 1
-        out[4] = 1 - sum(x->x^2, @view state[6:8])  # Terminate if χ₂ > 1
-        out[5] = vₑ - state[13]  # Terminate at v = vₑ
+        out[1] = state[M₁index]  # Terminate if M₁ ≤ 0
+        out[2] = state[M₂index]  # Terminate if M₂ ≤ 0
+        out[3] = 1 - sum(x->x^2, @view state[χ⃗₁indices])  # Terminate if χ₁ > 1
+        out[4] = 1 - sum(x->x^2, @view state[χ⃗₂indices])  # Terminate if χ₂ > 1
+        out[5] = vₑ - state[vindex]  # Terminate at v = vₑ
     end
     function terminator!(integrator, event_index)
         if event_index == 1
@@ -61,11 +61,11 @@ reasons.
 """
 function termination_backwards(v₁, quiet=false)
     function terminators_backwards(out,state,t,integrator)
-        out[1] = state[1]  # Terminate if M₁≤0
-        out[2] = state[2]  # Terminate if M₂≤0
-        out[3] = 1 - sum(x->x^2, @view state[3:5])  # Terminate if χ₁>1
-        out[4] = 1 - sum(x->x^2, @view state[6:8])  # Terminate if χ₂>1
-        out[5] = v₁ - state[13]  # Terminate at v = v₁
+        out[1] = state[M₁index]  # Terminate if M₁≤0
+        out[2] = state[M₂index]  # Terminate if M₂≤0
+        out[3] = 1 - sum(x->x^2, @view state[χ⃗₁indices])  # Terminate if χ₁>1
+        out[4] = 1 - sum(x->x^2, @view state[χ⃗₂indices])  # Terminate if χ₂>1
+        out[5] = v₁ - state[vindex]  # Terminate at v = v₁
     end
     function terminator_backwards!(integrator, event_index)
         if event_index == 1
@@ -111,7 +111,7 @@ function dtmin_terminator(T, quiet=false)
         abs(integrator.dt) < sqrtϵ
     end
     function discrete_terminator!(integrator)
-        v = integrator.u[13]
+        v = integrator.u[vindex]
         message = (
             "Terminating evolution because the time-step size has become very small:\n"
             * "|dt=$(integrator.dt)| < √ϵ=$(sqrtϵ)\n"
@@ -146,14 +146,14 @@ otherwise an `info` message will be issued only if the `quiet` flag is set to `f
 """
 function decreasing_v_terminator(quiet=false)
     function discrete_condition(state,t,integrator)
-        SciMLBase.get_du(integrator)[13] < 0  # This translates to v̇<0
+        SciMLBase.get_du(integrator)[vindex] < 0  # This translates to v̇<0
     end
     function discrete_terminator!(integrator)
-        v = integrator.u[13]
-        ∂ₜv = SciMLBase.get_du(integrator)[13]
+        v = integrator.u[vindex]
+        ∂ₜv = SciMLBase.get_du(integrator)[vindex]
         message = (
             "Terminating forwards evolution because 𝑣 is decreasing:\n"
-            * "This is only unusual if 𝑣 ≲ 1/2; the current value is\n"
+            * "This is only unusual if 𝑣 ≲ 1/2; the current value is 𝑣=$v\n"
             * "∂ₜ𝑣=$∂ₜv."
         )
         if v < 1//2
