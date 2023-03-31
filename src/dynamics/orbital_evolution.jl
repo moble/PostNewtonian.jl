@@ -32,10 +32,10 @@ The first argument to this function may be a single `PNSystem` that encodes thes
 arguments (as well as `Rᵢ`, `λ₁`, and `λ₂` among the keyword arguments), or the following
 may be given explicitly:
 
-  * `M₁`: Initial mass of black hole 1
-  * `M₂`: Initial mass of black hole 2
-  * `χ⃗₁`: Initial dimensionless spin of black hole 1, S⃗₁/M₁²
-  * `χ⃗₂`: Initial dimensionless spin of black hole 2, S⃗₂/M₂²
+  * `M₁`: Initial mass of object 1
+  * `M₂`: Initial mass of object 2
+  * `χ⃗₁`: Initial dimensionless spin of object 1, S⃗₁/M₁²
+  * `χ⃗₂`: Initial dimensionless spin of object 2, S⃗₂/M₂²
   * `Ωᵢ`: Initial orbital angular frequency
 
 (Note that the explicit inputs require `Ωᵢ`, whereas `PNSystem`s require `vᵢ` as input.)
