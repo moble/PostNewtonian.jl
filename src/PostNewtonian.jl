@@ -75,7 +75,7 @@ export GWFrames
 
 
 include("examples.jl")
-export hangup_superkick
+export hangup_kick
 
 
 end  # module PostNewtonian
