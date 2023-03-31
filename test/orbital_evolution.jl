@@ -1,4 +1,4 @@
-@testset verbose=true "Inspiral" begin
+@testset verbose=true "Orbital evolution" begin
     Random.seed!(1234)
     T = Float64
     M₁ = T(5//8)
