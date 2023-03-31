@@ -12,9 +12,10 @@ Compute a PN waveform, with the same call signature as `GWFrames.PNWaveform`
 
 This is essentially a compatibility layer for the corresponding function in the original
 [`GWFrames`](https://github.com/moble/GWFrames/blob/01b39bfe/Code/PNWaveforms.cpp#L83-L88)
-Python package, with two additional optional arguments: `dt` and `quiet` (see below).  Also,
-this function accepts optional arguments either as positional arguments (which the original
-`GWFrames` requires) or as keyword arguments.
+Python package, with several additional optional arguments: `inertial`, `dt`, `quiet`,
+`ell_min`, `ell_max`, `lambda1`, and `lambda2` (see below).  Also, this function accepts
+optional arguments either as positional arguments (which the original `GWFrames` requires)
+or as keyword arguments.
 
 !!! warning
 
@@ -61,12 +62,18 @@ order (though any number of them may be omitted from the end), or as keyword arg
   * `PNWaveformModeOrder=4.0`: Maximum PN order of terms in the waveform formulas.
   * `PNOrbitalEvolutionOrder=4.0`: Maximum PN order of terms in the orbital-evolution
     formulas.
+  * `inertial=false`: If `true`, transform waveform to the inertial frame; otherwise, the
+    waveform will be in the co-orbital frame.
   * `dt=0`: Uniform time step size of the output.  If this is not a strictly positive
     number, `MinStepsPerOrbit` will be used instead.
   * `quiet=true`: If `false`, show informational messages about the reasons for terminating
     the ODE integration.  In either case, warnings will still be issued if terminating for
     bad or suspicious reasons.  See the documentation of [`orbital_evolution`](@ref) for an
     example of how to filter warnings also.
+  * `ell_min=2`: The lowest ℓ value in the output waveform.
+  * `ell_max=8`: The highest ℓ value in the output waveform.
+  * `lambda1=0`: Tidal-coupling parameter of object 1.
+  * `lambda2=0`: Tidal-coupling parameter of object 2.
 
 
 ## Returned values
@@ -100,7 +107,9 @@ where `w` is the object returned by this function.
 function PNWaveform(
     Approximant::String, delta, chi1_i, chi2_i, Omega_orb_i,
     Omega_orb_0, R_frame_i=[1.0], MinStepsPerOrbit=32,
-    PNWaveformModeOrder=4.0, PNOrbitalEvolutionOrder=4.0, dt=0.0, quiet=true
+    PNWaveformModeOrder=4.0, PNOrbitalEvolutionOrder=4.0,
+    inertial=false, dt=0.0, quiet=true,
+    ell_min=2, ell_max=8, lambda1=0, lambda2=0
 )
     # Note that this method's signature is missing the `Omega_orb_0` default
     # value; if it is not given, Julia selects the other (keyword-based)
@@ -109,14 +118,17 @@ function PNWaveform(
     PNWaveform(
         Approximant, delta, chi1_i, chi2_i, Omega_orb_i;
         Omega_orb_0, R_frame_i, MinStepsPerOrbit,
-        PNWaveformModeOrder, PNOrbitalEvolutionOrder, dt, quiet
+        PNWaveformModeOrder, PNOrbitalEvolutionOrder,
+        inertial, dt, quiet,
+        ell_min, ell_max, lambda1, lambda2
     )
 end
 
 function PNWaveform(
     Approximant, delta, chi1_i, chi2_i, Omega_orb_i;
     Omega_orb_0=Omega_orb_i, R_frame_i=[1.0], MinStepsPerOrbit=32,
-    PNWaveformModeOrder=4.0, PNOrbitalEvolutionOrder=4.0, dt=0.0, quiet=true,
+    PNWaveformModeOrder=4.0, PNOrbitalEvolutionOrder=4.0,
+    inertial=false, dt=0.0, quiet=true,
     ell_min=2, ell_max=8, lambda1=0, lambda2=0
 )
     M₁ = (1 + delta) / 2
@@ -132,8 +144,7 @@ function PNWaveform(
         M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; λ₁=lambda1, λ₂=lambda2,
         Ω₁=Ω₁, Rᵢ=Rᵢ,
         approximant=Approximant, PNOrder=PNOrbitalEvolutionOrder,
-        quiet=quiet,
-        saveat=dt > 0 ? dt : []
+        quiet=quiet, saveat=dt > 0 ? dt : []
     )
     if dt ≤ 0
         solution = let
@@ -147,21 +158,10 @@ function PNWaveform(
     end
 
     # Modes
-    ℓmin = ell_min
-    ℓmax = ell_max
-    n_modes = (ℓmax+1)^2 - ℓmin^2
-    pnsystem = if iszero(lambda1) && iszero(lambda2)
-        BBH(copy(solution.u[1]), PNOrder=PNWaveformModeOrder)
-    elseif iszero(lambda1)
-        BHNS(copy(solution.u[1]); lambda2, PNOrder=PNWaveformModeOrder)
-    else
-        NSNS(copy(solution.u[1]); lambda1, lambda2, PNOrder=PNWaveformModeOrder)
-    end
-    h = Matrix{Complex{eltype(solution)}}(undef, n_modes, length(solution.t))
-    for (hi, ui) in zip(axes(h, 2), solution.u)
-        pnsystem.state[:] .= ui
-        h!(@view(h[:, hi]), pnsystem; ℓmin, ℓmax)
-    end
+    h = coorbital_waveform(
+        solution; ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max,
+        inertial, PNOrder=PNWaveformModeOrder
+    )
 
     # Return
     (
