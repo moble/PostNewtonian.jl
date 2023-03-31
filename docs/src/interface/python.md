@@ -7,13 +7,13 @@ dependencies *within* Julia that you may need (both of which are much easier
 than similar tasks in Python).
 
 !!! warning
-    This package uses Unicode *internally*.  However, an effort is made to
-    ensure that *users* of this package can always use plain ASCII.  For
-    example, if keyword arguments are accepted as Unicode, ASCII equivalents
-    are usually also accepted.  Some function *names* are similarly in
-    Unicode, but have ASCII equivalents.  See the various functions'
-    documentation for acceptable replacements.
-    
+    This package uses Unicode *internally* and in many of the examples found
+    in this documentation.  However, every effort is made to ensure that
+    *users* of this package can always use plain ASCII.  For example, if
+    keyword arguments are accepted as Unicode, ASCII equivalents are usually
+    also accepted.  Some function *names* are similarly in Unicode, but have
+    ASCII equivalents.  See the various functions' documentation for
+    acceptable replacements.
 
     It can be dangerous to use Unicode in Python in particular.  
     Python only accepts a small subset of Unicode — so that `M₁` for example
@@ -31,8 +31,8 @@ than similar tasks in Python).
     ```
     We might have expected three different values `(1, 2, 3)` in the output,
     but Python never even sees the variable names as different strings; it
-    interprets these expressions as setting and resetting the value of `Ma`.
-    
+    interprets these expressions as setting, resetting, and resetting again
+    the value of `Ma`.
     
     If you find an example where ASCII substitutions are not possible,
     please file a [bug
