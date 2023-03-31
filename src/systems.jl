@@ -36,6 +36,16 @@ pn_order(::PNSystem{ST, PNOrder}) where {ST, PNOrder} = PNOrder
 
 order_index(pn::PNSystem) = 1 + Int(2pn_order(pn))
 
+causes_domain_error!(u̇, ::PNSystem{VT}) where {VT<:Vector{Symbolics.Num}} = false
+function causes_domain_error!(u̇, p::PNSystem{VT}) where {VT}
+    if p.state[vindex] ≤ 0
+        u̇ .= convert(eltype(VT), NaN)
+        true
+    else
+        false
+    end
+end
+
 function prepare_system(;
     M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0,
     PNOrder=typemax(Int)
