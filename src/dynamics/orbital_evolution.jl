@@ -410,7 +410,7 @@ function orbital_evolution(
         # Reset state to initial conditions
         pnsystem.state[:] .= pnsystemᵢ.state
 
-        pnsystemᵢ.state[13] = v₁
+        pnsystemᵢ.state[vindex] = v₁
         τ = estimated_time_to_merger(pnsystemᵢ) - τ
 
         if isnothing(termination_criteria_backwards)

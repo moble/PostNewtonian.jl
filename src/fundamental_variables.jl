@@ -2,6 +2,7 @@ module FundamentalVariables
 
 using ..PostNewtonian
 using ..PostNewtonian: PNSystem, BHNS, NSNS
+using ..PostNewtonian: M₁index, M₂index, χ⃗₁indices, χ⃗₂indices, Rindices, vindex, Φindex
 using Quaternionic
 
 export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, λ₁, λ₂,
@@ -18,7 +19,7 @@ export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, λ₁, λ₂,
 Mass of object 1 in this system.
 """
 M₁(s::PNSystem) = M₁(s.state)
-M₁(state::AbstractVector) = @inbounds state[1]
+M₁(state::AbstractVector) = @inbounds state[M₁index]
 const M1 = M₁
 
 """
@@ -28,7 +29,7 @@ const M1 = M₁
 Mass of object 2 in this system.
 """
 M₂(s::PNSystem) = M₂(s.state)
-M₂(state::AbstractVector) = @inbounds state[2]
+M₂(state::AbstractVector) = @inbounds state[M₂index]
 const M2 = M₂
 
 """
@@ -38,7 +39,7 @@ const M2 = M₂
 Dimensionless spin vector of object 1 in this system, as a `QuatVec`.
 """
 χ⃗₁(s::PNSystem) = χ⃗₁(s.state)
-χ⃗₁(state::AbstractVector) = @inbounds QuatVec(view(state, 3:5)...)
+χ⃗₁(state::AbstractVector) = @inbounds QuatVec(view(state, χ⃗₁indices)...)
 const chi1 = χ⃗₁
 
 """
@@ -48,7 +49,7 @@ const chi1 = χ⃗₁
 Dimensionless spin vector of object 2 in this system, as a `QuatVec`.
 """
 χ⃗₂(s::PNSystem) = χ⃗₂(s.state)
-χ⃗₂(state::AbstractVector) = @inbounds QuatVec(view(state, 6:8)...)
+χ⃗₂(state::AbstractVector) = @inbounds QuatVec(view(state, χ⃗₂indices)...)
 const chi2 = χ⃗₂
 
 """
@@ -62,7 +63,7 @@ See also [`n̂`](@ref PostNewtonian.n̂), [`λ̂`](@ref PostNewtonian.λ̂), [`�
 PostNewtonian.ℓ̂).
 """
 R(s::PNSystem) = R(s.state)
-R(state::AbstractVector) = @inbounds Rotor(view(state, 9:12)...)
+R(state::AbstractVector) = @inbounds Rotor(view(state, Rindices)...)
 
 @doc raw"""
     v(pnsystem)
@@ -81,7 +82,7 @@ as a keyword argument — as in `v(Ω=0.1)`.
 See also [`Ω`](@ref).
 """
 v(s::PNSystem) = v(s.state)
-v(state::AbstractVector) = @inbounds state[13]
+v(state::AbstractVector) = @inbounds state[vindex]
 v(;Ω, M=1) = ∛(M*Ω)
 
 """
@@ -91,7 +92,7 @@ v(;Ω, M=1) = ∛(M*Ω)
 Integrated orbital phase of the system.  It is computed as the integral of [`Ω`](@ref).
 """
 Φ(s::PNSystem) = Φ(s.state)
-Φ(state::AbstractVector) = @inbounds state[14]
+Φ(state::AbstractVector) = @inbounds state[Φindex]
 const Phi = Φ
 
 @doc raw"""

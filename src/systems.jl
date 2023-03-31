@@ -21,6 +21,16 @@ const pnsystem_symbols = (
     :M₁, :M₂, :χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ, :χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ, :Rʷ, :Rˣ, :Rʸ, :Rᶻ, :v, :Φ
 )
 
+for (i, s) ∈ enumerate(pnsystem_symbols)
+    sindex = Symbol("$(s)index")
+    @eval const $sindex = $i
+end
+
+const χ⃗₁indices = χ⃗₁ˣindex:χ⃗₁ᶻindex
+const χ⃗₂indices = χ⃗₂ˣindex:χ⃗₂ᶻindex
+const Rindices = Rʷindex:Rᶻindex
+
+
 Base.eltype(::PNSystem{ST}) where {ST} = eltype(ST)
 pn_order(::PNSystem{ST, PNOrder}) where {ST, PNOrder} = PNOrder
 
