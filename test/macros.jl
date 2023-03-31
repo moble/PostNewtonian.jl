@@ -11,7 +11,8 @@
 
     @test isequal(
         PostNewtonian.macro_test(symbolic_pnsystem),
-        PostNewtonian.v(symbolic_pnsystem)*Num(π)*√Num(SymbolicUtils.Term(identity, [10]))
+        PostNewtonian.v(symbolic_pnsystem)
+        *Num(SymbolicUtils.Term(PostNewtonian.hold, [π]))
+        *√Num(SymbolicUtils.Term(PostNewtonian.hold, [10]))
     )
-
 end
