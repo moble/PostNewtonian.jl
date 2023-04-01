@@ -33,21 +33,27 @@
 
     # Test to ensure we don't get info with default value of `quiet`, and we *do* when `quiet=false`
     PNOrder = 1.5
+    R_frame_i = [1.0]
+    MinStepsPerOrbit = 32
+    PNWaveformModeOrder = 4.0
+    PNOrbitalEvolutionOrder = PNOrder
     @test_logs min_level=Logging.Info GWFrames.PNWaveform(
         Approximant, delta, chi1_i, chi2_i, Omega_orb_i, Omega_orb_0,
-        PNOrbitalEvolutionOrder=PNOrder
+        R_frame_i, MinStepsPerOrbit,
+        PNWaveformModeOrder, PNOrbitalEvolutionOrder
     )
     @test_logs min_level=Logging.Info GWFrames.PNWaveform(
         Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0,
-        PNOrbitalEvolutionOrder=PNOrder
+        PNOrbitalEvolutionOrder
     )
     @test_logs min_level=Logging.Info GWFrames.PNWaveform(
         Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0,
-        PNOrbitalEvolutionOrder=PNOrder, quiet=true
+        PNOrbitalEvolutionOrder, quiet=true
     )
     @test_logs (:info,r"Terminating forwards") (:info,r"Terminating backwards") GWFrames.PNWaveform(
         Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0,
-        PNOrbitalEvolutionOrder=PNOrder, quiet=false, Omega_e=0.729
+        PNOrbitalEvolutionOrder, quiet=false,
+        Omega_e=0.729  # This system fails by dt with v≈0.972, so just don't go that high
     )
 
     # Make sure that `MinStepsPerOrbit` gives us what we want
