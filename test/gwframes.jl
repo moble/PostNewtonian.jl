@@ -12,14 +12,14 @@
 
     Mₜₒₜ = M₁+M₂
     q = M₁/M₂
-    vᵢ = v(Ω=Ωᵢ,M=M₁+M₂)
-    v₁ = v(Ω=Ω₁,M=M₁+M₂)
-    vₑ = min(v(Ω=Ωₑ, M=M₁+M₂), 1)
+    vᵢ = PostNewtonian.v(Ω=Ωᵢ,M=M₁+M₂)
+    v₁ = PostNewtonian.v(Ω=Ω₁,M=M₁+M₂)
+    vₑ = min(PostNewtonian.v(Ω=Ωₑ, M=M₁+M₂), 1)
 
     uᵢ = [M₁; M₂; vec(χ⃗₁); vec(χ⃗₂); components(Rᵢ); vᵢ]
 
     Approximant = "TaylorT1"
-    delta = δ(M₁, M₂)
+    delta = PostNewtonian.δ(M₁, M₂)
     chi1_i = vec(χ⃗₁)
     chi2_i = vec(χ⃗₂)
     Omega_orb_i = Ωᵢ

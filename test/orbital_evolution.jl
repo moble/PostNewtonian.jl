@@ -12,11 +12,11 @@
 
     Mₜₒₜ = M₁+M₂
     q = M₁/M₂
-    vᵢ = v(Ω=Ωᵢ,M=M₁+M₂)
-    v₁ = v(Ω=Ω₁,M=M₁+M₂)
-    vₑ = min(v(Ω=Ωₑ, M=M₁+M₂), 1)
+    vᵢ = PostNewtonian.v(Ω=Ωᵢ,M=M₁+M₂)
+    v₁ = PostNewtonian.v(Ω=Ω₁,M=M₁+M₂)
+    vₑ = min(PostNewtonian.v(Ω=Ωₑ, M=M₁+M₂), 1)
 
-    uᵢ = [M₁; M₂; vec(χ⃗₁); vec(χ⃗₂); components(Rᵢ); vᵢ]
+    uᵢ = [M₁; M₂; vec(χ⃗₁); vec(χ⃗₂); components(Rᵢ); vᵢ; zero(T)]
 
     forwards_termination = (
         "Terminating forwards evolution because the PN parameter 𝑣 "
@@ -28,25 +28,25 @@
     )
 
     # Check for termination info
-    sol1 = @test_logs (:info,forwards_termination) orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, Rᵢ=Rᵢ)
-    sol2 = @test_logs (:info,forwards_termination) (:info,backwards_termination) orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, Ω₁=Ωᵢ/2, Rᵢ=Rᵢ)
+    sol1 = @test_logs (:info,forwards_termination) orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, Rᵢ=Rᵢ, quiet=false)
+    sol2 = @test_logs (:info,forwards_termination) (:info,backwards_termination) orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, Ω₁=Ωᵢ/2, Rᵢ=Rᵢ, quiet=false)
 
     # Check endpoint values
     @test sol1.retcode == SciMLBase.ReturnCode.Terminated
-    @test sol1[end, 1] == vᵢ
+    @test sol1[:v, 1] == vᵢ
     @test sol1[1] ≈ uᵢ
-    @test sol1[end, end] ≈ vₑ
+    @test sol1[:v, end] ≈ vₑ
 
     @test sol2.retcode == SciMLBase.ReturnCode.Terminated
-    @test sol2[end, 1] ≈ v₁
+    @test sol2[:v, 1] ≈ v₁
     iᵢ = argmin(abs.(sol2.t .- 0.0))  # Assuming uᵢ corresponds to t==0.0
     @test sol2[iᵢ] ≈ uᵢ
-    @test sol2[end, end] ≈ vₑ
+    @test sol2[:v, end] ≈ vₑ
 
     # Check various forms of interpolation with the forwards/backwards solution
     t = LinRange(sol1.t[1], sol1.t[2], 11)
-    @test sol1(t[3], idxs=13) == sol2(t[3], idxs=13)
-    @test sol1(t, idxs=13) == sol2(t, idxs=13)
+    @test sol1(t[3], idxs=(:v)) == sol2(t[3], idxs=(:v))
+    @test sol1(t, idxs=(:v)) == sol2(t, idxs=(:v))
     @test sol1(t[3], idxs=7:13) == sol2(t[3], idxs=7:13)
     @test sol1(t, idxs=7:13) == sol2(t, idxs=7:13)
 
@@ -54,21 +54,20 @@
     sol3 = @test_logs min_level=Logging.Info orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, Ω₁=Ωᵢ/2, Rᵢ=Rᵢ, quiet=true)
     t₁, tₑ = extrema(sol3.t)
     t = sol2.t[t₁ .< sol2.t .< tₑ]
-    @test sol2(t) ≈ sol3(t, idxs=1:13)
-    @test sol3(0.0, idxs=14) ≈ 0.0  # Initial phase should be ≈0
-    @test minimum(diff(sol3[end, :])) > 0  # Ensure that the phase is strictly increasing
+    @test sol2(t) ≈ sol3(t, idxs=1:length(sol3.u[1]))
+    @test sol3(0.0, idxs=(:Φ)) ≈ 0.0  # Initial phase should be ≈0
+    @test minimum(diff(sol3[:Φ])) > 0  # Ensure that the phase is strictly increasing
 
     # Ensure that non-precessing systems don't precess
     Rᵢ = Rotor(one(T))
     sol_np = orbital_evolution(M₁, M₂, QuatVec(0, 0, χ⃗₁.z), QuatVec(0, 0, χ⃗₂.z), Ωᵢ; Ω₁, Rᵢ, quiet=true)
-    @test all(sol_np[3:4, :] .== 0)
-    @test all(sol_np[6:7, :] .== 0)
-    @test all(sol_np[10:11, :] .== 0)
+    for c ∈ [:χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₂ˣ, :χ⃗₂ʸ, :Rˣ, :Rʸ]
+        @test all(sol_np[c] .== 0)
+    end
 
     # Test that non-precessing rotors evolve like orbital phase
-    sol_np = orbital_evolution(M₁, M₂, QuatVec(0, 0, χ⃗₁.z), QuatVec(0, 0, χ⃗₂.z), Ωᵢ; Ω₁, Rᵢ, quiet=true);
-    sincosΦ = cat(map(Φ -> [sincos(Φ/2)...], sol_np[14,:])..., dims=2)
-    Rwz = sol_np[[12,9], :]
+    sincosΦ = cat(map(Φ -> [sincos(Φ/2)...], sol_np[:Φ])..., dims=2)
+    Rwz = sol_np[[PostNewtonian.Rᶻindex,PostNewtonian.Rʷindex], :]
     @test sincosΦ ≈ Rwz atol=√eps(T)
 
 end
