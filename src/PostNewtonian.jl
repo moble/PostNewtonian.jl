@@ -75,7 +75,8 @@ export GWFrames
 
 
 include("examples.jl")
-export hangup_kick
+export superkick, hangup_kick
+# Also note that Base.rand is extended
 
 
 end  # module PostNewtonian
