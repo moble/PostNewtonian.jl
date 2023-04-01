@@ -109,7 +109,8 @@ function PNWaveform(
     Omega_orb_0, R_frame_i=[1.0], MinStepsPerOrbit=32,
     PNWaveformModeOrder=4.0, PNOrbitalEvolutionOrder=4.0,
     inertial=false, dt=0.0, quiet=true,
-    ell_min=2, ell_max=8, lambda1=0, lambda2=0
+    ell_min=2, ell_max=8, lambda1=0, lambda2=0,
+    kwargs...
 )
     # Note that this method's signature is missing the `Omega_orb_0` default
     # value; if it is not given, Julia selects the other (keyword-based)
@@ -120,7 +121,8 @@ function PNWaveform(
         Omega_orb_0, R_frame_i, MinStepsPerOrbit,
         PNWaveformModeOrder, PNOrbitalEvolutionOrder,
         inertial, dt, quiet,
-        ell_min, ell_max, lambda1, lambda2
+        ell_min, ell_max, lambda1, lambda2,
+        kwargs...
     )
 end
 
