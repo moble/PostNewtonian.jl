@@ -167,11 +167,11 @@ function PNWaveform(
     (
         t=solution.t,
         data=h',
-        frame=solution[Rindices, :]', # R
+        frame=solution[[:Rʷ, :Rˣ, :Rʸ, :Rᶻ], :]',
         M1=solution[:M₁],
         M2=solution[:M₂],
-        chi1=solution[χ⃗₁indices, :]', # χ⃗₁
-        chi2=solution[χ⃗₂indices, :]', # χ⃗₂
+        chi1=solution[[:χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ], :]',
+        chi2=solution[[:χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ], :]',
         v=solution[:v],
         Phi=solution[:Φ],
     )
