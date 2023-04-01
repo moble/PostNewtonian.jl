@@ -129,7 +129,8 @@ function PNWaveform(
     Omega_orb_0=Omega_orb_i, R_frame_i=[1.0], MinStepsPerOrbit=32,
     PNWaveformModeOrder=4.0, PNOrbitalEvolutionOrder=4.0,
     inertial=false, dt=0.0, quiet=true,
-    ell_min=2, ell_max=8, lambda1=0, lambda2=0
+    ell_min=2, ell_max=8, lambda1=0, lambda2=0,
+    kwargs...
 )
     M₁ = (1 + delta) / 2
     M₂ = (1 - delta) / 2
@@ -144,7 +145,8 @@ function PNWaveform(
         M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; λ₁=lambda1, λ₂=lambda2,
         Ω₁=Ω₁, Rᵢ=Rᵢ,
         approximant=Approximant, PNOrder=PNOrbitalEvolutionOrder,
-        quiet=quiet, saveat=dt > 0 ? dt : []
+        quiet=quiet, saveat=dt > 0 ? dt : [],
+        kwargs...
     )
     if dt ≤ 0
         solution = let
