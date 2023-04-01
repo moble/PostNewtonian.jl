@@ -69,7 +69,8 @@ are the same, regardless.
   * `Rᵢ=Rotor(1)` or `R_i`: Initial orientation of binary.
   * `approximant="TaylorT1"`: Method of evaluating the right-hand side of the evolution
     equations.
-  * `PNOrder=4//1`: Order to which to retain powers of ``v^2`` in PN expansions.
+  * `PNOrder=typemax(Int)`: Order to which to retain powers of ``v^2`` in PN expansions.
+    The default is to include all available terms in each PN expression.
   * `check_up_down_instability=true`: Warn if the "up-down instability" (see below) is
     likely to affect this system.
   * `time_stepper=AutoVern9(Rodas5())`: Choice of solver in OrdinaryDiffEq to integrate ODE.
