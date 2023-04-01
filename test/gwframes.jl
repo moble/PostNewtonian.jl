@@ -32,11 +32,22 @@
     GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i, Omega_orb_0, [components(Rᵢ)...], 37)
 
     # Test to ensure we don't get info with default value of `quiet`, and we *do* when `quiet=false`
-    @test_logs min_level=Logging.Info GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i, Omega_orb_0)
-    @test_logs min_level=Logging.Info GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0)
-    @test_logs min_level=Logging.Info GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0, quiet=true)
+    PNOrder = 1.5
+    @test_logs min_level=Logging.Info GWFrames.PNWaveform(
+        Approximant, delta, chi1_i, chi2_i, Omega_orb_i, Omega_orb_0,
+        PNOrbitalEvolutionOrder=PNOrder
+    )
+    @test_logs min_level=Logging.Info GWFrames.PNWaveform(
+        Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0,
+        PNOrbitalEvolutionOrder=PNOrder
+    )
+    @test_logs min_level=Logging.Info GWFrames.PNWaveform(
+        Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0,
+        PNOrbitalEvolutionOrder=PNOrder, quiet=true
+    )
     @test_logs (:info,r"Terminating forwards") (:info,r"Terminating backwards") GWFrames.PNWaveform(
-        Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0, quiet=false
+        Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0,
+        PNOrbitalEvolutionOrder=PNOrder, quiet=false, Omega_e=0.729
     )
 
     # Make sure that `MinStepsPerOrbit` gives us what we want
