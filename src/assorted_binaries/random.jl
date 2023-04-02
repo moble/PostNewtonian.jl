@@ -48,11 +48,11 @@ Given these, it seems like the current state of the art would be well covered by
 random `q` ∈ [0.05, 1], `χᵢ` ∈ [0, 0.998], and `λᵢ` ∈ [0, 5000], with isotropic choices for
 orientations.
 """
-Base.rand(pnclass::Type{P}; v::T=0.01, PNOrder=typemax(Int)) where {P<:PNSystem, T} =
+Base.rand(pnclass::Type{P}; v::T=0.2, PNOrder=typemax(Int)) where {P<:PNSystem, T} =
     rand(GLOBAL_RNG, pnclass; v, PNOrder)
 
 function Base.rand(
-    rng::AbstractRNG, pnclass::Type{P}; v::T=0.01, PNOrder=typemax(Int)
+    rng::AbstractRNG, pnclass::Type{P}; v::T=0.2, PNOrder=typemax(Int)
 ) where {P<:PNSystem, T}
     qₘᵢₙ = T(big"0.05")  # Note that we're using q≤1 here for consistency with LIGO
     χₘₐₓ = T(big"0.998")
