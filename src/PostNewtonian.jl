@@ -74,9 +74,10 @@ include("compatibility_layers.jl")
 export GWFrames
 
 
-include("examples.jl")
+include("assorted_binaries/examples.jl")
 export superkick, hangup_kick
-# Also note that Base.rand is extended
+include("assorted_binaries/random.jl")
+# Base.rand is the only function in that file
 
 
 end  # module PostNewtonian
