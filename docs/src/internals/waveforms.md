@@ -2,6 +2,6 @@
 
 ```@autodocs
 Modules = [PostNewtonian]
-Pages   = ["waveforms.jl", "pn_expressions/mode_weights.jl"]
+Pages   = ["waveforms.jl"]
 Order   = [:module, :type, :constant, :function, :macro]
 ```
