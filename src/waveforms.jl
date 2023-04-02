@@ -1,5 +1,5 @@
 """
-    coorbital_waveform(inspiral, [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [inertial=false], [PNOrder])
+    coorbital_waveform(inspiral; [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [inertial=false], [PNOrder])
 
 Evaluate the post-Newtonian waveform mode weights for the given `inspiral` output by
 [`orbital_evolution`](@ref).
@@ -28,7 +28,7 @@ instead transformed to the inertial frame, resulting in the oscillatory behavior
 expect from a waveform.
 
 The `PNOrder` defaults to the one used to compute `inspiral`, but may be given differently
-here.
+as a keyword argument.
 """
 function coorbital_waveform(
     inspiral::SciMLBase.ODESolution; ℓₘᵢₙ=2, ℓₘₐₓ=8,

@@ -28,6 +28,7 @@ makedocs(;
             "Python" => "interface/python.md",
             "Symbolics" => "interface/symbolics.md",
             "Differentiation" => "interface/differentiation.md",
+            "Assorted binaries" => "interface/assorted_binaries.md",
         ],
         "Internals" => [
             "Code structure" => "internals/code_structure.md",

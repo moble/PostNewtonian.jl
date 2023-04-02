@@ -39,13 +39,13 @@ Pkg.add("PostNewtonian")
 ## Quick start
 
 !!! tip
-    You don't have to [use cool Unicode
+    You don't have to use [cool Unicode
     names](https://docs.julialang.org/en/v1/manual/unicode-input/) for
     your variables if you don't want to.  For example, `chi1` works just
     as well as `χ⃗₁`.  Similarly, many functions in this package have
-    Unicode names or take optional Unicode keyword arguments; the
-    documentation for those functions will point out possible ASCII
-    substitutions.
+    Unicode names or take optional Unicode keyword arguments.  But every
+    such name or argument will also have an ASCII equivalent; see the
+    documentation of those functions for the appropriate substitutions.
 
 We can integrate the orbital dynamics of a black-hole binary using the
 [`orbital_evolution`](@ref) function.  Here, we arbitrarily choose something
