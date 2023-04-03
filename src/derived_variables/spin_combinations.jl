@@ -79,33 +79,54 @@ end
     χₚ(s)
     chi_p(s)
 
-Effective *precession* spin parameter of the system.
+Effective precession spin parameter of the system.
 
-Note that there are two different definitions of this quantity found in the literature.  The
-[original definition](https://arxiv.org/abs/1408.1810) (converted to the convention where
-``M_1 \geq M_2``) is
+Note that there are *two different* definitions of this quantity found in the literature.
+The [original definition](https://arxiv.org/abs/1408.1810) (converted to the convention
+where ``M_1 \geq M_2``) is
 ```math
 \begin{gathered}
 A_1 = 2 + \frac{3M_2}{2M_1} \\
 A_2 = 2 + \frac{3M_1}{2M_2} \\
-\chi_{\mathrm{p}} := \frac{1}{A_1 M_1^2}
+\chi_{\mathrm{p}} \colonequals \frac{1}{A_1 M_1^2}
 \mathrm{max}\left(A_1 S_{1\perp}, A_2 S_{2\perp} \right).
 \end{gathered}
 ```
-A [more recent paper](https://arxiv.org/abs/2010.04131) redefines this essentially as
-``M_1^2`` times that quantity.  This function uses the original definition.
+In a paper from early in the detection era, the [LIGO collaboration used this
+definition](https://arxiv.org/abs/1606.01210).
+
+However, a [more recent paper](https://arxiv.org/abs/2010.04131) redefines this essentially
+as ``M_1^2`` times that quantity.  Using the convention that ``q = M_2/M_1 \leq 1``, the
+definition may be more compactly written as
+```math
+\chi_{\mathrm{p}} \colonequals \mathrm{max} \left(
+    \chi_{1\perp}, \chi_{2\perp} q \frac{4q+3}{4+3q}
+\right).
+```
+Again, a more recent paper by [LIGO/Virgo/KAGRA](https://arxiv.org/abs/2111.03606) uses this
+convention.
+
+Because it seems to be the trend, this function uses the latter definition.
 """
 function χₚ(s::VecOrPNSystem)
-    let M₁=M₁(s), M₂=M₂(s)
-        if M₁ < M₂
-            M₁, M₂ = M₂, M₁
+    χ₁⟂ = √(χ₁ₙ(s)^2 + χ₁λ(s)^2)
+    χ₂⟂ = √(χ₂ₙ(s)^2 + χ₂λ(s)^2)
+    let q = 1/q(s)  # This is to convert to LVK's convention
+        if q > 1
+            q, χ₁⟂, χ₂⟂ = 1/q, χ₂⟂, χ₁⟂
         end
-        B₁ = 2 + 3M₂ / 2M₁
-        B₂ = 2 + 3M₁ / 2M₂
-        S₁⟂ = √(S₁ₙ(s)^2 + S₁λ(s)^2)
-        S₂⟂ = √(S₂ₙ(s)^2 + S₂λ(s)^2)
-        max(B₁*S₁⟂, B₂*S₂⟂) / (B₁*M₁^2)
+        max(χ₁⟂, χ₂⟂ * q * (4q+3) / (4+3q))
     end
+    # let M₁=M₁(s), M₂=M₂(s)
+    #     if M₁ < M₂
+    #         M₁, M₂ = M₂, M₁
+    #     end
+    #     B₁ = 2 + 3M₂ / 2M₁
+    #     B₂ = 2 + 3M₁ / 2M₂
+    #     S₁⟂ = √(S₁ₙ(s)^2 + S₁λ(s)^2)
+    #     S₂⟂ = √(S₂ₙ(s)^2 + S₂λ(s)^2)
+    #     max(B₁*S₁⟂, B₂*S₂⟂) / (B₁*M₁^2)
+    # end
 end
 
 
@@ -132,3 +153,10 @@ S₁ₗ(s::VecOrPNSystem) = S⃗₁(s) ⋅ ℓ̂(s)
 S₂ₙ(s::VecOrPNSystem) = S⃗₂(s) ⋅ n̂(s)
 S₂λ(s::VecOrPNSystem) = S⃗₂(s) ⋅ λ̂(s)
 S₂ₗ(s::VecOrPNSystem) = S⃗₂(s) ⋅ ℓ̂(s)
+
+χ₁ₙ(s::VecOrPNSystem) = χ⃗₁(s) ⋅ n̂(s)
+χ₁λ(s::VecOrPNSystem) = χ⃗₁(s) ⋅ λ̂(s)
+χ₁ₗ(s::VecOrPNSystem) = χ⃗₁(s) ⋅ ℓ̂(s)
+χ₂ₙ(s::VecOrPNSystem) = χ⃗₂(s) ⋅ n̂(s)
+χ₂λ(s::VecOrPNSystem) = χ⃗₂(s) ⋅ λ̂(s)
+χ₂ₗ(s::VecOrPNSystem) = χ⃗₂(s) ⋅ ℓ̂(s)
