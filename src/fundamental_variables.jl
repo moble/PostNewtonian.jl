@@ -72,7 +72,7 @@ R(state::AbstractVector) = @inbounds Rotor(view(state, Rindices)...)
 Post-Newtonian velocity parameter.  This is related to the orbital angular frequency
 ``\Omega`` as
 ```math
-v \coloneq (M\,\Omega)^{1/3},
+v \colonequals (M\,\Omega)^{1/3},
 ```
 where ``M`` is the total mass of the binary.
 

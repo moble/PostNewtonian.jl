@@ -62,7 +62,7 @@ The parameter `v` is the PN velocity parameter, and must be passed as a keyword 
 as in `Ω(v=0.1)`.  The parameter `M` is the total mass of the binary.  They are related *by
 definition* as
 ```math
-\Omega \coloneq \frac{v^3}{M}.
+\Omega \colonequals \frac{v^3}{M}.
 ```
 See also [`v`](@ref).
 """
