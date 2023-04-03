@@ -47,6 +47,9 @@ export total_mass,  # M,  # Avoid clashes: don't export nicer names for importan
     ell_hat, ℓ̂,
     Omega, Ω,
     S⃗₁, S⃗₂, S⃗, Σ⃗, χ⃗, χ⃗ₛ, χ⃗ₐ,
+    chi_perp, χₚₑᵣₚ,
+    chi_eff, χₑ,
+    chi_p, χₚ,
     Sₙ, Σₙ, Sλ, Σλ, Sₗ, Σₗ
 
 
@@ -67,7 +70,9 @@ export estimated_time_to_merger, up_down_instability, orbital_evolution
 
 
 include("waveforms.jl")
-export coorbital_waveform, inertial_waveform
+export coorbital_waveform, inertial_waveform,
+    coorbital_waveform_computation_storage, inertial_waveform_computation_storage,
+    coorbital_waveform!, inertial_waveform!
 
 
 include("compatibility_layers.jl")
