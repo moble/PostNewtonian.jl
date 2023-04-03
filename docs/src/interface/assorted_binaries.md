@@ -1,3 +1,5 @@
+# Assorted binaries
+
 For convenience, an assortment of constructors is provided for relevant classes
 of physical scenarios, as well as the ability to construct [random](@ref rand)
 systems across a broad range of reasonable physical parameters.
@@ -13,7 +15,6 @@ This implicitly provides the `M₁`, `M₂`, `χ⃗₁`, `χ⃗₂`, `Ωᵢ`, `R
 arguments (along with `λ₁` and/or `λ₂` for `BHNS` or `NSNS` systems) to
 [`orbital_evolution`](@ref); other keyword arguments to that function can be
 provided after `superkick()`.
-
 
 
 ```@autodocs

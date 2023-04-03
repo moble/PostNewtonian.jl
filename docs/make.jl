@@ -23,12 +23,13 @@ makedocs(;
     pages=[
         "Introduction" => "index.md",
         "Interface" => [
-            "High-level functions" => "interface/interface.md",
+            "interface/standard_interface.md",
+            #"High-level functions" => "interface/interface.md",
             "GWFrames" => "interface/gwframes.md",
             "Python" => "interface/python.md",
-            "Symbolics" => "interface/symbolics.md",
-            "Differentiation" => "interface/differentiation.md",
-            "Assorted binaries" => "interface/assorted_binaries.md",
+            "interface/symbolics.md",
+            "interface/differentiation.md",
+            "interface/assorted_binaries.md",
         ],
         "Internals" => [
             "Code structure" => "internals/code_structure.md",

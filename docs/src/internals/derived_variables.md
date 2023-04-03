@@ -30,6 +30,8 @@ S⃗
 χ⃗
 χ⃗ₛ
 χ⃗ₐ
+χₑ
+χₚ
 ```
 
 Additionally, there are numerous convenience functions to give certain
