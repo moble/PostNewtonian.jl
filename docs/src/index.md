@@ -7,8 +7,8 @@ CurrentModule = PostNewtonian
 This package computes orbital dynamics of and waveforms from binary black-hole
 systems, in the [post-Newtonian
 approximation](https://en.wikipedia.org/wiki/Post-Newtonian_expansion).
-Currently, there is no support for eccentric systems, but general precessing
-quasicircular systems are supported.
+Currently, general precessing quasispherical systems are supported, but support
+for eccentric systems is still upcoming.
 
 ## Installation
 
