@@ -162,10 +162,15 @@ function PNWaveform(
     end
 
     # Waveform
-    h = coorbital_waveform(
-        solution; ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max,
-        inertial, PNOrder=PNWaveformModeOrder
-    )
+    h = if inertial
+        inertial_waveform(
+            solution; ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max, PNOrder=PNWaveformModeOrder
+        )
+    else
+        coorbital_waveform(
+            solution; ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max, PNOrder=PNWaveformModeOrder
+        )
+    end
 
     # Return
     (
