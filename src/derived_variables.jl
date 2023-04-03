@@ -20,7 +20,8 @@ export n_hat, n̂,
     lnv
 
 include("derived_variables/spin_combinations.jl")
-export S⃗₁, S⃗₂, S⃗, Σ⃗, χ⃗, χ⃗ₛ, χ⃗ₐ, χₚₑᵣₚ,
+export S⃗₁, S⃗₂, S⃗, Σ⃗, χ⃗, χ⃗ₛ, χ⃗ₐ,
+    chi_perp, χₚₑᵣₚ, χₑ, chi_eff, χₚ, chi_p,
     χ₁², χ₂², χ₁, χ₂, χ₁₂,
     χ₁ₗ, χ₂ₗ, χₛₗ, χₐₗ,
     Sₙ, Σₙ, Sλ, Σλ, Sₗ, Σₗ,

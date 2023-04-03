@@ -56,6 +56,7 @@ Antisymmetric spin vector ``(χ⃗₁-χ⃗₂)/2``.
 χ⃗ₐ(s::VecOrPNSystem) = χ⃗ₐ(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
 
 χₚₑᵣₚ(s::VecOrPNSystem) = √(χ₁²(s) - (χ₁ₗ(s))^2 + χ₂²(s) - (χ₂ₗ(s))^2)
+const chi_perp = χₚₑᵣₚ
 
 @doc raw"""
     χₑ(s)
@@ -74,6 +75,7 @@ Defined as
 function χₑ(s::VecOrPNSystem)
     (S₁ₗ(s) / M₁(s) + S₂ₗ(s) / M₂(s)) / M(s)
 end
+const chi_eff = χₑ
 
 @doc raw"""
     χₚ(s)
@@ -109,13 +111,13 @@ convention.
 Because it seems to be the trend, this function uses the latter definition.
 """
 function χₚ(s::VecOrPNSystem)
-    χ₁⟂ = √(χ₁ₙ(s)^2 + χ₁λ(s)^2)
-    χ₂⟂ = √(χ₂ₙ(s)^2 + χ₂λ(s)^2)
+    χ₁ₚₑᵣₚ = √(χ₁ₙ(s)^2 + χ₁λ(s)^2)
+    χ₂ₚₑᵣₚ = √(χ₂ₙ(s)^2 + χ₂λ(s)^2)
     let q = 1/q(s)  # This is to convert to LVK's convention
         if q > 1
-            q, χ₁⟂, χ₂⟂ = 1/q, χ₂⟂, χ₁⟂
+            q, χ₁ₚₑᵣₚ, χ₂ₚₑᵣₚ = 1/q, χ₂ₚₑᵣₚ, χ₁ₚₑᵣₚ
         end
-        max(χ₁⟂, χ₂⟂ * q * (4q+3) / (4+3q))
+        max(χ₁ₚₑᵣₚ, χ₂ₚₑᵣₚ * q * (4q+3) / (4+3q))
     end
     # let M₁=M₁(s), M₂=M₂(s)
     #     if M₁ < M₂
@@ -123,11 +125,12 @@ function χₚ(s::VecOrPNSystem)
     #     end
     #     B₁ = 2 + 3M₂ / 2M₁
     #     B₂ = 2 + 3M₁ / 2M₂
-    #     S₁⟂ = √(S₁ₙ(s)^2 + S₁λ(s)^2)
-    #     S₂⟂ = √(S₂ₙ(s)^2 + S₂λ(s)^2)
-    #     max(B₁*S₁⟂, B₂*S₂⟂) / (B₁*M₁^2)
+    #     S₁ₚₑᵣₚ = √(S₁ₙ(s)^2 + S₁λ(s)^2)
+    #     S₂ₚₑᵣₚ = √(S₂ₙ(s)^2 + S₂λ(s)^2)
+    #     max(B₁*S₁ₚₑᵣₚ, B₂*S₂ₚₑᵣₚ) / (B₁*M₁^2)
     # end
 end
+const chi_p = χₚ
 
 
 χ₁²(s::VecOrPNSystem) = abs2vec(χ⃗₁(s))
@@ -135,10 +138,14 @@ end
 χ₁(s::VecOrPNSystem) = absvec(χ⃗₁(s))
 χ₂(s::VecOrPNSystem) = absvec(χ⃗₂(s))
 χ₁₂(s::VecOrPNSystem) = χ⃗₁(s) ⋅ χ⃗₂(s)
-χ₁ₗ(s::VecOrPNSystem) = χ⃗₁(s) ⋅ ℓ̂(s)
-χ₂ₗ(s::VecOrPNSystem) = χ⃗₂(s) ⋅ ℓ̂(s)
 χₛₗ(s::VecOrPNSystem) = χ⃗ₛ(s) ⋅ ℓ̂(s)
 χₐₗ(s::VecOrPNSystem) = χ⃗ₐ(s) ⋅ ℓ̂(s)
+χ₁ₙ(s::VecOrPNSystem) = χ⃗₁(s) ⋅ n̂(s)
+χ₁λ(s::VecOrPNSystem) = χ⃗₁(s) ⋅ λ̂(s)
+χ₁ₗ(s::VecOrPNSystem) = χ⃗₁(s) ⋅ ℓ̂(s)
+χ₂ₙ(s::VecOrPNSystem) = χ⃗₂(s) ⋅ n̂(s)
+χ₂λ(s::VecOrPNSystem) = χ⃗₂(s) ⋅ λ̂(s)
+χ₂ₗ(s::VecOrPNSystem) = χ⃗₂(s) ⋅ ℓ̂(s)
 
 Sₙ(s::VecOrPNSystem) = S⃗(s) ⋅ n̂(s)
 Σₙ(s::VecOrPNSystem) = Σ⃗(s) ⋅ n̂(s)
@@ -153,10 +160,3 @@ S₁ₗ(s::VecOrPNSystem) = S⃗₁(s) ⋅ ℓ̂(s)
 S₂ₙ(s::VecOrPNSystem) = S⃗₂(s) ⋅ n̂(s)
 S₂λ(s::VecOrPNSystem) = S⃗₂(s) ⋅ λ̂(s)
 S₂ₗ(s::VecOrPNSystem) = S⃗₂(s) ⋅ ℓ̂(s)
-
-χ₁ₙ(s::VecOrPNSystem) = χ⃗₁(s) ⋅ n̂(s)
-χ₁λ(s::VecOrPNSystem) = χ⃗₁(s) ⋅ λ̂(s)
-χ₁ₗ(s::VecOrPNSystem) = χ⃗₁(s) ⋅ ℓ̂(s)
-χ₂ₙ(s::VecOrPNSystem) = χ⃗₂(s) ⋅ n̂(s)
-χ₂λ(s::VecOrPNSystem) = χ⃗₂(s) ⋅ λ̂(s)
-χ₂ₗ(s::VecOrPNSystem) = χ⃗₂(s) ⋅ ℓ̂(s)
