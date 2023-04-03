@@ -25,11 +25,11 @@ makedocs(;
         "Interface" => [
             "interface/standard_interface.md",
             #"High-level functions" => "interface/interface.md",
-            "GWFrames" => "interface/gwframes.md",
-            "Python" => "interface/python.md",
             "interface/symbolics.md",
             "interface/differentiation.md",
             "interface/assorted_binaries.md",
+            "Python" => "interface/python.md",
+            "GWFrames" => "interface/gwframes.md",
         ],
         "Internals" => [
             "Code structure" => "internals/code_structure.md",
