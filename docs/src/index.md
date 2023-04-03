@@ -36,7 +36,13 @@ using Pkg
 Pkg.add("PostNewtonian")
 ```
 
+
 ## Quick start
+
+An example with slightly more explanation is given under ["Standard
+interface"](@ref Standard-interface), and of course the rest of this
+documentation goes into far more detail.  Here we see a simple example to start
+things off.
 
 !!! tip
     You don't have to use [cool Unicode
@@ -47,75 +53,45 @@ Pkg.add("PostNewtonian")
     such name or argument will also have an ASCII equivalent; see the
     documentation of those functions for the appropriate substitutions.
 
-We can integrate the orbital dynamics of a black-hole binary using the
-[`orbital_evolution`](@ref) function.  Here, we arbitrarily choose something
-close to a [hangup-kick](https://arxiv.org/abs/1908.04382) configuration.
 ```@example 1
 using PostNewtonian
 
 # Initial values of the masses, spins, and orbital angular frequency
-M₁ = 0.6
-M₂ = 0.4
-χ⃗₁ = [0.7, 0.1, 0.7]
-χ⃗₂ = [-0.7, 0.1, 0.7]
+M₁ = 0.4
+M₂ = 0.6
+χ⃗₁ = [0.0, 0.5, 0.8]
+χ⃗₂ = [0.8, 0.0, 0.5]
 Ωᵢ = 0.01
 
+# Integrate the orbital dynamics
 inspiral = orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ)
-nothing;  # hide
-```
-There are numerous optional keyword arguments to `orbital_evolution`,
-controlling things like the range of frequencies over which to integrate
-(including possibly both backwards *and* forwards from `Ωᵢ`), accuracy of the
-ODE integration, time steps at which to save the results, the PN order at which
-to compute the evolution equations, and so on.  See that function's
-[documentation](@ref orbital_evolution) for details.
 
-The returned `inspiral` object is an
-[`ODESolution`](https://docs.sciml.ai/DiffEqDocs/stable/basics/solution/) object
-with many features, like high-order interpolation (using dense output from the
-ODE integrator).  The time steps at which the solution was saved are available
-as `inspiral.t`, and the evolved variables are available as `inspiral.u`, or by
-their names as in `inspiral[:v]` or `inspiral[:Φ]`.  For example, we can plot
-the components of the spin of object 1 like this:
+# Interpolate for nicer plotting
+t′ = inspiral.t[end]-6_000 : 0.5 : inspiral.t[end]
+inspiral = inspiral(t′)
+
+# Compute the waveform in the inertial frame
+h = inertial_waveform(inspiral)
+nothing  # hide
+```
+We can plot the result like this:
 ```@example 1
 using Plots  # Requires also installing `Plots` in your project
 plotlyjs()  # hide
-default(size=(800,480), linewidth=2, leg=:top)  # hide
+default(size=(800,480), linewidth=2, leg=:top, legendfontsize=12)  # hide
 
-plot(
-    inspiral, idxs=[(0,:χ⃗₁ˣ), (0,:χ⃗₁ʸ), (0,:χ⃗₁ᶻ)],
-    xlabel="Time (𝑀)", ylabel="Dimensionless spin components"
-)
-savefig("inspiral_spins.html"); nothing  # hide
+plot(inspiral.t, real.(h[1, :]), label="Re{h₂₂}")
+plot!(inspiral.t, imag.(h[1, :]), label="Im{h₂₂}")
+plot!(inspiral.t, abs.(h[1, :]), label="|h₂₂|", linewidth=3)
+plot!(inspiral.t, abs.(h[5, :]), label="|h₂₋₂|")
+plot!(xlabel="Time (𝑀)", ylabel="Mode weights", ylim=(-0.45,0.45))
+
+savefig("waveform0.html"); nothing  # hide
 ```
 ```@raw html
-<iframe src="inspiral_spins.html" style="height:500px;width:100%;"></iframe>
+<iframe src="waveform0.html" style="height:500px;width:100%;"></iframe>
 ```
-As expected, we see *significant* precession of the spin.
-
-Usually, we will also want the actual waveform from this system.  We can just
-call [`inertial_waveform`](@ref) (or [`coorbital_waveform`](@ref) for the
-waveform in a rotating frame in which the binary is not rotating).  For nicer
-plotting, we'll first interpolate the inspiral to a finer set of time steps
-given by `t′`, going from ``5,000M`` before the end of the inspiral, to the end
-of the inspiral, and evaluated every ``0.5M``:
-```@example 1
-t′ = inspiral.t[end]-5_000 : 0.5 : inspiral.t[end]
-h = inertial_waveform(inspiral(t′))
-nothing;  # hide
-```
-Again, we can plot the result:
-```@example 1
-plot(t′, real.(h[1, :]), label="Re{h₂,₂}")
-plot!(t′, imag.(h[1, :]), label="Im{h₂,₂}")
-plot!(t′, abs.(h[1, :]), label="|h₂,₂|", linewidth=3)
-plot!(xlabel="Time (𝑀)", ylabel="Mode weights", ylim=(-1,1))
-savefig("waveform.html"); nothing  # hide
-```
-```@raw html
-<iframe src="waveform.html" style="height:500px;width:100%;"></iframe>
-```
-We see large oscillations in the amplitude of the ``h_{2,2}`` mode on the
-orbital timescale, which is to be expected in a hangup-kick scenario as the
-system alternates between beaming power preferentially along the ``+z`` and
-``-z`` directions.
+We see various features to be expected of a precessing system like this,
+including slow modulations of the modes on the precession timescale, as well as
+faster oscillations in the amplitudes and asymmetry between the ``m=\pm 2``
+modes on the orbital timescale.

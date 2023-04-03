@@ -1,4 +1,4 @@
-## Computing the waveform from inspiral data
+# Computing the waveform
 
 Once you have used [`orbital_evolution`](@ref) to compute the inspiral, and
 selected the time steps on which you want the waveform, you can compute the
@@ -18,7 +18,7 @@ coorbital_waveform
 inertial_waveform
 ```
 
-## In-place evaluation of waveforms
+# In-place evaluation of waveforms
 
 This is likely to be an uncommon scenario, but if you happen to need to evaluate
 the waveform repeatedly on the same set (or at least same number) of time steps

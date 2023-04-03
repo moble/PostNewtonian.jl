@@ -1,7 +1,5 @@
 # Structure of this package's code
 
-## Code hierarchy
-
 There is a fairly simple hierarchy to the code.  Beyond some basic utilities,
 which are related to how we write the code, rather than post-Newtonian
 calculations *per se*, we have the following:
