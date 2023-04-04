@@ -361,7 +361,10 @@ function orbital_evolution(
         reltol = eps(T)^(11//16)
     end
     if isnothing(abstol)
-        abstol = eps(T)^(11//16)
+        abstol = [
+            [eps(T(M₁+M₂))^(11//16) for _ ∈ 1:2];
+            [eps(T)^(11//16) for _ ∈ 3:length(pnsystem_symbols)]
+        ]
     end
 
     if isnothing(termination_criteria_forwards)

@@ -7,6 +7,11 @@
 
 Compute mode weights of gravitational waves emitted by `pn` system, modifying `h` in place.
 
+!!! note
+    This is a low-level function; you probably don't want to use this directly.  See
+    [`coorbital_waveform`](@ref) or [`inertial_waveform`](@ref) for more user-friendly
+    functions.
+
 These modes are computed in the "co-orbital" frame, in which the larger object lies on the
 positive ``x`` axis, the smaller lies on the negative ``x`` axis, and the instantaneous
 angular velocity is in the positive ``z`` direction.

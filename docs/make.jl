@@ -24,6 +24,7 @@ makedocs(;
         "Introduction" => "index.md",
         "Interface" => [
             "interface/standard_interface.md",
+            "Units" => "interface/units.md",
             #"High-level functions" => "interface/interface.md",
             "interface/symbolics.md",
             "interface/differentiation.md",

@@ -78,7 +78,7 @@ We can plot the result like this:
 ```@example 1
 using Plots  # Requires also installing `Plots` in your project
 plotlyjs()  # hide
-default(size=(800,480), linewidth=2, leg=:top, legendfontsize=12)  # hide
+default(size=(800,480), linewidth=2, leg=:top, legendfontsize=11)  # hide
 
 plot(inspiral.t, real.(h[1, :]), label="Re{h₂₂}")
 plot!(inspiral.t, imag.(h[1, :]), label="Im{h₂₂}")
@@ -86,10 +86,10 @@ plot!(inspiral.t, abs.(h[1, :]), label="|h₂₂|", linewidth=3)
 plot!(inspiral.t, abs.(h[5, :]), label="|h₂₋₂|")
 plot!(xlabel="Time (𝑀)", ylabel="Mode weights", ylim=(-0.45,0.45))
 
-savefig("waveform0.html"); nothing  # hide
+savefig("waveform.html"); nothing  # hide
 ```
 ```@raw html
-<iframe src="waveform0.html" style="height:500px;width:100%;"></iframe>
+<iframe src="waveform.html" style="height:500px;width:100%;"></iframe>
 ```
 We see various features to be expected of a precessing system like this,
 including slow modulations of the modes on the precession timescale, as well as
