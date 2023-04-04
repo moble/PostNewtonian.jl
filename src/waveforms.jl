@@ -6,6 +6,7 @@ _pnsystem(inspiral::SciMLBase.DiffEqArray) = inspiral.p
 
 """
     coorbital_waveform_computation_storage(inspiral; [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
+    coorbital_waveform_computation_storage(inspiral; [ell_min=2], [ell_max=8], [PNOrder])
 
 Construct storage needed to compute waveforms in the co-orbital frame without allocations.
 
@@ -16,7 +17,9 @@ storage.  The returned quantity can just be passed as the first argument to
 The meaning of the arguments is the same as in [`coorbital_waveform`](@ref).
 """
 function coorbital_waveform_computation_storage(
-    inspiral; ℓₘᵢₙ=2, ℓₘₐₓ=8, PNOrder=pn_order(_pnsystem(inspiral))
+    inspiral;
+    ell_min=2, ell_max=8, ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max,
+    PNOrder=pn_order(_pnsystem(inspiral))
 )
     @assert 0 ≤ ℓₘᵢₙ ≤ 2
     @assert ℓₘᵢₙ ≤ ℓₘₐₓ
@@ -35,6 +38,7 @@ end
 
 """
     coorbital_waveform!(storage, inspiral; [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
+    coorbital_waveform!(storage, inspiral; [ell_min=2], [ell_max=8], [PNOrder])
 
 Evaluate the post-Newtonian waveform mode weights in the co-orbital frame for the given
 `inspiral` output by [`orbital_evolution`](@ref), using pre-allocated storage.
@@ -44,7 +48,9 @@ The storage is assumed to be the object returned from
 [`coorbital_waveform`](@ref).
 """
 function coorbital_waveform!(
-    storage, inspiral; ℓₘᵢₙ=2, ℓₘₐₓ=8, PNOrder=pn_order(storage[2])
+    storage, inspiral;
+    ell_min=2, ell_max=8, ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max,
+    PNOrder=pn_order(storage[2])
 )
     h, pnsystem = storage
     @assert length(pnsystem.state) == length(inspiral.u[1])
@@ -59,6 +65,7 @@ end
 
 """
     coorbital_waveform(inspiral; [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
+    coorbital_waveform(inspiral; [ell_min=2], [ell_max=8], [PNOrder])
 
 Evaluate the post-Newtonian waveform mode weights in the co-orbital frame for the given
 `inspiral` output by [`orbital_evolution`](@ref).
@@ -90,7 +97,9 @@ instead transformed to the inertial frame, resulting in the oscillatory behavior
 expect from a waveform.
 """
 function coorbital_waveform(
-    inspiral; ℓₘᵢₙ=2, ℓₘₐₓ=8, PNOrder=pn_order(_pnsystem(inspiral))
+    inspiral;
+    ell_min=2, ell_max=8, ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max,
+    PNOrder=pn_order(_pnsystem(inspiral))
 )
     storage = coorbital_waveform_computation_storage(
         inspiral; ℓₘᵢₙ, ℓₘₐₓ, PNOrder
@@ -103,6 +112,7 @@ end
 
 """
     inertial_waveform_computation_storage(inspiral; [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
+    inertial_waveform_computation_storage(inspiral; [ell_min=2], [ell_max=8], [PNOrder])
 
 Construct storage needed to compute waveforms in the inertial frame without allocations.
 
@@ -113,7 +123,9 @@ the first argument to [`inertial_waveform!`](@ref) without being unpacked.
 The meaning of the arguments is the same as in [`inertial_waveform`](@ref).
 """
 function inertial_waveform_computation_storage(
-    inspiral; ℓₘᵢₙ=2, ℓₘₐₓ=8, PNOrder=pn_order(_pnsystem(inspiral))
+    inspiral;
+    ell_min=2, ell_max=8, ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max,
+    PNOrder=pn_order(_pnsystem(inspiral))
 )
     h, pnsystem = coorbital_waveform_computation_storage(inspiral; ℓₘᵢₙ, ℓₘₐₓ, PNOrder)
     (D, H_rec_coeffs, eⁱᵐᵅ, eⁱᵐᵞ) = Dprep(ℓₘₐₓ, eltype(inspiral))
@@ -123,6 +135,7 @@ end
 
 """
     inertial_waveform!(storage, inspiral; [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
+    inertial_waveform!(storage, inspiral; [ell_min=2], [ell_max=8], [PNOrder])
 
 Evaluate the post-Newtonian waveform mode weights in the inertial frame for the given
 `inspiral` output by [`orbital_evolution`](@ref), using pre-allocated storage.
@@ -132,7 +145,9 @@ The storage is assumed to be the object returned from
 [`inertial_waveform`](@ref).
 """
 function inertial_waveform!(
-    storage, inspiral; ℓₘᵢₙ=2, ℓₘₐₓ=8, PNOrder=pn_order(storage[2])
+    storage, inspiral;
+    ell_min=2, ell_max=8, ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max,
+    PNOrder=pn_order(storage[2])
 )
     h, pnsystem, D, H_rec_coeffs, eⁱᵐᵅ, eⁱᵐᵞ, hᵢ = storage
     @assert length(pnsystem.state) == length(inspiral.u[1])
@@ -155,6 +170,7 @@ end
 
 """
     inertial_waveform(inspiral, [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
+    inertial_waveform(inspiral, [ell_min=2], [ell_max=8], [PNOrder])
 
 Evaluate the post-Newtonian waveform mode weights in the inertial frame for the given
 `inspiral` output by [`orbital_evolution`](@ref).
@@ -166,7 +182,9 @@ from the co-orbital frame — which is the one in which PN expressions are provi
 See [`coorbital_waveform`](@ref) for details about the other arguments.
 """
 function inertial_waveform(
-    inspiral; ℓₘᵢₙ=2, ℓₘₐₓ=8, PNOrder=pn_order(_pnsystem(inspiral))
+    inspiral;
+    ell_min=2, ell_max=8, ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max,
+    PNOrder=pn_order(_pnsystem(inspiral))
 )
     storage = inertial_waveform_computation_storage(
         inspiral; ℓₘᵢₙ, ℓₘₐₓ, PNOrder
