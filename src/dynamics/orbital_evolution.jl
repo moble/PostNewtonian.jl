@@ -73,7 +73,7 @@ are the same, regardless.
     The default is to include all available terms in each PN expression.
   * `check_up_down_instability=true`: Warn if the "up-down instability" (see below) is
     likely to affect this system.
-  * `time_stepper=AutoVern9(Rodas5())`: Choice of solver in OrdinaryDiffEq to integrate ODE.
+  * `time_stepper=AutoVern9(Rodas5P())`: Choice of solver in OrdinaryDiffEq to integrate ODE.
   * `abstol=eps(T)^(11//16)`: Absolute tolerance of ODE solver, where `T` is the common type
     to which all the positional arguments are promoted.  This is the tolerance on local
     error estimates, not necessarily the global error.  Note that `11//16` is just chosen to
@@ -234,7 +234,7 @@ compute the unstable region is [`up_down_instability`](@ref).
 `Tsit5()` is a good default choice for time stepper when using `Float64` with medium-low
 tolerance.  If stiffness seems to be impacting the results, `AutoTsit5(Rosenbrock23())` will
 automatically switch when stiffness occurs.  For tighter tolerances, especially when using
-`Double64`s, `Vern9()` or `AutoVern9(Rodas5())` are good choices.  For very loose
+`Double64`s, `Vern9()` or `AutoVern9(Rodas5P())` are good choices.  For very loose
 tolerances, as when using `Float32`s, it might be better to use `OwrenZen3()`.
 
 
@@ -279,7 +279,7 @@ function orbital_evolution(
     lambda1=0, lambda2=0, Omega_1=Ωᵢ, Omega_e=Ω(v=1,M=M₁+M₂), R_i=Rotor(true),
     λ₁=lambda1, λ₂=lambda2, Ω₁=Omega_1, Ωₑ=Omega_e, Rᵢ=R_i,
     approximant="TaylorT1", PNOrder=typemax(Int),
-    check_up_down_instability=true, time_stepper=AutoVern9(Rodas5()),
+    check_up_down_instability=true, time_stepper=AutoVern9(Rodas5P()),
     reltol=nothing, abstol=nothing,
     termination_criteria_forwards=nothing,
     termination_criteria_backwards=nothing,
