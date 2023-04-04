@@ -1,5 +1,5 @@
 """
-    estimated_time_to_merger(ν, v)
+    estimated_time_to_merger(M, ν, v)
     estimated_time_to_merger(pnsystem)
 
 Compute the lowest-order PN approximation for the time to merger, starting from PN velocity
@@ -10,12 +10,12 @@ should run for; we don't want it to integrate forever if PN has broken down.  Ho
 can be a very poor approximation, especially close to merger, and doubly so if the spins or
 eccentricity are significant.
 """
-function estimated_time_to_merger(ν, v)
-    5/(256ν * v^8)
+function estimated_time_to_merger(M, ν, v)
+    5M/(256ν * v^8)
 end
 
 function estimated_time_to_merger(pnsystem)
-    estimated_time_to_merger(ν(pnsystem), v(pnsystem))
+    estimated_time_to_merger(M(pnsystem), ν(pnsystem), v(pnsystem))
 end
 
 
