@@ -13,7 +13,7 @@ makedocs(;
         PostNewtonian.DerivedVariables
     ],
     authors="Michael Boyle <michael.oliver.boyle@gmail.com> and contributors",
-    repo = Remotes.GitHub("moble", "PostNewtonian.jl"),
+    #repo = Remotes.GitHub("moble", "PostNewtonian.jl"),
     sitename="PostNewtonian.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
