@@ -4,7 +4,10 @@
 
 ```@docs
 orbital_evolution
+uniform_in_phase
 estimated_time_to_merger
+fISCO
+ΩISCO
 ```
 
 ## Detecting the up-down instability

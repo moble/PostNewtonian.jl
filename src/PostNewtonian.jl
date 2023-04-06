@@ -13,6 +13,7 @@ using SymbolicUtils
 using SciMLBase
 using DiffEqBase
 using OrdinaryDiffEq
+using DataInterpolations: CubicSpline
 
 # See the "Code structure" section of the documentation for a description of the simple
 # hierarchy into which this code is organized.  The different levels of that hierarchy are
@@ -66,7 +67,8 @@ export gw_energy_flux, 𝓕,
 
 
 include("dynamics.jl")
-export estimated_time_to_merger, up_down_instability, orbital_evolution
+export up_down_instability, estimated_time_to_merger, fISCO, ΩISCO,
+    uniform_in_phase, orbital_evolution
 
 
 include("waveforms.jl")

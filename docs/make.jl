@@ -23,7 +23,7 @@ makedocs(;
     pages=[
         "Introduction" => "index.md",
         "Interface" => [
-            "interface/standard_interface.md",
+            "interface/high-level.md",
             "Units" => "interface/units.md",
             #"High-level functions" => "interface/interface.md",
             "interface/symbolics.md",
