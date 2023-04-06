@@ -66,10 +66,25 @@ inspiral.t ↦ inspiral.t * σ
 inspiral[:M₁] ↦ inspiral[:M₁] * σ
 inspiral[:M₂] ↦ inspiral[:M₂] * σ
 ```
-All other evolved variables are dimensionless, and so are unaffected by the scaling.
+All other evolved variables are dimensionless, and so are unaffected by the
+scaling.
+
+The waveform ``H`` returned by either [`coorbital_waveform`](@ref) or
+[`inertial_waveform`](@ref) is the rescaled asymptotic limit of the strain.  The
+observable strain is
+```math
+h \approx H\, \frac{M}{r}\, \frac{G}{c^2}
+\qquad \mathrm{or} \qquad
+h \approx H\, \frac{M_z}{d_\mathrm{L}}\, \frac{G}{c^2}.
+```
+Here, ``r`` is the radius of the observer in asymptotically Minkowski
+coordinates centered on the source and ``M`` is the total mass of the binary;
+alternatively, ``M_z=M(1+z)`` is the redshifted mass and ``d_\mathrm{L}`` is the
+luminosity distance between the source and observer.  For more complete
+description, see [here](@ref Computing-the-waveform).
 
 
-## Example 1: Scale invariance
+## Example 1: Scale dependence
 
 It's important to check that the claims above are actually true.  Here, we put
 them to the test with a very large scale factor.
@@ -106,24 +121,30 @@ inspiral1[:v] ≈ inspiral2(inspiral1.t*σ, idxs=:v)
 ```
 
 The fact that these curves are on top of each other, and the final expression
-returned `true` shows that this system is indeed scale invariant.
+returned `true` shows that this system does indeed depend on scale as suggested
+above.
 
 ## [Example 2: Astrophysical units](@id Units-example-2)
 
-Suppose we want to construct a system with masses ``38.9\,M_\odot`` and
-``32.7\,M_\odot``, as it would be observed from a distance of
-``440\,\mathrm{Mpc}`` with time measured in seconds and dimensionless strain,
-for an initial frequency in the ``(\ell,m)=(2,2)`` mode of ``20\,\mathrm{Hz}``.
-(Note that these parameters are consistent with the estimated parameters of the
-[GW150914](https://en.wikipedia.org/wiki/First_observation_of_gravitational_waves)
-detection.)
+Suppose we want to construct a system consistent with
+[GW150914](https://arxiv.org/abs/1606.01210), having masses ``35.6\,M_\odot``
+and ``30.0\,M_\odot``, as it would be observed from a distance of
+``440\,\mathrm{Mpc}`` with an initial frequency in the ``(\ell,m)=(2,2)`` mode
+of ``f_i \approx 20\,\mathrm{Hz}``.
 
 Because the masses and frequencies must be in inverse units, we arbitrarily
 choose to measure frequencies in their natural unit of Hertz, and therefore
 masses are measured in seconds — multiplying the masses by ``G/c^3`` for
-geometric units.  The distance to the source will also be converted to seconds
-by dividing by ``c``, so that we can simply multiply the waveform by `(M₁+M₂)/r`
-to get the observed strain.
+geometric units.  The distance to the source ``d_\mathrm{L}`` will also be
+converted to seconds by dividing by ``c``, so that we can simply multiply the
+waveform by ``M_z/d_\mathrm{L}`` to get the observed strain.
+
+The frequency ``f_i`` is the observed initial frequency of the ``(2,2)`` mode.
+We will need the corresponding angular orbital frequency in the frame.  The two
+are related by
+```math
+\Omega_i = \frac{2\pi f_i}{2(1+z)}.
+```
 
 ```@example units2
 using Quaternionic
@@ -134,35 +155,38 @@ plotlyjs()  # hide
 default(size=(800,480), linewidth=3, leg=:top, legendfontsize=11)  # hide
 
 # Useful astronomical constants
-c = float(299_792_458) # m/s
-GMₛᵤₙ = 1.32712440041e20 # m^3/s^2
-au = float(149_597_870_700) # m
-pc = 1au / (π / 648_000) # m
-Mpc = 1_000_000pc # m
-
-# Parameters of this system
-M₁ = 38.9GMₛᵤₙ / c^3 # s
-M₂ = 32.7GMₛᵤₙ / c^3 # s
-r = 440Mpc / c # s
-fᵢ = 20 # Hz
+c = float(299_792_458)   # meters/second
+GMₛᵤₙ = 1.32712440041e20  # meters³/second²
+au = float(149_597_870_700)  # meters
+pc = 1au / (π / 648_000)  # meters
+Mpc = 1_000_000pc  # meters
 
 # Approximate maximum a posteriori spins
 χ⃗₁ = [0.0, 0.0, 0.3224]
 χ⃗₂ = [0.2663, 0.2134, -0.5761]
 
-Ωᵢ = 2π * fᵢ / 2 # Hz — Note the factor of 2 because fᵢ represents the (2,2) mode
-dt = 1/2048 # s — This is the sampling rate
+# Parameters of this system
+M₁ = 35.6GMₛᵤₙ / c^3  # seconds
+M₂ = 30.0GMₛᵤₙ / c^3  # seconds
+dL = 440Mpc / c  # seconds
+z = 0.094
+Mz = (M₁+M₂) * (1+z)  # seconds
+fᵢ = 20  # Hertz
+Ωᵢ = 2π * fᵢ / 2(1+z)  # Hertz
+dt = 1/2048(1+z)  # seconds — Observer's sampling interval in the source frame
 
 inspiral = orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, saveat=dt)
-hₗₘ = inertial_waveform(inspiral) * (M₁+M₂) / r
+tobs = (1+z)*inspiral.t
+Hₗₘ = inertial_waveform(inspiral)
+hₗₘ = Hₗₘ * Mz / dL
 
 # Evaluate waveform at a point; see Scri.jl for simpler methods
 R = Quaternionic.from_spherical_coordinates(2.856, 0.0)
 ₋₂Yₗₘ = SphericalFunctions.ₛ𝐘(-2, 8, Float64, [R])[1, :]
 h = (₋₂Yₗₘ' * hₗₘ)[1,:]
 
-plot(inspiral.t, real.(h), label="ℎ₊")
-plot!(inspiral.t, -imag.(h), label="ℎₓ")
+plot(tobs, real.(h), label="ℎ₊")
+plot!(tobs, -imag.(h), label="ℎₓ")
 plot!(xlabel="Time (seconds)", ylabel="Strain (dimensionless)", ylim=(-1.5e-21,1.5e-21))
 savefig("units2.html"); nothing  # hide
 ```
