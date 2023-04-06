@@ -1,17 +1,54 @@
 # Computing the waveform
 
-Once you have used [`orbital_evolution`](@ref) to compute the inspiral, and
-selected the time steps on which you want the waveform, you can compute the
-waveform with one of the following functions.
+Once you have [computed the orbital evolution](@ref orbital_evolution), and
+[selected the time steps](@ref .-(Optional)-Choose-time-steps) on which you want
+to evaluate the waveform, you can do so with one of the functions documented
+below.
 
-!!! danger
-    Remember that, by default, [`orbital_evolution`](@ref) will return the
-    solution at whatever time steps the ODE integrator chose, which are almost
-    certainly too far apart to satisfy the Nyquist limit relevant for waveforms.
-    You can use the `saves_per_orbit` argument to that function with a value of
-    at least `2ℓₘₐₓ` (where `ℓₘₐₓ` is the argument to one of the functions
-    below) to barely satisfy the Nyquist limit.  I usually use `4ℓₘₐₓ` for a
-    little extra safety factor.
+The waveform returned by these functions is essentially the complex strain ``h
+\colonequals h_+ - i\,h_\times``.  However, this quantity decays as ``1/r``,
+where ``r`` is the radius at which the strain is measured.  Therefore, as is
+conventional, the returned quantity is actually
+```math
+H \colonequals \lim_{r\to\infty} h\, \frac{r}{M}\, \frac{c^2}{G},
+```
+where ``M`` is the total mass of the two objects in the binary.  Binaries are
+usually modeled in relativity as being isolated systems in otherwise empty
+asymptotically flat spacetimes — or even more specifically, in asymptotically
+Minkowski spacetimes.  In this case, ``r`` is just the asymptotic areal radius.
+The equivalent expression in an FLRW spacetime requires a simple
+reinterpretation of ``M`` as the redshifted mass ``M_z \colonequals M(1+z)`` and
+``r`` as the luminosity distance ``d_L.``[^1]  Thus, to obtain the strain as it
+would be measured (in the asymptotic approximation) by an actual observer in our
+universe, we just need to invert the previous equation:
+```math
+h \approx H\, \frac{M_z}{d_L}\, \frac{G}{c^2}.
+```
+
+[^1]: Note that we use "luminosity distance" as it is [understood in
+      contemporary cosmology](https://arxiv.org/abs/astro-ph/9905116), which is
+      unfortunately different from its meaning in older cosmology literature,
+      and even some of the gravitational-wave astronomy literature from before
+      2015 or so.
+
+Furthermore, ``H`` is a function of coordinates ``(t, \theta, \phi)``.  The
+dependence on ``t`` will be discretely sampled at the times ``t_i`` that are
+present in the `inspiral` arguments to the functions below.  To handle the
+angular dependence, we provide the waveform decomposed as mode weights in a
+spin-weighted spherical-harmonic decomposition, so that the actual quantity
+returned will be
+```math
+H_{\ell,m}(t_i)
+\colonequals
+\int H(t, \theta, \phi)\, {}_{-2}\bar{Y}_{\ell,m}(\theta, \phi)\,
+\sin\theta\, d\theta\, d\phi.
+```
+The output array is a two-dimensional complex array.  The first dimension varies
+over ``(\ell,m)`` values, with ``m`` varying most rapidly — as in
+```julia
+[(ℓ,m) for ℓ ∈ ℓₘᵢₙ:ℓₘₐₓ for m ∈ -ℓ:ℓ]
+```
+The second dimension of the array indexes the time.
 
 ```@docs
 coorbital_waveform
