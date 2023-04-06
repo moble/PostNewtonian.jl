@@ -28,9 +28,11 @@ There are three useful approaches to deal with this:
      following two are not applicable, especially if you need to know the PN
      evolution before you can decide on the time steps you want.  See the
      ["Output"](@ref Orbital_evolution_Output) section below for details.
-  2. If you want the results with some fixed uniform time step `dt`, you can
+  2. If you want to ensure that each orbit is sampled a certain number of times,
+     you can pass the `saves_per_orbit` option to `orbital_evolution`.
+  3. If you want the results with some fixed uniform time step `dt`, you can
      just pass the option `saveat=dt` to `orbital_evolution`.
-  3. If you happen to know specific times `t` at which you want the result, you
+  4. If you happen to know specific times `t` at which you want the result, you
      can pass the option `saveat=t` to `orbital_evolution`.  This may be
      relevant, for example, when comparing the PN waveform to an existing
      waveform.  Note that the inspiral *may* end earlier than your last `t`

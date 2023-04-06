@@ -10,6 +10,7 @@ import Dates
 println("Building docs starting at ", Dates.format(Dates.now(), "HH:MM:SS"), ".")
 
 using Pkg
+#using Revise # Doesn't enable updates of docstrings in the output.
 cd((@__DIR__) * "/..")
 Pkg.activate("docs")
 

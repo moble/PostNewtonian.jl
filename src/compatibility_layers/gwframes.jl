@@ -151,14 +151,7 @@ function PNWaveform(
         kwargs...
     )
     if dt ≤ 0
-        solution = let
-            Φ = solution[:Φ]
-            t = solution.t
-            δΦ = 2π / MinStepsPerOrbit
-            Φrange = range(extrema(Φ)..., step=δΦ)
-            t_Φ = CubicSpline(t, Φ)(Φrange)
-            solution(t_Φ)
-        end
+        solution = uniform_in_phase(solution, MinStepsPerOrbit)
     end
 
     # Waveform

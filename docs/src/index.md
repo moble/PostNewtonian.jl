@@ -39,8 +39,8 @@ Pkg.add("PostNewtonian")
 
 ## Quick start
 
-An example with slightly more explanation is given under ["Standard
-interface"](@ref Standard-interface), and of course the rest of this
+An example with slightly more explanation is given under ["High-level
+interface"](@ref High-level-interface), and of course the rest of this
 documentation goes into far more detail.  Here we see a simple example to start
 things off.
 
@@ -79,12 +79,13 @@ We can plot the result like this:
 using Plots  # Requires also installing `Plots` in your project
 plotlyjs()  # hide
 default(size=(800,480), linewidth=2, leg=:top, legendfontsize=11)  # hide
+default(extra_plot_kwargs = KW(:include_mathjax => "cdn"))  # hide
 
-plot(inspiral.t, real.(h[1, :]), label="Re{h₂₂}")
-plot!(inspiral.t, imag.(h[1, :]), label="Im{h₂₂}")
-plot!(inspiral.t, abs.(h[1, :]), label="|h₂₂|", linewidth=3)
-plot!(inspiral.t, abs.(h[5, :]), label="|h₂₋₂|")
-plot!(xlabel="Time (𝑀)", ylabel="Mode weights", ylim=(-0.45,0.45))
+plot(inspiral.t, real.(h[1, :]), label=raw"$\Re\left\{h_{2,2}\right\}$")
+plot!(inspiral.t, imag.(h[1, :]), label=raw"$\Im\left\{h_{2,2}\right\}$")
+plot!(inspiral.t, abs.(h[1, :]), label=raw"$\left|h_{2,2}\right|$", linewidth=3)
+plot!(inspiral.t, abs.(h[5, :]), label=raw"$\left|h_{2,-2}\right|$")
+plot!(xlabel=raw"$\text{Time }(M)$", ylabel="Mode weights", ylim=(-0.45,0.45))
 
 savefig("waveform.html"); nothing  # hide
 ```

@@ -134,9 +134,9 @@ yourself using a lot of Julia code, you may want to consider flipping your
 approach.
 
 
-[^1]: As general advice, you should `conda install -y mamba` in your "base"
-      conda env, and then just use the command `mamba` wherever you would have
-      used `conda`; `mamba` is a complete drop-in replacement, but is much
+[^1]: As general advice, you should run `conda install -y mamba -n base -c
+      conda-forge`, and then just use the command `mamba` wherever you would
+      have used `conda`; `mamba` is a complete drop-in replacement, but is much
       faster because it's written in C instead of python.  For example, `mamba
       create -n julia_pn python numpy matplotlib` will typically run faster than
       the command given here.  This becomes a huge advantage when the env has
