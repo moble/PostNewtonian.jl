@@ -58,18 +58,21 @@ jobs:
         with:
           version: '1'
       - uses: julia-actions/cache@v1
-      - run: |
+      - name: Add Documenter master
+        run: |
           julia --project=docs -e '
             using Pkg
             url = "https://github.com/JuliaDocs/Documenter.jl"
             rev = "master"
-            Pkg.add(;url, rev)'
+            Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.add(;url, rev, preserve=Pkg.PRESERVE_ALL)'
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-docdeploy@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
-      - run: |
+      - name: Run doctests
+        run: |
           julia --project=docs -e '
             using Documenter: DocMeta, doctest
             using PostNewtonian
