@@ -58,6 +58,12 @@ jobs:
         with:
           version: '1'
       - uses: julia-actions/cache@v1
+      - run: |
+          julia --project=docs -e '
+            using Pkg
+            url = "https://github.com/JuliaDocs/Documenter.jl"
+            rev = "master"
+            Pkg.add(;url, rev)'
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-docdeploy@v1
         env:
