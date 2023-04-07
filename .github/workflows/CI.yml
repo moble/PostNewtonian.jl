@@ -56,16 +56,17 @@ jobs:
       - uses: actions/checkout@v3
       - uses: julia-actions/setup-julia@v1
         with:
-          version: '1'
+          version: 'nightly'
       - uses: julia-actions/cache@v1
-      - name: Add Documenter master
-        run: |
-          julia --project=docs -e '
-            using Pkg
-            url = "https://github.com/JuliaDocs/Documenter.jl"
-            rev = "master"
-            Pkg.develop(PackageSpec(path=pwd()))
-            Pkg.add(;url, rev, preserve=Pkg.PRESERVE_ALL)'
+      - run: julia --project=docs -e 'using Pkg; Pkg.instantiate()'
+      # - name: Add Documenter master
+      #   run: |
+      #     julia --project=docs -e '
+      #       using Pkg
+      #       url = "https://github.com/JuliaDocs/Documenter.jl"
+      #       rev = "master"
+      #       Pkg.develop(PackageSpec(path=pwd()))
+      #       Pkg.add(;url, rev, preserve=Pkg.PRESERVE_ALL)'
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-docdeploy@v1
         env:
