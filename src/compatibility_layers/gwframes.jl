@@ -142,15 +142,26 @@ function PNWaveform(
     Ω₁ = Omega_orb_0
     Rᵢ = Rotor(R_frame_i)
 
+    saveat = if dt > 0.0
+        if haskey(kwargs, :saveat)
+            error("GWFrames.PNWaveform received both `dt` and `saveat` arguments")
+        end
+        dt
+    elseif haskey(kwargs, :saveat)
+        kwargs = Dict(kwargs)
+        pop!(kwargs, :saveat)
+    else
+        []
+    end
+
     # Inspiral
     solution = orbital_evolution(
         M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; λ₁=lambda1, λ₂=lambda2,
         Ω₁=Ω₁, Rᵢ=Rᵢ,
         approximant=Approximant, PNOrder=PNOrbitalEvolutionOrder,
-        quiet=quiet, saveat=dt > 0 ? dt : [],
-        kwargs...
+        quiet=quiet, saveat, kwargs...
     )
-    if dt ≤ 0
+    if saveat == []
         solution = uniform_in_phase(solution, MinStepsPerOrbit)
     end
 
