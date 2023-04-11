@@ -79,8 +79,9 @@ manual.](https://moble.github.io/PostNewtonian.jl/stable/internals/waveforms.htm
 The `PNOrder` defaults to the one used to compute `inspiral`, but may be changed by passing
 the keyword argument.
 
-!!! tip If you need this waveform at a different set of times `t′` than is currently present
-    in `inspiral.t`, you should use the built-in interpolation capabilities of `inspiral`
+!!! tip
+    If you need this waveform at a different set of times `t′` than is currently present in
+    `inspiral.t`, you should use the built-in interpolation capabilities of `inspiral`
     *first*, as in `inspiral′ = inspiral(t′)`, rather than interpolating the results of this
     function.  Or, perhaps better yet, you could select the times when calling
     `orbital_evolution` by using the `saves_per_orbit` or `saveat` keyword argument to that
