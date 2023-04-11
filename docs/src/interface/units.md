@@ -35,7 +35,8 @@ units.  This does not completely constrain the units, however.  There is still a
 freedom to scale the units however you wish.  For example, it is most common to
 describe all quantities in units of some mass ``M`` — such as the sum of the
 input masses `M₁+M₂` or the Solar mass ``M_\odot``.  The input arguments would
-then be given in units of that mass.
+then *all* be given in units of that mass, or more likely some product of that
+mass with ``G`` and ``c``.
 
 The complete set of (required or optional) dimensionful arguments to
 `orbital_evolution` is
@@ -67,7 +68,18 @@ inspiral[:M₁] ↦ inspiral[:M₁] * σ
 inspiral[:M₂] ↦ inspiral[:M₂] * σ
 ```
 All other evolved variables are dimensionless, and so are unaffected by the
-scaling.
+scaling.  In particular, if the initial conditions are entered with values of
+`M₁` and `M₂` in their desired final units, no change needs to be made.  On the
+other hand, if the values are entered so that `M₁+M₂=1`, we can rescale any BBH
+system to any desired total mass `Mₜₒₜ` using
+```julia
+inspiral.t ↦ inspiral.t * Mₜₒₜ * G / c^3
+```
+Furthermore, if `M₁` and `M₂` represent the *source-frame* mass, and we need to
+apply a cosmological redshift `z`, we simply apply
+```julia
+inspiral.t ↦ inspiral.t * (1+z)
+```
 
 The waveform ``H`` returned by either [`coorbital_waveform`](@ref) or
 [`inertial_waveform`](@ref) is the rescaled asymptotic limit of the strain.  The
@@ -77,7 +89,9 @@ h \approx H\, \frac{M}{r}\, \frac{G}{c^2}
 \qquad \mathrm{or} \qquad
 h \approx H\, \frac{M_z}{d_\mathrm{L}}\, \frac{G}{c^2}.
 ```
-Here, ``r`` is the radius of the observer in asymptotically Minkowski
+(The equality is only approximate because we assume that terms in ``1/r^2`` can
+be ignored, which is almost certainly true of any detection in the foreseeable
+future.)  Here, ``r`` is the radius of the observer in asymptotically Minkowski
 coordinates centered on the source and ``M`` is the total mass of the binary;
 alternatively, ``M_z=M(1+z)`` is the redshifted mass and ``d_\mathrm{L}`` is the
 luminosity distance between the source and observer.  For more complete
@@ -127,10 +141,10 @@ above.
 ## [Example 2: Astrophysical units](@id Units-example-2)
 
 Suppose we want to construct a system consistent with
-[GW150914](https://arxiv.org/abs/1606.01210), having masses ``35.6\,M_\odot``
-and ``30.0\,M_\odot``, as it would be observed from a distance of
-``440\,\mathrm{Mpc}`` with an initial frequency in the ``(\ell,m)=(2,2)`` mode
-of ``f_i \approx 20\,\mathrm{Hz}``.
+[GW150914](https://arxiv.org/abs/1606.01210), having source-frame masses
+``35.6\,M_\odot`` and ``30.0\,M_\odot``, as it would be observed from a distance
+of ``440\,\mathrm{Mpc}`` with an initial frequency in the dominant
+``(\ell,m)=(2,\pm 2)`` modes of ``f_i \approx 20\,\mathrm{Hz}``.
 
 Because the masses and frequencies must be in inverse units, we arbitrarily
 choose to measure frequencies in their natural unit of Hertz, and therefore
@@ -140,11 +154,38 @@ converted to seconds by dividing by ``c``, so that we can simply multiply the
 waveform by ``M_z/d_\mathrm{L}`` to get the observed strain.
 
 The frequency ``f_i`` is the observed initial frequency of the ``(2,2)`` mode.
-We will need the corresponding angular orbital frequency in the frame.  The two
-are related by
+We will need the corresponding angular orbital frequency in the frame.  Recall
+that, by definition of redshift ``z``, we have
 ```math
-\Omega_i = \frac{2\pi f_i}{2(1+z)}.
+\frac{f_{\mathrm{source}}} {f_{\mathrm{observer}}} = 1+z
+\qquad
+\text{and}
+\qquad
+\frac{\Delta t_{\mathrm{observer}}}{\Delta t_{\mathrm{source}}} = 1+z.
 ```
+Thus, the initial *source-frame orbital angular frequency* ``\Omega_i`` is
+related to the *observer-frame $(2,2)$ temporal frequency* ``f_i`` by[^1]
+```math
+%\Omega_i = 2\pi f_{\mathrm{source}}^{(2,2)} / 2 \qquad f_i = f_{\mathrm{observer}}^{(2,2)}
+%\qquad
+%\frac{f_{\mathrm{source}}^{(2,2)}} {f_{\mathrm{observer}}^{(2,2)}} = 
+%\frac{\Omega_i/\pi} {f_i} = 1+z
+%\qquad
+\Omega_i = \pi\, f_i\, (1+z).
+```
+
+[^1]: Here, we have approximated the frequency of the ``(\ell,m)=(2,\pm 2)``
+    modes as being twice the orbital frequency.  In the post-Newtonian
+    approximation, waveform mode ``H_{\ell,m}`` is frequently written as
+    ``A_{\ell,m}\, \exp[-i\, m\, \Phi]``, where ``\Phi`` is the orbital phase
+    that varies in time with ``d\Phi/dt = \Omega``.  Just looking at the
+    exponential, we might expect the frequency of ``H_{\ell,m}`` to be ``m\,
+    \Omega``.  However, the "amplitude" term ``A_{\ell,m}`` is not an amplitude
+    in the usual sense; it is actually complex, with a slowly varying phase.
+    This means that the frequency of ``H_{\ell,m}`` is not precisely ``m\,
+    \Omega`` — though this is a reasonable approximation for systems with
+    reasonably low frequency.
+
 
 ```@example units2
 using Quaternionic
@@ -161,22 +202,26 @@ au = float(149_597_870_700)  # meters
 pc = 1au / (π / 648_000)  # meters
 Mpc = 1_000_000pc  # meters
 
-# Approximate maximum a posteriori spins
+# Approximate maximum a posteriori spins (via SXS:BBH:0308)
 χ⃗₁ = [0.0, 0.0, 0.3224]
 χ⃗₂ = [0.2663, 0.2134, -0.5761]
 
-# Parameters of this system
+# Parameters of this system (arXiv:1606.01210)
 M₁ = 35.6GMₛᵤₙ / c^3  # seconds
 M₂ = 30.0GMₛᵤₙ / c^3  # seconds
 dL = 440Mpc / c  # seconds
 z = 0.094
-Mz = (M₁+M₂) * (1+z)  # seconds
 fᵢ = 20  # Hertz
-Ωᵢ = 2π * fᵢ / 2(1+z)  # Hertz
-dt = 1/2048(1+z)  # seconds — Observer's sampling interval in the source frame
+Δtₒ = 1/2048  # seconds
 
-inspiral = orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, saveat=dt)
-tobs = (1+z)*inspiral.t
+# Conversions
+Mz = (M₁+M₂) * (1+z)  # seconds
+Ωᵢ = π * fᵢ * (1+z)  # Hertz
+Δtₛ = Δtₒ / (1+z)  # seconds
+
+# Evaluate waveform and convert to observer's frame and units
+inspiral = orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, saveat=Δtₛ)
+tₒ = (1+z) * inspiral.t
 Hₗₘ = inertial_waveform(inspiral)
 hₗₘ = Hₗₘ * Mz / dL
 
@@ -185,9 +230,11 @@ R = Quaternionic.from_spherical_coordinates(2.856, 0.0)
 ₋₂Yₗₘ = SphericalFunctions.ₛ𝐘(-2, 8, Float64, [R])[1, :]
 h = (₋₂Yₗₘ' * hₗₘ)[1,:]
 
-plot(tobs, real.(h), label="ℎ₊")
-plot!(tobs, -imag.(h), label="ℎₓ")
+# Plot the results
+plot(tₒ, real.(h), label="ℎ₊")
+plot!(tₒ, -imag.(h), label="ℎₓ")
 plot!(xlabel="Time (seconds)", ylabel="Strain (dimensionless)", ylim=(-1.5e-21,1.5e-21))
+plot!(title="Observer-frame waveform", legend=(0.205, 0.9))
 savefig("units2.html"); nothing  # hide
 ```
 ```@raw html
