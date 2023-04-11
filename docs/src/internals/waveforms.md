@@ -5,6 +5,8 @@ Once you have [computed the orbital evolution](@ref orbital_evolution), and
 to evaluate the waveform, you can do so with one of the functions documented
 below.
 
+## Precise definition of waveforms
+
 The waveform returned by these functions is essentially the complex strain ``h
 \colonequals h_+ - i\,h_\times``.  However, this quantity decays as ``1/r``,
 where ``r`` is the radius at which the strain is measured.  Therefore, as is
@@ -12,16 +14,21 @@ conventional, the returned quantity is actually
 ```math
 H \colonequals \lim_{r\to\infty} h\, \frac{r}{M}\, \frac{c^2}{G},
 ```
-where ``M`` is the total mass of the two objects in the binary.  Binaries are
-usually modeled in relativity as being isolated systems in otherwise empty
-asymptotically flat spacetimes — or even more specifically, in asymptotically
-Minkowski spacetimes.  In this case, ``r`` is just the asymptotic areal radius.
-The equivalent expression in an FLRW spacetime requires a simple
+where ``M`` is the total mass of the two objects in the binary.  Note that both
+``h`` and ``H`` are dimensionless, but only ``H`` is scale invariant.
+
+Binaries are usually modeled in relativity as being isolated systems in
+otherwise empty asymptotically flat spacetimes — or even more specifically, in
+asymptotically Minkowski spacetimes.  In this case, ``r`` is just the asymptotic
+areal radius.  The equivalent expression in an FLRW spacetime requires a simple
 reinterpretation of ``M`` as the redshifted mass ``M_z \colonequals M(1+z)`` and
 ``r`` as the luminosity distance ``d_L.``[^1]  Thus, to obtain the strain as it
-would be measured (in the asymptotic approximation) by an actual observer in our
-universe, we just need to invert the previous equation:
+would be measured (in the asymptotic approximation) by an actual observer in an
+asymptotically flat universe or in our universe, we just need to invert the
+previous equation:
 ```math
+h \approx H\, \frac{M}{r}\, \frac{G}{c^2}
+\qquad \mathrm{or} \qquad
 h \approx H\, \frac{M_z}{d_L}\, \frac{G}{c^2}.
 ```
 
@@ -50,12 +57,17 @@ over ``(\ell,m)`` values, with ``m`` varying most rapidly — as in
 ```
 The second dimension of the array indexes the time.
 
+See [Example 2 on the "Units" page](@ref Units-example-2) for a complete example
+of converting this package's output to standard units in our universe.
+
+## Evaluation of waveforms
+
 ```@docs
 coorbital_waveform
 inertial_waveform
 ```
 
-# In-place evaluation of waveforms
+## In-place evaluation of waveforms
 
 This is likely to be an uncommon scenario, but if you happen to need to evaluate
 the waveform repeatedly on the same set (or at least same number) of time steps
