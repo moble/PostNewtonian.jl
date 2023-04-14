@@ -19,12 +19,18 @@ or as keyword arguments.
 
 !!! warning
 
-    We do *not* expect the result of this function to be identical to the
-    result from the `GWFrames` Python package.  In particular, this package
-    uses more general expressions for the tidal-heating terms, fixes an error
-    in the 2PN quadratic-spin terms for the waveform modes, uses a more
-    accurate method to compute the number of steps per orbit (by default), and
-    uses more accurate (and efficient) ODE integration.
+    We do *not* expect the result of this function to be identical to the result from the
+    `GWFrames` Python package.  In particular, this package uses more general expressions
+    for the tidal-heating terms, fixes an error in the 2PN quadratic-spin terms for the
+    waveform modes, uses more accurate (and efficient) ODE integration, and uses a more
+    accurate method to compute the number of steps per orbit (by default).
+
+    Also note that there are differences in the order of operations for computing
+    intermediate variables.  Cancellation and roundoff error caused by these differences can
+    have surprisingly large effects on the orbital evolution in many cases — particularly
+    for precessing systems.  Results from the two packages have been painstakingly analyzed,
+    leading to the conclusion that all differences are caused by such errors or the
+    differences in formulations mentioned above.
 
 The Julia interface is more detailed, flexible, and efficient than the simple `GWFrames`
 interface that this function emulates.  In particular, [`orbital_evolution`](@ref) takes
@@ -34,8 +40,9 @@ takes, and returns a [`solution`](https://diffeq.sciml.ai/dev/basics/solution/) 
 provides dense output and more details about the ODE solution itself.  For example, one
 reason this function is more efficient than `GWFrames` is that we can use dense output to
 solve with fewer timesteps, while accurately and efficiently interpolating to the requested
-timesteps.  While `orbital_evolution` solves for the dynamics, [`h!`](@ref) provides the
-actual mode weights, which are also returned by this function.
+timesteps.  While `orbital_evolution` solves for the dynamics, [`coorbital_waveform`](@ref)
+or [`inertial_waveform`](@ref) provides the actual waveform; both are returned by this
+function.
 
 
 ## Required arguments
