@@ -13,8 +13,8 @@
 
 > :warning: **Warning**: This package has not yet reached version 1.0, and is
 > still missing quite a few capabilities.  In particular, only `TaylorT1` is
-> supported.  Also, pre-compilation is not yet optimized; it may take some time
-> to compile on each use.
+> supported.  Several other planned additions — such as memory terms in the
+> waveforms and eccentricity — are also still incomplete.
 
 This package computes orbital dynamics of and waveforms from binary black-hole
 systems, in the post-Newtonian approximation.  See [the
