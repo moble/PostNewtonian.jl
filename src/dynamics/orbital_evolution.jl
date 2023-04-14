@@ -359,6 +359,11 @@ function orbital_evolution(
 )
     # Sanity checks for the inputs
 
+    if approximant != "TaylorT1"
+        error("Approximant `$approximant` is not currently supported")
+    end
+    RHS! = TaylorT1RHS!
+
     if M₁ ≤ 0 || M₂ ≤ 0
         error("Unphysical masses: M₁=$M₁, M₂=$M₂.")
     end
@@ -427,6 +432,45 @@ function orbital_evolution(
         end
     end
 
+    if isnothing(termination_criteria_forwards)
+        termination_criteria_forwards = CallbackSet(
+            termination_forwards(vₑ, quiet),
+            dtmin_terminator(eltype(pnsystem), quiet),
+            decreasing_v_terminator(quiet),
+            nonfinite_terminator()
+        )
+    end
+
+    if isnothing(termination_criteria_backwards) && v₁ < v(pnsystem)
+        termination_criteria_backwards = CallbackSet(
+            termination_backwards(v₁, quiet),
+            dtmin_terminator(eltype(pnsystem), quiet),
+            nonfinite_terminator()
+        )
+    end
+
+    _orbital_evolution(
+        pnsystem, RHS!;
+        λ₁, λ₂, v₁, vₑ, Rᵢ,
+        check_up_down_instability, time_stepper,
+        reltol, abstol,
+        termination_criteria_forwards,
+        termination_criteria_backwards,
+        quiet, force_dtmin, saves_per_orbit,
+        solve_kwargs...
+    )
+end
+
+function _orbital_evolution(
+        pnsystem, RHS!;
+        λ₁, λ₂, v₁, vₑ, Rᵢ,
+        check_up_down_instability, time_stepper,
+        reltol, abstol,
+        termination_criteria_forwards,
+        termination_criteria_backwards,
+        quiet, force_dtmin, saves_per_orbit,
+        solve_kwargs...
+)
     if check_up_down_instability
         up_down_instability_warn(pnsystem, v₁, vₑ)
     end
@@ -440,21 +484,10 @@ function orbital_evolution(
     end
     if isnothing(abstol)
         abstol = [
-            [eps(T(M₁+M₂))^(11//16) for _ ∈ 1:2];
+            [eps(T(M₁(pnsystem)+M₂(pnsystem)))^(11//16) for _ ∈ 1:2];
             [eps(T)^(11//16) for _ ∈ 3:length(pnsystem_symbols)]
         ]
     end
-
-    if isnothing(termination_criteria_forwards)
-        termination_criteria_forwards = CallbackSet(
-            termination_forwards(vₑ, quiet),
-            dtmin_terminator(T, quiet),
-            decreasing_v_terminator(quiet),
-            nonfinite_terminator()
-        )
-    end
-
-    RHS! = TaylorT1RHS!
 
     # Log an error if the initial parameters return a NaN on the right-hand side
     let
@@ -494,14 +527,6 @@ function orbital_evolution(
 
         pnsystemᵢ.state[vindex] = v₁
         τ = estimated_time_to_merger(pnsystemᵢ) - τ
-
-        if isnothing(termination_criteria_backwards)
-            termination_criteria_backwards = CallbackSet(
-                termination_backwards(v₁, quiet),
-                dtmin_terminator(T, quiet),
-                nonfinite_terminator()
-            )
-        end
 
         # Note: Here again, we don't want to overestimate the time span by too much, but we
         # also don't want to underestimate and get a shortened waveform.  This should be a
