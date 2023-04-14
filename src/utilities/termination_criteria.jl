@@ -106,9 +106,9 @@ If this terminator is triggered while `v` is less than 1/2, a warning will alway
 otherwise an `info` message will be issued only if the `quiet` flag is set to `false`.
 """
 function dtmin_terminator(T, quiet=false)
-    sqrtϵ = √eps(T)
-    function discrete_condition(state,t,integrator)
-        abs(integrator.dt) < sqrtϵ
+    sqrtϵ::T = √eps(T)  # Tricks for faster closures
+    discrete_condition = let sqrtϵ=sqrtϵ
+        (state,t,integrator) -> abs(integrator.dt) < sqrtϵ
     end
     function discrete_terminator!(integrator)
         v = integrator.u[vindex]
