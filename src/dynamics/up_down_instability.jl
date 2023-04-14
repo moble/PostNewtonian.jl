@@ -26,7 +26,7 @@ relevant quantities.  Neither of these requires any adjustment by users of this 
 """
 @pn_expression function up_down_instability(pnsystem)
     T = eltype(pnsystem)
-    Ωₘₐₓ = PostNewtonian.Ω(v=1, M=M)
+    Ωₘₐₓ = PostNewtonian.Ω(v=one(T), M=M)
 
     # Note that, as mentioned in the docstring, Gerosa et al. use q<1
     if M₂ > M₁  # Just swap the relevant variables
@@ -36,11 +36,13 @@ relevant quantities.  Neither of these requires any adjustment by users of this 
     end
 
     if χ₁ₗ > 0 && χ₂ₗ < 0
-        r₊ = M * (√(χ₁ₗ) + √abs(q*χ₂ₗ))^4 / (1-q)^2
-        r₋ = M * (√(χ₁ₗ) - √abs(q*χ₂ₗ))^4 / (1-q)^2
+        # Note that `r₊ ≥ r₋`, but we keep corresponding subscripts,
+        # which means that `Ω₊ ≤ Ω₋`!
+        r₊ = M * (√abs(χ₁ₗ) + √abs(q*χ₂ₗ))^4 / (1-q)^2
+        r₋ = M * (√abs(χ₁ₗ) - √abs(q*χ₂ₗ))^4 / (1-q)^2
         Ω₊ = √(M/r₊)^3
         Ω₋ = √(M/r₋)^3
-        clamp.((Ω₊, Ω₋), T(0), Ωₘₐₓ)
+        (clamp(Ω₊, zero(T), Ωₘₐₓ), clamp(Ω₋, zero(T), Ωₘₐₓ))
     else
         (Ωₘₐₓ, Ωₘₐₓ)
     end
