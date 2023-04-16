@@ -74,8 +74,11 @@ jobs:
             Pkg.add(Pkg.PackageSpec(name="GitHubActions", version="0.1"))'
           julia --color=yes --code-coverage --project=docs/ -e '
             using Pkg
+            url = "https://github.com/JuliaDocs/Documenter.jl"
+            rev = "master"
+            preserve = Pkg.PRESERVE_ALL
             Pkg.develop(PackageSpec(path=pwd()))
-            Pkg.add(;url="https://github.com/JuliaDocs/Documenter.jl", rev="master", preserve=Pkg.PRESERVE_ALL)
+            Pkg.add(;url, rev, preserve)
             Pkg.instantiate()'
           julia --color=yes --project=docs/ -e '
             @eval Module() begin
@@ -84,7 +87,7 @@ jobs:
                 Logging.global_logger(GitHubActions.GitHubActionsLogger())
                 pop!(LOAD_PATH)
             end
-            include("docs/make.jl")' )
+            include("docs/make.jl")'
         env:
           ARTIFACTS_PATH: ~/.julia/artifacts
           PACKAGES_PATH: ~/.julia/packages
