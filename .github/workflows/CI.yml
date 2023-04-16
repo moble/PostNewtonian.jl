@@ -58,18 +58,37 @@ jobs:
         with:
           version: '1.9-nightly'
       - uses: julia-actions/cache@v1
-      #- run: julia --project=docs -e 'using Pkg; Pkg.instantiate()'
-      # - name: Add Documenter master
-      #   run: |
-      #     julia --project=docs -e '
-      #       using Pkg
-      #       url = "https://github.com/JuliaDocs/Documenter.jl"
-      #       rev = "master"
-      #       Pkg.develop(PackageSpec(path=pwd()))
-      #       Pkg.add(;url, rev, preserve=Pkg.PRESERVE_ALL)'
       - uses: julia-actions/julia-buildpkg@v1
-      - uses: julia-actions/julia-docdeploy@v1
+      # - uses: julia-actions/julia-docdeploy@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+      ### The following is a hack that basically reproduces julia-docdeploy,
+      ### but inserts a step where I add the master version of Documenter.
+      - name: Doc deploy
+        shell: bash
+        run: |
+          julia --color=yes --code-coverage --project=docs/ -e '
+            using Pkg
+            Pkg.activate("docs-logger-env"; shared=true)
+            Pkg.add(Pkg.PackageSpec(name="GitHubActions", version="0.1"))'
+          julia --color=yes --code-coverage --project=docs/ -e '
+            using Pkg
+            Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.add(;url="https://github.com/JuliaDocs/Documenter.jl", rev="master", preserve=Pkg.PRESERVE_ALL)
+            Pkg.instantiate()'
+          julia --color=yes --project=docs/ -e '
+            @eval Module() begin
+                push!(LOAD_PATH, "@docs-logger-env") # access GitHubActions.jl
+                import Logging, GitHubActions
+                Logging.global_logger(GitHubActions.GitHubActionsLogger())
+                pop!(LOAD_PATH)
+            end
+            include("docs/make.jl")' )
         env:
+          ARTIFACTS_PATH: ~/.julia/artifacts
+          PACKAGES_PATH: ~/.julia/packages
+          JULIA_PKG_SERVER_REGISTRY_PREFERENCE: eager
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
       - name: Run doctests
