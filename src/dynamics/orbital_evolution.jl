@@ -78,6 +78,9 @@ function uniform_in_phase(solution, saves_per_orbit)
         δΦ = 2π / saves_per_orbit
         Φrange = range(extrema(Φ)..., step=δΦ)
         t_Φ = CubicSpline(t, Φ)(Φrange)
+        # Hack to ensure that t=0 is interpolated back
+        # to exactly t=0 instead of, e.g., -1e-24:
+        t_Φ[1] = t[1]
         solution(t_Φ)
     end
 end
