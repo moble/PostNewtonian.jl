@@ -59,6 +59,7 @@ end
     addtests("up_down_instability.jl")
     addtests("orbital_evolution.jl")
     addtests("gwframes.jl")
+    addtests("truncated_series_monoid.jl")
 end
 
 if help
