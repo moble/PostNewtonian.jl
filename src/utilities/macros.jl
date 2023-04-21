@@ -46,11 +46,15 @@ end
 
 
 fundamental_variables = methodswith(PNSystem, FundamentalVariables)
+fundamental_quaternionic_variables = [
+    m for m ∈ methodswith(AbstractVector, FundamentalVariables)
+    if m.name ∈ [:χ⃗₁, :χ⃗₂, :R]
+]
 derived_variables = methodswith(VecOrPNSystem, DerivedVariables)
 pnvariables = map(v->v.name, [fundamental_variables; derived_variables])
 
 # Add symbolic capabilities to all derived variables (fundamental variables already work)
-for method ∈ derived_variables
+for method ∈ [fundamental_quaternionic_variables; derived_variables]
     name = method.name
     @eval begin
         function PostNewtonian.$name(v::PNSystem{T}) where {T<:Vector{Symbolics.Num}}
