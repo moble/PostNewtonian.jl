@@ -101,7 +101,7 @@ want their product (and ratio, if it exists) to also be a summation in terms up
 to ``v^N``.
 
 Note that we are not referring to these summations as "polynomials" in ``v``,
-because we the coefficients will sometimes involve ``\ln(v)`` — which is not
+because the coefficients will sometimes involve ``\ln(v)`` — which is not
 technically permitted for polynomials.  In particular, the presence of
 logarithms is irrelevant to our meaning of the "order" of the truncated series.
 This is standard practice in post-Newtonian theory.[^1]

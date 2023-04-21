@@ -14,7 +14,8 @@ For example, suppose the input coefficients represent the series
 ```math
 A \colonequals \sum_{i=0}^n a_{i-1} v^i.
 ```
-Then we return the coefficients `b` of the series
+(Remember that Julia's indexing is 1-based, so we subtract 1 to get the index of the
+coefficient of ``v^i``.)  Then we return the coefficients `b` of the series
 ```math
 B \colonequals \sum_{i=0}^n b_{i-1} v^i
 ```
@@ -22,8 +23,6 @@ such that
 ```math
 A\, B = 1 + \mathcal{O}(v^{n+1}).
 ```
-Remember that Julia's indexing is 1-based, so we subtract 1 to get the index of the
-coefficient of ``v^i``.
 
 !!! note
     This function requires that `a[1]` be nonzero.  If you have a series that starts at
@@ -105,7 +104,8 @@ B \colonequals \sum_{i=0}^n b_{i-1} v^i,
 ```
 and return the *value* of the ratio ``A / B`` truncated at ``v^n``.
 
-See also [`truncated_series_product`](@ref) and [`truncated_series_inverse`](@ref).
+This function simply combines [`truncated_series_product`](@ref) and
+[`truncated_series_inverse`](@ref).
 """
 function truncated_series_ratio(a, b, v)
     truncated_series_product(a, truncated_series_inverse(b), v)
