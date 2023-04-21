@@ -109,7 +109,9 @@ This is standard practice in post-Newtonian theory.[^1]
 [^1]: Different texts in post-Newtonian theory treat these logarithmic terms
       with varying levels of rigor.  The preferred method is [Hadamard
       regularization](https://en.wikipedia.org/wiki/Hadamard_regularization)
-      (often referred to in the literature as the *partie finie*).  Another
+      (often referred to in the literature as the *partie finie*).  A good
+      summary is found in Section 6 of [Blanchet's Living
+      Review](https://link.springer.com/article/10.12942/lrr-2014-2).  Another
       potential approach could be taken following [this
       paper](https://doi.org/10.1016/0001-8708(89)90079-0).  But for our
       purposes, it will suffice to take the simplistic approach of treating
