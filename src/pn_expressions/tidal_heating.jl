@@ -20,9 +20,8 @@ See also
   - [Tagoshi et al. (1997)](https://arxiv.org/abs/gr-qc/9711072)
   - [Chatziioannou et al. (2012)](https://arxiv.org/abs/1211.1686)
 
+
 # Notes
-
-
 
 The hardest parts to compute here involve the relative angles between the spins and the
 black-hole separation vectors.  Alvi constructs a spherical coordinate system centered on
@@ -150,10 +149,10 @@ Note that the sign of ``\hat{n}_i`` has dropped out of the calculations of both
     I₀₂ = (16rₕ₂ / 5b^6) * M₂^5 * M₁^2 * sin²θ₂ * (1 - 3//4 * χ₂² + 15//4 * χ₂² * sin²θ₂)
 
     # Eq. (21)
-    Ṡ₁ = I₀₁ * @pn_expansion (v^3 * ϕ̇₁╱Ω - Ωₕ₁)
-    Ṁ₁ = I₀₁ * v^3 * ϕ̇₁╱Ω * @pn_expansion 5 (v^3 * ϕ̇₁╱Ω - Ωₕ₁)  # ϕ̇₁ * Ṡ₁
-    Ṡ₂ = I₀₂ * @pn_expansion (v^3 * ϕ̇₂╱Ω - Ωₕ₂)
-    Ṁ₂ = I₀₂ * v^3 * ϕ̇₂╱Ω * @pn_expansion 5 (v^3 * ϕ̇₂╱Ω - Ωₕ₂)  # ϕ̇₂ * Ṡ₂
+    Ṡ₁ = I₀₁ * @pn_expansion (v^3/M * ϕ̇₁╱Ω - Ωₕ₁)
+    Ṁ₁ = I₀₁ * v^3/M * ϕ̇₁╱Ω * @pn_expansion 5 (v^3/M * ϕ̇₁╱Ω - Ωₕ₁)  # ϕ̇₁ * Ṡ₁
+    Ṡ₂ = I₀₂ * @pn_expansion (v^3/M * ϕ̇₂╱Ω - Ωₕ₂)
+    Ṁ₂ = I₀₂ * v^3/M * ϕ̇₂╱Ω * @pn_expansion 5 (v^3/M * ϕ̇₂╱Ω - Ωₕ₂)  # ϕ̇₂ * Ṡ₂
 
     (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂)
 end
