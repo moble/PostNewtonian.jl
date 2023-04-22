@@ -188,10 +188,10 @@ julia> M₁(symbolic_pnsystem), M₂(symbolic_pnsystem)
 (M₁, M₂)
 
 julia> χ⃗₁(symbolic_pnsystem)
- + χ⃗₁ˣ𝐢 + χ⃗₁ʸ𝐣 + χ⃗₁ᶻ𝐤
+χ⃗₁
 
 julia> χ⃗₂(symbolic_pnsystem)
- + χ⃗₂ˣ𝐢 + χ⃗₂ʸ𝐣 + χ⃗₂ᶻ𝐤
+χ⃗₂
 ```
 """
 const symbolic_pnsystem = SymbolicPNSystem()
