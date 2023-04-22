@@ -190,8 +190,16 @@ power of ``v``.  (I.e., the expansion does not have to be simplified or
 [`collect`](https://docs.sympy.org/latest/tutorials/intro-tutorial/simplification.html#collect)ed
 in sympy parlance.)
 
-However, note that the sum must appear together — as part of the same `:+` expression — rather
-than, say, factored into two sums that multiply each other.
+However, note that the sum must appear together — as part of the same `:+` expression —
+rather than, say, factored into two sums that multiply each other.
+
+The `offset` argument represents the *index* of the relative PN order (that is, 2 times the
+PN order) at which the PN expansion begins.  So if the first term in the expansion is really
+a relative 2.5-pN term, we should use an `offset` of 5.  For example, the
+[`tidal_heating`](@ref) expressions for `Ṁ₁` and `Ṁ₂` begin with a term proportional to
+`v^15`, and are added to the flux [`𝓕`](@ref), which begin's with a term proportional to
+`v^10`.  This means that `Ṁ₁` and `Ṁ₂` enter at 2.5-pN relative order, so we use an
+`offset` of 5.
 """
 macro pn_expansion(offset, pnsystem, expr)
     esc(pn_expansion(offset, pnsystem, expr))
@@ -204,10 +212,25 @@ end
 function pn_expansion(offset, pnsystem, expr)
     max_k, coefficients = var_collect(expr, :v)
     max_index = max_k + 1
-    :(evalpoly(
-        v,
-        $coefficients[1:min($max_index, order_index($pnsystem)+$offset)]
-    ))
+    if offset != 0
+        max_index_var = gensym("max_index")
+        quote
+            $max_index_var = min($max_index, order_index($pnsystem)-$offset)
+            if $max_index_var < 1
+                zero(v)
+            else
+                evalpoly(
+                    v,
+                    $coefficients[1:$max_index_var]
+                )
+            end
+        end
+    else
+        :(evalpoly(
+            v,
+            $coefficients[1:min($max_index, order_index($pnsystem))]
+        ))
+    end
 end
 
 
