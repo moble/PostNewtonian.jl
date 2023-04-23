@@ -122,7 +122,6 @@ for PNOrder ∈ 0//2:1//2:13//2
 
     𝓔′1 = 𝓔′(sympn)
     𝓔′2 = be(sympn, true)
-    #diff′ = simplify(𝓔′1-𝓔′2, expand=true)
     diff′ = expand(𝓔′1-𝓔′2)
     if !iszero(diff′)
         @show PNOrder 𝓔′1 𝓔′2 diff′

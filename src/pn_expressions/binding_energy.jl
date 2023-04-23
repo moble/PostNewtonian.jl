@@ -123,7 +123,7 @@ const 𝓔′ = let 𝓔=𝓔(symbolic_pnsystem), v=v(symbolic_pnsystem)
     splitfunc = MacroTools.splitdef(𝓔′)
     splitfunc[:body] = apply_to_first_add!(
         splitfunc[:body],
-        x->:(@pn_expansion(1, $x))
+        x->:(@pn_expansion(-1, $x))
     )
     𝓔′ = MacroTools.combinedef(splitfunc)
     # Finally, apply the "macro" to it and get a full function out
