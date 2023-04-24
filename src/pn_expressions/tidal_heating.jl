@@ -63,12 +63,11 @@ results come from computing
     \left| \vec{\chi}_i\right|^2
 }.
 ```
-If the denominator is zero, we set ``\sin^2\theta_i = 1`` from physical
-considerations.
+If the denominator is zero, we set ``\sin^2\theta_i = 1`` from physical considerations.
 
-Now consider the quantity ``\hat{n}_i \times \vec{\chi}_i``.  We next aim to
-calculate the rotation rate ``\dot{\phi}_i`` of this vector about
-``\vec{\chi}_i``.  We begin by directly calculating
+Now consider the quantity ``\hat{n}_i \times \vec{\chi}_i``.  We next aim to calculate the
+rotation rate ``\dot{\phi}_i`` of this vector about ``\vec{\chi}_i``.  We begin by directly
+calculating
 ```math
 \partial_t \left(\hat{n}_i \times \vec{\chi}_i\right)
 =
@@ -78,13 +77,12 @@ calculate the rotation rate ``\dot{\phi}_i`` of this vector about
 =
 \mp \Omega\, \hat{\lambda} \times \vec{\chi}_i,
 ```
-where the negative sign is chosen for ``i=1`` and positive for ``i=2``.  Now,
-from more fundamental considerations, we can understand the components of this
-change.  Since we assume that ``\vec{\chi}_i`` is constant at each instant for
-the purposes of calculation here, the only way for ``\hat{n}_i \times
-\vec{\chi}_i`` to change is either because ``\hat{n}_i`` rotates about
-``\vec{\chi}_i``, or because the angle ``\theta_i`` is changing.  We can express
-this as
+where the negative sign is chosen for ``i=1`` and positive for ``i=2``.  Now, from more
+fundamental considerations, we can understand the components of this change.  Since we
+assume that ``\vec{\chi}_i`` is constant at each instant for the purposes of calculation
+here, the only way for ``\hat{n}_i \times \vec{\chi}_i`` to change is either because
+``\hat{n}_i`` rotates about ``\vec{\chi}_i``, or because the angle ``\theta_i`` is changing.
+We can express this as
 ```math
 \partial_t \left(\hat{n}_i \times \vec{\chi}_i\right)
 =
@@ -92,9 +90,9 @@ this as
 +
 \dot{\theta_i}\, \cot \theta_i\, \left(\hat{n}_i \times \vec{\chi}_i\right).
 ```
-Since these two components are orthogonal, we can obtain ``\dot{\phi}`` directly
-by taking the component of this quantity along ``\hat{\chi}_i \times
-\left(\hat{n}_i \times \vec{\chi}_i\right)``:
+Since these two components are orthogonal, we can obtain ``\dot{\phi}`` directly by taking
+the component of this quantity along ``\hat{\chi}_i \times \left(\hat{n}_i \times
+\vec{\chi}_i\right)``:
 ```math
 \dot{\phi}_i
 =
@@ -112,14 +110,16 @@ by taking the component of this quantity along ``\hat{\chi}_i \times
 =
 \Omega\, \frac{\hat{\ell} \cdot \hat{\chi}_i}{\sin^2 \theta_i}.
 ```
-Here again, we may run into numerical trouble if ``\left| \vec{\chi}_1 \right|
-\approx 0``, in which case we again use physical arguments to take
-``\dot{\phi}_i = \Omega``.  However, we can also run into trouble if ``\sin^2
-\theta_i \approx 0``, which corresponds to a polar orbit, in which case Alvi's
-approximations break down.  In this case, we choose ``\dot{\phi}_i = 0``.
+Here again, we may run into numerical trouble if ``\left| \vec{\chi}_1 \right| \approx 0``,
+in which case we again use physical arguments to take ``\dot{\phi}_i = \Omega``.  We might
+also expect to run into trouble if ``\sin^2 \theta_i \approx 0``, which corresponds to a
+polar orbit, in which case Alvi's approximations break down.  This turns out to not be a
+problem *numerically*, because of the cancellation with the numerator, except when ``\sin^2
+\theta_i = 0`` exactly.  In this case, we choose ``\dot{\phi}_i = 0``.
 
 Note that the sign of ``\hat{n}_i`` has dropped out of the calculations of both
-``\sin^2\theta_i`` and ``\dot{\phi}_i``.
+``\sin^2\theta_i`` and ``\dot{\phi}_i``, cancelling with the signs that had appeared next to
+``\Omega``.
 """
 @pn_expression function tidal_heating(pnsystem)
     # References to pages and equation numbers are from Alvi (2001)
