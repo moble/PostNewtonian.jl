@@ -132,27 +132,26 @@ Note that the sign of ``\hat{n}_i`` has dropped out of the calculations of both
     Ωₕ₁ = χ₁ / 2rₕ₁
     Ωₕ₂ = χ₂ / 2rₕ₂
 
-    # Page 2, line 9
-    b = M / v^2
-
     # Equivalent to Eqs. (18)/(19)
     #   * θ is the angle between the BH's spin and the vector towards the opposite BH;
     #   * ϕ̇ is the rotation rate of the plane containing those two vectors.
     # See docstring for details.
     sin²θ₁ = ifelse(iszero(χ₁²), one(χ₁²), abs2vec(n̂×χ⃗₁)/χ₁²)
     sin²θ₂ = ifelse(iszero(χ₂²), one(χ₂²), abs2vec(n̂×χ⃗₂)/χ₂²)
-    ϕ̇₁╱Ω = ifelse(iszero(χ₁²), one(χ₁²), ifelse(iszero(sin²θ₁), zero(χ₁²), ℓ̂⋅χ⃗₁/(χ₁*sin²θ₁)))
-    ϕ̇₂╱Ω = ifelse(iszero(χ₂²), one(χ₂²), ifelse(iszero(sin²θ₂), zero(χ₂²), ℓ̂⋅χ⃗₂/(χ₂*sin²θ₂)))
+    # ϕ̇ = ϕ̇̂ * v^3/M
+    ϕ̇̂₁ = ifelse(iszero(χ₁²), one(χ₁²), ifelse(iszero(sin²θ₁), zero(χ₁²), ℓ̂⋅χ⃗₁/(χ₁*sin²θ₁)))
+    ϕ̇̂₂ = ifelse(iszero(χ₂²), one(χ₂²), ifelse(iszero(sin²θ₂), zero(χ₂²), ℓ̂⋅χ⃗₂/(χ₂*sin²θ₂)))
 
-    # Eq. (10)
-    I₀₁ = (16rₕ₁ / 5b^6) * M₁^5 * M₂^2 * sin²θ₁ * (1 - 3//4 * χ₁² + 15//4 * χ₁² * sin²θ₁)
-    I₀₂ = (16rₕ₂ / 5b^6) * M₂^5 * M₁^2 * sin²θ₂ * (1 - 3//4 * χ₂² + 15//4 * χ₂² * sin²θ₂)
+    # Eq. (10), using `b` as defined on page 2, line 9
+    # I₀₁ = v^12 * Î₀₁
+    Î₀₁ = (16rₕ₁ / 5M^6) * M₁^5 * M₂^2 * sin²θ₁ * (1 - 3//4 * χ₁² + 15//4 * χ₁² * sin²θ₁)
+    Î₀₂ = (16rₕ₂ / 5M^6) * M₂^5 * M₁^2 * sin²θ₂ * (1 - 3//4 * χ₂² + 15//4 * χ₂² * sin²θ₂)
 
     # Eq. (21)
-    Ṡ₁ = I₀₁ * @pn_expansion (v^3/M * ϕ̇₁╱Ω - Ωₕ₁)
-    Ṁ₁ = I₀₁ * v^3/M * ϕ̇₁╱Ω * @pn_expansion 5 (v^3/M * ϕ̇₁╱Ω - Ωₕ₁)  # ϕ̇₁ * Ṡ₁
-    Ṡ₂ = I₀₂ * @pn_expansion (v^3/M * ϕ̇₂╱Ω - Ωₕ₂)
-    Ṁ₂ = I₀₂ * v^3/M * ϕ̇₂╱Ω * @pn_expansion 5 (v^3/M * ϕ̇₂╱Ω - Ωₕ₂)  # ϕ̇₂ * Ṡ₂
+    Ṡ₁ = Î₀₁ * v^12 * @pn_expansion (v^3/M * ϕ̇̂₁ - Ωₕ₁)
+    Ṁ₁ = Î₀₁ * v^12 * v^3/M * ϕ̇̂₁ * @pn_expansion 5 (v^3/M * ϕ̇̂₁ - Ωₕ₁)  # ϕ̇₁ * Ṡ₁
+    Ṡ₂ = Î₀₂ * v^12 * @pn_expansion (v^3/M * ϕ̇̂₂ - Ωₕ₂)
+    Ṁ₂ = Î₀₂ * v^12 * v^3/M * ϕ̇̂₂ * @pn_expansion 5 (v^3/M * ϕ̇̂₂ - Ωₕ₂)  # ϕ̇₂ * Ṡ₂
 
     (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂)
 end
