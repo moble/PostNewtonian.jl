@@ -125,10 +125,10 @@ Note that the sign of ``\hat{n}_i`` has dropped out of the calculations of both
     # References to pages and equation numbers are from Alvi (2001)
 
     # Eq. (21)
-    Ṡ₁ = Î₀₁ * v^12 * @pn_expansion (v^3/M * ϕ̇̂₁ - Ωₕ₁)
-    Ṁ₁ = Î₀₁ * v^12 * v^3/M * ϕ̇̂₁ * @pn_expansion 5 (v^3/M * ϕ̇̂₁ - Ωₕ₁)  # ϕ̇₁ * Ṡ₁
-    Ṡ₂ = Î₀₂ * v^12 * @pn_expansion (v^3/M * ϕ̇̂₂ - Ωₕ₂)
-    Ṁ₂ = Î₀₂ * v^12 * v^3/M * ϕ̇̂₂ * @pn_expansion 5 (v^3/M * ϕ̇̂₂ - Ωₕ₂)  # ϕ̇₂ * Ṡ₂
+    Ṡ₁ = Î₀₁ * v^12 * @pn_expansion (v^3 * ϕ̇̂₁ - Ωₕ₁)
+    Ṁ₁ = Î₀₁ * v^12 * v^3 * ϕ̇̂₁ * @pn_expansion 5 (v^3 * ϕ̇̂₁ - Ωₕ₁)  # ϕ̇₁ * Ṡ₁
+    Ṡ₂ = Î₀₂ * v^12 * @pn_expansion (v^3 * ϕ̇̂₂ - Ωₕ₂)
+    Ṁ₂ = Î₀₂ * v^12 * v^3 * ϕ̇̂₂ * @pn_expansion 5 (v^3 * ϕ̇̂₂ - Ωₕ₂)  # ϕ̇₂ * Ṡ₂
 
     (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂)
 end

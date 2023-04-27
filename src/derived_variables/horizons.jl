@@ -79,20 +79,20 @@ end
 Rate of rotation of black hole 2 about the spin of black hole 1, relative to orbital
 rotation rate.
 
-This is the rotation rate divided by ``\Omega = v^3 / M``.
+This is the rotation rate divided by ``v^3  = M\, \Omega``.
 
 As defined in Eq. (19) of [Alvi (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).
 See [`tidal_heating`](@ref PostNewtonian.tidal_heating) for more details.
 """
 function ϕ̇̂₁(s::VecOrPNSystem)
-    let χ₁=χ₁(s), sin²θ₁=sin²θ₁(s)
+    let χ₁=χ₁(s), sin²θ₁=sin²θ₁(s), M=M(s)
         ifelse(
             iszero(χ₁),
-            one(χ₁),
+            inv(M),
             ifelse(
                 iszero(sin²θ₁),
                 zero(χ₁),
-                ℓ̂(s) ⋅ χ⃗₁(s) / (χ₁*sin²θ₁)
+                ℓ̂(s) ⋅ χ⃗₁(s) / (M*χ₁*sin²θ₁)
             )
         )
     end
@@ -104,20 +104,20 @@ end
 Rate of rotation of black hole 1 about the spin of black hole 2, relative to orbital
 rotation rate.
 
-This is the rotation rate divided by ``\Omega = v^3 / M``.
+This is the rotation rate divided by ``v^3  = M\, \Omega``.
 
 As defined in Eq. (19) of [Alvi (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).
 See [`tidal_heating`](@ref PostNewtonian.tidal_heating) for more details.
 """
 function ϕ̇̂₂(s::VecOrPNSystem)
-    let χ₂=χ₂(s), sin²θ₂=sin²θ₂(s)
+    let χ₂=χ₂(s), sin²θ₂=sin²θ₂(s), M=M(s)
         ifelse(
             iszero(χ₂),
-            one(χ₂),
+            inv(M),
             ifelse(
                 iszero(sin²θ₂),
                 zero(χ₂),
-                ℓ̂(s) ⋅ χ⃗₂(s) / (χ₂*sin²θ₂)
+                ℓ̂(s) ⋅ χ⃗₂(s) / (M*χ₂*sin²θ₂)
             )
         )
     end
