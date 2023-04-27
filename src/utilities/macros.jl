@@ -242,6 +242,12 @@ Extract a factor of `var` from the product `term`.
 This is a helper function for [`var_collect`](@ref).
 """
 function extract_var_factor(term, var)
+    if MacroTools.isexpr(term, :call) && term.args[1] ∈ ((/), :/)
+        k₂, term₂ = extract_var_factor(term.args[2], var)
+        k₃, term₃ = extract_var_factor(term.args[3], var)
+        return k₂-k₃, Expr(:call, term.args[1], term₂, term₃)
+        #return k₂-k₃, :($(term.args[1]), $term₂, $term₃)
+    end
     if !MacroTools.isexpr(term, :call) || term.args[1] ∉ ((*), :*)
         if term == var
             return 1, 1
@@ -260,19 +266,32 @@ function extract_var_factor(term, var)
         if i==1
             continue  # Skip the :*
         end
-        if factor == var
-            k += 1
-            push!(indices, i)
-            continue
-        end
-        m = MacroTools.trymatch(:((^)(v_, k_)), factor)
-        m = !isnothing(m) ? m : MacroTools.trymatch(:($(^)(v_, k_)), factor)
-        if !isnothing(m) && m[:v] == var
-            k += m[:k]
-            push!(indices, i)
+        if MacroTools.isexpr(factor, :call)
+            k′, term′ = extract_var_factor(factor, var)
+            # if term′ isa Expr
+            #     term′ = Expr(:call, term′.args...)
+            # end
+            if k′ > 0
+                k += k′
+                term.args[i] = term′
+            end
+        else
+            if factor == var
+                k += 1
+                push!(indices, i)
+                continue
+            end
+            m = MacroTools.trymatch(:((^)(v_, k_)), factor)
+            m = !isnothing(m) ? m : MacroTools.trymatch(:($(^)(v_, k_)), factor)
+            if !isnothing(m) && m[:v] == var
+                k += m[:k]
+                push!(indices, i)
+            end
         end
     end
-    splice!(term.args, indices)
+    if !isempty(indices)
+        splice!(term.args, indices)
+    end
     # TODO: If there's just 1 arg left over, return it alone
     if length(term.args) == 2
         k, term.args[2]
@@ -309,12 +328,20 @@ function var_collect(expr, var)
         k, term = extract_var_factor(expr, var)
         terms[k] = term
     else
-        for term ∈ expr.args[2:end]
+        for (i,term) ∈ enumerate(expr.args[2:end])
             k, term = extract_var_factor(term, var)
-            if k ∈ keys(terms)
-                terms[k] = :($(terms[k]) + $(term))
+            if expr.args[1] ∈ ((-), :-) && i==2
+                if k ∈ keys(terms)
+                    terms[k] = :($(terms[k]) - $(term))
+                else
+                    terms[k] = :(-$(term))
+                end
             else
-                terms[k] = term
+                if k ∈ keys(terms)
+                    terms[k] = :($(terms[k]) + $(term))
+                else
+                    terms[k] = term
+                end
             end
         end
     end
