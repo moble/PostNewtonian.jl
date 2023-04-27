@@ -124,29 +124,6 @@ Note that the sign of ``\hat{n}_i`` has dropped out of the calculations of both
 @pn_expression function tidal_heating(pnsystem)
     # References to pages and equation numbers are from Alvi (2001)
 
-    # Page 2, line 4
-    rₕ₁ = M₁ * (1 + √(1-min(χ₁²,1)))
-    rₕ₂ = M₂ * (1 + √(1-min(χ₂²,1)))
-
-    # Page 2, line 5
-    Ωₕ₁ = χ₁ / 2rₕ₁
-    Ωₕ₂ = χ₂ / 2rₕ₂
-
-    # Equivalent to Eqs. (18)/(19)
-    #   * θ is the angle between the BH's spin and the vector towards the opposite BH;
-    #   * ϕ̇ is the rotation rate of the plane containing those two vectors.
-    # See docstring for details.
-    sin²θ₁ = ifelse(iszero(χ₁²), one(χ₁²), abs2vec(n̂×χ⃗₁)/χ₁²)
-    sin²θ₂ = ifelse(iszero(χ₂²), one(χ₂²), abs2vec(n̂×χ⃗₂)/χ₂²)
-    # ϕ̇ = ϕ̇̂ * v^3/M
-    ϕ̇̂₁ = ifelse(iszero(χ₁²), one(χ₁²), ifelse(iszero(sin²θ₁), zero(χ₁²), ℓ̂⋅χ⃗₁/(χ₁*sin²θ₁)))
-    ϕ̇̂₂ = ifelse(iszero(χ₂²), one(χ₂²), ifelse(iszero(sin²θ₂), zero(χ₂²), ℓ̂⋅χ⃗₂/(χ₂*sin²θ₂)))
-
-    # Eq. (10), using `b` as defined on page 2, line 9
-    # I₀₁ = v^12 * Î₀₁
-    Î₀₁ = (16rₕ₁ / 5M^6) * M₁^5 * M₂^2 * sin²θ₁ * (1 - 3//4 * χ₁² + 15//4 * χ₁² * sin²θ₁)
-    Î₀₂ = (16rₕ₂ / 5M^6) * M₂^5 * M₁^2 * sin²θ₂ * (1 - 3//4 * χ₂² + 15//4 * χ₂² * sin²θ₂)
-
     # Eq. (21)
     Ṡ₁ = Î₀₁ * v^12 * @pn_expansion (v^3/M * ϕ̇̂₁ - Ωₕ₁)
     Ṁ₁ = Î₀₁ * v^12 * v^3/M * ϕ̇̂₁ * @pn_expansion 5 (v^3/M * ϕ̇̂₁ - Ωₕ₁)  # ϕ̇₁ * Ṡ₁

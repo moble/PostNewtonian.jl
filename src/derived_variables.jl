@@ -2,7 +2,7 @@ module DerivedVariables
 
 using ..PostNewtonian: PNSystem, VecOrPNSystem
 using ..PostNewtonian.FundamentalVariables
-using Quaternionic: 𝐢, 𝐣, 𝐤, QuatVec, (⋅), abs2vec, absvec
+using Quaternionic: 𝐢, 𝐣, 𝐤, QuatVec, (⋅), (×), abs2vec, absvec
 
 include("derived_variables/mass_combinations.jl")
 export total_mass, M,
@@ -26,5 +26,10 @@ export S⃗₁, S⃗₂, S⃗, Σ⃗, χ⃗, χ⃗ₛ, χ⃗ₐ,
     χ₁ₗ, χ₂ₗ, χₛₗ, χₐₗ,
     Sₙ, Σₙ, Sλ, Σλ, Sₗ, Σₗ,
     S₁ₙ, S₁λ, S₁ₗ, S₂ₙ, S₂λ, S₂ₗ
+
+include("derived_variables/horizons.jl")
+export rₕ₁, rₕ₂, Ωₕ₁, Ωₕ₂,
+    sin²θ₁, sin²θ₂, ϕ̇̂₁, ϕ̇̂₂,
+    Î₀₁, Î₀₂
 
 end

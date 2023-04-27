@@ -41,3 +41,19 @@ such as `χ₁²`, which gives `χ⃗₁ ⋅ χ⃗₁`; or `χ₁₂ = χ⃗₁ 
 Like all the other fundamental and derived variables, these can be used directly
 in PN expressions modified by the [`@pn_expression`](@ref
 PostNewtonian.@pn_expression) macro.
+
+
+## Horizons
+
+```@docs
+PostNewtonian.rₕ₁
+PostNewtonian.rₕ₂
+PostNewtonian.Ωₕ₁
+PostNewtonian.Ωₕ₂
+PostNewtonian.sin²θ₁
+PostNewtonian.sin²θ₂
+PostNewtonian.ϕ̇̂₁
+PostNewtonian.ϕ̇̂₂
+PostNewtonian.Î₀₁
+PostNewtonian.Î₀₂
+```
