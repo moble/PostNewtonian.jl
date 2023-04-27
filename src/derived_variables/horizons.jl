@@ -4,8 +4,8 @@
 Horizon radius of black hole 1.
 
 As defined on page 2, line 4, of [Alvi
-(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See [`tidal_heating`](@ref
-PostNewtonian.tidal_heating) for more details.
+(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See the documentation section
+on ["Horizons"](@ref Horizons) for more details.
 """
 rₕ₁(s::VecOrPNSystem) = M₁(s) * (1 + √(1-min(χ₁²(s),1)))
 
@@ -15,8 +15,8 @@ rₕ₁(s::VecOrPNSystem) = M₁(s) * (1 + √(1-min(χ₁²(s),1)))
 Horizon radius of black hole 2.
 
 As defined on page 2, line 4, of [Alvi
-(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See [`tidal_heating`](@ref
-PostNewtonian.tidal_heating) for more details.
+(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See the documentation section
+on ["Horizons"](@ref Horizons) for more details.
 """
 rₕ₂(s::VecOrPNSystem) = M₂(s) * (1 + √(1-min(χ₂²(s),1)))
 
@@ -27,8 +27,8 @@ rₕ₂(s::VecOrPNSystem) = M₂(s) * (1 + √(1-min(χ₂²(s),1)))
 Horizon angular velocity of black hole 1.
 
 As defined on page 2, line 5, of [Alvi
-(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See [`tidal_heating`](@ref
-PostNewtonian.tidal_heating) for more details.
+(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See the documentation section
+on ["Horizons"](@ref Horizons) for more details.
 """
 Ωₕ₁(s::VecOrPNSystem) = χ₁(s) / 2rₕ₁(s)
 
@@ -38,8 +38,8 @@ PostNewtonian.tidal_heating) for more details.
 Horizon angular velocity of black hole 2.
 
 As defined on page 2, line 5, of [Alvi
-(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See [`tidal_heating`](@ref
-PostNewtonian.tidal_heating) for more details.
+(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See the documentation section
+on ["Horizons"](@ref Horizons) for more details.
 """
 Ωₕ₂(s::VecOrPNSystem) = χ₂(s) / 2rₕ₂(s)
 
@@ -50,7 +50,7 @@ PostNewtonian.tidal_heating) for more details.
 Sine-squared of angle between spin of black hole 1 and vector to black hole 2.
 
 Compare to Eq. (18) of [Alvi (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).
-See [`tidal_heating`](@ref PostNewtonian.tidal_heating) for more details.
+See the documentation section on ["Horizons"](@ref Horizons) for more details.
 """
 function sin²θ₁(s::VecOrPNSystem)
     let χ₁²=χ₁²(s)
@@ -64,7 +64,7 @@ end
 Sine-squared of angle between spin of black hole 2 and vector to black hole 1.
 
 Compare to Eq. (18) of [Alvi (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).
-See [`tidal_heating`](@ref PostNewtonian.tidal_heating) for more details.
+See the documentation section on ["Horizons"](@ref Horizons) for more details.
 """
 function sin²θ₂(s::VecOrPNSystem)
     let χ₂²=χ₂²(s)
@@ -82,7 +82,7 @@ rotation rate.
 This is the rotation rate divided by ``v^3  = M\, \Omega``.
 
 As defined in Eq. (19) of [Alvi (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).
-See [`tidal_heating`](@ref PostNewtonian.tidal_heating) for more details.
+See the documentation section on ["Horizons"](@ref Horizons) for more details.
 """
 function ϕ̇̂₁(s::VecOrPNSystem)
     let χ₁=χ₁(s), sin²θ₁=sin²θ₁(s), M=M(s)
@@ -107,7 +107,7 @@ rotation rate.
 This is the rotation rate divided by ``v^3  = M\, \Omega``.
 
 As defined in Eq. (19) of [Alvi (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).
-See [`tidal_heating`](@ref PostNewtonian.tidal_heating) for more details.
+See the documentation section on ["Horizons"](@ref Horizons) for more details.
 """
 function ϕ̇̂₂(s::VecOrPNSystem)
     let χ₂=χ₂(s), sin²θ₂=sin²θ₂(s), M=M(s)
@@ -129,9 +129,9 @@ end
 
 Horizon moment of inertia of black hole 1.
 
-This is the moment divided by ``v^12``, as given by Eq. (10) of [Alvi
-(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See [`tidal_heating`](@ref
-PostNewtonian.tidal_heating) for more details.
+This is the moment divided by ``v^{12}``, as given by Eq. (10) of [Alvi
+(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See the documentation section
+on ["Horizons"](@ref Horizons) for more details.
 """
 function Î₀₁(s::VecOrPNSystem)
     let χ₁²=χ₁²(s), sin²θ₁=sin²θ₁(s)
@@ -146,9 +146,9 @@ end
 
 Horizon moment of inertia of black hole 2.
 
-This is the moment divided by ``v^12``, as given by Eq. (10) of [Alvi
-(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See [`tidal_heating`](@ref
-PostNewtonian.tidal_heating) for more details.
+This is the moment divided by ``v^{12}``, as given by Eq. (10) of [Alvi
+(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See the documentation section
+on ["Horizons"](@ref Horizons) for more details.
 """
 function Î₀₂(s::VecOrPNSystem)
     let χ₂²=χ₂²(s), sin²θ₂=sin²θ₂(s)
