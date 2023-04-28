@@ -153,6 +153,8 @@ Sλ(s::VecOrPNSystem) = S⃗(s) ⋅ λ̂(s)
 Σλ(s::VecOrPNSystem) = Σ⃗(s) ⋅ λ̂(s)
 Sₗ(s::VecOrPNSystem) = S⃗(s) ⋅ ℓ̂(s)
 Σₗ(s::VecOrPNSystem) = Σ⃗(s) ⋅ ℓ̂(s)
+sₗ(s::VecOrPNSystem) = S⃗(s) ⋅ ℓ̂(s) / M(s)^2
+σₗ(s::VecOrPNSystem) = Σ⃗(s) ⋅ ℓ̂(s) / M(s)^2
 
 S₁ₙ(s::VecOrPNSystem) = S⃗₁(s) ⋅ n̂(s)
 S₁λ(s::VecOrPNSystem) = S⃗₁(s) ⋅ λ̂(s)

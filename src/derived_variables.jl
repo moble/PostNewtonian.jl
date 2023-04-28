@@ -24,7 +24,7 @@ export S⃗₁, S⃗₂, S⃗, Σ⃗, χ⃗, χ⃗ₛ, χ⃗ₐ,
     chi_perp, χₚₑᵣₚ, χₑ, chi_eff, χₚ, chi_p,
     χ₁², χ₂², χ₁, χ₂, χ₁₂,
     χ₁ₗ, χ₂ₗ, χₛₗ, χₐₗ,
-    Sₙ, Σₙ, Sλ, Σλ, Sₗ, Σₗ,
+    Sₙ, Σₙ, Sλ, Σλ, Sₗ, Σₗ, sₗ, σₗ,
     S₁ₙ, S₁λ, S₁ₗ, S₂ₙ, S₂λ, S₂ₗ
 
 include("derived_variables/horizons.jl")

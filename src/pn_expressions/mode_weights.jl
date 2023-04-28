@@ -25,10 +25,11 @@ included in `h`.  If that is not the case, set `ℓₘᵢₙ` to the smallest ``
 should be present in the output data — `ℓₘᵢₙ=2` being the most reasonable alternative.
 
 All non-spinning terms are taken from [Blanchet
-(2014)](https://doi-org.proxy.library.cornell.edu/10.12942/lrr-2014-2).  The 1PN spin-orbit
-term is from Eq. (3.22d) of [Kidder
-(1995)](https://link.aps.org/doi/10.1103/PhysRevD.52.821).  The 1.5PN spin-orbit term is
-from Eq. (3.22f) of Kidder (1995) and Eq. (F15b) of [Will and Wiseman
+(2014)](https://doi.org/10.12942/lrr-2014-2), except for the highest-pN terms in the (2,0)
+and (2,2) modes, which are taken from [Blanchet et al.
+(2023)](https://arxiv.org/abs/2304.11186).  The 1PN spin-orbit term is from Eq. (3.22d) of
+[Kidder (1995)](https://link.aps.org/doi/10.1103/PhysRevD.52.821).  The 1.5PN spin-orbit
+term is from Eq. (3.22f) of Kidder (1995) and Eq. (F15b) of [Will and Wiseman
 (1996)](https://link.aps.org/doi/10.1103/PhysRevD.54.4813).  The 2PN spin-orbit term is from
 Eq. (4.13) of [Buonanno, Faye, Hinderer
 (2013)](https://link.aps.org/doi/10.1103/PhysRevD.87.044009), while the 2PN spin-spin term
@@ -41,7 +42,11 @@ is from Eq. (4.15) of that reference.
 
     # ell=2
     if ℓₘₐₓ≥2
-        h[Yindex(2,0,ℓₘᵢₙ)] = c * (-5/(14√6))
+        h[Yindex(2,0,ℓₘᵢₙ)] = c * (-5/(14√6)) * @pn_expansion(
+            1
+            # Eq. (6.19) of Blanchet et al. (2023); note that the 1.5pN term is 0
+            + v^2 * (-4075//4032 + 67ν/48)
+        )
         h[Yindex(2,1,ℓₘᵢₙ)] = c * @pn_expansion(
             v^1 * (𝒾 * δ / 3)
             + v^3 * (𝒾 * δ * (-17 + 20ν) / 84)
@@ -61,6 +66,12 @@ is from Eq. (4.15) of that reference.
                 - (856//105)*ln(v)
             )
             + v^7 * ((-2𝒾 * ν * (-501655 + 24396ν) + 15*(-2173 + 2ν*(-2459 + 560ν))π) / 11340)
+            # Eq. (6.17) of Blanchet et al. (2023)
+            + v^8 * (
+                - 846557506853//12713500800 + 45796γₑ/2205 - 22898𝒾*π/2205 - 107π^2/63 + 45796(2ln2+ln(v))/2205
+                + (-336005827477//4237833600 + 15284γₑ/441 - 219314𝒾*π/2205 - 9755*π^2/32256 + 15284(2ln2+ln(v))/441)ν
+                + (256450291//7413120 - 1025*π^2/1008)ν^2 - 81579187ν^3/15567552 + 26251249ν^4/31135104
+            )
         )
     end
 

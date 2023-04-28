@@ -18,6 +18,7 @@ See also
   - [Tagoshi and Sasaki (1994)](http://arxiv.org/abs/gr-qc/9405062)
   - [Poisson and Sasaki (1995)](https://arxiv.org/abs/gr-qc/9412027)
   - [Tagoshi et al. (1997)](https://arxiv.org/abs/gr-qc/9711072)
+  - [Porto (2007)](https://arxiv.org/abs/0710.5150)
   - [Chatziioannou et al. (2012)](https://arxiv.org/abs/1211.1686)
 
 
