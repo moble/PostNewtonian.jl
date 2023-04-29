@@ -79,7 +79,8 @@ overall factor is used, leading to a sign difference.
             - 89δ/48 * (χ₁² - χ₂²)/4
         )
 
-        # EMRI terms; Appendix A of Fujita (2012)
+        # EMRI terms; Appendix A of Fujita (2012), with lower-order terms removed because
+        # they have since been incorporated into non-EMRI terms above
         + v^10 * (
             - 2500861660823683//2831932303200 - 424223π^2/6804 - 83217611ln2/1122660
             + 916628467γₑ/7858620 + 47385ln3/196 + 916628467ln(v)/7858620
