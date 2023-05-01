@@ -18,10 +18,10 @@ function be(pnsystem, deriv)
     let M₁ = PostNewtonian.M₁(pnsystem), M₂ = PostNewtonian.M₂(pnsystem),
         v = PostNewtonian.v(pnsystem),
         λ₁ = PostNewtonian.λ₁(pnsystem), λ₂ = PostNewtonian.λ₂(pnsystem),
-        M = PostNewtonian.M(pnsystem), Sₗ = PostNewtonian.Sₗ(pnsystem),
+        M = PostNewtonian.M(pnsystem), sₗ = PostNewtonian.sₗ(pnsystem),
         δ = PostNewtonian.δ(pnsystem), μ = PostNewtonian.μ(pnsystem),
         ν = PostNewtonian.ν(pnsystem),
-        Σₗ = PostNewtonian.Σₗ(pnsystem), χ₁² = PostNewtonian.χ₁²(pnsystem),
+        σₗ = PostNewtonian.σₗ(pnsystem), χ₁² = PostNewtonian.χ₁²(pnsystem),
         χ₁₂ = PostNewtonian.χ₁₂(pnsystem), χ₂² = PostNewtonian.χ₂²(pnsystem),
         χₐₗ = PostNewtonian.χₐₗ(pnsystem), χₛₗ = PostNewtonian.χₛₗ(pnsystem),
         π = PostNewtonian.type_converter(pnsystem, π),
@@ -79,9 +79,9 @@ function be(pnsystem, deriv)
         )
 
         # Spin-orbit
-        e[3] = ((14Sₗ/3 + 2δ * Σₗ) / M^2)
-        e[5] = (((11-61ν/9) * Sₗ + δ*(3 - 10ν/3) * Σₗ) / M^2)
-        e[7] = (((135//4 - 367ν/4 + 29ν^2/12) * Sₗ + δ*(27//4 - 39ν + 5ν^2/4) * Σₗ) / M^2)
+        e[3] = (14sₗ/3 + 2δ * σₗ)
+        e[5] = ((11-61ν/9) * sₗ + δ*(3 - 10ν/3) * σₗ)
+        e[7] = ((135//4 - 367ν/4 + 29ν^2/12) * sₗ + δ*(27//4 - 39ν + 5ν^2/4) * σₗ)
 
         # Spin-squared
         e[4] += (
