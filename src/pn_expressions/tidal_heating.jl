@@ -29,10 +29,10 @@ computation of horizon quantities used in this function.
     # References to pages and equation numbers are from Alvi (2001)
 
     # Eq. (21)
-    Ṡ₁ = Î₀₁ * v^12 * @pn_expansion (v^3 * ϕ̇̂₁ - Ωₕ₁)
-    Ṁ₁ = Î₀₁ * v^12 * v^3 * ϕ̇̂₁ * @pn_expansion 5 (v^3 * ϕ̇̂₁ - Ωₕ₁)  # ϕ̇₁ * Ṡ₁
-    Ṡ₂ = Î₀₂ * v^12 * @pn_expansion (v^3 * ϕ̇̂₂ - Ωₕ₂)
-    Ṁ₂ = Î₀₂ * v^12 * v^3 * ϕ̇̂₂ * @pn_expansion 5 (v^3 * ϕ̇̂₂ - Ωₕ₂)  # ϕ̇₂ * Ṡ₂
+    Ṡ₁ = ν^2 * Î₀₁ * v^12 * @pn_expansion (v^3 * ϕ̇̂₁ - Ωₕ₁)
+    Ṁ₁ = ν^2 * Î₀₁ * v^12 * v^3 * ϕ̇̂₁ * @pn_expansion 5 (v^3 * ϕ̇̂₁ - Ωₕ₁)  # ϕ̇₁ * Ṡ₁
+    Ṡ₂ = ν^2 * Î₀₂ * v^12 * @pn_expansion (v^3 * ϕ̇̂₂ - Ωₕ₂)
+    Ṁ₂ = ν^2 * Î₀₂ * v^12 * v^3 * ϕ̇̂₂ * @pn_expansion 5 (v^3 * ϕ̇̂₂ - Ωₕ₂)  # ϕ̇₂ * Ṡ₂
 
     (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂)
 end

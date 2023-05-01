@@ -135,7 +135,7 @@ on ["Horizons"](@ref Horizons) for more details.
 """
 function Î₀₁(s::VecOrPNSystem)
     let χ₁²=χ₁²(s), sin²θ₁=sin²θ₁(s)
-        (16rₕ₁(s) / 5M(s)^6) * M₁(s)^5 * M₂(s)^2 * sin²θ₁ * (
+        (16rₕ₁(s) / 5M(s)^2) * M₁(s)^3 * sin²θ₁ * (
             1 - 3//4 * χ₁² + 15//4 * χ₁² * sin²θ₁
         )
     end
@@ -152,7 +152,7 @@ on ["Horizons"](@ref Horizons) for more details.
 """
 function Î₀₂(s::VecOrPNSystem)
     let χ₂²=χ₂²(s), sin²θ₂=sin²θ₂(s)
-        (16rₕ₂(s) / 5M(s)^6) * M₂(s)^5 * M₁(s)^2 * sin²θ₂ * (
+        (16rₕ₂(s) / 5M(s)^2) * M₂(s)^3 * sin²θ₂ * (
             1 - 3//4 * χ₂² + 15//4 * χ₂² * sin²θ₂
         )
     end
