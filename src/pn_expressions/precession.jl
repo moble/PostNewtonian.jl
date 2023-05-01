@@ -25,6 +25,11 @@ they define aₗ ≔ r ω ϖ, where r is the separation and ω is the orbital an
 Then, they define the PN parameter γₚ≔M/r and we have Mω = v³ so that ϖ = γₚ aₗ / v³.  The
 parameters γₚ and aₗ are given by Eqs. (4.3) and (4.4), and given here by the functions
 [`γₚ`](@ref) and [`aₗ`](@ref).
+
+The spin-squared terms (by which we mean both spin-spin and spin-orbit squared terms) in the
+energy are known to 3pN order, and given in [Eq. (3.32) of Bohé et al.
+(2015)](https://arxiv.org/abs/1501.01529).
+
 """
 @pn_expression function 𝛡(pnsystem)
     (γₚ(pnsystem) * aₗ(pnsystem) / v^3) * n̂
@@ -34,20 +39,35 @@ end
 """
     γₚ(pnsystem)
 
-Eq. (4.3) of [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520).  This term contributes
-to [`𝛡`](@ref).
+Eq. (4.3) of [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520) and Eq. (3.32) of [Bohé
+et al.  (2015)](https://arxiv.org/abs/1501.01529).  This term contributes to [`𝛡`](@ref).
 
 Note that there is a 3PN term of ``-22ν\\ln(r/r₀′)/3`` that is simply ignored here.
 """
 @pn_expression function γₚ(pnsystem)
     v^2 * @pn_expansion(
+        # Non-spinning terms; Eq. (4.3) of Bohé et al. (2013)
         1
         + v^2 * (1 - ν / 3)
         + v^4 * (1 - 65ν / 12)
         + v^6 * (1 + (-2203//2520 - 41π^2 / 192)ν + 229ν^2 / 36 + ν^3 / 81)
-        + v^3 * ((5//3 * Sₗ + δ * Σₗ) / M^2)
-        + v^5 * (((10//3 + 8ν/9) * Sₗ + 2δ * Σₗ) / M^2)
-        + v^7 * (((5 - 127ν/12 - 6ν^2) * Sₗ + δ * (3 - 61ν/6 - 8ν^2/3) * Σₗ)/M^2)
+
+        # Spin-orbit terms; Eq. (4.3) of Bohé et al. (2013)
+        + v^3 * (5//3 * sₗ + δ * σₗ)
+        + v^5 * ((10//3 + 8ν/9) * sₗ + 2δ * σₗ)
+        + v^7 * ((5 - 127ν/12 - 6ν^2) * sₗ + δ * (3 - 61ν/6 - 8ν^2/3) * σₗ)
+
+        # Spin-squared terms; Eq. (3.32) of Bohé et al. (2015)
+        + v^4 * (
+            sₗ^2 * (-κ₊/2 - 1)
+            + sₗ * σₗ * (-δ*κ₊/2 - δ + κ₋/2)
+            + σₗ^2 * (δ*κ₋/4 - κ₊/4 + (κ₊/2 + 1)ν)
+        )
+        + v^6 * (
+            sₗ^2 * (-11δ*κ₋/12 - 11κ₊/12 + 14//9 + (-κ₊/6 - 1//3)ν)
+            + sₗ * σₗ * (5δ/3 + (-δ*κ₊/6 - δ/3 + 23κ₋/6)ν)
+            + σₗ^2 * (1 + (δ*κ₋ - κ₊ - 2)ν + (κ₊/6 + 1//3)ν^2)
+        )
     )
 end
 

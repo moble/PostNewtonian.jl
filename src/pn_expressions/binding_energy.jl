@@ -22,14 +22,12 @@ is known exactly, now that the ``ν``-linear piece is given as Eq. (32) of [Bini
 [Bini and Damour (2013b)](https://arxiv.org/abs/1312.2503v2) have derived some terms, though
 there is incomplete information, which are noted as the constants in this code.
 
-The spin-squared terms (by which I mean both spin-spin and spin-orbit squared terms) in the
-energy are known only at 2pN order (from [Kidder
-(1995)](https://link.aps.org/doi/10.1103/PhysRevD.52.821) and [Will and Wiseman
-(1996)](https://link.aps.org/doi/10.1103/PhysRevD.54.4813)).  They are most conveniently
-given in Eq. (C4) of [Arun et al.](https://arxiv.org/abs/0810.5336v3)
-
 The spin-orbit terms in the energy are now complete to 4.0pN (the last term is zero).  These
 terms come from Eq. (4.6) of [Bohé et al. (2012)](https://arxiv.org/abs/1212.5520v2).
+
+The spin-squared terms (by which we mean both spin-spin and spin-orbit squared terms) in the
+energy are known to 3pN order, and given in Eq. (3.33) of [Bohé et al.
+(2015)](https://arxiv.org/abs/1501.01529).
 
 The tidal-coupling terms come in to the binding energy at relative 5pN order, and are known
 to 6pN order.  These terms come from Eq. (2.11) of [Vines et al.
@@ -92,10 +90,16 @@ overall factor is used, leading to a sign difference.
         + v^5 * ((11-61ν/9) * sₗ + (3 - 10ν/3)δ * σₗ)
         + v^7 * ((135//4 - 367ν/4 + 29ν^2/12) * sₗ + (27//4 - 39ν + 5ν^2/4)δ * σₗ)
 
-        # Spin-squared; Eq. (C4) of Arun et al. (2008)
+        # Spin-squared; Eq. (3.33) of Bohé et al. (2015)
         + v^4 * (
-            (1 + δ - 2ν) * (χ₁² + χ₂²)/4 - 3*(χₐₗ^2 + χₛₗ^2)/2
-            - (χ₂²/2 + 3χₐₗ*χₛₗ)δ + (χ₁₂ + 6χₐₗ^2)ν
+            sₗ^2 * (-κ₊ - 2)
+            + sₗ * σₗ * (-δ*κ₊ - 2δ + κ₋)
+            + σₗ^2 * (δ*κ₋/2 - κ₊/2 + (κ₊ + 2)ν)
+        )
+        + v^6 * (
+            sₗ^2 * (-5δ*κ₋/3 - 25*κ₊/6 + 50//9 + (5κ₊/6 + 5/3)ν)
+            + sₗ * σₗ * (-5*δ*κ₊/2 + 25*δ/3 + 5κ₋/2 + (5δ*κ₊/6 + 5δ/3 + 35κ₋/6)ν)
+            + σₗ^2 * (5δ*κ₋/4 - 5κ₊/4 + 5 + (5δ*κ₋/4 + 5κ₊/4 - 10)ν + (-5κ₊/6 - 5//3)ν^2)
         )
 
         # # NS tidal coupling

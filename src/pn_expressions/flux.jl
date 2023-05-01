@@ -7,19 +7,16 @@ Compute the gravitational-wave energy flux to infinity
 The nonspinning flux terms are complete to 4.5pN order, and are given in Eq. (6.11) of
 [Blanchet et al. (2023)](https://arxiv.org/abs/2304.11186).
 
-The spin-squared terms (by which I mean both spin-spin and spin-orbit squared terms) in the
-flux are known only at 2pN order (from [Kidder
-(1995)](https://link.aps.org/doi/10.1103/PhysRevD.52.821) and [Will and Wiseman
-(1996)](https://link.aps.org/doi/10.1103/PhysRevD.54.4813)).  They are most conveniently
-given in Eq. (C10) of [Arun et al. (2008)](https://arxiv.org/abs/0810.5336v3)
-
 The spin-orbit terms in the flux are now known to 4.0pN.  These terms come from Eq. (4.9) of
 [Marsat et al. (2013)](https://arxiv.org/abs/1307.6793v1)
 
-Beyond 3.5pN, terms other than the 4.0pN spin-orbit are only known in the extreme-mass-ratio
-limit.  These terms are given in Appendix A of [Fujita
-(2012)](https://arxiv.org/abs/1211.5535v1).  He computed them up to 22pN.  That seems like
-overkill, so we'll just go up to 6pN.
+The spin-squared terms (by which we mean both spin-spin and spin-orbit squared terms) in the
+flux are known to 3pN order, and given most conveniently in Eq. (4.14) of [Bohé et al.
+(2015)](https://arxiv.org/abs/1501.01529).
+
+Beyond 4.5pN, terms are only known in the extreme-mass-ratio limit.  These terms are given
+in Appendix A of [Fujita (2012)](https://arxiv.org/abs/1211.5535v1).  He computed them up to
+22pN.  That seems like overkill, so we'll just go up to 6pN.
 
 For systems with matter, the tidal-heating terms come in at relative 5pN order, and are
 known partially at 6pN order.  These terms come from Eq. (3.6) of [Vines et al.
@@ -71,12 +68,20 @@ overall factor is used, leading to a sign difference.
             + (-7163//672 + 130583ν/2016)π*δ * σₗ
         )
 
-        # Spin-squared terms; Eq. (C10) of Arun et al. (2008)
+        # Spin-squared terms; Eq. (4.14) of Bohé et al. (2015)
         + v^4 * (
-            (287//96 + ν/24) * (χₛₗ)^2 - (89//96 + 7ν/24) * (χ₁² + 2χ₁₂ + χ₂²) / 4
-            + (287//96 - 12ν) * (χₐₗ)^2 + (-89//96 + 4ν) * (χ₁² - 2χ₁₂ + χ₂²) / 4
-            + 287δ/48 * χₛₗ * χₐₗ
-            - 89δ/48 * (χ₁² - χ₂²)/4
+            sₗ^2 * (2κ₊ + 4)
+            + sₗ * σₗ * (2δ*κ₊ + 4δ - 2κ₋)
+            + σₗ^2 * (-δ*κ₋ + κ₊ + 1//16 + (-2κ₊ - 4)ν)
+        )
+        + v^6 * (
+            sₗ^2 * (41δ*κ₋/16 - 271κ₊/112 - 5239//504 + (-43κ₊/4 - 43//2)ν)
+            + sₗ * σₗ * (-279δ*κ₊/56 - 817δ/56 + 279κ₋/56 + (-43δ*κ₊/4 - 43δ/2 + κ₋/2)ν)
+            + σₗ^2 * (
+                279δ*κ₋/112 - 279*κ₊/112 - 25//8
+                + (45δ*κ₋/16 + 243κ₊/112 + 344//21)ν
+                + (43κ₊/4 + 43//2)ν^2
+            )
         )
 
         # EMRI terms; Appendix A of Fujita (2012), with lower-order terms removed because

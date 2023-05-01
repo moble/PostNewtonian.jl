@@ -157,3 +157,56 @@ function Î₀₂(s::VecOrPNSystem)
         )
     end
 end
+
+@doc raw"""
+    κ₁(s)
+
+The "quadrupolar polarisability" of object 1 used by [Bohé et al.
+(2015)](https://arxiv.org/abs/1501.01529).
+
+Note that Bohé et al. refer to the closely related (and co-authored) [Marsat
+(2014)](https://arxiv.org/abs/1411.4118), who notes that this is denoted
+``C_{\mathrm{ES}^2}`` in who notes that "we can set ... the Wilson coefficients
+``C_{\mathrm{ES}^2} = C_{\mathrm{BS}^3} = 1`` for the black hole case."
+
+!!! warn
+    This function will be incorrect for objects other than black holes.  It is not clear to
+    me if this is the same quantity as ``C_Q`` used in some papers, such as [Bini and
+    Geralico (2014)](https://arxiv.org/abs/1408.5261), but they point out that for neutron
+    stars, the value varies between 4.3 and 7.4, depending on the equation of state.  This
+    quantity may also be related to [`λ₁`](@ref).  Pull requests or issues with more
+    information are welcome.
+"""
+function κ₁(s::VecOrPNSystem)
+    1
+end
+
+"""
+    κ₂(s)
+
+The "quadrupolar polarisability" of object 2 used by [Bohé et al.
+(2015)](https://arxiv.org/abs/1501.01529).  See [`κ₁`](@ref) for more details.
+"""
+function κ₂(s::VecOrPNSystem)
+    1
+end
+
+"""
+    κ₊(s)
+
+Equal to [`κ₁`](@ref)` + `[`κ₂`](@ref); defined below Eq. (3.28) of [Bohé et al.
+(2015)](https://arxiv.org/abs/1501.01529).
+"""
+function κ₊(s::VecOrPNSystem)
+    κ₁(s) + κ₂(s)
+end
+
+"""
+    κ₋(s)
+
+Equal to [`κ₁`](@ref)` - `[`κ₂`](@ref); defined below Eq. (3.28) of [Bohé et al.
+(2015)](https://arxiv.org/abs/1501.01529).
+"""
+function κ₋(s::VecOrPNSystem)
+    κ₁(s) - κ₂(s)
+end
