@@ -1,27 +1,28 @@
-@doc raw"""
-    TaylorT1!(u̇, pnsystem)
-
-Compute the right-hand side for the orbital evolution of a non-eccentric binary in the
-"TaylorT1" approximant.
-
-This approximant is the simplest, in which the time derivative ``\dot{v}`` is given directly
-by
-```math
-\dot{v} = -\frac{\mathcal{F} + \dot{M}_1 + \dot{M}_2} {\mathcal{E}'},
-```
-and the PN expression for each term on the right-hand side is evaluated numerically before
-insertion directly in this expression.  Compare [`TaylorT4!`](@ref) and [`TaylorT5!`](@ref).
-
-Here, `u̇` is the time-derivative of the state vector, which is stored in the
-[`PNSystem`](@ref) object `p`.
-"""
-@pn_expression 2 function TaylorT1!(u̇, p)
-    if causes_domain_error!(u̇, p)
-        return
-    end
+function v̇_numerator(p)
     (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(p)
-    v̇ = - (𝓕(p) + Ṁ₁ + Ṁ₂) / 𝓔′(p)  # This expression is what makes this TaylorT1
+    - (𝓕(p) + Ṁ₁ + Ṁ₂)
+end
+
+function v̇_denominator(p)
+    𝓔′(p)
+end
+
+function v̇_numerator_coeffs(p)
+    error("Not yet implemented")
+end
+
+function v̇_denominator_coeffs(p)
+    error("Not yet implemented")
+end
+
+
+# This represents most of the lines of code needed to compute each approximant, but is
+# identical in each.  The only things that this code don't do are (1) checking
+# `causes_domain_error!` and (2) computing v̇.  The first has to be done before the second,
+# but is just one line, and the second changes depending on the approximant.
+RHS_body = quote
     Ω⃗ = Ω⃗ₚ(p) + Ω * ℓ̂
+    (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(p)
     χ̂₁ = ifelse(iszero(χ₁), ℓ̂, χ⃗₁ / χ₁)
     χ̂₂ = ifelse(iszero(χ₂), ℓ̂, χ⃗₂ / χ₂)
     χ⃗̇₁ = (Ṡ₁ / M₁^2) * χ̂₁ - (2Ṁ₁ / M₁) * χ⃗₁ + Ω⃗ᵪ₁(p) × χ⃗₁
@@ -44,12 +45,38 @@ Here, `u̇` is the time-derivative of the state vector, which is stored in the
     nothing
 end
 
+@eval @doc raw"""
+    TaylorT1!(u̇, pnsystem)
+
+Compute the right-hand side for the orbital evolution of a non-eccentric binary in the
+"TaylorT1" approximant.
+
+This approximant is the simplest, in which the time derivative ``\dot{v}`` is given directly
+by
+```math
+\dot{v} = -\frac{\mathcal{F} + \dot{M}_1 + \dot{M}_2} {\mathcal{E}'},
+```
+and the PN expression for each term on the right-hand side is evaluated numerically before
+insertion directly in this expression.  Compare [`TaylorT4!`](@ref) and [`TaylorT5!`](@ref).
+
+Here, `u̇` is the time-derivative of the state vector, which is stored in the
+[`PNSystem`](@ref) object `p`.
+"""
+@pn_expression 2 function TaylorT1!(u̇, p)
+    causes_domain_error!(u̇, p) && return
+
+    # This expression is what makes this TaylorT1
+    v̇ = v̇_numerator(p) / v̇_denominator(p)
+
+    $RHS_body
+end
+
 const TaylorT1RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
     (u̇,u,p,t) -> (p.state.=u; TaylorT1!(u̇,p)), syms=pnsystem_symbols
 )
 
 
-@doc raw"""
+@eval @doc raw"""
     TaylorT4!(u̇, pnsystem)
 
 Compute the right-hand side for the orbital evolution of a non-eccentric binary in the
@@ -67,7 +94,12 @@ the [`PNSystem`](@ref) object `p`.  The parameter `t` represents the time, and w
 always be unused in this package, but is part of the `DifferentialEquations` API.
 """
 @pn_expression 2 function TaylorT4!(u̇, p)
-    error("Not yet implemented")
+    causes_domain_error!(u̇, p) && return
+
+    # This expression is what makes this TaylorT4
+    v̇ = truncated_series_ratio(v̇_numerator_coeffs(p), v̇_denominator_coeffs(p), v)
+
+    $RHS_body
 end
 
 const TaylorT4RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
@@ -75,7 +107,7 @@ const TaylorT4RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
 )
 
 
-@doc raw"""
+@eval @doc raw"""
     TaylorT5!(u̇, pnsystem)
 
 Compute the right-hand side for the orbital evolution of a non-eccentric binary in the
@@ -96,7 +128,12 @@ the [`PNSystem`](@ref) object `p`.  The parameter `t` represents the time, and w
 always be unused in this package, but is part of the `DifferentialEquations` API.
 """
 @pn_expression 2 function TaylorT5!(u̇, p)
-    error("Not yet implemented")
+    causes_domain_error!(u̇, p) && return
+
+    # This expression is what makes this TaylorT5
+    v̇ = inv(truncated_series_ratio(v̇_denominator_coeffs(p), v̇_numerator_coeffs(p), v))
+
+    $RHS_body
 end
 
 const TaylorT5RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(

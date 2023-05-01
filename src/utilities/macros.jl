@@ -351,6 +351,31 @@ function var_collect(expr, var)
 end
 
 
+function var_collect(expr::Num, var; max_power=100, max_gap=4)
+    expr = expand(expr)
+    dict = Dict(var^j => 0 for j=1:max_power)
+    c = substitute(expr, dict, fold=false)
+    expr = expr - c
+    coefficients = [c]
+    gap = 0
+    for i in 1:max_power
+        dict[var^i] = 1
+        if i > 1
+            dict[var^(i-1)] = 0
+        end
+        push!(coefficients, substitute(expr, dict, fold=false))
+        if iszero(coefficients[end])
+            gap += 1
+            if gap ≥ max_gap
+                return coefficients[1:end-gap]
+            end
+        else
+            gap = 0
+        end
+    end
+    coefficients
+end
+
 
 # function symbolic_collect(expr::Num, var)
 #     ex = Symbolics.unwrap(expr)
