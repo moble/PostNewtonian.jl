@@ -178,7 +178,7 @@ Note that Bohé et al. refer to the closely related (and co-authored) [Marsat
     information are welcome.
 """
 function κ₁(s::VecOrPNSystem)
-    1
+    one(eltype(s))
 end
 
 """
@@ -188,7 +188,7 @@ The "quadrupolar polarisability" of object 2 used by [Bohé et al.
 (2015)](https://arxiv.org/abs/1501.01529).  See [`κ₁`](@ref) for more details.
 """
 function κ₂(s::VecOrPNSystem)
-    1
+    one(eltype(s))
 end
 
 """
