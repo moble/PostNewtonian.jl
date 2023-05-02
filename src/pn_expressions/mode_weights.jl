@@ -25,11 +25,12 @@ included in `h`.  If that is not the case, set `ℓₘᵢₙ` to the smallest ``
 should be present in the output data — `ℓₘᵢₙ=2` being the most reasonable alternative.
 
 All non-spinning terms are taken from [Blanchet
-(2014)](https://doi.org/10.12942/lrr-2014-2), except for the highest-pN terms in the (2,0)
-and (2,2) modes, which are taken from [Blanchet et al.
-(2023)](https://arxiv.org/abs/2304.11186).  The 1PN spin-orbit term is from Eq. (3.22d) of
-[Kidder (1995)](https://link.aps.org/doi/10.1103/PhysRevD.52.821).  The 1.5PN spin-orbit
-term is from Eq. (3.22f) of Kidder (1995) and Eq. (F15b) of [Will and Wiseman
+(2014)](https://doi.org/10.12942/lrr-2014-2), except for the highest-pN term in the (2,2)
+mode, which are taken from [Blanchet et al.  (2023)](https://arxiv.org/abs/2304.11186), and
+the ``m=0`` modes, which are taken from [Favata (2008)](https://arxiv.org/abs/0812.0069).
+The 1PN spin-orbit term is from Eq. (3.22d) of [Kidder
+(1995)](https://link.aps.org/doi/10.1103/PhysRevD.52.821).  The 1.5PN spin-orbit term is
+from Eq. (3.22f) of Kidder (1995) and Eq. (F15b) of [Will and Wiseman
 (1996)](https://link.aps.org/doi/10.1103/PhysRevD.54.4813).  The 2PN spin-orbit term is from
 Eq. (4.13) of [Buonanno, Faye, Hinderer
 (2013)](https://link.aps.org/doi/10.1103/PhysRevD.87.044009), while the 2PN spin-spin term
@@ -43,9 +44,17 @@ is from Eq. (4.15) of that reference.
     # ell=2
     if ℓₘₐₓ≥2
         h[Yindex(2,0,ℓₘᵢₙ)] = c * (-5/(14√6)) * @pn_expansion(
+            # Eq. (4.3a) of Favata (2008)
             1
-            # Eq. (6.19) of Blanchet et al. (2023); note that the 1.5pN term is 0
             + v^2 * (-4075//4032 + 67ν/48)
+            + v^4 * (-151877213//67060224 - 123815ν/44352 + 205ν^2/352)
+            + v^5 * (-253/336 + 253ν/84)π
+            + v^6 * (
+                -4397711103307//532580106240
+                + (700464542023/13948526592 - 205π^2/96)ν
+                + 69527951ν^2/166053888
+                + 1321981ν^3/5930496
+            )
         )
         h[Yindex(2,1,ℓₘᵢₙ)] = c * @pn_expansion(
             v^1 * (𝒾 * δ / 3)
@@ -120,7 +129,19 @@ is from Eq. (4.15) of that reference.
 
     # ell=4
     if ℓₘₐₓ≥4
-        h[Yindex(4,0,ℓₘᵢₙ)] = c * (-1 / 504√2)
+        h[Yindex(4,0,ℓₘᵢₙ)] = c * (-1 / 504√2) * @pn_expansion(
+            # Eq. (4.3b) of Favata (2008)
+            1
+            + v^2 * (-180101//29568 + 27227ν/1056)
+            + v^4 * (2201411267//158505984 - 34829479ν/432432 + 844951ν^2/27456)
+            + v^5 * (-13565//1232 + 13565ν/308)π
+            + v^6 * (
+                15240463356751//781117489152
+                + (-1029744557245//27897053184 - 205π^2/96)ν
+                - 4174614175ν^2/36900864
+                + 221405645ν^3/11860992
+            )
+        )
         h[Yindex(4,1,ℓₘᵢₙ)] = c * @pn_expansion(
             v^3 * (𝒾 * δ * (1 - 2ν) / 84√10)
             + v^5 * (-𝒾 * δ * (404 + (-1011 + 332ν)ν) / 11088√10)
@@ -174,6 +195,18 @@ is from Eq. (4.15) of that reference.
 
     # ell=6
     if ℓₘₐₓ≥6
+        h[Yindex(6,0,ℓₘᵢₙ)] = c * (4195/(1419264√273)) * @pn_expansion(
+            # Eq. (4.3c) of Favata (2008)
+            + v^2 * (1 - 3612ν/839)
+            + v^4 * (-45661561//6342840 + 101414ν/2517 - 48118ν^2/839)
+            + v^5 * (1248//839 - 4992ν/839)π
+            + v^6 * (
+                3012132889099//144921208320
+                - 27653500031ν/191694720
+                + 1317967427ν^2/4107744
+                - 24793657ν^3/342312
+            )
+        )
         h[Yindex(6,1,ℓₘᵢₙ)] = c * @pn_expansion(
             v^5 * (𝒾 * δ * (-1 + ν) * (-1 + 3 * ν) / 8316√26)
         )
@@ -224,6 +257,16 @@ is from Eq. (4.15) of that reference.
 
     # ell=8
     if ℓₘₐₓ≥8
+        h[Yindex(8,0,ℓₘᵢₙ)] = c * (-75601/(213497856√119)) * @pn_expansion(
+            # Eq. (4.3d) of Favata (2008)
+            + v^4 * (1 - 452070ν/75601 + 733320ν^2/75601)
+            + v^6 * (
+                - 265361599//33869248
+                + 18177898147ν/321757856
+                - 722521125ν^2/5745676
+                + 261283995ν^3/2872838
+            )
+        )
         h[Yindex(8,2,ℓₘᵢₙ)] = c * @pn_expansion(
             v^6 * (-(-1 + (-1 + ν)^2 * 7ν) / 9009√85)
         )
