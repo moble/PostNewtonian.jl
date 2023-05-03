@@ -24,6 +24,7 @@ function be(pnsystem, deriv)
         σₗ = PostNewtonian.σₗ(pnsystem), χ₁² = PostNewtonian.χ₁²(pnsystem),
         χ₁₂ = PostNewtonian.χ₁₂(pnsystem), χ₂² = PostNewtonian.χ₂²(pnsystem),
         χₐₗ = PostNewtonian.χₐₗ(pnsystem), χₛₗ = PostNewtonian.χₛₗ(pnsystem),
+        κ₊ = PostNewtonian.κ₊(pnsystem), κ₋ = PostNewtonian.κ₋(pnsystem),
         π = PostNewtonian.type_converter(pnsystem, π),
         ln2 = PostNewtonian.type_converter(pnsystem, PostNewtonian.ln2),
         ln3 = PostNewtonian.type_converter(pnsystem, PostNewtonian.ln3),
@@ -85,8 +86,14 @@ function be(pnsystem, deriv)
 
         # Spin-squared
         e[4] += (
-            (1 + δ - 2ν) * (χ₁² + χ₂²)/4 - 3*(χₐₗ^2 + χₛₗ^2)/2
-            - δ*(χ₂²/2 + 3χₐₗ*χₛₗ) + (χ₁₂ + 6χₐₗ^2)ν
+            sₗ^2 * (-κ₊ - 2)
+            + sₗ * σₗ * (-δ*κ₊ - 2δ + κ₋)
+            + σₗ^2 * (δ*κ₋/2 - κ₊/2 + (κ₊ + 2)ν)
+        )
+        e[6] += (
+            sₗ^2 * (-5δ*κ₋/3 - 25*κ₊/6 + 50//9 + (5κ₊/6 + 5/3)ν)
+            + sₗ * σₗ * (-5*δ*κ₊/2 + 25*δ/3 + 5κ₋/2 + (5δ*κ₊/6 + 5δ/3 + 35κ₋/6)ν)
+            + σₗ^2 * (5δ*κ₋/4 - 5κ₊/4 + 5 + (5δ*κ₋/4 + 5κ₊/4 - 10)ν + (-5κ₊/6 - 5//3)ν^2)
         )
 
         # # NS tidal coupling
