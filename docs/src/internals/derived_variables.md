@@ -164,4 +164,8 @@ PostNewtonian.ϕ̇̂₁
 PostNewtonian.ϕ̇̂₂
 PostNewtonian.Î₀₁
 PostNewtonian.Î₀₂
+PostNewtonian.κ₁
+PostNewtonian.κ₂
+PostNewtonian.κ₊
+PostNewtonian.κ₋
 ```
