@@ -17,6 +17,6 @@ PostNewtonian.χ⃗₂
 PostNewtonian.R
 PostNewtonian.v
 PostNewtonian.Φ
-PostNewtonian.λ₁
-PostNewtonian.λ₂
+PostNewtonian.Λ̂₁
+PostNewtonian.Λ̂₂
 ```

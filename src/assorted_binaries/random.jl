@@ -45,7 +45,7 @@ distance or total mass — so we'll just choose the total mass to be ``1`` at th
 frequency, then sample based on mass ratio and spin magnitudes.
 
 Given these, it seems like the current state of the art would be well covered by choosing a
-random `q` ∈ [0.05, 1], `χᵢ` ∈ [0, 0.998], and `λᵢ` ∈ [0, 5000], with isotropic choices for
+random `q` ∈ [0.05, 1], `χᵢ` ∈ [0, 0.998], and `Λ̂ᵢ` ∈ [0, 5000], with isotropic choices for
 orientations.
 """
 Base.rand(pnclass::Type{P}; v::T=0.2, PNOrder=typemax(Int)) where {P<:PNSystem, T} =
@@ -56,14 +56,14 @@ function Base.rand(
 ) where {P<:PNSystem, T}
     qₘᵢₙ = T(big"0.05")  # Note that we're using q≤1 here for consistency with LIGO
     χₘₐₓ = T(big"0.998")
-    λₘₐₓ = T(big"5000.0")
+    Λ̂ₘₐₓ = T(big"5000.0")
     q = rand(rng, T) * (1-qₘᵢₙ) + qₘᵢₙ
     M₁ = 1/(q+1)
     M₂ = q/(q+1)
     χ⃗₁ = χₘₐₓ * rand(rng, T) * normalize(randn(rng, QuatVec{T}))
     χ⃗₂ = χₘₐₓ * rand(rng, T) * normalize(randn(rng, QuatVec{T}))
     R = randn(rng, Rotor{T})
-    λ₁ = λₘₐₓ * rand(rng, T)
-    λ₂ = λₘₐₓ * rand(rng, T)
-    pnclass(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, λ₁, λ₂, PNOrder)
+    Λ̂₁ = Λ̂ₘₐₓ * rand(rng, T)
+    Λ̂₂ = Λ̂ₘₐₓ * rand(rng, T)
+    pnclass(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ̂₁, Λ̂₂, PNOrder)
 end

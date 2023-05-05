@@ -15,7 +15,7 @@ to existing PN expressions, and possibly simple functions in
 
 Existing code should be a good guide on how to do this.  However, it may appear
 as if some magic is happening in the various PN expressions, whereby variables
-like `M₁`, `χ⃗₂`, `ν`, `λ̂`, etc., can be used without being defined.  These are
+like `M₁`, `χ⃗₂`, `ν`, `Λ̂`, etc., can be used without being defined.  These are
 automatically computed by way of the [`@pn_expression`](@ref
 PostNewtonian.@pn_expression) macro.  Also note that to correctly truncate a PN
 expansion at the desired order, the [`@pn_expansion`](@ref

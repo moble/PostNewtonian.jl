@@ -13,7 +13,7 @@ Compute a PN waveform, with the same call signature as `GWFrames.PNWaveform`
 This is essentially a compatibility layer for the corresponding function in the original
 [`GWFrames`](https://github.com/moble/GWFrames/blob/01b39bfe/Code/PNWaveforms.cpp#L83-L88)
 Python package, with several additional optional arguments: `inertial`, `dt`, `quiet`,
-`ell_min`, `ell_max`, `lambda1`, and `lambda2` (see below).  Also, this function accepts
+`ell_min`, `ell_max`, `LambdaHat1`, and `LambdaHat2` (see below).  Also, this function accepts
 optional arguments either as positional arguments (which the original `GWFrames` requires)
 or as keyword arguments.
 
@@ -79,8 +79,8 @@ order (though any number of them may be omitted from the end), or as keyword arg
     example of how to filter warnings also.
   * `ell_min=2`: The lowest ℓ value in the output waveform.
   * `ell_max=8`: The highest ℓ value in the output waveform.
-  * `lambda1=0`: Tidal-coupling parameter of object 1.
-  * `lambda2=0`: Tidal-coupling parameter of object 2.
+  * `LambdaHat1=0`: Tidal-coupling parameter of object 1.
+  * `LambdaHat2=0`: Tidal-coupling parameter of object 2.
 
 
 ## Returned values
@@ -116,7 +116,7 @@ function PNWaveform(
     Omega_orb_0, R_frame_i=[1.0], MinStepsPerOrbit=32,
     PNWaveformModeOrder=4.0, PNOrbitalEvolutionOrder=4.0,
     inertial=false, dt=0.0, quiet=true,
-    ell_min=2, ell_max=8, lambda1=0, lambda2=0,
+    ell_min=2, ell_max=8, LambdaHat1=0, LambdaHat2=0,
     kwargs...
 )
     # Note that this method's signature is missing the `Omega_orb_0` default
@@ -128,7 +128,7 @@ function PNWaveform(
         Omega_orb_0, R_frame_i, MinStepsPerOrbit,
         PNWaveformModeOrder, PNOrbitalEvolutionOrder,
         inertial, dt, quiet,
-        ell_min, ell_max, lambda1, lambda2,
+        ell_min, ell_max, LambdaHat1, LambdaHat2,
         kwargs...
     )
 end
@@ -138,7 +138,7 @@ function PNWaveform(
     Omega_orb_0=Omega_orb_i, R_frame_i=[1.0], MinStepsPerOrbit=32,
     PNWaveformModeOrder=4.0, PNOrbitalEvolutionOrder=4.0,
     inertial=false, dt=0.0, quiet=true,
-    ell_min=2, ell_max=8, lambda1=0, lambda2=0,
+    ell_min=2, ell_max=8, LambdaHat1=0, LambdaHat2=0,
     kwargs...
 )
     M₁ = (1 + delta) / 2
@@ -163,7 +163,7 @@ function PNWaveform(
 
     # Inspiral
     solution = orbital_evolution(
-        M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; λ₁=lambda1, λ₂=lambda2,
+        M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; Λ̂₁=LambdaHat1, Λ̂₂=LambdaHat2,
         Ω₁=Ω₁, Rᵢ=Rᵢ,
         approximant=Approximant, PNOrder=PNOrbitalEvolutionOrder,
         quiet=quiet, saveat, kwargs...

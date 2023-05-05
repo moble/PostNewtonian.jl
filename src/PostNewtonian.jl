@@ -32,7 +32,7 @@ export PNSystem, BBH, BHNS, NSNS, SymbolicPNSystem, symbolic_pnsystem, pn_order
 
 include("fundamental_variables.jl")
 using .FundamentalVariables
-#export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, λ₁, λ₂  # Avoid clashes: don't export
+#export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, Λ̂₁, Λ̂₂  # Avoid clashes: don't export
 
 
 include("derived_variables.jl")

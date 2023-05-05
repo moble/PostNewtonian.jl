@@ -12,7 +12,7 @@ For example, to integrate the inspiral of a binary black-hole system in
 inspiral = orbital_evolution(superkick())
 ```
 This implicitly provides the `M₁`, `M₂`, `χ⃗₁`, `χ⃗₂`, `Ωᵢ`, `Rᵢ`, and `PNOrder`
-arguments (along with `λ₁` and/or `λ₂` for `BHNS` or `NSNS` systems) to
+arguments (along with `Λ̂₁` and/or `Λ̂₂` for `BHNS` or `NSNS` systems) to
 [`orbital_evolution`](@ref); other keyword arguments to that function can be
 provided after `superkick()`.
 

@@ -31,7 +31,7 @@ PostNewtonian.𝓔′) is constructed, essentially as
 julia> ∂ᵥ = Differential(v);
 
 julia> expand_derivatives(∂ᵥ(𝓔(symbolic_pnsystem)))
-(-1//2)*M*ν*((-90(v^9)*((M₂*λ₁) / M₁ + (M₁*λ₂) / M₂)) / (M^5) + [...]
+(-1//2)*M*ν*(-90*(v^9)*((M₂*Λ̂₁) / M₁ + (M₁*Λ̂₂) / M₂)) + [...]
 ```
 
 Note that special care is taken to preserve the types of `Irrational`s and the

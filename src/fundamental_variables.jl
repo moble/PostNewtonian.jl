@@ -5,8 +5,8 @@ using ..PostNewtonian: PNSystem, BHNS, NSNS
 using ..PostNewtonian: M₁index, M₂index, χ⃗₁indices, χ⃗₂indices, Rindices, vindex, Φindex
 using Quaternionic
 
-export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, λ₁, λ₂,
-    M1, M2, chi1, chi2, Phi, lambda1, lambda2
+export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, Λ̂₁, Λ̂₂,
+    M1, M2, chi1, chi2, Phi, LambdaHat1, LambdaHat2
 
 ## NOTE:
 ## This indices used below are intimately bound to choices made in the definitions of
@@ -96,14 +96,14 @@ Integrated orbital phase of the system.  It is computed as the integral of [`Ω`
 const Phi = Φ
 
 @doc raw"""
-    λ₁(pnsystem)
-    lambda1(pnsystem)
+    Λ̂₁(pnsystem)
+    LambdaHat1(pnsystem)
 
 Tidal coupling parameter of object 1 in this system.
 
 This is related to the Love number ``k_2`` and the star's radius ``R`` as
 ```math
-\lambda_1 = \frac{2}{3} k_2 R^5.
+\hat{\Lambda}_1 = \frac{2}{3} k_2 R^5 / M^5.
 ```
 There is another common parameter denoted
 ```math
@@ -115,20 +115,20 @@ quantity.  All other types return `0`, which Julia can use to eliminate code tha
 be 0.  Thus, it is safe and efficient to use this quantity in any PN expression that
 specializes on the type of `pnsystem`.
 """
-λ₁(::PNSystem) = 0
-λ₁(pn::NSNS) = pn.λ₁
-λ₁(pn::SymbolicPNSystem) = pn.λ₁
-const lambda1 = λ₁
+Λ̂₁(::PNSystem) = 0
+Λ̂₁(pn::NSNS) = pn.Λ̂₁
+Λ̂₁(pn::SymbolicPNSystem) = pn.Λ̂₁
+const LambdaHat1 = Λ̂₁
 
 @doc raw"""
-    λ₂(pnsystem)
-    lambda2(pnsystem)
+    Λ̂₂(pnsystem)
+    LambdaHat2(pnsystem)
 
 Tidal coupling parameter of object 2 in this system.
 
 This is related to the Love number ``k_2`` and the star's radius ``R`` as
 ```math
-\lambda_2 = \frac{2}{3} k_2 R^5.
+\hat{\Lambda}_2 = \frac{2}{3} k_2 R^5 / M^5.
 ```
 There is another common parameter denoted
 ```math
@@ -140,10 +140,10 @@ this quantity.  All other types return `0`, which Julia can use to eliminate cod
 then be 0.  Thus, it is safe and efficient to use this quantity in any PN expression that
 specializes on the type of `pnsystem`.
 """
-λ₂(::PNSystem) = 0
-λ₂(pn::BHNS) = pn.λ₂
-λ₂(pn::NSNS) = pn.λ₂
-λ₂(pn::SymbolicPNSystem) = pn.λ₂
-const lambda2 = λ₂
+Λ̂₂(::PNSystem) = 0
+Λ̂₂(pn::BHNS) = pn.Λ̂₂
+Λ̂₂(pn::NSNS) = pn.Λ̂₂
+Λ̂₂(pn::SymbolicPNSystem) = pn.Λ̂₂
+const LambdaHat2 = Λ̂₂
 
 end

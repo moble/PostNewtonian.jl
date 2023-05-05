@@ -31,6 +31,8 @@ export S⃗₁, S⃗₂, S⃗, Σ⃗, χ⃗, χ⃗ₛ, χ⃗ₐ,
 include("derived_variables/horizons.jl")
 export rₕ₁, rₕ₂, Ωₕ₁, Ωₕ₂,
     sin²θ₁, sin²θ₂, ϕ̇̂₁, ϕ̇̂₂,
-    Î₀₁, Î₀₂, κ₁, κ₂, κ₊, κ₋
+    Î₀₁, Î₀₂,
+    κ₁, κ₂, κ₊, κ₋,
+    Ξ₁, Ξ₂, Ξ₊, Ξ₋
 
 end
