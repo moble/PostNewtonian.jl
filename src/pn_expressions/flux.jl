@@ -84,6 +84,20 @@ overall factor is used, leading to a sign difference.
             )
         )
 
+        # Spin-cubed; Eq. (6.19) of Marsat (2014)
+        + v^7 * (
+            sₗ^3 * (-16κ₊/3 - 4λ₊ + 40//3)
+            + sₗ^2 * σₗ * (-35δ*κ₊/6 - 6δ*λ₊ + 73δ/3 - 3κ₋/4 + 6λ₋)
+            + sₗ * σₗ^2 * (
+                -35δ*κ₋/12 + 6δ*λ₋ + 35κ₊/12 - 6λ₊ + 32//3
+                + (22κ₊/3 + 12λ₊ - 172//3)ν
+            )
+            + σₗ^3 * (
+                67δ*κ₊/24 - 2δ*λ₊ - δ/8 - 67κ₋/24 + 2λ₋
+                + (δ*κ₊/2 + 2δ*λ₊ - 11δ + 61κ₋/12 - 6λ₋)ν
+            )
+        )
+
         # EMRI terms; Appendix A of Fujita (2012), with lower-order terms removed because
         # they have since been incorporated into non-EMRI terms above
         + v^10 * (

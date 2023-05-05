@@ -32,6 +32,8 @@ S⃗
 χ⃗ₐ
 χₑ
 χₚ
+S⃗₀⁺
+S⃗₀⁻
 ```
 
 Additionally, there are numerous convenience functions to give certain
@@ -152,7 +154,6 @@ Note that the sign of ``\hat{n}_i`` has dropped out of the calculations of both
 ``\sin^2\theta_i`` and ``\dot{\phi}_i``, cancelling with the signs that had
 appeared next to ``\Omega``.
 
-
 ```@docs
 PostNewtonian.rₕ₁
 PostNewtonian.rₕ₂
@@ -168,4 +169,8 @@ PostNewtonian.κ₁
 PostNewtonian.κ₂
 PostNewtonian.κ₊
 PostNewtonian.κ₋
+PostNewtonian.λ₁
+PostNewtonian.λ₂
+PostNewtonian.λ₊
+PostNewtonian.λ₋
 ```

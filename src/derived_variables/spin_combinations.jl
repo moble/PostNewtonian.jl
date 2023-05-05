@@ -5,12 +5,14 @@ Dimensionful spin vector of object 1.
 """
 S⃗₁(s::VecOrPNSystem) = χ⃗₁(s) * M₁(s)^2
 
+
 """
     S⃗₂(pnsystem)
 
 Dimensionful spin vector of object 2.
 """
 S⃗₂(s::VecOrPNSystem) = χ⃗₂(s) * M₂(s)^2
+
 
 """
     S⃗(pnsystem)
@@ -21,6 +23,7 @@ Total (dimensionful) spin vector ``S⃗₁+S⃗₂``.
 S⃗(M₁, M₂, χ⃗₁, χ⃗₂) = χ⃗₁ * M₁^2 + χ⃗₂ * M₂^2
 S⃗(s::VecOrPNSystem) = S⃗(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
 
+
 """
     Σ⃗(pnsystem)
     Σ⃗(M₁, M₂, χ⃗₁, χ⃗₂)
@@ -29,6 +32,7 @@ Differential spin vector ``M(a⃗₂-a⃗₁)``.
 """
 Σ⃗(M₁, M₂, χ⃗₁, χ⃗₂) =  (M₁ + M₂) * (χ⃗₂ * M₂ - χ⃗₁ * M₁)
 Σ⃗(s::VecOrPNSystem) = Σ⃗(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
+
 
 """
     χ⃗(pnsystem)
@@ -39,6 +43,7 @@ Normalized spin vector ``S⃗/M²``.
 χ⃗(S⃗, M) = S⃗ / M^2
 χ⃗(s::VecOrPNSystem) = χ⃗(S⃗(s), M(s))
 
+
 """
     χ⃗ₛ(M₁, M₂, χ⃗₁, χ⃗₂)
 
@@ -46,6 +51,7 @@ Symmetric spin vector ``(χ⃗₁+χ⃗₂)/2``.
 """
 χ⃗ₛ(M₁, M₂, χ⃗₁, χ⃗₂) = (χ⃗₁ + χ⃗₂) / 2
 χ⃗ₛ(s::VecOrPNSystem) = χ⃗ₛ(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
+
 
 """
     χ⃗ₐ(M₁, M₂, χ⃗₁, χ⃗₂)
@@ -55,8 +61,10 @@ Antisymmetric spin vector ``(χ⃗₁-χ⃗₂)/2``.
 χ⃗ₐ(M₁, M₂, χ⃗₁, χ⃗₂) = (χ⃗₁ - χ⃗₂) / 2
 χ⃗ₐ(s::VecOrPNSystem) = χ⃗ₐ(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
 
+
 χₚₑᵣₚ(s::VecOrPNSystem) = √(χ₁²(s) - (χ₁ₗ(s))^2 + χ₂²(s) - (χ₂ₗ(s))^2)
 const chi_perp = χₚₑᵣₚ
+
 
 @doc raw"""
     χₑ(s)
@@ -76,6 +84,7 @@ function χₑ(s::VecOrPNSystem)
     (S₁ₗ(s) / M₁(s) + S₂ₗ(s) / M₂(s)) / M(s)
 end
 const chi_eff = χₑ
+
 
 @doc raw"""
     χₚ(s)
@@ -131,6 +140,34 @@ function χₚ(s::VecOrPNSystem)
     # end
 end
 const chi_p = χₚ
+
+
+"""
+    S⃗₀⁺(s)
+    S⃗₀⁺(M₁, M₂, κ₁, κ₂, S⃗₁, S⃗₂)
+
+Defined in Eq. (3.4) of [Buonanno et al. (2012)](https://arxiv.org/abs/1209.6349).  See
+also [`S⃗₀⁻`](@ref).
+"""
+S⃗₀⁺(s::VecOrPNSystem) = S⃗₀⁺(M₁(s), M₂(s), κ₁(s), κ₂(s), S⃗₁(s), S⃗₂(s))
+function S⃗₀⁺(M₁, M₂, κ₁, κ₂, S⃗₁, S⃗₂)
+    M = M₁ + M₂
+    κᵣ = (κ₁/κ₂)^(1//4)
+    (M/M₁) * κᵣ * √(1 + √(1 - κ₁*κ₂)) * S⃗₁ + (M/M₂) / κᵣ * √(1 - √(1 - κ₁*κ₂)) * S⃗₂
+end
+S₀⁺ₗ(s::VecOrPNSystem) = S⃗₀⁺(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁ₗ(s), S₂ₗ(s))
+
+
+"""
+    S⃗₀⁻(s)
+    S⃗₀⁻(M₁, M₂, κ₁, κ₂, S⃗₁, S⃗₂)
+
+Defined below Eq. (3.4) of [Buonanno et al. (2012)](https://arxiv.org/abs/1209.6349).  See
+also [`S⃗₀⁺`](@ref).
+"""
+S⃗₀⁻(s::VecOrPNSystem) = S⃗₀⁻(M₁(s), M₂(s), κ₁(s), κ₂(s), S⃗₁(s), S⃗₂(s))
+S⃗₀⁻(M₁, M₂, κ₁, κ₂, S⃗₁, S⃗₂) = S⃗₀⁺(M₂, M₁, κ₂, κ₁, S⃗₂, S⃗₁)
+S₀⁻ₗ(s::VecOrPNSystem) = S⃗₀⁻(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁ₗ(s), S₂ₗ(s))
 
 
 χ₁²(s::VecOrPNSystem) = abs2vec(χ⃗₁(s))
