@@ -175,14 +175,14 @@ However, a very similar constant ``\kappa_A`` is used in Eq. (2.1) of [Buonanno 
 black hole, but can deviate from 1 for a black hole in a binary — though those deviations
 occur at "much higher" order than those they consider (2PN).
 
-See also [`Ξ₁`](@ref).
+See also [`λ₁`](@ref).
 
 !!! warn
     This function will be incorrect for objects other than black holes.  It is not clear to
     me if this is the same quantity as ``C_Q`` used in some papers, such as [Bini and
     Geralico (2014)](https://arxiv.org/abs/1408.5261), but they point out that for neutron
     stars, the value varies between 4.3 and 7.4, depending on the equation of state.  This
-    quantity may also be related to [`Ξ₁`](@ref).  Pull requests or issues with more
+    quantity may also be related to [`λ₁`](@ref).  Pull requests or issues with more
     information are welcome.
 """
 function κ₁(s::VecOrPNSystem)
@@ -219,9 +219,9 @@ function κ₋(s::VecOrPNSystem)
     κ₁(s) - κ₂(s)
 end
 
-
+\lambd
 @doc raw"""
-    Ξ₁(s)
+    \lambda ₁(s)
 
 The "quadrupolar polarisability" of object 1 used by [Marsat
 (2014)](https://arxiv.org/abs/1411.4118), who notes above Eq. (4.11) that this is denoted
@@ -236,39 +236,39 @@ See also [`κ₁`](@ref).
     me if this is the same quantity as ``C_Q`` used in some papers, such as [Bini and
     Geralico (2014)](https://arxiv.org/abs/1408.5261), but they point out that for neutron
     stars, the value varies between 4.3 and 7.4, depending on the equation of state.  This
-    quantity may also be related to [`Ξ₁`](@ref).  Pull requests or issues with more
+    quantity may also be related to [`λ₁`](@ref).  Pull requests or issues with more
     information are welcome.
 """
-function Ξ₁(s::VecOrPNSystem)
+function λ₁(s::VecOrPNSystem)
     one(eltype(s))
 end
 
 """
-    Ξ₂(s)
+    λ₂(s)
 
 The "quadrupolar polarisability" of object 2 used by [Bohé et al.
-(2015)](https://arxiv.org/abs/1501.01529).  See [`Ξ₁`](@ref) for more details.
+(2015)](https://arxiv.org/abs/1501.01529).  See [`λ₁`](@ref) for more details.
 """
-function Ξ₂(s::VecOrPNSystem)
+function λ₂(s::VecOrPNSystem)
     one(eltype(s))
 end
 
 """
-    Ξ₊(s)
+    λ₊(s)
 
-Equal to [`Ξ₁`](@ref)` + `[`Ξ₂`](@ref); defined below Eq. (3.28) of [Bohé et al.
+Equal to [`λ₁`](@ref)` + `[`λ₂`](@ref); defined below Eq. (3.28) of [Bohé et al.
 (2015)](https://arxiv.org/abs/1501.01529).
 """
-function Ξ₊(s::VecOrPNSystem)
-    Ξ₁(s) + Ξ₂(s)
+function λ₊(s::VecOrPNSystem)
+    λ₁(s) + λ₂(s)
 end
 
 """
-    Ξ₋(s)
+    λ₋(s)
 
-Equal to [`Ξ₁`](@ref)` - `[`Ξ₂`](@ref); defined below Eq. (3.28) of [Bohé et al.
+Equal to [`λ₁`](@ref)` - `[`λ₂`](@ref); defined below Eq. (3.28) of [Bohé et al.
 (2015)](https://arxiv.org/abs/1501.01529).
 """
-function Ξ₋(s::VecOrPNSystem)
-    Ξ₁(s) - Ξ₂(s)
+function λ₋(s::VecOrPNSystem)
+    λ₁(s) - λ₂(s)
 end

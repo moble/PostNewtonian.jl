@@ -169,8 +169,8 @@ PostNewtonian.κ₁
 PostNewtonian.κ₂
 PostNewtonian.κ₊
 PostNewtonian.κ₋
-PostNewtonian.Ξ₁
-PostNewtonian.Ξ₂
-PostNewtonian.Ξ₊
-PostNewtonian.Ξ₋
+PostNewtonian.λ₁
+PostNewtonian.λ₂
+PostNewtonian.λ₊
+PostNewtonian.λ₋
 ```
