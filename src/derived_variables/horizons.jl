@@ -219,9 +219,9 @@ function κ₋(s::VecOrPNSystem)
     κ₁(s) - κ₂(s)
 end
 
-\lambd
+
 @doc raw"""
-    \lambda ₁(s)
+    λ₁(s)
 
 The "quadrupolar polarisability" of object 1 used by [Marsat
 (2014)](https://arxiv.org/abs/1411.4118), who notes above Eq. (4.11) that this is denoted
