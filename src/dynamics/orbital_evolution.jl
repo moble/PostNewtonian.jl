@@ -101,8 +101,8 @@ may be given explicitly:
 
   * `M₁`: Initial mass of object 1
   * `M₂`: Initial mass of object 2
-  * `χ⃗₁`: Initial dimensionless spin of object 1, S⃗₁/M₁²
-  * `χ⃗₂`: Initial dimensionless spin of object 2, S⃗₂/M₂²
+  * `χ⃗₁`: Initial dimensionless spin of object 1, `S⃗₁/M₁²`
+  * `χ⃗₂`: Initial dimensionless spin of object 2, `S⃗₂/M₂²`
   * `Ωᵢ`: Initial orbital angular frequency
 
 (Note that the explicit inputs require `Ωᵢ`, whereas `PNSystem`s require `vᵢ` as input.)
