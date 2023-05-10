@@ -122,16 +122,16 @@ nothing;  # hide
 ```
 Again, we can plot the result:
 ```@example 1
-plot(inspiral.t, real.(h[1, :]), label=raw"$\Re\left\{h_{2,2}\right\}$")
-plot!(inspiral.t, imag.(h[1, :]), label=raw"$\Im\left\{h_{2,2}\right\}$")
-plot!(inspiral.t, abs.(h[1, :]), label=raw"$\left|h_{2,2}\right|$", linewidth=3)
+plot(inspiral.t, real.(h[1, :]), label=raw"$\Re\left\{h_{2,-2}\right\}$")
+plot!(inspiral.t, imag.(h[1, :]), label=raw"$\Im\left\{h_{2,-2}\right\}$")
+plot!(inspiral.t, abs.(h[1, :]), label=raw"$\left|h_{2,-2}\right|$", linewidth=3)
 plot!(xlabel="Time (𝑀)", ylabel="Mode weights", ylim=(-0.5,0.5))
 savefig("waveform.html"); nothing  # hide
 ```
 ```@raw html
 <iframe src="../waveform.html" style="height:500px;width:100%;"></iframe>
 ```
-We see oscillations in the amplitude of the ``h_{2,2}`` mode on the orbital
+We see oscillations in the *amplitude* of the ``h_{2,-2}`` mode on the orbital
 timescale, which is to be expected in a hangup-kick scenario as the system
 alternates between beaming power preferentially along the ``+z`` and ``-z``
 directions.
