@@ -49,20 +49,26 @@ each of the different environments.
    There are several options here:
 
    * If you are already use [conda](https://conda.io/) to manage your python
-     installation (which is generally the recommended approach in python), you
-     can just add `julia` to the list of packages to install in step 2.
-   * The [`juliaup`](https://github.com/JuliaLang/juliaup) installer has pretty
-     broad support from some of the main Julia developers, and seems likely to
-     be the main installation method in the not-too-distant future.
+     installation (which is generally the recommended approach in python), and
+     you are running one of the [platforms supported by
+     conda-forge](https://anaconda.org/conda-forge/julia/files) (as of this
+     writing, only `linux-64` or `osx-64` — not the newer ARM-based Macs, or any
+     Windows machines), you can just add `julia` to the list of packages to
+     install in step 2.
+   * The [`juliaup`](https://github.com/JuliaLang/juliaup) installer is the most
+     widely used option, and provides a simple method to update.
    * Otherwise, the official method is to just download a binary from the
      [official download page](https://julialang.org/downloads/).
-   
+
+   (It is also usually *very* easy to build Julia from source, but this should
+   almost never be necessary.)
+
    Whichever method you choose, make sure that the `julia` executable is on your
    `PATH`.
    
 2. Optionally, create a conda[^1] env just for this task
    ```bash
-   conda create -n julia_pn python numpy matplotlib
+   conda create -c conda-forge -n julia_pn python numpy matplotlib
    conda activate julia_pn
    ```
    Add whatever other packages you use to that first line.
@@ -72,7 +78,7 @@ each of the different environments.
    python -m pip install juliacall
    python -c 'from juliacall import Main as jl; jl.seval("""using Pkg; Pkg.add("PostNewtonian")""")'
    ```
-   (Yes, you should use `pip` from inside a conda env.)  This will take a few
+   (Yes, you should use `pip` from *inside* a conda env.)  This will take a few
    minutes to compile all the necessary packages in Julia.
 
 4. Test the installation
