@@ -159,7 +159,7 @@ function inertial_waveform!(
     @inbounds @fastmath for iₜ ∈ eachindex(inspiral)
         pnsystem.state .= inspiral.u[iₜ]
         h!(@view(h[:, iₜ]), pnsystem; ℓₘᵢₙ, ℓₘₐₓ)
-        D!(D, R(pnsystem), ℓₘₐₓ, H_rec_coeffs, eⁱᵐᵅ, eⁱᵐᵞ)
+        D!(D, conj(R(pnsystem)), ℓₘₐₓ, H_rec_coeffs, eⁱᵐᵅ, eⁱᵐᵞ)
         f′ = Yiterator(hᵢ, ℓₘₐₓ, ℓₘᵢₙ, 1)
         f = Yiterator(h[:, iₜ], ℓₘₐₓ, ℓₘᵢₙ, 1)
         𝔇 = Diterator(D, ℓₘₐₓ, ℓₘᵢₙ)
