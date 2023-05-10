@@ -25,7 +25,7 @@ included in `h`.  If that is not the case, set `ℓₘᵢₙ` to the smallest ``
 should be present in the output data — `ℓₘᵢₙ=2` being the most reasonable alternative.
 
 All non-spinning terms are taken from [Blanchet
-(2014)](https://doi.org/10.12942/lrr-2014-2), except for the highest-pN term in the (2,2)
+(2014)](https://doi.org/10.12942/lrr-2014-2), except for the highest-pN term in the (2,±2)
 mode, which are taken from [Blanchet et al.  (2023)](https://arxiv.org/abs/2304.11186), and
 the ``m=0`` modes, which are taken from [Favata (2008)](https://arxiv.org/abs/0812.0069).
 The 1PN spin-orbit term is from Eq. (3.22d) of [Kidder
@@ -283,10 +283,10 @@ is from Eq. (4.15) of that reference.
 
     # Symmetric spin terms
     if ℓₘₐₓ ≥ 2
-        h[Yindex(2,0,ℓₘᵢₙ)] += c * @pn_expansion(
-            v^4 * -((M₂*(S₁λ - S₁ₙ) + M₁*(S₂λ - S₂ₙ)) * (M₂*(S₁λ + S₁ₙ) + M₁*(S₂λ + S₂ₙ)))
-            / (√6 * M^4 * ν^2)
-        )
+        # h[Yindex(2,0,ℓₘᵢₙ)] += c * @pn_expansion(
+        #     v^4 * -((M₂*(S₁λ - S₁ₙ) + M₁*(S₂λ - S₂ₙ)) * (M₂*(S₁λ + S₁ₙ) + M₁*(S₂λ + S₂ₙ)))
+        #     / (√6 * M^4 * ν^2)
+        # )
         h[Yindex(2,1,ℓₘᵢₙ)] += c * @pn_expansion(
             v^2 * (𝒾 * Σₗ / 2M^2)
         )
@@ -297,11 +297,12 @@ is from Eq. (4.15) of that reference.
             v^3 * (-(6Sₗ + 2Σₗ*δ) / 3M^2)
         )
         h[Yindex(2,2,ℓₘᵢₙ)] += c * @pn_expansion(
-            v^4 * (
-                M₂^2 * (6S₁ₗ^2 + 5S₁λ^2 - 15𝒾*S₁λ*S₁ₙ - 11S₁ₙ^2)
-                + M₁*M₂ * (12S₁ₗ*S₂ₗ + 10S₁λ*S₂λ - 15𝒾*S₁ₙ*S₂λ - 15𝒾*S₁λ*S₂ₙ - 22S₁ₙ*S₂ₙ)
-                + M₁^2 * (6S₂ₗ^2 + 5S₂λ^2 - 15𝒾*S₂λ*S₂ₙ - 11S₂ₙ^2)
-            ) / (6M^4 * ν^2)
+            v^4 * (S₀⁺ₗ * S₀⁻ₗ / M^2)
+            # v^4 * (
+            #     M₂^2 * (6S₁ₗ^2 + 5S₁λ^2 - 15𝒾*S₁λ*S₁ₙ - 11S₁ₙ^2)
+            #     + M₁*M₂ * (12S₁ₗ*S₂ₗ + 10S₁λ*S₂λ - 15𝒾*S₁ₙ*S₂λ - 15𝒾*S₁λ*S₂ₙ - 22S₁ₙ*S₂ₙ)
+            #     + M₁^2 * (6S₂ₗ^2 + 5S₂λ^2 - 15𝒾*S₂λ*S₂ₙ - 11S₂ₙ^2)
+            # ) / (6M^4 * ν^2)
         )
     end
     if ℓₘₐₓ ≥ 3
@@ -340,7 +341,7 @@ is from Eq. (4.15) of that reference.
         h[Yindex(2,0,ℓₘᵢₙ)] += h̃₂₀
         h̃₂₁ = c * @pn_expansion(
             v^3 * ((4𝒾*Sλ + 25*Sₙ + 4𝒾*Σλ*δ + 13*Σₙ*δ) / 6M^2)
-            + v^4 * -3 * (M₂*S₁ₗ + M₁*S₂ₗ) * (M₂*S₁ₙ + M₁*S₂ₙ) / (2M^4 * ν^2)
+            # + v^4 * -3 * (M₂*S₁ₗ + M₁*S₂ₗ) * (M₂*S₁ₙ + M₁*S₂ₙ) / (2M^4 * ν^2)
         )
         h[Yindex(2,1,ℓₘᵢₙ)] += h̃₂₁
         h[Yindex(2,-1,ℓₘᵢₙ)] += -conj(h̃₂₁)
