@@ -99,7 +99,7 @@ const Phi = Φ
     Λ₁(pnsystem)
     Lambda1(pnsystem)
 
-Tidal-coupling parameter of object 1 in this system.
+Quadrupolar tidal-coupling parameter of object 1 in this system.
 
 We imagine object 1 begin placed in an (adiabatic) external field with Newtonian potential
 ``\phi``, resulting in a tidal field measured by ``\partial_i \partial_j \phi`` evaluated at
@@ -109,7 +109,8 @@ which can be related to the tidal field as
 Q_{ij} = -\frac{G^4}{c^{10}} \Lambda_1 M_1^5 \partial_i \partial_j \phi,
 ```
 where ``M_1`` is the mass of object 1.  This tidal-coupling parameter ``\Lambda_1`` can be
-related to the Love number ``k_2`` as
+related to the Love number ``k_2`` (where the subscript 2 refers to the fact that this is
+for the ``\ell=2`` quadrupole, rather than object 2) as
 ```math
 \Lambda_1 = \frac{2}{3} \frac{c^{10}}{G^5} \frac{R_1^5}{M_1^5} k_2,
 ```
@@ -131,7 +132,7 @@ const Lambda1 = Λ₁
     Λ₂(pnsystem)
     Lambda2(pnsystem)
 
-Tidal coupling parameter of object 2 in this system.
+Quadrupolar tidal coupling parameter of object 2 in this system.
 
 See [`Λ₁`](@ref) for details about the definition, swapping "object 1" with "object 2".
 
