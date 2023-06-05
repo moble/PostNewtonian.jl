@@ -88,7 +88,7 @@ function BBH(;
     (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
     BBH{T, PNOrder}(state)
 end
-function BBH(state; Λ̂₁=0, Λ̂₂=0, PNOrder=typemax(Int))
+function BBH(state; Λ₁=0, Λ₂=0, PNOrder=typemax(Int))
     @assert length(state) == 14
     BBH{typeof(state), prepare_pn_order(PNOrder)}(state)
 end
@@ -99,26 +99,26 @@ end
 
 The [`PNSystem`](@ref) subtype describing a black-hole—neutron-star binary system.
 
-The `state` vector is the same as for a [`BBH`](@ref).  There is an additional field `Λ̂₂`
+The `state` vector is the same as for a [`BBH`](@ref).  There is an additional field `Λ₂`
 holding the (constant) tidal-coupling parameter of the neutron star.
 
-Note that the neutron star is *always* object 2 — meaning that `M₂`, `χ⃗₂`, and `Λ̂₂` always
+Note that the neutron star is *always* object 2 — meaning that `M₂`, `χ⃗₂`, and `Λ₂` always
 refer to it; `M₁` and `χ⃗₁` always refer to the black hole.  See also [`NSNS`](@ref).
 """
 struct BHNS{T, PNOrder} <: PNSystem{T, PNOrder}
     state::T
-    Λ̂₂::eltype(T)
+    Λ₂::eltype(T)
 end
 function BHNS(;
-    M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ̂₂, Φ=0,
+    M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₂, Φ=0,
     PNOrder=typemax(Int), kwargs...
 )
     (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
-    BHNS{T, PNOrder}(state, Λ̂₂)
+    BHNS{T, PNOrder}(state, Λ₂)
 end
-function BHNS(state; Λ̂₂, Λ̂₁=0, PNOrder=typemax(Int))
+function BHNS(state; Λ₂, Λ₁=0, PNOrder=typemax(Int))
     @assert length(state) == 14
-    BHNS{typeof(state), prepare_pn_order(PNOrder)}(state, Λ̂₂)
+    BHNS{typeof(state), prepare_pn_order(PNOrder)}(state, Λ₂)
 end
 
 
@@ -127,30 +127,30 @@ end
 
 The [`PNSystem`](@ref) subtype describing a neutron-star—neutron-star binary system.
 
-The `state` vector is the same as for a [`BBH`](@ref).  There are two additional fields `Λ̂₁`
-and `Λ̂₂` holding the (constant) tidal-coupling parameters of the neutron stars.  See also
+The `state` vector is the same as for a [`BBH`](@ref).  There are two additional fields `Λ₁`
+and `Λ₂` holding the (constant) tidal-coupling parameters of the neutron stars.  See also
 [`BHNS`](@ref).
 """
 struct NSNS{T, PNOrder} <: PNSystem{T, PNOrder}
     state::T
-    Λ̂₁::eltype(T)
-    Λ̂₂::eltype(T)
+    Λ₁::eltype(T)
+    Λ₂::eltype(T)
 end
 function NSNS(;
-    M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ̂₁, Λ̂₂, Φ=0,
+    M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₁, Λ₂, Φ=0,
     PNOrder=typemax(Int), kwargs...
 )
     (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
-    NSNS{T, PNOrder}(state, Λ̂₁, Λ̂₂)
+    NSNS{T, PNOrder}(state, Λ₁, Λ₂)
 end
-function NSNS(state; Λ̂₁, Λ̂₂, PNOrder=typemax(Int))
+function NSNS(state; Λ₁, Λ₂, PNOrder=typemax(Int))
     @assert length(state) == 14
-    NSNS{typeof(state), prepare_pn_order(PNOrder)}(state, Λ̂₁, Λ̂₂)
+    NSNS{typeof(state), prepare_pn_order(PNOrder)}(state, Λ₁, Λ₂)
 end
 
 
 """
-    SymbolicPNSystem{T, PNOrder}(state, Λ̂₁, Λ̂₂)
+    SymbolicPNSystem{T, PNOrder}(state, Λ₁, Λ₂)
 
 A `PNSystem` that contains information as variables from
 [`Symbolics.jl`](https://symbolics.juliasymbolics.org/).
@@ -159,14 +159,14 @@ See also [`symbolic_pnsystem`](@ref) for a particular general instance of this t
 """
 struct SymbolicPNSystem{T, PNOrder} <: PNSystem{T, PNOrder}
     state::T
-    Λ̂₁::eltype(T)
-    Λ̂₂::eltype(T)
+    Λ₁::eltype(T)
+    Λ₂::eltype(T)
 end
 function SymbolicPNSystem(PNOrder=typemax(Int))
-    @variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ̂₁ Λ̂₂
+    @variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
     SymbolicPNSystem{Vector{typeof(M₁)}, prepare_pn_order(PNOrder)}(
         [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
-        Λ̂₁, Λ̂₂
+        Λ₁, Λ₂
     )
 end
 
@@ -176,7 +176,7 @@ end
 A symbolic `PNSystem` that contains symbolic information for all types of `PNSystem`s.
 
 In particular, note that this object has an (essentially) infinite `PNOrder`, uses the
-`TaylorT1` approximant, and has nonzero values for quantities like `Λ̂₁` and `Λ̂₂`.  If you
+`TaylorT1` approximant, and has nonzero values for quantities like `Λ₁` and `Λ₂`.  If you
 want different choices, you may need to call [`SymbolicPNSystem`](@ref) yourself, or even
 construct a different specialized subtype of `PNSystem` (it's not hard).
 

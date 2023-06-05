@@ -17,7 +17,7 @@ function be(pnsystem, deriv)
 
     let M₁ = PostNewtonian.M₁(pnsystem), M₂ = PostNewtonian.M₂(pnsystem),
         v = PostNewtonian.v(pnsystem),
-        Λ̂₁ = PostNewtonian.Λ̂₁(pnsystem), Λ̂₂ = PostNewtonian.Λ̂₂(pnsystem),
+        Λ₁ = PostNewtonian.Λ₁(pnsystem), Λ₂ = PostNewtonian.Λ₂(pnsystem),
         M = PostNewtonian.M(pnsystem), sₗ = PostNewtonian.sₗ(pnsystem),
         δ = PostNewtonian.δ(pnsystem), μ = PostNewtonian.μ(pnsystem),
         ν = PostNewtonian.ν(pnsystem),
@@ -97,10 +97,10 @@ function be(pnsystem, deriv)
         )
 
         # NS tidal coupling
-        e[10] += -9*((M₁/M₂)Λ̂₂ + (M₂/M₁)Λ̂₁)
+        e[10] += -9*((M₁/M₂)Λ₂ + (M₂/M₁)Λ₁)
         e[12] += (
-            -11//2*(M₁/M₂)*(3+2M₂/M+3*(M₂/M)^2)Λ̂₂
-            - 11//2*(M₂/M₁)*(3+2M₁/M+3*(M₁/M)^2)Λ̂₁
+            -11//2*(M₁/M₂)*(3+2M₂/M+3*(M₂/M)^2)Λ₂
+            - 11//2*(M₂/M₁)*(3+2M₁/M+3*(M₁/M)^2)Λ₁
         )
 
         if deriv

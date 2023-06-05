@@ -41,7 +41,7 @@ mass with ``G`` and ``c``.
 The complete set of (required or optional) dimensionful arguments to
 `orbital_evolution` is
 ```julia
-M₁, M₂, Ωᵢ, Λ̂₁, Λ̂₂, Ω₁, Ωₑ, abstol, saveat
+M₁, M₂, Ωᵢ, Λ₁, Λ₂, Ω₁, Ωₑ, abstol, saveat
 ```
 If we scale the values by some `σ`, then to maintain the same physical meaning
 we should transform all the arguments as
@@ -49,8 +49,8 @@ we should transform all the arguments as
 M₁ ↦ M₁ * σ
 M₂ ↦ M₂ * σ
 Ωᵢ ↦ Ωᵢ / σ
-Λ̂₁ ↦ Λ̂₁
-Λ̂₂ ↦ Λ̂₂
+Λ₁ ↦ Λ₁
+Λ₂ ↦ Λ₂
 Ω₁ ↦ Ω₁ / σ
 Ωₑ ↦ Ωₑ / σ
 abstol ↦ [abstol[1:2] * σ; abstol[3:end]]

@@ -23,7 +23,7 @@ calculations *per se*, we have the following:
    
    This consists of the basic variables describing the system such as `M₁`,
    `M₂`, `χ⃗₁`, `χ⃗₂`, `R`, `v`.  For systems with matter, this may also include
-   tidal deformability for each star, `Λ̂₁` and `Λ̂₂`.
+   tidal deformability for each star, `Λ₁` and `Λ₂`.
 
    It's important to note that these should all be accessed through functions
    like `M₁(pnsystem)` rather than directly like `pnsystem.M₁`.  This allows

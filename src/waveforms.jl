@@ -27,8 +27,8 @@ function coorbital_waveform_computation_storage(
     PNSystemType = SciMLBase.parameterless_type(p)
     pnsystem = PNSystemType(
         copy(inspiral.u[1]);
-        Λ̂₁=Λ̂₁(p),
-        Λ̂₂=Λ̂₂(p),
+        Λ₁=Λ₁(p),
+        Λ₂=Λ₂(p),
         PNOrder
     )
     n_modes = (ℓₘₐₓ+1)^2 - ℓₘᵢₙ^2
