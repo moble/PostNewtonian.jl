@@ -40,6 +40,9 @@ important exceptions to this rule:
       `3π/2`, you don't need to use `Irrational`; in this case, `3π` is
       evaluated first and achieves full precision, and is then divided by the
       exact integer 2, so that it retains full precision.
+      Note that a helpful regex to search for this case is
+      `(?<!(ζ|n|\^))[0-9]+/[0-9]`, which has relatively few false positives in
+      this repo.
    3. A slight caveat to the above is that an expression like `3λ/2` could
       *still* be converted to `Float64` if `λ` is defined at compile time to be
       `0`.  For type-stability reasons, Julia will always treat `0/2` just like

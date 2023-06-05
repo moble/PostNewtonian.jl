@@ -18,6 +18,7 @@ function be(pnsystem, deriv)
     let M₁ = PostNewtonian.M₁(pnsystem), M₂ = PostNewtonian.M₂(pnsystem),
         v = PostNewtonian.v(pnsystem),
         Λ₁ = PostNewtonian.Λ₁(pnsystem), Λ₂ = PostNewtonian.Λ₂(pnsystem),
+        X₁ = PostNewtonian.X₁(pnsystem), X₂ = PostNewtonian.X₂(pnsystem),
         M = PostNewtonian.M(pnsystem), sₗ = PostNewtonian.sₗ(pnsystem),
         δ = PostNewtonian.δ(pnsystem), μ = PostNewtonian.μ(pnsystem),
         ν = PostNewtonian.ν(pnsystem),
@@ -25,6 +26,7 @@ function be(pnsystem, deriv)
         χ₁₂ = PostNewtonian.χ₁₂(pnsystem), χ₂² = PostNewtonian.χ₂²(pnsystem),
         χₐₗ = PostNewtonian.χₐₗ(pnsystem), χₛₗ = PostNewtonian.χₛₗ(pnsystem),
         κ₊ = PostNewtonian.κ₊(pnsystem), κ₋ = PostNewtonian.κ₋(pnsystem),
+        λ₊ = PostNewtonian.λ₊(pnsystem), λ₋ = PostNewtonian.λ₋(pnsystem),
         π = PostNewtonian.type_converter(pnsystem, π),
         ln2 = PostNewtonian.type_converter(pnsystem, PostNewtonian.ln2),
         ln3 = PostNewtonian.type_converter(pnsystem, PostNewtonian.ln3),
@@ -91,17 +93,25 @@ function be(pnsystem, deriv)
             + σₗ^2 * (δ*κ₋/2 - κ₊/2 + (κ₊ + 2)ν)
         )
         e[6] += (
-            sₗ^2 * (-5δ*κ₋/3 - 25*κ₊/6 + 50//9 + (5κ₊/6 + 5/3)ν)
+            sₗ^2 * (-5δ*κ₋/3 - 25*κ₊/6 + 50//9 + (5κ₊/6 + 5//3)ν)
             + sₗ * σₗ * (-5*δ*κ₊/2 + 25*δ/3 + 5κ₋/2 + (5δ*κ₊/6 + 5δ/3 + 35κ₋/6)ν)
             + σₗ^2 * (5δ*κ₋/4 - 5κ₊/4 + 5 + (5δ*κ₋/4 + 5κ₊/4 - 10)ν + (-5κ₊/6 - 5//3)ν^2)
         )
 
-        # NS tidal coupling
-        e[10] += -9*((M₁/M₂)Λ₂ + (M₂/M₁)Λ₁)
-        e[12] += (
-            -11//2*(M₁/M₂)*(3+2M₂/M+3*(M₂/M)^2)Λ₂
-            - 11//2*(M₂/M₁)*(3+2M₁/M+3*(M₁/M)^2)Λ₁
+        # Spin-cubed
+        e[7] += (
+            sₗ^3 * (2κ₊ + 4λ₊ - 20)
+            + sₗ^2 * σₗ * (2δ*κ₊ + 6δ*λ₊ - 32δ + 4κ₋ - 6λ₋)
+            + sₗ * σₗ^2 * (5δ*κ₋ - 6δ*λ₋ - 5κ₊ + 6λ₊ - 12 + (-2κ₊ - 12λ₊ + 68)ν)
+            + σₗ^3 * (-3δ*κ₊ + 2δ*λ₊ + 3κ₋ - 2λ₋ + (-2δ*λ₊ + 12δ - 6κ₋ + 6λ₋)ν)
         )
+
+       # NS tidal coupling
+        e[10] += -9 * (Λ₁ * X₁^3 + Λ₂ * X₂^3)ν
+        e[12] += -11//2 * (
+            (3 + 2X₁ + 3X₁^2)Λ₁ * X₁^3
+            + (3 + 2X₂ + 3X₂^2)Λ₂ * X₂^3
+        )ν
 
         if deriv
             c * v * (
