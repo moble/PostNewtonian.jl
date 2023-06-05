@@ -43,6 +43,8 @@ export total_mass,  # M,  # Avoid clashes: don't export nicer names for importan
     mass_difference_ratio,  # δ,
     mass_ratio,  # q,
     chirp_mass,  # ℳ,
+    # X1, X₁,
+    # X2, X₂,
     n_hat, n̂,
     lambda_hat, λ̂,
     ell_hat, ℓ̂,

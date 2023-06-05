@@ -10,7 +10,9 @@ export total_mass, M,
     reduced_mass_ratio, ν,
     mass_difference_ratio, δ,
     mass_ratio, q,
-    chirp_mass, ℳ
+    chirp_mass, ℳ,
+    X1, X₁,
+    X2, X₂
 
 include("derived_variables/orbital_elements.jl")
 export n_hat, n̂,
