@@ -5,8 +5,8 @@ using ..PostNewtonian: PNSystem, BHNS, NSNS
 using ..PostNewtonian: M₁index, M₂index, χ⃗₁indices, χ⃗₂indices, Rindices, vindex, Φindex
 using Quaternionic
 
-export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, Λ̂₁, Λ̂₂,
-    M1, M2, chi1, chi2, Phi, LambdaHat1, LambdaHat2
+export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, Λ₁, Λ₂,
+    M1, M2, chi1, chi2, Phi, Lambda1, Lambda2
 
 ## NOTE:
 ## This indices used below are intimately bound to choices made in the definitions of
@@ -96,8 +96,8 @@ Integrated orbital phase of the system.  It is computed as the integral of [`Ω`
 const Phi = Φ
 
 @doc raw"""
-    Λ̂₁(pnsystem)
-    LambdaHat1(pnsystem)
+    Λ₁(pnsystem)
+    Lambda1(pnsystem)
 
 Tidal-coupling parameter of object 1 in this system.
 
@@ -122,28 +122,28 @@ quantity.  All other types return `0`, which Julia can use to eliminate code tha
 be 0.  Thus, it is safe and efficient to use this quantity in any PN expression that
 specializes on the type of `pnsystem`.
 """
-Λ̂₁(::PNSystem) = 0
-Λ̂₁(pn::NSNS) = pn.Λ̂₁
-Λ̂₁(pn::SymbolicPNSystem) = pn.Λ̂₁
-const LambdaHat1 = Λ̂₁
+Λ₁(::PNSystem) = 0
+Λ₁(pn::NSNS) = pn.Λ₁
+Λ₁(pn::SymbolicPNSystem) = pn.Λ₁
+const Lambda1 = Λ₁
 
 @doc raw"""
-    Λ̂₂(pnsystem)
-    LambdaHat2(pnsystem)
+    Λ₂(pnsystem)
+    Lambda2(pnsystem)
 
 Tidal coupling parameter of object 2 in this system.
 
-See [`Λ̂₁`](@ref) for details about the definition, swapping "object 1" with "object 2".
+See [`Λ₁`](@ref) for details about the definition, swapping "object 1" with "object 2".
 
 Note that — as of this writing — only `BHNS` and `NSNS` systems can have a nonzero value for
 this quantity.  All other types return `0`, which Julia can use to eliminate code that would
 then be 0.  Thus, it is safe and efficient to use this quantity in any PN expression that
 specializes on the type of `pnsystem`.
 """
-Λ̂₂(::PNSystem) = 0
-Λ̂₂(pn::BHNS) = pn.Λ̂₂
-Λ̂₂(pn::NSNS) = pn.Λ̂₂
-Λ̂₂(pn::SymbolicPNSystem) = pn.Λ̂₂
-const LambdaHat2 = Λ̂₂
+Λ₂(::PNSystem) = 0
+Λ₂(pn::BHNS) = pn.Λ₂
+Λ₂(pn::NSNS) = pn.Λ₂
+Λ₂(pn::SymbolicPNSystem) = pn.Λ₂
+const Lambda2 = Λ₂
 
 end

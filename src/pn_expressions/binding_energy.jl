@@ -112,12 +112,12 @@ overall factor is used, leading to a sign difference.
 
         # NS tidal coupling; Eq. (2.11) of Vines et al. (2011) with λ̂=v^10*Λ₂*(M₂/M)^5
         + v^10 * (
-            - 9Λ̂₁ * ν * X₁^3
-            - 9Λ̂₂ * ν * X₂^3
+            - 9Λ₁ * ν * X₁^3
+            - 9Λ₂ * ν * X₂^3
         )
         + v^12 * (
-            - 11//2 * (3 + 2X₁ + 3X₁^2)Λ̂₁ * ν * X₁^3
-            - 11//2 * (3 + 2X₂ + 3X₂^2)Λ̂₂ * ν * X₂^3
+            - 11//2 * (3 + 2X₁ + 3X₁^2)Λ₁ * ν * X₁^3
+            - 11//2 * (3 + 2X₂ + 3X₂^2)Λ₂ * ν * X₂^3
         )
     )
 end

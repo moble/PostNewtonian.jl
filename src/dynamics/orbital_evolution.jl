@@ -96,7 +96,7 @@ Integrate the orbital dynamics of an inspiraling non-eccentric compact binary.
 ## Required arguments
 
 The first argument to this function may be a single `PNSystem` that encodes these required
-arguments (as well as `Rᵢ`, `Λ̂₁`, and `Λ̂₂` among the keyword arguments), or the following
+arguments (as well as `Rᵢ`, `Λ₁`, and `Λ₂` among the keyword arguments), or the following
 may be given explicitly:
 
   * `M₁`: Initial mass of object 1
@@ -118,11 +118,11 @@ due to tidal heating.  Therefore, the values passed here are only precisely as g
 ## Keyword arguments
 
 Note that several of these keywords are given as Unicode but can also be given as the ASCII
-string noted.  For example, `Λ̂₁` may be input as `LambdaHat1` equivalently; the default values
+string noted.  For example, `Λ₁` may be input as `Lambda1` equivalently; the default values
 are the same, regardless.
 
-  * `Λ̂₁=0` or `LambdaHat1`: Tidal-coupling parameter of object 1.
-  * `Λ̂₂=0` or `LambdaHat2`: Tidal-coupling parameter of object 2.
+  * `Λ₁=0` or `Lambda1`: Tidal-coupling parameter of object 1.
+  * `Λ₂=0` or `Lambda2`: Tidal-coupling parameter of object 2.
   * `Ω₁=Ωᵢ` or `Omega_1`: First angular frequency in output data.  This may be less than
     `Ωᵢ`, in which case we integrate backwards to this point, and combine the backwards and
     forwards solutions into one seamless output.  (See next section.)
@@ -343,15 +343,15 @@ function orbital_evolution(pnsystem::PNSystem; kwargs...)
         M₁(pnsystem), M₂(pnsystem),
         χ⃗₁(pnsystem), χ⃗₂(pnsystem),
         Ω(v=v(pnsystem), M=M(pnsystem));
-        Λ̂₁=Λ̂₁(pnsystem), Λ̂₂=Λ̂₂(pnsystem),
+        Λ₁=Λ₁(pnsystem), Λ₂=Λ₂(pnsystem),
         Rᵢ=R(pnsystem), PNOrder=pn_order(pnsystem), kwargs...
     )
 end
 
 function orbital_evolution(
     M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ;
-    LambdaHat1=0, LambdaHat2=0, Omega_1=Ωᵢ, Omega_e=Ω(v=1,M=M₁+M₂), R_i=Rotor(true),
-    Λ̂₁=LambdaHat1, Λ̂₂=LambdaHat2, Ω₁=Omega_1, Ωₑ=Omega_e, Rᵢ=R_i,
+    Lambda1=0, Lambda2=0, Omega_1=Ωᵢ, Omega_e=Ω(v=1,M=M₁+M₂), R_i=Rotor(true),
+    Λ₁=Lambda1, Λ₂=Lambda2, Ω₁=Omega_1, Ωₑ=Omega_e, Rᵢ=R_i,
     approximant="TaylorT1", PNOrder=typemax(Int),
     check_up_down_instability=true, time_stepper=AutoVern9(Rodas5P()),
     reltol=nothing, abstol=nothing,
@@ -390,11 +390,11 @@ function orbital_evolution(
         )
     end
 
-    if !iszero(Λ̂₁) && iszero(Λ̂₂)
+    if !iszero(Λ₁) && iszero(Λ₂)
         error(
             "By convention, the NS in a BHNS binary must be the second body,\n"
-            *"meaning that Λ̂₁ should be zero, and only Λ̂₂ should be nonzero.\n"
-            *"You may want to swap the masses, spins, and Λ̂ parameters.\n"
+            *"meaning that Λ₁ should be zero, and only Λ₂ should be nonzero.\n"
+            *"You may want to swap the masses, spins, and Λ parameters.\n"
             *"Alternatively, both can be nonzero, resulting in an NSNS binary."
         )
     end
@@ -426,10 +426,10 @@ function orbital_evolution(
 
     # Initial conditions for the ODE integration
     pnsystem = let R=Rᵢ, v=vᵢ
-        if !iszero(Λ̂₁) && !iszero(Λ̂₂)
-            NSNS(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ̂₁, Λ̂₂, Φ, PNOrder)
-        elseif !iszero(Λ̂₂)
-            BHNS(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ̂₂, Φ, PNOrder)
+        if !iszero(Λ₁) && !iszero(Λ₂)
+            NSNS(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₁, Λ₂, Φ, PNOrder)
+        elseif !iszero(Λ₂)
+            BHNS(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₂, Φ, PNOrder)
         else
             BBH(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
         end
@@ -454,7 +454,7 @@ function orbital_evolution(
 
     _orbital_evolution(
         pnsystem, RHS!;
-        Λ̂₁, Λ̂₂, v₁, vₑ, Rᵢ,
+        Λ₁, Λ₂, v₁, vₑ, Rᵢ,
         check_up_down_instability, time_stepper,
         reltol, abstol,
         termination_criteria_forwards,
@@ -466,7 +466,7 @@ end
 
 function _orbital_evolution(
         pnsystem, RHS!;
-        Λ̂₁, Λ̂₂, v₁, vₑ, Rᵢ,
+        Λ₁, Λ₂, v₁, vₑ, Rᵢ,
         check_up_down_instability, time_stepper,
         reltol, abstol,
         termination_criteria_forwards,
