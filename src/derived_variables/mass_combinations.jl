@@ -90,3 +90,29 @@ The chirp mass is defined as
 ℳ(M₁, M₂) = ((M₁ * M₂)^3 / (M₁ + M₂))^(1//5)
 ℳ(s::VecOrPNSystem) = ℳ(M₁(s), M₂(s))
 const chirp_mass = ℳ
+
+
+"""
+    X₁(pnsystem)
+    X₁(M₁, M₂)
+    X1(pnsystem)
+    X1(M1, M2)
+
+Compute the reduced mass ``M₁/(M₁+M₂)``.
+"""
+X₁(M₁, M₂) = M₁ / (M₁ + M₂)
+X₁(s::VecOrPNSystem) = X₁(M₁(s), M₂(s))
+const X1 = X₁
+
+
+"""
+    X₂(pnsystem)
+    X₂(M₁, M₂)
+    X2(pnsystem)
+    X2(M1, M2)
+
+Compute the reduced mass ``M₂/(M₁+M₂)``.
+"""
+X₂(M₁, M₂) = M₂ / (M₁ + M₂)
+X₂(s::VecOrPNSystem) = X₂(M₁(s), M₂(s))
+const X2 = X₂

@@ -99,16 +99,23 @@ const Phi = Φ
     Λ̂₁(pnsystem)
     LambdaHat1(pnsystem)
 
-Tidal coupling parameter of object 1 in this system.
+Tidal-coupling parameter of object 1 in this system.
 
-This is related to the Love number ``k_2`` and the star's radius ``R`` as
+We imagine object 1 begin placed in an (adiabatic) external field with Newtonian potential
+``\phi``, resulting in a tidal field measured by ``\partial_i \partial_j \phi`` evaluated at
+the center of mass of the object.  This induces a quadrupole moment ``Q_{ij}`` in object 1,
+which can be related to the tidal field as
 ```math
-\hat{\Lambda}_1 = \frac{2}{3} k_2 R^5 / M^5.
+Q_{ij} = -\frac{G^4}{c^{10}} \Lambda_1 M_1^5 \partial_i \partial_j \phi,
 ```
-There is another common parameter denoted
+where ``M_1`` is the mass of object 1.  This tidal-coupling parameter ``\Lambda_1`` can be
+related to the Love number ``k_2`` as
 ```math
-\Lambda_1 = \frac{3}{2} \frac{M_1}{M_2} \lambda_1.
+\Lambda_1 = \frac{2}{3} \frac{c^{10}}{G^5} \frac{R_1^5}{M_1^5} k_2,
 ```
+where ``R_1`` is the radius of object 1.  Note that ``\Lambda_1`` is dimensionless.  For
+black holes, it is precisely zero; for neutron stars it may range up to 1; more exotic
+objects may have significantly larger values.
 
 Note that — as of this writing — only `NSNS` systems can have a nonzero value for this
 quantity.  All other types return `0`, which Julia can use to eliminate code that would then
@@ -126,14 +133,7 @@ const LambdaHat1 = Λ̂₁
 
 Tidal coupling parameter of object 2 in this system.
 
-This is related to the Love number ``k_2`` and the star's radius ``R`` as
-```math
-\hat{\Lambda}_2 = \frac{2}{3} k_2 R^5 / M^5.
-```
-There is another common parameter denoted
-```math
-\Lambda_2 = \frac{3}{2} \frac{M_2}{M_1} \lambda_2.
-```
+See [`Λ̂₁`](@ref) for details about the definition, swapping "object 1" with "object 2".
 
 Note that — as of this writing — only `BHNS` and `NSNS` systems can have a nonzero value for
 this quantity.  All other types return `0`, which Julia can use to eliminate code that would
