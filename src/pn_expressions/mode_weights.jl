@@ -1,14 +1,13 @@
 # This function is stolen from SphericalFunctions.jl
 @inline Yindex(ℓ, m, ℓₘᵢₙ=0) = ℓ*(ℓ + 1) - ℓₘᵢₙ^2 + m + 1
 
-"""
+@doc raw"""
     h!(h, pnsystem; ℓₘᵢₙ=0, ℓₘₐₓ=typemax(Int))
     mode_weights!(h, pnsystem; ℓₘᵢₙ=0, ℓₘₐₓ=typemax(Int))
 
 Compute mode weights of gravitational waves emitted by `pn` system, modifying `h` in place.
 
-!!! note
-    This is a low-level function; you probably don't want to use this directly.  See
+!!! note This is a low-level function; you probably don't want to use this directly.  See
     [`coorbital_waveform`](@ref) or [`inertial_waveform`](@ref) for more user-friendly
     functions.
 
@@ -24,7 +23,11 @@ and ``(1,1)`` modes are always 0.  By default, we assume that these modes are no
 included in `h`.  If that is not the case, set `ℓₘᵢₙ` to the smallest ``ℓ`` value that
 should be present in the output data — `ℓₘᵢₙ=2` being the most reasonable alternative.
 
-All non-spinning terms are taken from [Blanchet
+These results come most directly from Eqs. (A5) of [Boyle et al.
+(2014)](https://arxiv.org/abs/1409.4431), with the exception of errors in the 2PN spin-spin
+terms, in which cases we must multiply by ``\nu/2`` and make the substitutions $S_1 \mapsto
+S_0^+$ and $S_2 \mapsto S_0^-$.  In turn, those expressions are synthesized from the
+following:  Non-spinning terms are taken from [Blanchet
 (2014)](https://doi.org/10.12942/lrr-2014-2), except for the highest-pN term in the (2,±2)
 mode, which are taken from [Blanchet et al.  (2023)](https://arxiv.org/abs/2304.11186), and
 the ``m=0`` modes, which are taken from [Favata (2008)](https://arxiv.org/abs/0812.0069).
