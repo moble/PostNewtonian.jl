@@ -155,6 +155,8 @@ function S⃗₀⁺(M₁, M₂, κ₁, κ₂, S⃗₁, S⃗₂)
     κᵣ = (κ₁/κ₂)^(1//4)
     (M/M₁) * κᵣ * √(1 + √(1 - κ₁*κ₂)) * S⃗₁ + (M/M₂) / κᵣ * √(1 - √(1 - κ₁*κ₂)) * S⃗₂
 end
+S₀⁺ₙ(s::VecOrPNSystem) = S⃗₀⁺(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁ₙ(s), S₂ₙ(s))
+S₀⁺λ(s::VecOrPNSystem) = S⃗₀⁺(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁λ(s), S₂λ(s))
 S₀⁺ₗ(s::VecOrPNSystem) = S⃗₀⁺(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁ₗ(s), S₂ₗ(s))
 
 
@@ -167,6 +169,8 @@ also [`S⃗₀⁺`](@ref).
 """
 S⃗₀⁻(s::VecOrPNSystem) = S⃗₀⁻(M₁(s), M₂(s), κ₁(s), κ₂(s), S⃗₁(s), S⃗₂(s))
 S⃗₀⁻(M₁, M₂, κ₁, κ₂, S⃗₁, S⃗₂) = S⃗₀⁺(M₂, M₁, κ₂, κ₁, S⃗₂, S⃗₁)
+S₀⁻ₙ(s::VecOrPNSystem) = S⃗₀⁻(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁ₙ(s), S₂ₙ(s))
+S₀⁻λ(s::VecOrPNSystem) = S⃗₀⁻(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁λ(s), S₂λ(s))
 S₀⁻ₗ(s::VecOrPNSystem) = S⃗₀⁻(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁ₗ(s), S₂ₗ(s))
 
 
