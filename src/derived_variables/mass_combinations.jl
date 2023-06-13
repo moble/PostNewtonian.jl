@@ -98,7 +98,7 @@ const chirp_mass = ℳ
     X1(pnsystem)
     X1(M1, M2)
 
-Compute the reduced mass ``M₁/(M₁+M₂)``.
+Compute the reduced *individual* mass ``M₁/(M₁+M₂)``.
 """
 X₁(M₁, M₂) = M₁ / (M₁ + M₂)
 X₁(s::VecOrPNSystem) = X₁(M₁(s), M₂(s))
@@ -111,7 +111,7 @@ const X1 = X₁
     X2(pnsystem)
     X2(M1, M2)
 
-Compute the reduced mass ``M₂/(M₁+M₂)``.
+Compute the reduced *individual* mass ``M₂/(M₁+M₂)``.
 """
 X₂(M₁, M₂) = M₂ / (M₁ + M₂)
 X₂(s::VecOrPNSystem) = X₂(M₁(s), M₂(s))

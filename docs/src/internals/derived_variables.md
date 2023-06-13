@@ -18,6 +18,8 @@ PostNewtonian.ν
 PostNewtonian.δ
 PostNewtonian.q
 PostNewtonian.ℳ
+PostNewtonian.X₁
+PostNewtonian.X₂
 ```
 
 ## Spin combinations
@@ -32,8 +34,8 @@ S⃗
 χ⃗ₐ
 χₑ
 χₚ
-S⃗₀⁺
-S⃗₀⁻
+PostNewtonian.S⃗₀⁺
+PostNewtonian.S⃗₀⁻
 ```
 
 Additionally, there are numerous convenience functions to give certain

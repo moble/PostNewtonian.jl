@@ -1,9 +1,9 @@
 @doc raw"""
-    rand([rng=GLOBAL_RNG], pnclass; [v=0.01], [PNOrder=typemax(Int)])
+    rand([rng=GLOBAL_RNG], pnclass; [v=0.2], [PNOrder=typemax(Int)])
 
-Generate a random PNSystem, specifically of class `pnclass` (one of `BBH`, `BHNS`, or
-`NSNS`), with parameters chosen to be consistent with typical LIGO/Virgo/KAGRA searches as
-of this writing.
+Generate a random PNSystem, specifically of class `pnclass` (one of [`BBH`](@ref),
+[`BHNS`](@ref), or [`NSNS`](@ref)), with parameters chosen to be consistent with typical
+LIGO/Virgo/KAGRA searches as of this writing.
 
 # Examples
 ```julia-repl
@@ -46,7 +46,10 @@ frequency, then sample based on mass ratio and spin magnitudes.
 
 Given these, it seems like the current state of the art would be well covered by choosing a
 random `q` ∈ [0.05, 1], `χᵢ` ∈ [0, 0.998], and `Λᵢ` ∈ [0, 5000], with isotropic choices for
-orientations.
+orientations.  Note that the `Λᵢ` are only used if the input `pnclass` is `BHNS` or `NSNS`.
+
+If you would prefer a different range of parameters, the source code for this function is
+easily modified.
 """
 Base.rand(pnclass::Type{P}; v::T=0.2, PNOrder=typemax(Int)) where {P<:PNSystem, T} =
     rand(GLOBAL_RNG, pnclass; v, PNOrder)
