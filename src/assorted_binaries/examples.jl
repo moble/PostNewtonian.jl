@@ -15,7 +15,8 @@ when the system mergers, the remnant may then acquire a huge recoil velocity.
 approximations cannot describe.  Therefore, we cannot actually use PN methods to derive any
 useful information about the remnant.)
 
-See also [`hangup_kick`](@ref) for systems that can achieve even larger recoil velocities.
+Note that the name "superkick" appeared in the literature before a class of systems that can
+achieve even larger recoil velocities: see [`hangup_kick`](@ref) for such systems.
 
 # Examples
 ```julia-repl

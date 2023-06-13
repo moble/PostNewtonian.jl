@@ -70,4 +70,10 @@
     Rwz = sol_np[[PostNewtonian.Rᶻindex,PostNewtonian.Rʷindex], :]
     @test sincosΦ ≈ Rwz atol=√eps(T) rtol=√eps(T)
 
+    # Just check that a few nice/random cases can be integrated
+    orbital_evolution(superkick())
+    orbital_evolution(hangup_kick())
+    orbital_evolution(rand(BBH))
+    orbital_evolution(rand(BHNS))
+    orbital_evolution(rand(NSNS))
 end
