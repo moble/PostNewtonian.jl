@@ -172,8 +172,8 @@ function inertial_waveform!(
 end
 
 """
-    inertial_waveform(inspiral, [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
-    inertial_waveform(inspiral, [ell_min=2], [ell_max=8], [PNOrder])
+    inertial_waveform(inspiral; [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
+    inertial_waveform(inspiral; [ell_min=2], [ell_max=8], [PNOrder])
 
 Evaluate the post-Newtonian waveform mode weights in the inertial frame for the given
 `inspiral` output by [`orbital_evolution`](@ref).
