@@ -55,12 +55,21 @@ const chi2 = χ⃗₂
 """
     R(pnsystem)
 
-Orientation of the binary, as a `Rotor`.  This `Rotor` will rotate the `ẑ` vector to be
-along the orbital angular velocity vector and the `x̂` vector to be along the separation
-vector pointing from object 2 to object 1.
+Orientation of the binary, as a `Rotor`.
+
+At any instant, the binary is represented by the right-handed triad ``(n̂, λ̂, ℓ̂)``, where
+[``n̂``](@ref PostNewtonian.n̂) is the unit vector pointing from object 2 to object 1, and
+the instantaneous velocities of the binary's elements are in the ``n̂``-``λ̂`` plane.  This
+`Rotor` will rotate the ``x̂`` vector to be along ``n̂``,  the ``ŷ`` vector to be along
+``λ̂``, and  the ``ẑ`` vector to be along ``ℓ̂``.
+
+Note that the angular velocity associated to `R` is given by ``Ω⃗ = 2 Ṙ R̄ = Ω ℓ̂ + ϖ n̂``.
+(Any component of ``Ω⃗`` along ``λ̂`` would violate the condition that the velocities be in
+the ``n̂``-``λ̂`` plane.)  Here, the scalar quantity ``Ω`` is the orbital angular frequency,
+and ``ϖ`` is the precession angular frequency.
 
 See also [`n̂`](@ref PostNewtonian.n̂), [`λ̂`](@ref PostNewtonian.λ̂), [`ℓ̂`](@ref
-PostNewtonian.ℓ̂).
+PostNewtonian.ℓ̂), [`Ω`](@ref PostNewtonian.Ω), and [`𝛡`](@ref PostNewtonian.𝛡)``=ϖ n̂``.
 """
 R(s::PNSystem) = R(s.state)
 R(state::AbstractVector) = @inbounds Rotor(view(state, Rindices)...)

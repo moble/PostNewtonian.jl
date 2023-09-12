@@ -8,6 +8,8 @@ the time derivative of that *unit* vector is ``Ω⃗ₚ × ℓ̂``.
 
 At the moment, this is computed solely by expressions from [Bohé et al.
 (2013)](https://arxiv.org/abs/1212.5520).  See [`𝛡`](@ref) for details.
+
+See also [`R`](@ref PostNewtonian.R).
 """
 Ω⃗ₚ(pnsystem) = 𝛡(pnsystem)
 const Omega_p = Ω⃗ₚ
@@ -22,29 +24,36 @@ As [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520) explain above their Eq
 orbital precession is given by the time derivative of the orbital axis: 𝓵̇ = 𝛡 × 𝓵, where
 the angular velocity is along the separation vector 𝓷, so that 𝛡 = ϖ 𝓷.  And in turn,
 they define aₗ ≔ r ω ϖ, where r is the separation and ω is the orbital angular frequency.
-Then, they define the PN parameter γₚ≔M/r and we have Mω = v³ so that ϖ = γₚ aₗ / v³.  The
-parameters γₚ and aₗ are given by Eqs. (4.3) and (4.4), and given here by the functions
-[`γₚ`](@ref) and [`aₗ`](@ref).
+Then, they define the PN parameter γₚₙ≔M/r and we have Mω = v³ so that ϖ = γₚₙ aₗ / v³.  The
+parameters γₚₙ and aₗ are given by Eqs. (4.3) and (4.4), and given here by the functions
+[`γₚₙ`](@ref) and [`aₗ`](@ref).
 
 The spin-squared terms (by which we mean both spin-spin and spin-orbit squared terms) in the
 energy are known to 3pN order, and given in [Eq. (3.32) of Bohé et al.
 (2015)](https://arxiv.org/abs/1501.01529).
 
+See also [`R`](@ref PostNewtonian.R).
 """
 @pn_expression function 𝛡(pnsystem)
-    (γₚ(pnsystem) * aₗ(pnsystem) / v^3) * n̂
+    (γₚₙ(pnsystem) * aₗ(pnsystem) / v^3) * n̂
 end
 
 
-"""
-    γₚ(pnsystem)
+@doc raw"""
+    γₚₙ(pnsystem)
 
-Eq. (4.3) of [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520) and Eq. (3.32) of [Bohé
-et al.  (2015)](https://arxiv.org/abs/1501.01529).  This term contributes to [`𝛡`](@ref).
+Compute the post-Newtonian parameter
+```math
+\gamma_{\mathrm{PN}} \equiv \frac{G\, M}{r\, c^2},
+```
+where ``r`` is the magnitude of the orbital separation.  This quantity has PN order 1, and
+is given by Eq. (4.3) of [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520) and Eq.
+(3.32) of [Bohé et al.  (2015)](https://arxiv.org/abs/1501.01529).
 
-Note that there is a 3PN term of ``-22ν\\ln(r/r₀′)/3`` that is simply ignored here.
+Note that there is a 3PN gauge term of ``-22ν\\ln(r/r₀′)/3`` that is simply ignored here, as
+it should cancel out of any physical quantity.
 """
-@pn_expression function γₚ(pnsystem)
+@pn_expression function γₚₙ(pnsystem)
     v^2 * @pn_expansion(
         # Non-spinning terms; Eq. (4.3) of Bohé et al. (2013)
         1
