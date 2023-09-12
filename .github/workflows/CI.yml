@@ -35,7 +35,7 @@ jobs:
             version: '1'
             arch: x64
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}
@@ -53,45 +53,24 @@ jobs:
     name: Documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v1
         with:
-          version: '1.9-nightly'
+          version: '1.9'
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
-      # - uses: julia-actions/julia-docdeploy@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
-      ### The following is a hack that basically reproduces julia-docdeploy,
-      ### but inserts a step where I add the master version of Documenter.
-      - name: Doc deploy
+      # NOTE: This next step should be temporary, until Documenter v1 is released
+      - name: Documenter v1
         shell: bash
         run: |
-          julia --color=yes --code-coverage --project=docs/ -e '
-            using Pkg
-            Pkg.activate("docs-logger-env"; shared=true)
-            Pkg.add(Pkg.PackageSpec(name="GitHubActions", version="0.1"))'
-          julia --color=yes --code-coverage --project=docs/ -e '
-            using Pkg
-            url = "https://github.com/JuliaDocs/Documenter.jl"
-            rev = "master"
-            preserve = Pkg.PRESERVE_ALL
-            Pkg.develop(PackageSpec(path=pwd()))
-            Pkg.add(;url, rev, preserve)
-            Pkg.instantiate()'
           julia --color=yes --project=docs/ -e '
-            @eval Module() begin
-                push!(LOAD_PATH, "@docs-logger-env") # access GitHubActions.jl
-                import Logging, GitHubActions
-                Logging.global_logger(GitHubActions.GitHubActionsLogger())
-                pop!(LOAD_PATH)
-            end
-            include("docs/make.jl")'
+              using Pkg
+              Pkg.add(url="https://github.com/JuliaDocs/Documenter.jl", rev="master")
+              Pkg.instantiate()
+              Pkg.precompile()
+          '
+      - uses: julia-actions/julia-docdeploy@v1
         env:
-          ARTIFACTS_PATH: ~/.julia/artifacts
-          PACKAGES_PATH: ~/.julia/packages
-          JULIA_PKG_SERVER_REGISTRY_PREFERENCE: eager
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
       - name: Run doctests
