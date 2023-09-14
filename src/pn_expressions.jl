@@ -1,4 +1,5 @@
 include("utilities/macros.jl")
+include("pn_expressions/orbital_kinematics.jl")
 include("pn_expressions/flux.jl")
 include("pn_expressions/tidal_heating.jl")
 include("pn_expressions/binding_energy.jl")

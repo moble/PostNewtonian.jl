@@ -64,7 +64,7 @@ export gw_energy_flux, 𝓕,
     Omega_p, Ω⃗ₚ,
     Omega_chi1, Ω⃗ᵪ₁,
     Omega_chi2, Ω⃗ᵪ₂,
-    #𝛡, γₚₙ, aₗ, Ω⃗ᵪ  # Too obscure to bother with
+    #𝛡, aₗ, Ω⃗ᵪ, γₚₙ, r, ṙ,  # Too obscure/ambiguous to bother with
     mode_weights!, h!
 
 
