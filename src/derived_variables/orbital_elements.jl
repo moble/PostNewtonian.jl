@@ -69,6 +69,3 @@ See also [`v`](@ref).
 Ω(;v, M=1) = v^3 / M
 Ω(s::VecOrPNSystem) = Ω(v=v(s), M=M(s))
 const Omega = Ω
-
-
-lnv(s::VecOrPNSystem) = ln(v(s))

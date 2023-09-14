@@ -18,8 +18,7 @@ include("derived_variables/orbital_elements.jl")
 export n_hat, n̂,
     lambda_hat, λ̂,
     ell_hat, ℓ̂,
-    Omega, Ω,
-    lnv
+    Omega, Ω
 
 include("derived_variables/spin_combinations.jl")
 export S⃗₁, S⃗₂, S⃗, Σ⃗, χ⃗, χ⃗ₛ, χ⃗ₐ,
