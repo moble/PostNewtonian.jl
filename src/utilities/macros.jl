@@ -271,7 +271,7 @@ function extract_var_factor(term, var)
             # if term′ isa Expr
             #     term′ = Expr(:call, term′.args...)
             # end
-            if k′ > 0
+            if !iszero(k′)
                 k += k′
                 term.args[i] = term′
             end
