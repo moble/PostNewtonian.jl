@@ -42,7 +42,7 @@ it should cancel out of any physical quantity.
 end
 
 
-"""
+@doc raw"""
     r(pnsystem)
 
 Orbital separation given by the *coordinate* distance between the centers of objects in a
