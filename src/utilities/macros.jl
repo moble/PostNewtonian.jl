@@ -242,6 +242,16 @@ Extract a factor of `var` from the product `term`.
 This is a helper function for [`var_collect`](@ref).
 """
 function extract_var_factor(term, var)
+    if MacroTools.isexpr(term, :call) && term.args[1] ∈ ((^), :^)
+        k₂, term₂ = extract_var_factor(term.args[2], var)
+        if !(term.args[3] isa Real)
+            error(
+                "The exponent in $(term) must be a real number; "
+                * "it is a $(typeof(term.args[3]))."
+            )
+        end
+        return k₂*term.args[3], Expr(:call, term.args[1], term₂, term.args[3])
+    end
     if MacroTools.isexpr(term, :call) && term.args[1] ∈ ((/), :/)
         k₂, term₂ = extract_var_factor(term.args[2], var)
         k₃, term₃ = extract_var_factor(term.args[3], var)
@@ -268,9 +278,6 @@ function extract_var_factor(term, var)
         end
         if MacroTools.isexpr(factor, :call)
             k′, term′ = extract_var_factor(factor, var)
-            # if term′ isa Expr
-            #     term′ = Expr(:call, term′.args...)
-            # end
             if !iszero(k′)
                 k += k′
                 term.args[i] = term′
