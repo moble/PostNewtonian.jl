@@ -36,7 +36,7 @@ jobs:
             arch: x64
     steps:
       - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@v1
+      - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
@@ -54,9 +54,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@v1
+      - uses: julia-actions/setup-julia@v2
         with:
-          version: '1.9'
+          version: '1.10'
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
       # NOTE: This next step should be temporary, until Documenter v1 is released
