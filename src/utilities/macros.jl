@@ -335,6 +335,7 @@ function var_collect(expr, var)
         k, term = extract_var_factor(expr, var)
         terms[k] = term
     else
+        #expr = dissociate_sum(expr)
         for (i,term) ∈ enumerate(expr.args[2:end])
             k, term = extract_var_factor(term, var)
             if expr.args[1] ∈ ((-), :-) && i==2

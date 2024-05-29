@@ -22,11 +22,19 @@ end
 
 
 """
-    iscall(x, symbols)
+    iscall(x, fs)
 
-Return `true` if the `Expr` `x` is a call to any element of `symbols`.
+Return `true` if the `Expr` `x` is a call to any element of `fs`.
 """
-iscall(x, symbols) = MacroTools.isexpr(x, :call) && x.args[1] ∈ symbols
+iscall(x, fs) = MacroTools.isexpr(x, :call) && x.args[1] ∈ fs
+
+
+"""
+    isadditive(x)
+
+Return `true` if the `Expr` `x` is a call to `(+)`, `:+`, `(-)`, or `:-`.
+"""
+isadditive(x) = iscall(x, ((+), :+, (-), :-))
 
 
 """
@@ -35,6 +43,14 @@ iscall(x, symbols) = MacroTools.isexpr(x, :call) && x.args[1] ∈ symbols
 Return `true` if the `Expr` `x` is a call to `(+)` or `:+`.
 """
 isadd(x) = iscall(x, ((+), :+))
+
+
+"""
+    issubtract(x)
+
+Return `true` if the `Expr` `x` is a call to `(-)` or `:-`.
+"""
+issubtract(x) = iscall(x, ((-), :-))
 
 
 """
