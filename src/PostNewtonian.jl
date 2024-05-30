@@ -14,6 +14,7 @@ using SciMLBase
 using DiffEqBase
 using OrdinaryDiffEq
 using DataInterpolations: CubicSpline
+using SymbolicIndexingInterface: SymbolCache
 
 # See the "Code structure" section of the documentation for a description of the simple
 # hierarchy into which this code is organized.  The different levels of that hierarchy are
@@ -89,7 +90,7 @@ include("assorted_binaries/random.jl")
 # Base.rand is the only function in that file
 
 
-include("precompilation.jl")
+#include("precompilation.jl")
 
 
 end  # module PostNewtonian
