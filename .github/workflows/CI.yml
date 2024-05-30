@@ -56,19 +56,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v2
         with:
-          version: '1.10'
+          version: '1'
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
-      # NOTE: This next step should be temporary, until Documenter v1 is released
-      - name: Documenter v1
-        shell: bash
-        run: |
-          julia --color=yes --project=docs/ -e '
-              using Pkg
-              Pkg.add(url="https://github.com/JuliaDocs/Documenter.jl", rev="master")
-              Pkg.instantiate()
-              Pkg.precompile()
-          '
       - uses: julia-actions/julia-docdeploy@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
