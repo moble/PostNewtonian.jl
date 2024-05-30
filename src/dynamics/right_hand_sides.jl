@@ -45,6 +45,8 @@ RHS_body = quote
     nothing
 end
 
+sys = SymbolCache(collect(pnsystem_symbols), nothing, :t)
+
 @eval @doc raw"""
     TaylorT1!(u̇, pnsystem)
 
@@ -63,6 +65,8 @@ Here, `u̇` is the time-derivative of the state vector, which is stored in the
 [`PNSystem`](@ref) object `p`.
 """
 @pn_expression 2 function TaylorT1!(u̇, p)
+    # If these parameters result in v≤0, fill u̇ with NaNs so that `solve` will
+    # know that this was a bad step and try again.
     causes_domain_error!(u̇, p) && return
 
     # This expression is what makes this TaylorT1
@@ -72,7 +76,7 @@ Here, `u̇` is the time-derivative of the state vector, which is stored in the
 end
 
 const TaylorT1RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
-    (u̇,u,p,t) -> (p.state.=u; TaylorT1!(u̇,p)), syms=pnsystem_symbols
+    (u̇,u,p,t) -> (p.state.=u; TaylorT1!(u̇,p)); sys
 )
 
 
@@ -94,6 +98,8 @@ the [`PNSystem`](@ref) object `p`.  The parameter `t` represents the time, and w
 always be unused in this package, but is part of the `DifferentialEquations` API.
 """
 @pn_expression 2 function TaylorT4!(u̇, p)
+    # If these parameters result in v≤0, fill u̇ with NaNs so that `solve` will
+    # know that this was a bad step and try again.
     causes_domain_error!(u̇, p) && return
 
     # This expression is what makes this TaylorT4
@@ -103,7 +109,7 @@ always be unused in this package, but is part of the `DifferentialEquations` API
 end
 
 const TaylorT4RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
-    (u̇,u,p,t) -> (p.state.=u; TaylorT4!(u̇,p)), syms=pnsystem_symbols
+    (u̇,u,p,t) -> (p.state.=u; TaylorT4!(u̇,p)); sys
 )
 
 
@@ -128,6 +134,8 @@ the [`PNSystem`](@ref) object `p`.  The parameter `t` represents the time, and w
 always be unused in this package, but is part of the `DifferentialEquations` API.
 """
 @pn_expression 2 function TaylorT5!(u̇, p)
+    # If these parameters result in v≤0, fill u̇ with NaNs so that `solve` will
+    # know that this was a bad step and try again.
     causes_domain_error!(u̇, p) && return
 
     # This expression is what makes this TaylorT5
@@ -137,5 +145,5 @@ always be unused in this package, but is part of the `DifferentialEquations` API
 end
 
 const TaylorT5RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
-    (u̇,u,p,t) -> (p.state.=u; TaylorT5!(u̇,p)), syms=pnsystem_symbols
+    (u̇,u,p,t) -> (p.state.=u; TaylorT5!(u̇,p)); sys
 )

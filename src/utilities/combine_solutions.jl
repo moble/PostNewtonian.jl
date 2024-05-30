@@ -48,11 +48,14 @@ function (interp::CombinedInterpolationData)(val, tvals, idxs, deriv, p, continu
             end
         end
     end
-    syms = interp.sol₊.prob.f.syms
-    indepsym = interp.sol₊.prob.f.indepsym
-    observed = interp.sol₊.prob.f.observed
     p = interp.sol₊.prob.p
-    RecursiveArrayTools.DiffEqArray(val, tvals, syms, indepsym, observed, p)
+    variables = interp.sol₊.prob.f.sys.variables
+    parameters = interp.sol₊.prob.f.sys.parameters
+    independent_variables = interp.sol₊.prob.f.sys.independent_variables
+    RecursiveArrayTools.DiffEqArray(
+        val, tvals, p;
+        variables, parameters, independent_variables
+    )
 end
 
 
