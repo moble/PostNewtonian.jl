@@ -130,7 +130,7 @@ const 𝓔′ = let 𝓔=𝓔(symbolic_pnsystem), v=v(symbolic_pnsystem)
     # Evaluate derivative symbolically
     𝓔′ = simplify(expand_derivatives(∂ᵥ(𝓔)), expand=true)#, simplify_fractions=false)
     # Turn it into (an Expr of) a function taking one argument: `pnsystem`
-    𝓔′ = build_function(𝓔′, :pnsystem)
+    𝓔′ = build_function(𝓔′, :pnsystem, nanmath=false)
     # Remove `hold` (which we needed for Symbolics.jl to not collapse to Float64)
     𝓔′ = unhold(𝓔′)
     # "Flatten" the main sum, because Symbolics nests sums for some reason
