@@ -49,3 +49,10 @@ Modules = [PostNewtonian]
 Pages   = ["dynamics/right_hand_sides.jl"]
 Order   = [:module, :type, :constant, :function, :macro]
 ```
+
+
+Note that, internally, the `TaylorT*` functions call `causes_domain_error!`.  This is a fairly simplistic detection of when evolved parameters will lead to bad values.  It may be
+desirable to extend this detection to be more sophisticated.
+```@docs
+PostNewtonian.causes_domain_error!
+```
