@@ -1,7 +1,7 @@
 # Computing the waveform
 
 Once you have [computed the orbital evolution](@ref orbital_evolution), and
-[selected the time steps](@ref .-(Optional)-Choose-time-steps) on which you want
+[selected the time steps](@ref sec_optional_choose_time_steps) on which you want
 to evaluate the waveform, you can do so with one of the functions documented
 below.
 
