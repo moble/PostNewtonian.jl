@@ -131,7 +131,8 @@ savefig("units1.html"); nothing  # hide
 inspiral1[:v] ≈ inspiral2(inspiral1.t*σ, idxs=:v)
 ```
 ```@raw html
-<iframe src="units1.html" style="height:500px;width:100%;"></iframe>
+<!-- NOTE: ../ in src works on github, but not locally -->
+<iframe src="../units1.html" style="height:500px;width:100%;"></iframe>
 ```
 
 The fact that these curves are on top of each other, and the final expression
@@ -238,5 +239,6 @@ plot!(title="Observer-frame waveform", legend=(0.205, 0.9))
 savefig("units2.html"); nothing  # hide
 ```
 ```@raw html
-<iframe src="units2.html" style="height:500px;width:100%;"></iframe>
+<!-- NOTE: ../ in src works on github, but not locally -->
+<iframe src="../units2.html" style="height:500px;width:100%;"></iframe>
 ```
