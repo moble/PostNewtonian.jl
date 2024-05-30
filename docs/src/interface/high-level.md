@@ -57,7 +57,8 @@ plot!(xlabel="Time (𝑀)", ylabel="Dimensionless spin components")
 savefig("inspiral_spins.html"); nothing  # hide
 ```
 ```@raw html
-<iframe src="inspiral_spins.html" style="height:500px;width:100%;"></iframe>
+<!-- NOTE: ../ in src works on github, but not locally -->
+<iframe src="../inspiral_spins.html" style="height:500px;width:100%;"></iframe>
 ```
 As expected, we see *significant* precession of the spin on long time scales, as
 well as smaller nutations on orbital time scales visible mostly at later times.
@@ -129,7 +130,8 @@ plot!(xlabel="Time (𝑀)", ylabel="Mode weights", ylim=(-0.5,0.5))
 savefig("waveform.html"); nothing  # hide
 ```
 ```@raw html
-<iframe src="waveform.html" style="height:500px;width:100%;"></iframe>
+<!-- NOTE: ../ in src works on github, but not locally -->
+<iframe src="../waveform.html" style="height:500px;width:100%;"></iframe>
 ```
 We see oscillations in the *amplitude* of the ``h_{2,-2}`` mode on the orbital
 timescale, which is to be expected in a hangup-kick scenario as the system

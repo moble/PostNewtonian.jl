@@ -87,10 +87,10 @@ plot!(inspiral.t, abs.(h[1, :]), label=raw"$\left|h_{2,-2}\right|$", linewidth=3
 plot!(inspiral.t, abs.(h[5, :]), label=raw"$\left|h_{2,2}\right|$")
 plot!(xlabel=raw"$\text{Time }(M)$", ylabel="Mode weights", ylim=(-0.45,0.45))
 
-savefig("waveform.html"); nothing  # hide
+savefig("quickstart_waveform.html"); nothing  # hide
 ```
 ```@raw html
-<iframe src="waveform.html" style="height:500px;width:100%;"></iframe>
+<iframe src="quickstart_waveform.html" style="height:500px;width:100%;"></iframe>
 ```
 We see various features to be expected of a precessing system like this,
 including slow modulations of the modes on the precession timescale, as well as
