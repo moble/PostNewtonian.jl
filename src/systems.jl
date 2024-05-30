@@ -36,15 +36,29 @@ pn_order(::PNSystem{ST, PNOrder}) where {ST, PNOrder} = PNOrder
 
 order_index(pn::PNSystem) = 1 + Int(2pn_order(pn))
 
-causes_domain_error!(u̇, ::PNSystem{VT}) where {VT<:Vector{Symbolics.Num}} = false
+
+"""
+    causes_domain_error!(u̇, p)
+
+Ensure that these parameters correspond to a physically valid set of PN parameters.
+
+If the parameters are not valid, this function should modify `u̇` to indicate that the
+current step is invalid.  This is done by filling `u̇` with `NaN`s, which will be detected
+by the ODE solver and cause it to try a different (smaller) step size.
+
+Currently, the only check that is done is to test that these parameters result in a PN
+parameter v>0.  In the future, this function may be expanded to include other checks.
+"""
 function causes_domain_error!(u̇, p::PNSystem{VT}) where {VT}
-    if p.state[vindex] ≤ 0
+    if p.state[vindex] ≤ 0  # If this is expanded, document the change in the docstring.
         u̇ .= convert(eltype(VT), NaN)
         true
     else
         false
     end
 end
+causes_domain_error!(u̇, ::PNSystem{VT}) where {VT<:Vector{Symbolics.Num}} = false
+
 
 function prepare_system(;
     M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0,
