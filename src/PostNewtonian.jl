@@ -90,7 +90,7 @@ include("assorted_binaries/random.jl")
 # Base.rand is the only function in that file
 
 
-#include("precompilation.jl")
+include("precompilation.jl")
 
 
 end  # module PostNewtonian
