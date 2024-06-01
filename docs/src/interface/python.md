@@ -1,21 +1,22 @@
 # Using this package from Python
 
-While not quite as natural as calling Python code from Julia, it is very easy
-to call Julia code from Python.  The process is essentially the same as using
-any other Python package, other than installing Julia itself and any
-dependencies *within* Julia that you may need (both of which are much easier
-than similar tasks in Python).
+While not quite as natural as calling Python code from Julia, it is
+very easy to call Julia code from Python.  The process is essentially
+the same as using any other Python package, other than installing
+Julia itself and any dependencies *within* Julia that you may need
+(both of which are much easier than similar tasks in Python).
 
-!!! warning
-    This package uses Unicode *internally* and in many of the examples found
-    in this documentation.  However, every effort is made to ensure that
-    *users* of this package can always use plain ASCII.  For example, if
-    keyword arguments are accepted as Unicode, ASCII equivalents are usually
-    also accepted.  Some function *names* are similarly in Unicode, but have
-    ASCII equivalents.  See the various functions' documentation for
-    acceptable replacements.
+!!! warning "Be careful of using unicode in Python!"
 
-    It can be dangerous to use Unicode in Python in particular.  
+    Every effort is made to ensure that *users* of this package can always use
+    plain ASCII — even though this package uses Unicode *internally* and in many
+    of the examples found in this documentation.  For example, if keyword
+    arguments are accepted as Unicode, ASCII equivalents are usually also
+    accepted.  Some function *names* are similarly in Unicode, but have ASCII
+    equivalents.  See the various functions' documentation for acceptable
+    replacements.
+
+    It can be dangerous to use Unicode in Python in particular.
     Python only accepts a small subset of Unicode — so that `M₁` for example
     is not valid input.  And what it does accept is automatically ["NFKC
     normalized"](https://en.wikipedia.org/wiki/Unicode_equivalence#Normal_forms).
@@ -26,7 +27,7 @@ than similar tasks in Python).
     >>> Mₐ = 1
     >>> Mᵃ = 2
     >>> Ma = 3
-    >>> (Mₐ, Mᵃ, Ma)
+    >>> print((Mₐ, Mᵃ, Ma))
     (3, 3, 3)
     ```
     We might have expected three different values `(1, 2, 3)` in the output,
@@ -38,112 +39,119 @@ than similar tasks in Python).
     please file a [bug
     report](https://github.com/moble/PostNewtonian.jl/issues/new).
 
-Note that the Julia packages are installed uniquely to your python environment —
-preferably a conda env.  For example, if you use two different conda envs to
-call into Julia, you'll need to install the Julia packages for each env.  This
-has the great advantage of allowing you to use different packages or versions in
-each of the different environments.
 
-1. Install Julia
+## Getting started
 
-   There are several options here:
+Installation is pretty simple.  There are two optional steps first,
+but generally just one required step.  
 
-   * If you are already use [conda](https://conda.io/) to manage your python
-     installation (which is generally the recommended approach in python), and
-     you are running one of the [platforms supported by
-     conda-forge](https://anaconda.org/conda-forge/julia/files) (as of this
-     writing, only `linux-64` or `osx-64` — not the newer ARM-based Macs, or any
-     Windows machines), you can just add `julia` to the list of packages to
-     install in step 2.
-   * The [`juliaup`](https://github.com/JuliaLang/juliaup) installer is the most
-     widely used option, and provides a simple method to update.
-   * Otherwise, the official method is to just download a binary from the
-     [official download page](https://julialang.org/downloads/).
+!!! tip "TL;DR"
+    Basically, you just need to install the `sxs` package, and then
+    run the python command `from sxs import julia`.
 
-   (It is also usually *very* easy to build Julia from source, but this should
-   almost never be necessary.)
 
-   Whichever method you choose, make sure that the `julia` executable is on your
-   `PATH`.
+### Optional step 1: Install Julia
+
+If a Julia installation is not already available, the made below will
+automatically install it for you *in the python environment you are
+using*.  If you have multiple python environments, this means that
+there will be multiple copies of Julia installed, one in each
+environment.  Installing Julia beforehand will avoid this duplication.
+
+The officially recommended method is to use [the `juliaup`
+installer](https://github.com/JuliaLang/juliaup?tab=readme-ov-file#juliaup---julia-version-manager),
+which also provides an easy way to update Julia itself, manage
+multiple versions of Julia, and update it.
+
+Note that the `julia` executable must be on your `PATH` for the next
+steps to work properly.  You may need to restart your shell or
+terminal after installing Julia to make sure.
+
+
+### Optional step 2: Create a conda env
+
+Create a conda[^1] env just for this task
+```bash
+conda create -c conda-forge -n julia_pn python numpy matplotlib
+conda activate julia_pn
+```
+Add whatever other packages you use to that first line.
+
+
+### Required step: Install the `sxs` package and use it to install Julia
+
+While the `sxs` package is not *strictly* required, it is very useful
+for providing a general interface to waveforms, and will automatically
+install the `PostNewtonian` package and its dependencies.  Simply run
+
+```bash
+python -m pip install sxs
+python -c 'from sxs import julia'
+```
+The first line installs `sxs` itself, but not Julia; the second line
+will take a few minutes to install Julia then download and compile all
+the necessary packages.
+
+
+## Testing the installation
    
-2. Optionally, create a conda[^1] env just for this task
-   ```bash
-   conda create -c conda-forge -n julia_pn python numpy matplotlib
-   conda activate julia_pn
-   ```
-   Add whatever other packages you use to that first line.
+Start up a python session and run something like this:
+```python
+# Any python imports you need go here
+import numpy as np
+import matplotlib.pyplot as plt
 
-3. Install `juliacall` and `PostNewtonian`
-   ```bash
-   python -m pip install juliacall
-   python -c 'from juliacall import Main as jl; jl.seval("""using Pkg; Pkg.add("PostNewtonian")""")'
-   ```
-   (Yes, you should use `pip` from *inside* a conda env.)  This will take a few
-   minutes to compile all the necessary packages in Julia.
+# Start the Julia session
+from sxs.julia import PNWaveform
 
-4. Test the installation
-   
-   Start up a python session and run something like this:
-   ```python
-   # Any python imports you need go here
-   import numpy as np
-   import matplotlib.pyplot as plt
+# Declare the essential parameters
+M1 = 0.5
+M2 = 0.5
+chi1 = [0.1, 0.2, 0.3]
+chi2 = [-0.2, 0.1, -0.3]
+Omega_i = 0.01
 
-   # Start the Julia session
-   from juliacall import Main as jl
+# Call into Julia to run some function
+w = PNWaveform(M1, M2, chi1, chi2, Omega_i)
 
-   # Import `PostNewtonian` in the Julia session
-   jl.seval("using PostNewtonian")
+# Plot the magnitudes of all the modes as functions of time
+plt.semilogy(w.t, np.abs(w.data))
+```
+The `w` object returned here will be an `sxs.WaveformModes` object,
+with all the usual methods and properties.
 
-   # Declare some parameters
-   delta = 0.0
-   chi1 = np.array([0.1, 0.2, 0.3])
-   chi2 = np.array([-0.2, 0.1, -0.3])
-   Omega_i = 0.01
+---
 
-   # Call into Julia to run some function
-   w = jl.GWFrames.PNWaveform("TaylorT1", delta, chi1, chi2, Omega_i)
+In general, you can now call any function from the Julia
+`PostNewtonian` package by running
+```python
+from sxs.julia import PostNewtonian
+```
+and then calling the function just as you would if you had run `import
+PostNewtonian` in Julia.  As a fallback, you can evaluate actual Julia
+code in the Julia session using `PostNewtonian.seval("<Julia code goes
+here>")`.  This returns whatever the Julia code would return.  A
+simple example is `x = PostNewtonian.seval("1+2")`.  See the
+[documentation for `juliacall`
+here](https://github.com/cjdoris/PythonCall.jl#readme) for more
+details.
 
-   # Plot the magnitudes of all the modes as functions of time
-   plt.semilogy(w.t, np.abs(w.data))
-   ```
-   The second-to-last line above uses the [`GWFrames.PNWaveform`](@ref) function
-   from this package, which is meant to emulate the original syntax from the
-   `GWFrames` package.  The resulting `w` will have various fields, like `t`,
-   `data`, and `frame`, similar to those attached to `WaveformModes` objects in
-   the `scri` and `sxs` packages.
+Sometimes, the returned objects will be wrappers around Julia
+`Vector`s, `Matrix`es, or more generally shaped `Array`s.  Usually,
+you will be able to pass these objects directly to Python functions.
+If you really need a `numpy` array, you can use the `to_numpy()`
+method that the wrappers will support.
 
-In general, you can now call any Julia function by prepending `jl.` to the call
-you would make in Julia.  As a fallback, you can evaluate actual Julia code in
-the Julia session using `jl.seval("<Julia code goes here>")`.  This returns
-whatever the Julia code would return.  A simple example is `x =
-jl.seval("1+2")`.  See the [documentation for `juliacall`
-here](https://github.com/cjdoris/PythonCall.jl#readme) for more details.
-
-Typically, the main stumbling block is converting Python lists to Julia
-`Vector`s when calling Julia functions.  Frequently, Julia code will have
-difficulty if you try to pass a Python `list`, because `list`s do not have any
-specific type that Julia can understand.  Instead, you should always convert a
-list to a numpy array with `np.asarray`.  It is still possible that numpy will
-not understand the type of the list, and you'll still get an error from Julia;
-in this case you need to figure out [the `dtype` to tell numpy
-about.](https://numpy.org/doc/stable/reference/generated/numpy.asarray.html).
-
-Fortunately, conversion back to Python objects is more automatic.  In
-particular, if Julia returns a `Vector`, `Matrix`, or more generally shaped
-`Array`, you can usually just use that quantity in calls to Python functions.
-If you really need a numpy array, the returned object will have a `.to_numpy()`
-method.
-
-Of course, it is *much* simpler to call Python code from Julia, so if you find
-yourself using a lot of Julia code, you may want to consider flipping your
-approach.
+Of course, it is *much* simpler to call Python code from Julia, so if
+you find yourself using a lot of Julia code, you may want to consider
+flipping your approach.
 
 
-[^1]: As general advice, you should run `conda install -y mamba -n base -c
-      conda-forge`, and then just use the command `mamba` wherever you would
-      have used `conda`; `mamba` is a complete drop-in replacement, but is much
-      faster because it's written in C instead of python.  For example, `mamba
-      create -n julia_pn python numpy matplotlib` will typically run faster than
-      the command given here.  This becomes a huge advantage when the env has
-      lots of dependencies.
+[^1]: As general advice, you should run `conda install -y mamba -n
+      base -c conda-forge`, and then just use the command `mamba`
+      wherever you would have used `conda`; `mamba` is a complete
+      drop-in replacement, but is much faster because it's written in
+      C instead of python.  For example, `mamba create -n julia_pn
+      python numpy matplotlib` will typically run faster than the
+      command given here.  This becomes a huge advantage when the env
+      has lots of dependencies.
