@@ -117,8 +117,19 @@ w = PNWaveform(M1, M2, chi1, chi2, Omega_i)
 # Plot the magnitudes of all the modes as functions of time
 plt.semilogy(w.t, np.abs(w.data))
 ```
-The `w` object returned here will be an `sxs.WaveformModes` object,
-with all the usual methods and properties.
+The `w` object returned here will be an [`sxs.WaveformModes`
+object](https://sxs.readthedocs.io/en/stable/api/waveforms/#waveformmodes-class),
+with all the usual methods and properties, as well as several fields
+relevant to post-Newtonian waveforms:
+
+- `M1` (array): The primary mass as a function of time.
+- `M2` (array): The secondary mass as a function of time.
+- `chi1` (array): The primary spin as a function of time.
+- `chi2` (array): The secondary spin as a function of time.
+- `frame` (array): The quaternionic frame as a function of time.
+- `v` (array): The orbital velocity as a function of time.
+- `orbital_phase` (array): The orbital phase as a function of
+    time.
 
 ---
 
@@ -128,13 +139,12 @@ In general, you can now call any function from the Julia
 from sxs.julia import PostNewtonian
 ```
 and then calling the function just as you would if you had run `import
-PostNewtonian` in Julia.  As a fallback, you can evaluate actual Julia
-code in the Julia session using `PostNewtonian.seval("<Julia code goes
-here>")`.  This returns whatever the Julia code would return.  A
-simple example is `x = PostNewtonian.seval("1+2")`.  See the
-[documentation for `juliacall`
-here](https://github.com/cjdoris/PythonCall.jl#readme) for more
-details.
+PostNewtonian` in Julia.  As a fallback, you can evaluate arbitrary
+Julia code using `PostNewtonian.seval("<Julia code goes here>")`.
+This returns whatever the Julia code would return.  A simple example
+is `x = PostNewtonian.seval("1+2")`.  See the [documentation for
+`juliacall` here](https://github.com/cjdoris/PythonCall.jl#readme) for
+more details.
 
 Sometimes, the returned objects will be wrappers around Julia
 `Vector`s, `Matrix`es, or more generally shaped `Array`s.  Usually,
