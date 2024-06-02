@@ -1,8 +1,7 @@
 module GWFrames
 
 using ..PostNewtonian
-using Quaternionic
-using DataInterpolations: CubicSpline
+using Quaternionic: Quaternionic, QuatVec, Rotor
 
 
 """

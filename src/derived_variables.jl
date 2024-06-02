@@ -1,6 +1,6 @@
 module DerivedVariables
 
-using ..PostNewtonian: PNSystem, VecOrPNSystem
+using ..PostNewtonian: VecOrPNSystem
 using ..PostNewtonian.FundamentalVariables
 using Quaternionic: 𝐢, 𝐣, 𝐤, QuatVec, (⋅), (×), abs2vec, absvec
 

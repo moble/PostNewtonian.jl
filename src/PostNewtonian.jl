@@ -1,19 +1,25 @@
 module PostNewtonian
 
-using Random: AbstractRNG, GLOBAL_RNG
+# Always explicitly address functions similar to functions defined in this package,
+# which come from these packages:
+import MacroTools
+import Symbolics
+import SymbolicUtils
+
+# Otherwise, we just explicitly import specific functions:
+using DataInterpolations: CubicSpline
 using InteractiveUtils: methodswith
 using LinearAlgebra: mul!
-using StaticArrays
-using Quaternionic
-using SphericalFunctions
-using RecursiveArrayTools
-using MacroTools
-using Symbolics
-using SymbolicUtils
-using SciMLBase
-using DiffEqBase
-using OrdinaryDiffEq
-using DataInterpolations: CubicSpline
+using OrdinaryDiffEq: AutoVern9, Rodas5P,
+    ODEFunction, ODEProblem, solve, remake,
+    terminate!, CallbackSet, DiscreteCallback, VectorContinuousCallback
+using Quaternionic: QuatVec, Rotor, abs2vec, components, normalize, (⋅), (×)
+using Random: AbstractRNG, GLOBAL_RNG
+using RecursiveArrayTools: DiffEqArray
+using SciMLBase: ODESolution, parameterless_type, FullSpecialize,
+    AbstractDiffEqInterpolation, build_solution, get_du
+using SciMLBase.ReturnCode: ReturnCode
+using SphericalFunctions: D!, Diterator, Dprep, Yiterator
 using SymbolicIndexingInterface: SymbolCache
 
 # See the "Code structure" section of the documentation for a description of the simple

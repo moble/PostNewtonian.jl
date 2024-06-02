@@ -75,7 +75,7 @@ Here, `u̇` is the time-derivative of the state vector, which is stored in the
     $RHS_body
 end
 
-const TaylorT1RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
+const TaylorT1RHS! = ODEFunction{true, FullSpecialize}(
     (u̇,u,p,t) -> (p.state.=u; TaylorT1!(u̇,p)); sys
 )
 
@@ -108,7 +108,7 @@ always be unused in this package, but is part of the `DifferentialEquations` API
     $RHS_body
 end
 
-const TaylorT4RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
+const TaylorT4RHS! = ODEFunction{true, FullSpecialize}(
     (u̇,u,p,t) -> (p.state.=u; TaylorT4!(u̇,p)); sys
 )
 
@@ -144,6 +144,6 @@ always be unused in this package, but is part of the `DifferentialEquations` API
     $RHS_body
 end
 
-const TaylorT5RHS! = ODEFunction{true, SciMLBase.FullSpecialize}(
+const TaylorT5RHS! = ODEFunction{true, FullSpecialize}(
     (u̇,u,p,t) -> (p.state.=u; TaylorT5!(u̇,p)); sys
 )

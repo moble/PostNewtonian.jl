@@ -1,5 +1,5 @@
 # This should be an internal class that just allows us to combine ODE solution objects
-struct CombinedInterpolationData <: SciMLBase.AbstractDiffEqInterpolation
+struct CombinedInterpolationData <: AbstractDiffEqInterpolation
     sol₋
     sol₊
     tᵢ
@@ -52,7 +52,7 @@ function (interp::CombinedInterpolationData)(val, tvals, idxs, deriv, p, continu
     variables = interp.sol₊.prob.f.sys.variables
     parameters = interp.sol₊.prob.f.sys.parameters
     independent_variables = interp.sol₊.prob.f.sys.independent_variables
-    RecursiveArrayTools.DiffEqArray(
+    DiffEqArray(
         val, tvals, p;
         variables, parameters, independent_variables
     )
@@ -80,8 +80,8 @@ function combine_solutions(sol₋, sol₊)
     problem = ODEProblem(sol₊.prob.f, u[1], (t[1], t[end]), sol₊.prob.p)
     if sol₊.dense
         interp = CombinedInterpolationData(sol₋, sol₊, sol₊.t[1])
-        DiffEqBase.build_solution(problem, alg, t, u, dense=true, retcode=retcode, interp=interp)
+        build_solution(problem, alg, t, u, dense=true, retcode=retcode, interp=interp)
     else
-        DiffEqBase.build_solution(problem, alg, t, u, dense=false, retcode=retcode)
+        build_solution(problem, alg, t, u, dense=false, retcode=retcode)
     end
 end

@@ -1,7 +1,7 @@
 # Helper functions to get the `pnsystem` from either an ODESolution or the result of
 # interpolating such a thing
-_pnsystem(inspiral::SciMLBase.ODESolution) = inspiral.prob.p
-_pnsystem(inspiral::SciMLBase.DiffEqArray) = inspiral.p
+_pnsystem(inspiral::ODESolution) = inspiral.prob.p
+_pnsystem(inspiral::DiffEqArray) = inspiral.p
 
 
 """
@@ -24,7 +24,7 @@ function coorbital_waveform_computation_storage(
     @assert 0 ≤ ℓₘᵢₙ ≤ 2
     @assert ℓₘᵢₙ ≤ ℓₘₐₓ
     p = _pnsystem(inspiral)
-    PNSystemType = SciMLBase.parameterless_type(p)
+    PNSystemType = parameterless_type(p)
     pnsystem = PNSystemType(
         copy(inspiral.u[1]);
         Λ₁=Λ₁(p),

@@ -177,7 +177,7 @@ struct SymbolicPNSystem{T, PNOrder} <: PNSystem{T, PNOrder}
     Λ₂::eltype(T)
 end
 function SymbolicPNSystem(PNOrder=typemax(Int))
-    @variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
+    Symbolics.@variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
     SymbolicPNSystem{Vector{typeof(M₁)}, prepare_pn_order(PNOrder)}(
         [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
         Λ₁, Λ₂

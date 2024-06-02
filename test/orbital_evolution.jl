@@ -32,12 +32,12 @@
     sol2 = @test_logs (:info,forwards_termination) (:info,backwards_termination) orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, Ω₁=Ωᵢ/2, Rᵢ=Rᵢ, quiet=false)
 
     # Check endpoint values
-    @test sol1.retcode == SciMLBase.ReturnCode.Terminated
+    @test sol1.retcode == ReturnCode.Terminated
     @test sol1[:v, 1] == vᵢ
     @test sol1[1] ≈ uᵢ
     @test sol1[:v, end] ≈ vₑ
 
-    @test sol2.retcode == SciMLBase.ReturnCode.Terminated
+    @test sol2.retcode == ReturnCode.Terminated
     @test sol2[:v, 1] ≈ v₁
     iᵢ = argmin(abs.(sol2.t .- 0.0))  # Assuming uᵢ corresponds to t==0.0
     @test sol2[iᵢ] ≈ uᵢ

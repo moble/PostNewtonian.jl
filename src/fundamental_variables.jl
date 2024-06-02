@@ -3,7 +3,7 @@ module FundamentalVariables
 using ..PostNewtonian
 using ..PostNewtonian: PNSystem, BHNS, NSNS
 using ..PostNewtonian: M₁index, M₂index, χ⃗₁indices, χ⃗₂indices, Rindices, vindex, Φindex
-using Quaternionic
+using Quaternionic: Quaternionic, QuatVec, Rotor
 
 export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, Λ₁, Λ₂,
     M1, M2, chi1, chi2, Phi, Lambda1, Lambda2

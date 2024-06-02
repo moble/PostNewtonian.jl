@@ -146,11 +146,11 @@ otherwise an `info` message will be issued only if the `quiet` flag is set to `f
 """
 function decreasing_v_terminator(quiet=false)
     function discrete_condition(state,t,integrator)
-        SciMLBase.get_du(integrator)[vindex] < 0  # This translates to v̇<0
+        get_du(integrator)[vindex] < 0  # This translates to v̇<0
     end
     function discrete_terminator!(integrator)
         v = integrator.u[vindex]
-        ∂ₜv = SciMLBase.get_du(integrator)[vindex]
+        ∂ₜv = get_du(integrator)[vindex]
         message = (
             "Terminating forwards evolution because 𝑣 is decreasing:\n"
             * "This is only unusual if 𝑣 ≲ 1/2; the current value is 𝑣=$v\n"
