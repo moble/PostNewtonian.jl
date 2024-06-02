@@ -10,10 +10,10 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6847321.svg)](https://doi.org/10.5281/zenodo.6847321)
 
-> :warning: **Warning**: This package has not yet reached version 1.0, and is
-> still missing a few capabilities.  In particular, only `TaylorT1` is
-> supported.  Nonetheless, the features that are present have been tested
-> carefully, and should be reliable.
+> [!NOTE]
+> This package is still missing a few capabilities.  In particular, only
+> `TaylorT1` is supported.  Nonetheless, the features that are present
+> have been tested carefully, and should be reliable.
 
 This package computes orbital dynamics of and waveforms from binary black-hole
 systems, in the post-Newtonian approximation.  See [the
