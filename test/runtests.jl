@@ -31,7 +31,8 @@ using SymbolicUtils
 using DoubleFloats
 using Quaternionic
 
-using Aqua
+import Aqua
+import ExplicitImports
 
 enabled_tests = lowercase.(ARGS)
 
