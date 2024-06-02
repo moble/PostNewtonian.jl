@@ -7,7 +7,6 @@
 [![Coverage](https://codecov.io/gh/moble/PostNewtonian.jl/branch/main/graph/badge.svg?token=GZULA1HBZB)](https://codecov.io/gh/moble/PostNewtonian.jl)
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
 [![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
-[![PkgEval](https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/P/PostNewtonian.svg)](https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/report.html)
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6847321.svg)](https://doi.org/10.5281/zenodo.6847321)
 
