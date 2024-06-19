@@ -7,7 +7,8 @@
 
 Compute mode weights of gravitational waves emitted by `pn` system, modifying `h` in place.
 
-!!! note This is a low-level function; you probably don't want to use this directly.  See
+!!! note
+    This is a low-level function; you probably don't want to use this directly.  See
     [`coorbital_waveform`](@ref) or [`inertial_waveform`](@ref) for more user-friendly
     functions.
 
