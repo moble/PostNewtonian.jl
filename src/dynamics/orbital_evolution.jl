@@ -141,7 +141,7 @@ are the same, regardless.
     The default is to include all available terms in each PN expression.
   * `check_up_down_instability=true`: Warn if the "up-down instability" (see below) is
     likely to affect this system.
-  * `time_stepper=AutoVern9(Rodas5P())`: Choice of solver in OrdinaryDiffEq to integrate
+  * `time_stepper=Vern9()`: Choice of solver in OrdinaryDiffEq to integrate
     ODE.
   * `abstol=eps(T)^(11//16)`: Absolute tolerance of ODE solver, where `T` is the common type
     to which all the positional arguments are promoted.  This is the tolerance on local
@@ -354,7 +354,7 @@ function orbital_evolution(
     Lambda1=0, Lambda2=0, Omega_1=Ωᵢ, Omega_e=Ω(v=1,M=M₁+M₂), R_i=Rotor(true),
     Λ₁=Lambda1, Λ₂=Lambda2, Ω₁=Omega_1, Ωₑ=Omega_e, Rᵢ=R_i,
     approximant="TaylorT1", PNOrder=typemax(Int),
-    check_up_down_instability=true, time_stepper=AutoVern9(Rodas5P()),
+    check_up_down_instability=true, time_stepper=Vern9(),
     reltol=nothing, abstol=nothing,
     termination_criteria_forwards=nothing,
     termination_criteria_backwards=nothing,
