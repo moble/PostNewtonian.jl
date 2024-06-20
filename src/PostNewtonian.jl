@@ -10,7 +10,7 @@ import SymbolicUtils
 using DataInterpolations: CubicSpline
 using InteractiveUtils: methodswith
 using LinearAlgebra: mul!
-using OrdinaryDiffEq: AutoVern9, Rodas5P,
+using OrdinaryDiffEq: Vern9, #AutoVern9, Rodas5P,
     ODEFunction, ODEProblem, solve, remake,
     terminate!, CallbackSet, DiscreteCallback, VectorContinuousCallback
 using Quaternionic: QuatVec, Rotor, abs2vec, components, normalize, (⋅), (×)
