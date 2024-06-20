@@ -107,7 +107,7 @@ them to the test with a very large scale factor.
 using PostNewtonian, Plots  # hide
 plotlyjs()  # hide
 default(size=(800,480), linewidth=3, leg=:top, legendfontsize=11)  # hide
-σ = 10^10  # Scale factor
+σ = 10.0^10  # Scale factor
 
 M₁ = 0.4
 M₂ = 0.6
@@ -116,7 +116,7 @@ M₂ = 0.6
 Ωᵢ = 0.01
 Ω₁ = 3Ωᵢ/4
 Ωₑ = 0.9
-dt = 5
+dt = 5.0
 
 inspiral1 = orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, Ω₁=Ω₁, Ωₑ=Ωₑ, saveat=dt)
 inspiral2 = orbital_evolution(M₁*σ, M₂*σ, χ⃗₁, χ⃗₂, Ωᵢ/σ, Ω₁=Ω₁/σ, Ωₑ=Ωₑ/σ, saveat=dt*σ)
