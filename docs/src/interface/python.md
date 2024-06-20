@@ -40,57 +40,48 @@ Julia itself and any dependencies *within* Julia that you may need
     report](https://github.com/moble/PostNewtonian.jl/issues/new).
 
 
-## Getting started
+## Installation
+ 
 
-Installation is pretty simple.  There are two optional steps first,
-but generally just one required step.  
+### 0. Optionally pre-install Julia
 
-!!! tip "TL;DR"
-    Basically, you just need to install the `sxs` package, and then
-    run the python command `from sxs import julia`.
+If you'll want to use Julia from outside of Python, install Julia
+first with [the `juliaup`
+installer](https://github.com/JuliaLang/juliaup?tab=readme-ov-file#juliaup---julia-version-manager).
 
+### 1. Install the `sxs` python package
 
-### Optional step 1: Install Julia
+While not *strictly necessary*, the `sxs` python package is very
+useful for providing a general interface to waveforms, and will
+automatically install the PostNewtonian package and its dependencies
+(and even Julia, if necessary).
 
-If a Julia installation is not already available, the made below will
-automatically install it for you *in the python environment you are
-using*.  If you have multiple python environments, this means that
-there will be multiple copies of Julia installed, one in each
-environment.  Installing Julia beforehand will avoid this duplication.
-
-The officially recommended method is to use [the `juliaup`
-installer](https://github.com/JuliaLang/juliaup?tab=readme-ov-file#juliaup---julia-version-manager),
-which also provides an easy way to update Julia itself, manage
-multiple versions of Julia, and update it.
-
-Note that the `julia` executable must be on your `PATH` for the next
-steps to work properly.  You may need to restart your shell or
-terminal after installing Julia to make sure.
-
-
-### Optional step 2: Create a conda env
-
-Create a conda[^1] env just for this task
+If you use `conda`, just run something like[^1]
 ```bash
-conda create -c conda-forge -n julia_pn python numpy matplotlib
-conda activate julia_pn
+conda install -c conda-forge sxs numba::numba numba::llvmlite
 ```
-Add whatever other packages you use to that first line.
-
-
-### Required step: Install the `sxs` package and use it to install Julia
-
-While the `sxs` package is not *strictly* required, it is very useful
-for providing a general interface to waveforms, and will automatically
-install the `PostNewtonian` package and its dependencies.  Simply run
-
+If you prefer `pip`, use
 ```bash
 python -m pip install sxs
+```
+
+!!! danger "Avoid segfaults on macOS"
+    If using conda/mamba on macOS, you **MUST** install the correct
+    versions of `numba` and `llvmlite`, or [you will get
+    segfaults.](https://github.com/numba/numba/issues/7857#issuecomment-1082246028)
+    Specifically, you **must** include the `numba::` prefix to
+    select the correct anaconda channel, as shown in the
+    command given above.
+
+### 2. Install Julia and `PostNewtonian.jl`
+
+The following line will take a few minutes to install Julia (if
+necessary), then download and compile all the necessary Julia
+packages.
+
+```bash
 python -c 'from sxs import julia'
 ```
-The first line installs `sxs` itself, but not Julia; the second line
-will take a few minutes to install Julia then download and compile all
-the necessary packages.
 
 
 ## Testing the installation
