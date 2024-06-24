@@ -77,10 +77,9 @@ function uniform_in_phase(solution, saves_per_orbit)
         Φ = solution[:Φ]
         δΦ = 2π / saves_per_orbit
         Φrange = range(extrema(Φ)..., step=δΦ)
-        # Call to `convert` is hack to work around DataInterpolations 5.0 bug
-        t_Φ = convert(typeof(t), CubicSpline(t, Φ)(collect(Φrange)))
-        # Hack to ensure that t=0 is interpolated back
-        # to exactly t=0 instead of, e.g., -1e-24:
+        t_Φ = CubicSpline(t, Φ)(Φrange)
+        # Ensure that t=0 is interpolated back
+        # to *exactly* t=0 instead of, e.g., -1e-24:
         t_Φ[1] = t[1]
         solution(t_Φ)
     end
