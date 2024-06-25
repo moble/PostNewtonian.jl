@@ -5,6 +5,7 @@ module PostNewtonian
 import MacroTools
 import Symbolics
 import SymbolicUtils
+import FastDifferentiation
 
 # Otherwise, we just explicitly import specific functions:
 using DataInterpolations: CubicSpline
@@ -21,6 +22,7 @@ using SciMLBase: ODESolution, parameterless_type, FullSpecialize,
 using SciMLBase.ReturnCode: ReturnCode
 using SphericalFunctions: D!, Diterator, Dprep, Yiterator
 using SymbolicIndexingInterface: SymbolCache
+using RuntimeGeneratedFunctions: get_expression
 
 # See the "Code structure" section of the documentation for a description of the simple
 # hierarchy into which this code is organized.  The different levels of that hierarchy are
@@ -34,7 +36,7 @@ using .MathConstants
 
 
 include("systems.jl")
-export PNSystem, BBH, BHNS, NSNS, SymbolicPNSystem, symbolic_pnsystem, pn_order
+export PNSystem, BBH, BHNS, NSNS, SymbolicPNSystem, symbolic_pnsystem, FDPNSystem, fd_pnsystem, pn_order
 
 
 include("fundamental_variables.jl")

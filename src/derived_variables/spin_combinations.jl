@@ -20,6 +20,7 @@ S⃗₂(s::VecOrPNSystem) = χ⃗₂(s) * M₂(s)^2
 
 Total (dimensionful) spin vector ``S⃗₁+S⃗₂``.
 """
+#S(M₁::FastDifferentiation.Node, M₂, χ⃗₁, χ⃗₂) = QuatVec([χ⃗₁[2] * M₁^2, χ⃗₁[3] * M₁^2, χ⃗₁[4]*M₁^2]) + QuatVec([χ⃗₂[2] * M₂^2, χ⃗₂[3] * M₂^2, χ⃗₂[4]*M₁^2]) 
 S⃗(M₁, M₂, χ⃗₁, χ⃗₂) = χ⃗₁ * M₁^2 + χ⃗₂ * M₂^2
 S⃗(s::VecOrPNSystem) = S⃗(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
 

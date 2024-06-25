@@ -123,9 +123,7 @@ overall factor is used, leading to a sign difference.
 end
 const binding_energy = 𝓔
 
-
-# We derive the function 𝓔′ analytically from 𝓔.  Documentation goes below.
-const 𝓔′ = let 𝓔=𝓔(symbolic_pnsystem), v=v(symbolic_pnsystem)
+const 𝓔′Symbolics = let 𝓔=𝓔(symbolic_pnsystem), v=v(symbolic_pnsystem)
     ∂ᵥ = Symbolics.Differential(v)
     # Evaluate derivative symbolically
     𝓔′ = SymbolicUtils.simplify(Symbolics.expand_derivatives(∂ᵥ(𝓔)), expand=true)#, simplify_fractions=false)
@@ -145,6 +143,29 @@ const 𝓔′ = let 𝓔=𝓔(symbolic_pnsystem), v=v(symbolic_pnsystem)
     # Finally, apply the "macro" to it and get a full function out
     eval(pn_expression(1, 𝓔′))::Function
 end
+
+# We derive the function 𝓔′ analytically from 𝓔.  Documentation goes below.
+@generated function 𝓔′(pnsystem::PNSystem{FT, PNOrder}) where {FT, PNOrder}
+    fdpnsystem = FDPNSystem(eltype(FT), PNOrder)
+    𝓔′ = FastDifferentiation.derivative(𝓔(fdpnsystem), v(fdpnsystem))
+    𝓔′ = FastDifferentiation.make_function([𝓔′], [fdpnsystem.state; Λ₁(fdpnsystem); Λ₂(fdpnsystem)]; in_place = true)
+    𝓔′ = get_expression(𝓔′)
+    body = MacroTools.splitdef(𝓔′)[:body]
+    body = MacroTools.flatten(body)
+    body = MacroTools.rmlines(body)
+    body = MacroTools.unblock(body)
+    body = body.args[end]
+    newbody = [body.args[1:end-2]; body.args[end-1].args[2]]
+    return quote
+        input_variables = [pnsystem.state; Λ₁(pnsystem); Λ₂(pnsystem)]
+        @fastmath @inbounds begin
+            $(newbody...)
+        end
+    end
+
+end
+
+
 const binding_energy_deriv=𝓔′
 
 """
