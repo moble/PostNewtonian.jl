@@ -31,6 +31,8 @@ end
 function type_converter(pnsystem, x)
     convert(eltype(pnsystem), x)
 end
+type_converter(pnsystem, x::FastDifferentiation.Node) = x
+type_converter(::FDPNSystem{FT}, x::FastDifferentiation.Node) where FT = x
 
 """
     unhold(expr)

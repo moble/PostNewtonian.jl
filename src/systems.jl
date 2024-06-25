@@ -219,3 +219,20 @@ julia> χ⃗₂(symbolic_pnsystem)
 ```
 """
 const symbolic_pnsystem = SymbolicPNSystem()
+
+
+struct FDPNSystem{FT, PNOrder} <: PNSystem{Vector{FastDifferentiation.Node}, PNOrder}
+    state::Vector{FastDifferentiation.Node}
+    Λ₁::FastDifferentiation.Node
+    Λ₂::FastDifferentiation.Node
+end
+function FDPNSystem(FT, PNOrder=typemax(Int))
+    FastDifferentiation.@variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
+    FDPNSystem{FT, prepare_pn_order(PNOrder)}(
+        [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
+        Λ₁, Λ₂
+    )
+end
+Base.eltype(::FDPNSystem{FT}) where {FT} = FT
+
+const fd_pnsystem = FDPNSystem(Float64)

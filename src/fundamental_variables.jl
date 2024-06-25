@@ -4,6 +4,7 @@ using ..PostNewtonian
 using ..PostNewtonian: PNSystem, BHNS, NSNS
 using ..PostNewtonian: M₁index, M₂index, χ⃗₁indices, χ⃗₂indices, Rindices, vindex, Φindex
 using Quaternionic: Quaternionic, QuatVec, Rotor
+#using ..QuaternionicFastDifferentiationExt: QuatVec, Rotor
 
 export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, Λ₁, Λ₂,
     M1, M2, chi1, chi2, Phi, Lambda1, Lambda2
@@ -135,6 +136,7 @@ specializes on the type of `pnsystem`.
 Λ₁(::PNSystem) = 0
 Λ₁(pn::NSNS) = pn.Λ₁
 Λ₁(pn::SymbolicPNSystem) = pn.Λ₁
+Λ₁(pn::FDPNSystem) = pn.Λ₁
 const Lambda1 = Λ₁
 
 @doc raw"""
@@ -154,6 +156,7 @@ specializes on the type of `pnsystem`.
 Λ₂(pn::BHNS) = pn.Λ₂
 Λ₂(pn::NSNS) = pn.Λ₂
 Λ₂(pn::SymbolicPNSystem) = pn.Λ₂
+Λ₂(pn::FDPNSystem) = pn.Λ₂
 const Lambda2 = Λ₂
 
 end
