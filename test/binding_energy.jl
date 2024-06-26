@@ -128,16 +128,18 @@ function be(pnsystem, deriv)
 end
 
 for PNOrder ∈ 0//2:1//2:13//2
-    sympn = SymbolicPNSystem(PNOrder)
+    fdpn = FDNSystem(Float64, PNOrder)
 
-    𝓔1 = 𝓔(sympn)
-    𝓔2 = be(sympn, false)
-    diff = simplify(𝓔1-𝓔2, expand=true)
+    𝓔1 = 𝓔(fdpn)
+    𝓔2 = be(fdpn, false)
+    #diff = simplify(𝓔1-𝓔2, expand=true)
+    diff = 𝓔1 - 𝓔2
     @test iszero(diff)
 
-    𝓔′1 = 𝓔′(sympn)
-    𝓔′2 = be(sympn, true)
-    diff′ = expand(𝓔′1-𝓔′2)
+    𝓔′1 = 𝓔′(fdpn)
+    𝓔′2 = be(fdpn, true)
+    #diff′ = expand(𝓔′1-𝓔′2)
+    diff′ = 𝓔′1-𝓔′2
     if !iszero(diff′)
         @show PNOrder 𝓔′1 𝓔′2 diff′
         println()

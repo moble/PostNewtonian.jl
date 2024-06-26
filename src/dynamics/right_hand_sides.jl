@@ -4,8 +4,6 @@ function v̇_numerator(p)
 end
 
 function v̇_denominator(p)
-    #print("UHHHH 𝓔′ is " * string(𝓔′(p)[1]))
-    #𝓔′(p)[1]
     𝓔′(p)
 end
 
