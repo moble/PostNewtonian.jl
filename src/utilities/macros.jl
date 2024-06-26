@@ -1,33 +1,10 @@
-"""
-    hold(x)
 
-Delay evaluation of the argument in `Symbolics` expressions.
-
-This is just a helper function that acts trivially — like the `identity` function — but also
-gets registered with `Symbolics` to avoid evaluation of the argument.  For example, we can
-preserve expressions like `π^2`, which Julia would normally convert directly to a `Float64`.
-
-Note that you probably don't want to use this function directly; this will probably be done
-for you by [`@pn_expression`](@ref) or similar.  If you *do* want to use this directly, you
-probably want another layer of indirection to construct something like
-`Symbolics.Num(SymbolicUtils.Term(hold, [x]))` so that you can use the result in a symbolic
-expression.
-"""
-hold(x) = x
-Symbolics.@register_symbolic hold(x)
-Symbolics.derivative(::typeof(hold), args::NTuple{1,Any}, ::Val{1}) = 1
 
 """
     type_converter(pnsystem, x)
 
 Convert `x` to a type appropriate for the float type of `pnsystem`.
 """
-function type_converter(::PNSystem{T}, x) where {T<:Vector{Symbolics.Num}}
-    Symbolics.Num(SymbolicUtils.Term(hold, [x]))
-end
-function type_converter(::PNSystem{T}, x::Symbolics.Num) where {T<:Vector{Symbolics.Num}}
-    x
-end
 function type_converter(pnsystem, x)
     convert(eltype(pnsystem), x)
 end
@@ -55,18 +32,6 @@ fundamental_quaternionic_variables = [
 derived_variables = methodswith(VecOrPNSystem, DerivedVariables)
 pnvariables = map(v->v.name, [fundamental_variables; derived_variables])
 
-# Add symbolic capabilities to all derived variables (fundamental variables already work)
-for method ∈ [fundamental_quaternionic_variables; derived_variables]
-    name = method.name
-    @eval begin
-        function PostNewtonian.$name(v::PNSystem{T}) where {T<:Vector{Symbolics.Num}}
-            Symbolics.Num(SymbolicUtils.Sym{Real}(Symbol($name)))
-        end
-        function PostNewtonian.$name(v::Vector{T}) where {T<:Symbolics.Num}
-            Symbolics.Num(SymbolicUtils.Sym{Real}(Symbol($name)))
-        end
-    end
-end
 
 irrationals = unique([
     find_symbols_of_type(Base.MathConstants, Irrational);
@@ -350,32 +315,6 @@ function var_collect(expr, var)
     max_k = maximum(keys(terms))
     term_exprs = [get(terms, k, 0) for k ∈ 0:max_k]
     max_k, :(($(term_exprs...),))
-end
-
-
-function var_collect(expr::Symbolics.Num, var; max_power=100, max_gap=4)
-    expr = SymbolicUtils.expand(expr)
-    dict = Dict(var^j => 0 for j=1:max_power)
-    c = SymbolicUtils.substitute(expr, dict, fold=false)
-    expr = expr - c
-    coefficients = [c]
-    gap = 0
-    for i in 1:max_power
-        dict[var^i] = 1
-        if i > 1
-            dict[var^(i-1)] = 0
-        end
-        push!(coefficients, Symbolics.substitute(expr, dict, fold=false))
-        if iszero(coefficients[end])
-            gap += 1
-            if gap ≥ max_gap
-                return coefficients[1:end-gap]
-            end
-        else
-            gap = 0
-        end
-    end
-    coefficients
 end
 
 

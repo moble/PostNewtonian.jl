@@ -135,7 +135,6 @@ specializes on the type of `pnsystem`.
 """
 Λ₁(::PNSystem) = 0
 Λ₁(pn::NSNS) = pn.Λ₁
-Λ₁(pn::SymbolicPNSystem) = pn.Λ₁
 Λ₁(pn::FDPNSystem) = pn.Λ₁
 const Lambda1 = Λ₁
 
@@ -155,7 +154,6 @@ specializes on the type of `pnsystem`.
 Λ₂(::PNSystem) = 0
 Λ₂(pn::BHNS) = pn.Λ₂
 Λ₂(pn::NSNS) = pn.Λ₂
-Λ₂(pn::SymbolicPNSystem) = pn.Λ₂
 Λ₂(pn::FDPNSystem) = pn.Λ₂
 const Lambda2 = Λ₂
 

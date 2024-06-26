@@ -3,7 +3,6 @@ module PostNewtonian
 # Always explicitly address functions similar to functions defined in this package,
 # which come from these packages:
 import MacroTools
-import Symbolics
 import SymbolicUtils
 import FastDifferentiation
 
@@ -99,6 +98,20 @@ include("assorted_binaries/random.jl")
 
 
 include("precompilation.jl")
+
+if !isdefined(Base, :get_extension)
+    using Requires
+end
+
+@static if !isdefined(Base, :get_extension)
+    # COV_EXCL_START
+
+    function __init__()
+        @require Symbolics="0c5d862f-8b57-4792-8d23-62f2024744c7" include("../ext/PostNewtonianSymbolicsExt.jl")
+    end
+
+    # COV_EXCL_STOP
+end
 
 
 end  # module PostNewtonian

@@ -57,7 +57,6 @@ function causes_domain_error!(u̇, p::PNSystem{VT}) where {VT}
         false
     end
 end
-causes_domain_error!(u̇, ::PNSystem{VT}) where {VT<:Vector{Symbolics.Num}} = false
 
 
 function prepare_system(;
@@ -169,56 +168,6 @@ struct NSNS{ST, PNOrder, ET} <: PNSystem{ST, PNOrder}
         new{ST, PNOrder, ET}(state, convert(ET, Λ₁), convert(ET, Λ₂))
     end
 end
-
-
-"""
-    SymbolicPNSystem{T, PNOrder}(state, Λ₁, Λ₂)
-
-A `PNSystem` that contains information as variables from
-[`Symbolics.jl`](https://symbolics.juliasymbolics.org/).
-
-See also [`symbolic_pnsystem`](@ref) for a particular general instance of this type.
-"""
-struct SymbolicPNSystem{ST, PNOrder, ET} <: PNSystem{ST, PNOrder}
-    state::ST
-    Λ₁::ET
-    Λ₂::ET
-
-    function SymbolicPNSystem(PNOrder=typemax(Int))
-        Symbolics.@variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
-        ET = typeof(M₁)
-        new{Vector{ET}, prepare_pn_order(PNOrder), ET}(
-            [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
-            Λ₁, Λ₂
-        )
-    end
-end
-
-"""
-    symbolic_pnsystem
-
-A symbolic `PNSystem` that contains symbolic information for all types of `PNSystem`s.
-
-In particular, note that this object has an (essentially) infinite `PNOrder`, uses the
-`TaylorT1` approximant, and has nonzero values for quantities like `Λ₁` and `Λ₂`.  If you
-want different choices, you may need to call [`SymbolicPNSystem`](@ref) yourself, or even
-construct a different specialized subtype of `PNSystem` (it's not hard).
-
-# Examples
-```jldoctest
-julia> using PostNewtonian: M₁, M₂, χ⃗₁, χ⃗₂
-
-julia> M₁(symbolic_pnsystem), M₂(symbolic_pnsystem)
-(M₁, M₂)
-
-julia> χ⃗₁(symbolic_pnsystem)
-χ⃗₁
-
-julia> χ⃗₂(symbolic_pnsystem)
-χ⃗₂
-```
-"""
-const symbolic_pnsystem = SymbolicPNSystem()
 
 
 struct FDPNSystem{FT, PNOrder} <: PNSystem{Vector{FastDifferentiation.Node}, PNOrder}
