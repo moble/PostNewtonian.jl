@@ -123,27 +123,6 @@ overall factor is used, leading to a sign difference.
 end
 const binding_energy = 𝓔
 
-const 𝓔′Symbolics = let 𝓔=𝓔(symbolic_pnsystem), v=v(symbolic_pnsystem)
-    ∂ᵥ = Symbolics.Differential(v)
-    # Evaluate derivative symbolically
-    𝓔′ = SymbolicUtils.simplify(Symbolics.expand_derivatives(∂ᵥ(𝓔)), expand=true)#, simplify_fractions=false)
-    # Turn it into (an Expr of) a function taking one argument: `pnsystem`
-    𝓔′ = Symbolics.build_function(𝓔′, :pnsystem, nanmath=false)
-    # Remove `hold` (which we needed for Symbolics.jl to not collapse to Float64)
-    𝓔′ = unhold(𝓔′)
-    # "Flatten" the main sum, because Symbolics nests sums for some reason
-    𝓔′ = apply_to_first_add!(𝓔′, flatten_add!)
-    # Apply `@pn_expansion` to the main sum
-    splitfunc = MacroTools.splitdef(𝓔′)
-    splitfunc[:body] = apply_to_first_add!(
-        splitfunc[:body],
-        x->:(@pn_expansion(-1, $x))
-    )
-    𝓔′ = MacroTools.combinedef(splitfunc)
-    # Finally, apply the "macro" to it and get a full function out
-    eval(pn_expression(1, 𝓔′))::Function
-end
-
 # We derive the function 𝓔′ analytically from 𝓔.  Documentation goes below.
 @generated function 𝓔′(pnsystem::PNSystem{FT, PNOrder}) where {FT, PNOrder}
     fdpnsystem = FDPNSystem(eltype(FT), PNOrder)
