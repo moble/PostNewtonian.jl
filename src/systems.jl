@@ -119,20 +119,24 @@ holding the (constant) tidal-coupling parameter of the neutron star.
 Note that the neutron star is *always* object 2 — meaning that `M₂`, `χ⃗₂`, and `Λ₂` always
 refer to it; `M₁` and `χ⃗₁` always refer to the black hole.  See also [`NSNS`](@ref).
 """
-struct BHNS{T, PNOrder} <: PNSystem{T, PNOrder}
-    state::T
-    Λ₂::eltype(T)
-end
-function BHNS(;
-    M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₂, Φ=0,
-    PNOrder=typemax(Int), kwargs...
-)
-    (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
-    BHNS{T, PNOrder}(state, Λ₂)
-end
-function BHNS(state; Λ₂, Λ₁=0, PNOrder=typemax(Int))
-    @assert length(state) == 14
-    BHNS{typeof(state), prepare_pn_order(PNOrder)}(state, Λ₂)
+struct BHNS{ST, PNOrder, ET} <: PNSystem{ST, PNOrder}
+    state::ST
+    Λ₂::ET
+
+    function BHNS(;
+        M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₂, Φ=0,
+        PNOrder=typemax(Int), kwargs...
+    )
+        ST, PNOrder, state = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
+        ET = eltype(ST)
+        new{ST, PNOrder, ET}(state, convert(ET, Λ₂))
+    end
+    function BHNS(state; Λ₂, Λ₁=0, PNOrder=typemax(Int))
+        @assert length(state) == 14
+        ST, PNOrder = typeof(state), prepare_pn_order(PNOrder)
+        ET = eltype(ST)
+        new{ST, PNOrder, ET}(state, convert(ET, Λ₂))
+    end
 end
 
 
@@ -145,21 +149,25 @@ The `state` vector is the same as for a [`BBH`](@ref).  There are two additional
 and `Λ₂` holding the (constant) tidal-coupling parameters of the neutron stars.  See also
 [`BHNS`](@ref).
 """
-struct NSNS{T, PNOrder} <: PNSystem{T, PNOrder}
-    state::T
-    Λ₁::eltype(T)
-    Λ₂::eltype(T)
-end
-function NSNS(;
-    M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₁, Λ₂, Φ=0,
-    PNOrder=typemax(Int), kwargs...
-)
-    (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
-    NSNS{T, PNOrder}(state, Λ₁, Λ₂)
-end
-function NSNS(state; Λ₁, Λ₂, PNOrder=typemax(Int))
-    @assert length(state) == 14
-    NSNS{typeof(state), prepare_pn_order(PNOrder)}(state, Λ₁, Λ₂)
+struct NSNS{ST, PNOrder, ET} <: PNSystem{ST, PNOrder}
+    state::ST
+    Λ₁::ET
+    Λ₂::ET
+
+    function NSNS(;
+        M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₁, Λ₂, Φ=0,
+        PNOrder=typemax(Int), kwargs...
+    )
+        ST, PNOrder, state = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
+        ET = eltype(ST)
+        new{ST, PNOrder, ET}(state, convert(ET, Λ₁), convert(ET, Λ₂))
+    end
+    function NSNS(state; Λ₁, Λ₂, PNOrder=typemax(Int))
+        @assert length(state) == 14
+        ST, PNOrder = typeof(state), prepare_pn_order(PNOrder)
+        ET = eltype(state)
+        new{ST, PNOrder, ET}(state, convert(ET, Λ₁), convert(ET, Λ₂))
+    end
 end
 
 
@@ -171,17 +179,19 @@ A `PNSystem` that contains information as variables from
 
 See also [`symbolic_pnsystem`](@ref) for a particular general instance of this type.
 """
-struct SymbolicPNSystem{T, PNOrder} <: PNSystem{T, PNOrder}
-    state::T
-    Λ₁::eltype(T)
-    Λ₂::eltype(T)
-end
-function SymbolicPNSystem(PNOrder=typemax(Int))
-    Symbolics.@variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
-    SymbolicPNSystem{Vector{typeof(M₁)}, prepare_pn_order(PNOrder)}(
-        [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
-        Λ₁, Λ₂
-    )
+struct SymbolicPNSystem{ST, PNOrder, ET} <: PNSystem{ST, PNOrder}
+    state::ST
+    Λ₁::ET
+    Λ₂::ET
+
+    function SymbolicPNSystem(PNOrder=typemax(Int))
+        Symbolics.@variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
+        ET = typeof(M₁)
+        new{Vector{ET}, prepare_pn_order(PNOrder), ET}(
+            [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
+            Λ₁, Λ₂
+        )
+    end
 end
 
 """
