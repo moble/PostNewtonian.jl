@@ -109,7 +109,7 @@ w = PNWaveform(M1, M2, chi1, chi2, Omega_i)
 plt.semilogy(w.t, np.abs(w.data))
 ```
 The [`sxs.julia.PNWaveform`
-function](https://github.com/sxs-collaboration/sxs/blob/3998b47694125b23ad8271b1e832fdad5b800292/sxs/julia/__init__.py#L17-L70)
+function](https://github.com/sxs-collaboration/sxs/blob/e6aa63695fdb1a2f97cfb54e04dbbd5453142cd3/sxs/julia/__init__.py#L17-L86)
 is a simple wrapper that calls [`orbital_evolution`](@ref) and
 [`inertial_waveform`](@ref), then wraps the result in an
 [`sxs.WaveformModes`
