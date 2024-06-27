@@ -169,6 +169,15 @@ struct NSNS{ST, PNOrder, ET} <: PNSystem{ST, PNOrder}
     end
 end
 
+"""
+    FDPNSystem{FT, PNOrder}(state, Λ₁, Λ₂)
+
+A `PNSystem` that contains information as variables from
+[`FastDifferentiation.jl`](https://docs.juliahub.com/General/FastDifferentiation/stable/).
+
+See also [`fd_pnsystem`](@ref) for a particular general instance of this type.
+"""
+
 
 struct FDPNSystem{FT, PNOrder} <: PNSystem{Vector{FastDifferentiation.Node}, PNOrder}
     state::Vector{FastDifferentiation.Node}
@@ -183,5 +192,30 @@ function FDPNSystem(FT, PNOrder=typemax(Int))
     )
 end
 Base.eltype(::FDPNSystem{FT}) where {FT} = FT
+
+"""
+    fd_pnsystem
+
+A symbolic `PNSystem` that contains symbolic information for all types of `PNSystem`s.
+
+In particular, note that this object has an (essentially) infinite `PNOrder`, uses the
+`TaylorT1` approximant, and has nonzero values for quantities like `Λ₁` and `Λ₂`.  If you
+want different choices, you may need to call [`FDPNSystem`](@ref) yourself, or even
+construct a different specialized subtype of `PNSystem` (it's not hard).
+
+# Examples
+```jldoctest
+julia> using PostNewtonian: M₁, M₂, χ⃗₁, χ⃗₂
+
+julia> M₁(symbolic_pnsystem), M₂(symbolic_pnsystem)
+(M₁, M₂)
+
+julia> χ⃗₁(symbolic_pnsystem)
+χ⃗₁
+
+julia> χ⃗₂(symbolic_pnsystem)
+χ⃗₂
+```
+"""
 
 const fd_pnsystem = FDPNSystem(Float64)
