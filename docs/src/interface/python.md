@@ -126,10 +126,11 @@ additional fields relevant to post-Newtonian waveforms:
 - `orbital_phase` (array): The orbital phase as a function of
     time.
 
-The input arguments for `sxs.julia.PNWaveform` are mostly the same as
-for [`orbital_evolution`](@ref), except that the keyword arguments
-`ell_min`, `ell_max`, and `waveform_pn_order` will be intercepted and
-passed to [`inertial_waveform`](@ref).
+The input arguments for
+[`sxs.julia.PNWaveform`](https://github.com/sxs-collaboration/sxs/blob/e6aa63695fdb1a2f97cfb54e04dbbd5453142cd3/sxs/julia/__init__.py#L17-L86)
+are mostly the same as for [`orbital_evolution`](@ref), except that
+the keyword arguments `ell_min`, `ell_max`, and `waveform_pn_order`
+will be intercepted and passed to [`inertial_waveform`](@ref).
 
 
 ## Full Julia interface from Python
