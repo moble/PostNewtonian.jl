@@ -5,6 +5,7 @@ version = "0.7.2"
 
 [deps]
 DataInterpolations = "82cc6244-b520-54b8-b5a6-8a565e85f1d0"
+FastDifferentiation = "eb9bf01b-bf85-4b60-bf87-ee5de06c00be"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
@@ -13,12 +14,12 @@ OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
 Quaternionic = "0756cd96-85bf-4b6f-a009-b5012ea7a443"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 RecursiveArrayTools = "731186ca-8d62-57ce-b412-fbd966d074cd"
+RuntimeGeneratedFunctions = "7e49a35a-f44a-4d26-94aa-eba1b4ca6b47"
 SciMLBase = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
 SphericalFunctions = "af6d55de-b1f7-4743-b797-0829a72cf84e"
 SymbolicIndexingInterface = "2efcf032-c050-4f8e-a9bb-153293bab1f5"
 SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
-FastDifferentiation = "eb9bf01b-bf85-4b60-bf87-ee5de06c00be"
-RuntimeGeneratedFunctions = "7e49a35a-f44a-4d26-94aa-eba1b4ca6b47"
+Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
 DataInterpolations = "5.1"
@@ -27,7 +28,7 @@ LinearAlgebra = "1"
 Logging = "1"
 MacroTools = "0.5.10"
 OrdinaryDiffEq = "6"
-Quaternionic = "1.2"
+Quaternionic = "1.5"
 Random = "1"
 RecursiveArrayTools = "3"
 SciMLBase = "1, 2"
@@ -39,8 +40,14 @@ julia = "1.9"
 FastDifferentiation = "0.3.14"
 RuntimeGeneratedFunctions = "0.5.13"
 
-[extensions]
-PostNewtonianSymbolicsExt = "Symbolics"
+## Symbolics can't be an extension yet; we need it for @pn_expansion
+## It is permissible for a package to appear in both [deps] and
+## [weakdeps], but "Newer Julia versions will ignore dependencies in
+## [deps] that are also in [weakdeps]", and we definitely need it
+## installed.
 
-[weakdeps]
-Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
+# [extensions]
+# PostNewtonianSymbolicsExt = "Symbolics"
+
+# [weakdeps]
+# Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"

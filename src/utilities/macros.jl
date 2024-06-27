@@ -1,5 +1,3 @@
-
-
 """
     type_converter(pnsystem, x)
 
@@ -10,18 +8,6 @@ function type_converter(pnsystem, x)
 end
 type_converter(pnsystem, x::FastDifferentiation.Node) = x
 type_converter(::FDPNSystem{FT}, x::FastDifferentiation.Node) where FT = x
-
-"""
-    unhold(expr)
-
-Remove occurrences of [`hold`](@ref) from an `Expr`.
-"""
-function unhold(expr)
-    MacroTools.postwalk(expr) do x
-        m = MacroTools.trymatch(:(f_(i_)), x)
-        m === nothing || m[:f]!==hold ? x : Symbol(m[:i])
-    end
-end
 
 
 fundamental_variables = methodswith(PNSystem, FundamentalVariables)

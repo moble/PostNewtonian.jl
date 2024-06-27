@@ -123,12 +123,21 @@ overall factor is used, leading to a sign difference.
 end
 const binding_energy = 𝓔
 
-# We derive the function 𝓔′ analytically from 𝓔.  Documentation goes below.
+
+"""
+    𝓔′(pnsystem)
+    binding_energy_deriv(pnsystem)
+
+Compute the derivative with respect to ``v`` of the binding energy of a compact binary.
+
+This is computed automatically (via `FastDifferentiation`) from [`𝓔`](@ref); see that
+function for details of the PN formulas.
+"""
 @generated function 𝓔′(pnsystem::PNSystem{FT, PNOrder}) where {FT, PNOrder}
     fdpnsystem = FDPNSystem(eltype(FT), PNOrder)
     𝓔′ = FastDifferentiation.derivative(𝓔(fdpnsystem), v(fdpnsystem))
     𝓔′ = FastDifferentiation.make_function([𝓔′], [fdpnsystem.state; Λ₁(fdpnsystem); Λ₂(fdpnsystem)]; in_place = true)
-    𝓔′ = get_expression(𝓔′)
+    𝓔′ = RuntimeGeneratedFunctions.get_expression(𝓔′)
     body = MacroTools.splitdef(𝓔′)[:body]
     body = MacroTools.flatten(body)
     body = MacroTools.rmlines(body)
@@ -143,16 +152,4 @@ const binding_energy = 𝓔
     end
 
 end
-
-
 const binding_energy_deriv=𝓔′
-
-"""
-    𝓔′(pnsystem)
-    binding_energy_deriv(pnsystem)
-
-Compute the derivative with respect to ``v`` of the binding energy of a compact binary.
-
-This is computed symbolically from [`𝓔`](@ref); see that function for details.
-"""
-𝓔′
