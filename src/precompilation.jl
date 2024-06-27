@@ -11,7 +11,6 @@ let
         Ω₁ = 99Ωᵢ/100
         Ωₑ = 0.20
         inspiral = orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; Ω₁, Ωₑ)
-        #println(inspiral)
         uniform_in_phase(inspiral, 128)
         t′ = inspiral.t[end]-1.0 : 0.1 : inspiral.t[end]
         inspiral = inspiral(t′)
