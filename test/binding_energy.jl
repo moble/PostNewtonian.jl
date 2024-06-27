@@ -128,7 +128,7 @@ function be(pnsystem, deriv)
 end
 
 for PNOrder ∈ 0//2:1//2:13//2
-    fdpn = FDNSystem(Float64, PNOrder)
+    fdpn = FDPNSystem(Float64, PNOrder)
 
     𝓔1 = 𝓔(fdpn)
     𝓔2 = be(fdpn, false)

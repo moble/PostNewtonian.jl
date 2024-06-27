@@ -93,17 +93,20 @@ systems beyond a convenient description of how "far" the system has evolved.
 """
 struct BBH{T, PNOrder} <: PNSystem{T, PNOrder}
     state::T
-end
-function BBH(;
-    M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0,
-    PNOrder=typemax(Int), kwargs...
-)
-    (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
-    BBH{T, PNOrder}(state)
-end
-function BBH(state; Λ₁=0, Λ₂=0, PNOrder=typemax(Int))
-    @assert length(state) == 14
-    BBH{typeof(state), prepare_pn_order(PNOrder)}(state)
+
+    function BBH(;
+        M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0,
+        PNOrder=typemax(Int), kwargs...
+    )
+        (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
+        new{T, PNOrder}(state)
+    end
+    function BBH(state; Λ₁=0, Λ₂=0, PNOrder=typemax(Int))
+        @assert length(state) == 14
+        @assert Λ₁==0
+        @assert Λ₂==0
+        new{typeof(state), prepare_pn_order(PNOrder)}(state)
+    end
 end
 
 
@@ -169,6 +172,7 @@ struct NSNS{ST, PNOrder, ET} <: PNSystem{ST, PNOrder}
     end
 end
 
+
 """
     FDPNSystem{FT, PNOrder}(state, Λ₁, Λ₂)
 
@@ -177,21 +181,21 @@ A `PNSystem` that contains information as variables from
 
 See also [`fd_pnsystem`](@ref) for a particular general instance of this type.
 """
-
-
 struct FDPNSystem{FT, PNOrder} <: PNSystem{Vector{FastDifferentiation.Node}, PNOrder}
     state::Vector{FastDifferentiation.Node}
     Λ₁::FastDifferentiation.Node
     Λ₂::FastDifferentiation.Node
-end
-function FDPNSystem(FT, PNOrder=typemax(Int))
-    FastDifferentiation.@variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
-    FDPNSystem{FT, prepare_pn_order(PNOrder)}(
-        [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
-        Λ₁, Λ₂
-    )
+
+    function FDPNSystem(FT, PNOrder=typemax(Int))
+        FastDifferentiation.@variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
+        new{FT, prepare_pn_order(PNOrder)}(
+            [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
+            Λ₁, Λ₂
+        )
+    end
 end
 Base.eltype(::FDPNSystem{FT}) where {FT} = FT
+
 
 """
     fd_pnsystem
@@ -217,5 +221,4 @@ julia> χ⃗₂(symbolic_pnsystem)
 χ⃗₂
 ```
 """
-
 const fd_pnsystem = FDPNSystem(Float64)

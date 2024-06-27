@@ -3,8 +3,10 @@ module PostNewtonian
 # Always explicitly address functions similar to functions defined in this package,
 # which come from these packages:
 import MacroTools
+import Symbolics
 import SymbolicUtils
 import FastDifferentiation
+import RuntimeGeneratedFunctions
 
 # Otherwise, we just explicitly import specific functions:
 using DataInterpolations: CubicSpline
@@ -21,7 +23,6 @@ using SciMLBase: ODESolution, parameterless_type, FullSpecialize,
 using SciMLBase.ReturnCode: ReturnCode
 using SphericalFunctions: D!, Diterator, Dprep, Yiterator
 using SymbolicIndexingInterface: SymbolCache
-using RuntimeGeneratedFunctions: get_expression
 
 # See the "Code structure" section of the documentation for a description of the simple
 # hierarchy into which this code is organized.  The different levels of that hierarchy are
@@ -35,7 +36,7 @@ using .MathConstants
 
 
 include("systems.jl")
-export PNSystem, BBH, BHNS, NSNS, SymbolicPNSystem, symbolic_pnsystem, FDPNSystem, fd_pnsystem, pn_order
+export PNSystem, pn_order, BBH, BHNS, NSNS, FDPNSystem, fd_pnsystem
 
 
 include("fundamental_variables.jl")
@@ -61,7 +62,17 @@ export total_mass,  # M,  # Avoid clashes: don't export nicer names for importan
     chi_perp, χₚₑᵣₚ,
     chi_eff, χₑ,
     chi_p, χₚ,
-    Sₙ, Σₙ, Sλ, Σλ, Sₗ, Σₗ
+    S⃗₀⁺, S⃗₀⁻, S₀⁺ₙ, S₀⁻ₙ, S₀⁺λ, S₀⁻λ, S₀⁺ₗ, S₀⁻ₗ,
+    χ₁², χ₂², χ₁, χ₂, χ₁₂,
+    χ₁ₗ, χ₂ₗ, χₛₗ, χₐₗ,
+    Sₙ, Σₙ, Sλ, Σλ, Sₗ, Σₗ, sₗ, σₗ,
+    S₁ₙ, S₁λ, S₁ₗ, S₂ₙ, S₂λ, S₂ₗ,
+    rₕ₁, rₕ₂, Ωₕ₁, Ωₕ₂,
+    sin²θ₁, sin²θ₂, ϕ̇̂₁, ϕ̇̂₂,
+    Î₀₁, Î₀₂,
+    κ₁, κ₂, κ₊, κ₋,
+    λ₁, λ₂, λ₊, λ₋
+
 
 
 include("pn_expressions.jl")
@@ -97,21 +108,29 @@ include("assorted_binaries/random.jl")
 # Base.rand is the only function in that file
 
 
+### NOTE!!! This is hopefully temporary, until we can refactor @pn_expression to
+### avoid the use of `var_collect`, which requires Symbolics.jl.  At that point,
+### we should be able to make this a true extension
+include("../ext/PostNewtonianSymbolicsExt.jl")
+using .PostNewtonianSymbolicsExt
+export SymbolicPNSystem, symbolic_pnsystem, var_collect
+
+
 include("precompilation.jl")
 
-if !isdefined(Base, :get_extension)
-    using Requires
-end
+# if !isdefined(Base, :get_extension)
+#     using Requires
+# end
 
-@static if !isdefined(Base, :get_extension)
-    # COV_EXCL_START
+# @static if !isdefined(Base, :get_extension)
+#     # COV_EXCL_START
 
-    function __init__()
-        @require Symbolics="0c5d862f-8b57-4792-8d23-62f2024744c7" include("../ext/PostNewtonianSymbolicsExt.jl")
-    end
+#     function __init__()
+#         @require Symbolics="0c5d862f-8b57-4792-8d23-62f2024744c7" include("../ext/PostNewtonianSymbolicsExt.jl")
+#     end
 
-    # COV_EXCL_STOP
-end
+#     # COV_EXCL_STOP
+# end
 
 
 end  # module PostNewtonian

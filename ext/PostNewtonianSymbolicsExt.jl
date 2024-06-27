@@ -1,9 +1,20 @@
 module PostNewtonianSymbolicsExt
 
+using PostNewtonian
+import PostNewtonian: type_converter, fundamental_quaternionic_variables, derived_variables,
+    var_collect, causes_domain_error!, prepare_pn_order,
+    apply_to_first_add!, flatten_add!, pn_expression,
+    M, μ, ν, δ, q, ℳ, X₁, X₂,
+    M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, Λ₁, Λ₂
+
+using MacroTools
 using SymbolicUtils
 isdefined(Base, :get_extension) ? (using Symbolics) : (using ..Symbolics)
 
-#from macros
+export SymbolicPNSystem, symbolic_pnsystem, var_collect
+
+### Moved from src/utilities/macros.jl
+
 """
     hold(x)
 
@@ -22,11 +33,19 @@ expression.
 hold(x) = x
 Symbolics.@register_symbolic hold(x)
 Symbolics.derivative(::typeof(hold), args::NTuple{1,Any}, ::Val{1}) = 1
-"""
-    type_converter(pnsystem, x)
 
-Convert `x` to a type appropriate for the float type of `pnsystem`.
 """
+    unhold(expr)
+
+Remove occurrences of [`hold`](@ref) from an `Expr`.
+"""
+function unhold(expr)
+    MacroTools.postwalk(expr) do x
+        m = MacroTools.trymatch(:(f_(i_)), x)
+        m === nothing || m[:f]!==hold ? x : Symbol(m[:i])
+    end
+end
+
 function type_converter(::PNSystem{T}, x) where {T<:Vector{Symbolics.Num}}
     Symbolics.Num(SymbolicUtils.Term(hold, [x]))
 end
@@ -72,7 +91,8 @@ function var_collect(expr::Symbolics.Num, var; max_power=100, max_gap=4)
     coefficients
 end
 
-#from systems
+
+## Moved from src/systems.jl
 
 causes_domain_error!(u̇, ::PNSystem{VT}) where {VT<:Vector{Symbolics.Num}} = false
 
@@ -85,17 +105,19 @@ A `PNSystem` that contains information as variables from
 
 See also [`symbolic_pnsystem`](@ref) for a particular general instance of this type.
 """
-struct SymbolicPNSystem{T, PNOrder} <: PNSystem{T, PNOrder}
-    state::T
-    Λ₁::eltype(T)
-    Λ₂::eltype(T)
-end
-function SymbolicPNSystem(PNOrder=typemax(Int))
-    Symbolics.@variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
-    SymbolicPNSystem{Vector{typeof(M₁)}, prepare_pn_order(PNOrder)}(
-        [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ], 
-        Λ₁, Λ₂
-    )
+struct SymbolicPNSystem{ST, PNOrder, ET} <: PNSystem{ST, PNOrder}
+    state::ST
+    Λ₁::ET
+    Λ₂::ET
+
+    function SymbolicPNSystem(PNOrder=typemax(Int))
+        Symbolics.@variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
+        ET = typeof(M₁)
+        new{Vector{ET}, prepare_pn_order(PNOrder), ET}(
+            [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
+            Λ₁, Λ₂
+        )
+    end
 end
 
 """
@@ -124,12 +146,14 @@ julia> χ⃗₂(symbolic_pnsystem)
 """
 const symbolic_pnsystem = SymbolicPNSystem()
 
-# from fundamental variables
+
+## Moved from src/fundamental_variables.jl
 Λ₁(pn::SymbolicPNSystem) = pn.Λ₁
 Λ₂(pn::SymbolicPNSystem) = pn.Λ₂
 
-#from binding energy
-const 𝓔′ = let 𝓔=𝓔(symbolic_pnsystem), v=v(symbolic_pnsystem)
+
+## Moved from src/pn_expressions/binding_energy.jl and renamed
+const 𝓔′Symbolics = let 𝓔=𝓔(symbolic_pnsystem), v=v(symbolic_pnsystem)
     ∂ᵥ = Symbolics.Differential(v)
     # Evaluate derivative symbolically
     𝓔′ = SymbolicUtils.simplify(Symbolics.expand_derivatives(∂ᵥ(𝓔)), expand=true)#, simplify_fractions=false)
