@@ -102,16 +102,20 @@ chi1 = [0.1, 0.2, 0.3]
 chi2 = [-0.2, 0.1, -0.3]
 Omega_i = 0.01
 
-# Call into Julia to run some function
+# Call `sxs` wrapper for Julia functions
 w = PNWaveform(M1, M2, chi1, chi2, Omega_i)
 
 # Plot the magnitudes of all the modes as functions of time
 plt.semilogy(w.t, np.abs(w.data))
 ```
-The `w` object returned here will be an [`sxs.WaveformModes`
+The [`sxs.julia.PNWaveform`
+function](https://github.com/sxs-collaboration/sxs/blob/3998b47694125b23ad8271b1e832fdad5b800292/sxs/julia/__init__.py#L17-L70)
+is a simple wrapper that calls [`orbital_evolution`](@ref) and
+[`inertial_waveform`](@ref), then wraps the result in an
+[`sxs.WaveformModes`
 object](https://sxs.readthedocs.io/en/stable/api/waveforms/#waveformmodes-class),
-with all the usual methods and properties, as well as several fields
-relevant to post-Newtonian waveforms:
+with all the usual methods and properties, as well as several
+additional fields relevant to post-Newtonian waveforms:
 
 - `M1` (array): The primary mass as a function of time.
 - `M2` (array): The secondary mass as a function of time.
@@ -122,7 +126,13 @@ relevant to post-Newtonian waveforms:
 - `orbital_phase` (array): The orbital phase as a function of
     time.
 
----
+The input arguments for `sxs.julia.PNWaveform` are mostly the same as
+for [`orbital_evolution`](@ref), except that the keyword arguments
+`ell_min`, `ell_max`, and `waveform_pn_order` will be intercepted and
+passed to [`inertial_waveform`](@ref).
+
+
+## Full Julia interface from Python
 
 In general, you can now call any function from the Julia
 `PostNewtonian` package by running
@@ -130,18 +140,33 @@ In general, you can now call any function from the Julia
 from sxs.julia import PostNewtonian
 ```
 and then calling the function just as you would if you had run `import
-PostNewtonian` in Julia.  As a fallback, you can evaluate arbitrary
-Julia code using `PostNewtonian.seval("<Julia code goes here>")`.
-This returns whatever the Julia code would return.  A simple example
-is `x = PostNewtonian.seval("1+2")`.  See the [documentation for
-`juliacall` here](https://github.com/cjdoris/PythonCall.jl#readme) for
-more details.
+PostNewtonian` in Julia.  That is, any of the functions given in the
+rest of this documentation should be available in Python, just as they
+would be in Julia.  (Again, note that all function names and arguments
+should have ASCII equivalents to use from Python.)
 
-Sometimes, the returned objects will be wrappers around Julia
-`Vector`s, `Matrix`es, or more generally shaped `Array`s.  Usually,
-you will be able to pass these objects directly to Python functions.
-If you really need a `numpy` array, you can use the `to_numpy()`
-method that the wrappers will support.
+You can also evaluate *arbitrary Julia code* by prefixing
+`PostNewtonian.` to the command, or as a fallback write Julia code as
+a string and pass it to `PostNewtonian.seval("<Julia code goes
+here>")`.  Simple examples include
+```python
+>>> PostNewtonian.println("Hello from Julia!")
+Hello from Julia!
+>>> x = PostNewtonian.seval("1+2")
+>>> x
+3
+```
+See the [documentation for `juliacall`
+here](https://github.com/cjdoris/PythonCall.jl#readme) for more
+details.
+
+Whenever they correspond naturally to built-in Python types — like
+`int`, `float`, `str`, etc. — the returned objects will be converted
+to such Python objects.  Otherwise, the returned objects will be
+wrappers around Julia `Vector`s, `Matrix`es, or more generally shaped
+`Array`s.  Usually, you will be able to pass these objects directly to
+Python functions.  If you really need a `numpy` array, you can use the
+`to_numpy()` method that the wrappers will support.
 
 Of course, it is *much* simpler to call Python code from Julia, so if
 you find yourself using a lot of Julia code, you may want to consider
