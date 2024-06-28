@@ -1,7 +1,7 @@
 module FundamentalVariables
 
 using ..PostNewtonian
-using ..PostNewtonian: PNSystem, BHNS, NSNS
+using ..PostNewtonian: PNSystem, BHNS, NSNS, FDPNSystem
 using ..PostNewtonian: M₁index, M₂index, χ⃗₁indices, χ⃗₂indices, Rindices, vindex, Φindex
 using Quaternionic: Quaternionic, QuatVec, Rotor
 
@@ -132,7 +132,7 @@ quantity.  All other types return `0`, which Julia can use to eliminate code tha
 be 0.  Thus, it is safe and efficient to use this quantity in any PN expression that
 specializes on the type of `pnsystem`.
 """
-Λ₁(::PNSystem) = 0
+Λ₁(pn::PNSystem) = zero(eltype(pn))
 Λ₁(pn::NSNS) = pn.Λ₁
 Λ₁(pn::FDPNSystem) = pn.Λ₁
 const Lambda1 = Λ₁
@@ -150,7 +150,7 @@ this quantity.  All other types return `0`, which Julia can use to eliminate cod
 then be 0.  Thus, it is safe and efficient to use this quantity in any PN expression that
 specializes on the type of `pnsystem`.
 """
-Λ₂(::PNSystem) = 0
+Λ₂(pn::PNSystem) = zero(eltype(pn))
 Λ₂(pn::BHNS) = pn.Λ₂
 Λ₂(pn::NSNS) = pn.Λ₂
 Λ₂(pn::FDPNSystem) = pn.Λ₂

@@ -222,3 +222,45 @@ julia> χ⃗₂(symbolic_pnsystem)
 ```
 """
 const fd_pnsystem = FDPNSystem(Float64)
+
+
+function SVector(pnsystem::PNSystem)
+    SVector{16, eltype(pnsystem)}(
+        pnsystem.state[1],
+        pnsystem.state[2],
+        pnsystem.state[3],
+        pnsystem.state[4],
+        pnsystem.state[5],
+        pnsystem.state[6],
+        pnsystem.state[7],
+        pnsystem.state[8],
+        pnsystem.state[9],
+        pnsystem.state[10],
+        pnsystem.state[11],
+        pnsystem.state[12],
+        pnsystem.state[13],
+        pnsystem.state[14],
+        Λ₁(pnsystem),
+        Λ₂(pnsystem)
+    )
+end
+function SVector(pnsystem::FDPNSystem)
+    SVector{16, FastDifferentiation.Node}(
+        pnsystem.state[1],
+        pnsystem.state[2],
+        pnsystem.state[3],
+        pnsystem.state[4],
+        pnsystem.state[5],
+        pnsystem.state[6],
+        pnsystem.state[7],
+        pnsystem.state[8],
+        pnsystem.state[9],
+        pnsystem.state[10],
+        pnsystem.state[11],
+        pnsystem.state[12],
+        pnsystem.state[13],
+        pnsystem.state[14],
+        Λ₁(pnsystem),
+        Λ₂(pnsystem)
+    )
+end
