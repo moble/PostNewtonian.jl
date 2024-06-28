@@ -34,13 +34,13 @@
     # Check endpoint values
     @test sol1.retcode == ReturnCode.Terminated
     @test sol1[:v, 1] == vᵢ
-    @test sol1[1] ≈ uᵢ
+    @test sol1[:, 1] ≈ uᵢ
     @test sol1[:v, end] ≈ vₑ
 
     @test sol2.retcode == ReturnCode.Terminated
     @test sol2[:v, 1] ≈ v₁
     iᵢ = argmin(abs.(sol2.t .- 0.0))  # Assuming uᵢ corresponds to t==0.0
-    @test sol2[iᵢ] ≈ uᵢ
+    @test sol2[:, iᵢ] ≈ uᵢ
     @test sol2[:v, end] ≈ vₑ
 
     # Check various forms of interpolation with the forwards/backwards solution

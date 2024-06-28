@@ -75,7 +75,7 @@ the expression should be returned.
 function apply_to_first_add!(expr, func)
     found_add = false
     MacroTools.prewalk(expr) do x
-        if !found_add && PostNewtonian.isadd(x)
+        if !found_add && isadd(x)
             found_add = true
             func(x)
         else

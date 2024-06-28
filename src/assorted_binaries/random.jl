@@ -1,5 +1,5 @@
 @doc raw"""
-    rand([rng=GLOBAL_RNG], pnclass; [v=0.2], [PNOrder=typemax(Int)])
+    rand([rng=default_rng()], pnclass; [v=0.2], [PNOrder=typemax(Int)])
 
 Generate a random PNSystem, specifically of class `pnclass` (one of [`BBH`](@ref),
 [`BHNS`](@ref), or [`NSNS`](@ref)), with parameters chosen to be consistent with typical
@@ -51,8 +51,9 @@ orientations.  Note that the `Λᵢ` are only used if the input `pnclass` is `BH
 If you would prefer a different range of parameters, the source code for this function is
 easily modified.
 """
-Base.rand(pnclass::Type{P}; v::T=0.2, PNOrder=typemax(Int)) where {P<:PNSystem, T} =
-    rand(GLOBAL_RNG, pnclass; v, PNOrder)
+function Base.rand(pnclass::Type{P}; v::T=0.2, PNOrder=typemax(Int)) where {P<:PNSystem, T}
+    rand(default_rng(), pnclass; v, PNOrder)
+end
 
 function Base.rand(
     rng::AbstractRNG, pnclass::Type{P}; v::T=0.2, PNOrder=typemax(Int)

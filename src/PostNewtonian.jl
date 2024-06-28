@@ -16,7 +16,7 @@ using OrdinaryDiffEq: Vern9, #AutoVern9, Rodas5P,
     ODEFunction, ODEProblem, solve, remake,
     terminate!, CallbackSet, DiscreteCallback, VectorContinuousCallback
 using Quaternionic: QuatVec, Rotor, abs2vec, components, normalize, (⋅), (×)
-using Random: AbstractRNG, GLOBAL_RNG
+using Random: AbstractRNG, default_rng
 using RecursiveArrayTools: DiffEqArray
 using SciMLBase: ODESolution, parameterless_type, FullSpecialize,
     AbstractDiffEqInterpolation, build_solution, get_du
@@ -111,6 +111,11 @@ include("assorted_binaries/random.jl")
 ### NOTE!!! This is hopefully temporary, until we can refactor @pn_expression to
 ### avoid the use of `var_collect`, which requires Symbolics.jl.  At that point,
 ### we should be able to make this a true extension
+### TODO: Make @pn_expression independent of Symbolics.jl
+### TODO: Remove these lines
+### TODO: Uncomment the :get_extension lines below
+### TODO: Remove Symbolics and SymbolicUtils from Project.toml
+### TODO: Uncomment the extension properties in Project.toml
 include("../ext/PostNewtonianSymbolicsExt.jl")
 using .PostNewtonianSymbolicsExt
 export SymbolicPNSystem, symbolic_pnsystem, var_collect
