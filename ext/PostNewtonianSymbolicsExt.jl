@@ -3,9 +3,10 @@ module PostNewtonianSymbolicsExt
 using PostNewtonian
 import PostNewtonian: type_converter, fundamental_quaternionic_variables, derived_variables,
     var_collect, causes_domain_error!, prepare_pn_order,
-    apply_to_first_add!, flatten_add!, pn_expression,
+    apply_to_first_add!, flatten_add!, pn_expression, order_index,
     M₁, M₂, χ⃗₁, χ⃗₂, v, Φ, Λ₁, Λ₂,
-    R, M, μ, ν, δ, q, ℳ, X₁, X₂
+    R, M, μ, ν, δ, q, ℳ, X₁, X₂,
+    ln, ln2, ln3, ln5, ζ3, γₑ
 
 import MacroTools
 import SymbolicUtils
