@@ -17,12 +17,14 @@ RecursiveArrayTools = "731186ca-8d62-57ce-b412-fbd966d074cd"
 RuntimeGeneratedFunctions = "7e49a35a-f44a-4d26-94aa-eba1b4ca6b47"
 SciMLBase = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
 SphericalFunctions = "af6d55de-b1f7-4743-b797-0829a72cf84e"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 SymbolicIndexingInterface = "2efcf032-c050-4f8e-a9bb-153293bab1f5"
 SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
 DataInterpolations = "5.1"
+FastDifferentiation = "0.3.14"
 InteractiveUtils = "1"
 LinearAlgebra = "1"
 Logging = "1"
@@ -31,23 +33,11 @@ OrdinaryDiffEq = "6"
 Quaternionic = "1.5"
 Random = "1"
 RecursiveArrayTools = "3"
+RuntimeGeneratedFunctions = "0.5.13"
 SciMLBase = "1, 2"
 SphericalFunctions = "2.1.4"
+StaticArrays = "1.9"
 SymbolicIndexingInterface = "0.3"
 SymbolicUtils = "1, 2"
 Symbolics = "5.25"
 julia = "1.9"
-FastDifferentiation = "0.3.14"
-RuntimeGeneratedFunctions = "0.5.13"
-
-## Symbolics can't be an extension yet; we need it for @pn_expansion
-## It is permissible for a package to appear in both [deps] and
-## [weakdeps], but "Newer Julia versions will ignore dependencies in
-## [deps] that are also in [weakdeps]", and we definitely need it
-## installed.
-
-# [extensions]
-# PostNewtonianSymbolicsExt = "Symbolics"
-
-# [weakdeps]
-# Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"

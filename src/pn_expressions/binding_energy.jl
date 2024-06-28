@@ -133,23 +133,68 @@ Compute the derivative with respect to ``v`` of the binding energy of a compact 
 This is computed automatically (via `FastDifferentiation`) from [`𝓔`](@ref); see that
 function for details of the PN formulas.
 """
-@generated function 𝓔′(pnsystem::PNSystem{FT, PNOrder}) where {FT, PNOrder}
-    fdpnsystem = FDPNSystem(eltype(FT), PNOrder)
-    𝓔′ = FastDifferentiation.derivative(𝓔(fdpnsystem), v(fdpnsystem))
-    𝓔′ = FastDifferentiation.make_function([𝓔′], [fdpnsystem.state; Λ₁(fdpnsystem); Λ₂(fdpnsystem)]; in_place = true)
-    𝓔′ = RuntimeGeneratedFunctions.get_expression(𝓔′)
-    body = MacroTools.splitdef(𝓔′)[:body]
-    body = MacroTools.flatten(body)
-    body = MacroTools.rmlines(body)
-    body = MacroTools.unblock(body)
-    body = body.args[end]
-    newbody = [body.args[1:end-2]; body.args[end-1].args[2]]
-    return quote
-        input_variables = [pnsystem.state; Λ₁(pnsystem); Λ₂(pnsystem)]
-        @fastmath @inbounds begin
-            $(newbody...)
-        end
-    end
+@generated function 𝓔′(pnsystem::PNSystem{ST, PNOrder}) where {ST, PNOrder}
+    # Create a `PNSystem` with `FastDifferentiation` (henceforth FD) variables, using the
+    # same PNOrder as the input `pnsystem`.
+    fdpnsystem = FDPNSystem(eltype(ST), PNOrder)
 
+    # FD expects a single vector of variables, so we concatenate the state vector with the
+    # two tidal-coupling parameters
+    vars = FastDifferentiation.Node[fdpnsystem.state; Λ₁(fdpnsystem); Λ₂(fdpnsystem)]
+
+    # Now we evaluate ℰ using the FD variables.  This will expand all derived variables in
+    # terms of the fundamental variables, but FD will take care of evaluating those
+    # efficiently via common subexpression elimination (CSE).
+    𝓔formula = 𝓔(fdpnsystem)
+
+    # Now we take the derivative of ℰ with respect to v.
+    𝓔′ = FastDifferentiation.derivative(𝓔formula, v(fdpnsystem))
+
+    # Here, 𝓔′ is a tree (or DAG) with lots of FD expressions (Nodes), so we want to make a
+    # function out of it.  We choose `in_place=true` to avoid allocating memory and FD's
+    # attempts to convert to `Float64`.
+    ℰ′func = FastDifferentiation.make_function([𝓔′], vars, in_place=true)
+
+    # Unfortunately, FD produces a function with signature `function (result, vars)`, where
+    # `result` is an array of the same type as `vars`, and `vars` is as given above.  We
+    # want a function with signature `function (pnsystem)`, so we need to massage `ℰ′func`
+    # into that form.  Here, we get the actual `Expr` from which the function is built.
+    𝓔′expr = RuntimeGeneratedFunctions.get_expression(ℰ′func)
+
+    # Now, we use `MacroTools` to get the body of the function.
+    𝓔′body = MacroTools.unblock(MacroTools.splitdef(𝓔′expr)[:body])
+
+    # At this point, the function is just a long series of statements inside an `@inbounds`
+    # block, which we will want later, but first we need to extract them.
+    MacroTools.@capture(𝓔′body, @inbounds begin 𝓔′statements__ end) ||
+        throw(ArgumentError(
+            "\n    No @inbounds block found in 𝓔′ expression." *
+            "\n    Something may have changed in FastDifferentiation." *
+            "\n    Open an issue citing this PNSystem:" *
+            "\n    $pnsystem"
+        ))
+
+    # The 𝓔′statements are mostly what we want, except that FD makes the second-to-last
+    # line set element 1 of the result array to the desired result; we just want to return
+    # the desired result, so we get that right-hand side here.  Also note that the last line
+    # is just `return nothing`, so we never use `𝓔′statements[end]`.
+    MacroTools.@capture(𝓔′statements[end-1], _ = 𝓔′return_) ||
+        throw(ArgumentError(
+            "\n    No return statement found in 𝓔′ expression." *
+            "\n    Something may have changed in FastDifferentiation." *
+            "\n    Open an issue citing this PNSystem:" *
+            "\n    $pnsystem"
+        ))
+
+    # Finally, we build the expression we want to return, constructing the required input
+    # variables from `pnsystem`, reinstating the `@inbounds` block and adding `@fastmath`,
+    # and otherwise just reusing the statements and return from the FD-generated function.
+    return quote
+        input_variables = SVector(pnsystem)
+        @fastmath @inbounds begin
+            $(𝓔′statements[1:end-2]...)
+        end
+        return $(𝓔′return)
+    end
 end
 const binding_energy_deriv=𝓔′

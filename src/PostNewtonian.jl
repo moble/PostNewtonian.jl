@@ -22,6 +22,7 @@ using SciMLBase: ODESolution, parameterless_type, FullSpecialize,
     AbstractDiffEqInterpolation, build_solution, get_du
 using SciMLBase.ReturnCode: ReturnCode
 using SphericalFunctions: D!, Diterator, Dprep, Yiterator
+using StaticArrays: SVector
 using SymbolicIndexingInterface: SymbolCache
 
 # See the "Code structure" section of the documentation for a description of the simple

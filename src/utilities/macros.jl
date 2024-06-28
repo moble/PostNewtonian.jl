@@ -6,9 +6,12 @@ Convert `x` to a type appropriate for the float type of `pnsystem`.
 function type_converter(pnsystem, x)
     convert(eltype(pnsystem), x)
 end
-type_converter(pnsystem, x::FastDifferentiation.Node) = x
-type_converter(::FDPNSystem{FT}, x::FastDifferentiation.Node) where FT = x
-
+function type_converter(::FDPNSystem{FT}, x) where FT
+    convert(FT, x)
+end
+function type_converter(::FDPNSystem, x::FastDifferentiation.Node)
+    x
+end
 
 fundamental_variables = methodswith(PNSystem, FundamentalVariables)
 fundamental_quaternionic_variables = [
