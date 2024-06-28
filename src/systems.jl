@@ -179,7 +179,8 @@ end
 A `PNSystem` that contains information as variables from
 [`FastDifferentiation.jl`](https://docs.juliahub.com/General/FastDifferentiation/stable/).
 
-See also [`fd_pnsystem`](@ref) for a particular general instance of this type.
+See also [`fd_pnsystem`](@ref) for a particular instance of this type.  The correct type of
+`FDPNSystem` is used in calculating `ℰ′`.
 """
 struct FDPNSystem{FT, PNOrder} <: PNSystem{Vector{FastDifferentiation.Node}, PNOrder}
     state::Vector{FastDifferentiation.Node}
@@ -202,10 +203,10 @@ Base.eltype(::FDPNSystem{FT}) where {FT} = FT
 
 A symbolic `PNSystem` that contains symbolic information for all types of `PNSystem`s.
 
-In particular, note that this object has an (essentially) infinite `PNOrder`, uses the
-`TaylorT1` approximant, and has nonzero values for quantities like `Λ₁` and `Λ₂`.  If you
-want different choices, you may need to call [`FDPNSystem`](@ref) yourself, or even
-construct a different specialized subtype of `PNSystem` (it's not hard).
+In particular, note that this object has (essentially) infinite `PNOrder`, has nonzero
+values for quantities like `Λ₁` and `Λ₂`, and assumes that the eventual output will be in
+`Float64`.  If you want different choices, you may need to call [`FDPNSystem`](@ref)
+yourself, or even construct a different specialized subtype of `PNSystem` (it's not hard).
 
 # Examples
 ```jldoctest
