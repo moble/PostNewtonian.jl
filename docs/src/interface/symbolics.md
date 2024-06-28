@@ -45,3 +45,11 @@ don't need to do anything more.  However, you *can* remove them using
 [`PostNewtonian.unhold`](@ref) if the code is in
 [`Expr`](https://docs.julialang.org/en/v1/manual/metaprogramming/#Program-representation)
 form.
+
+
+```@docs
+hold
+unhold
+PostNewtonian.PostNewtonianSymbolicsExt.SymbolicPNSystem
+PostNewtonian.PostNewtonianSymbolicsExt.symbolic_pnsystem
+```
