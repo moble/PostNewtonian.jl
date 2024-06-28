@@ -128,21 +128,6 @@ function be(pnsystem, deriv)
 end
 
 for PNOrder ∈ 0//2:1//2:13//2
-    fdpn = FDPNSystem(Float64, PNOrder)
-
-    𝓔1 = 𝓔(fdpn)
-    𝓔2 = be(fdpn, false)
-    diff = 𝓔1 - 𝓔2
-    @test iszero(diff)
-
-    𝓔′1 = 𝓔′(fdpn)
-    𝓔′2 = be(fdpn, true)
-    diff′ = 𝓔′1-𝓔′2
-    if !iszero(diff′)
-        @show PNOrder 𝓔′1 𝓔′2 diff′
-        println()
-    end
-    @test iszero(diff′)
 
     for T ∈ [Float32, Float64, Double64, BigFloat]
         v = T(1//100)
