@@ -119,7 +119,7 @@ include("assorted_binaries/random.jl")
 ### TODO: Uncomment the extension properties in Project.toml
 include("../ext/PostNewtonianSymbolicsExt.jl")
 using .PostNewtonianSymbolicsExt
-export SymbolicPNSystem, symbolic_pnsystem, var_collect
+export SymbolicPNSystem, symbolic_pnsystem, var_collect, hold, unhold
 
 
 include("precompilation.jl")

@@ -5,6 +5,6 @@ PNSystem
 BBH
 BHNS
 NSNS
-SymbolicPNSystem
-symbolic_pnsystem
+FDPNSystem
+fd_pnsystem
 ```

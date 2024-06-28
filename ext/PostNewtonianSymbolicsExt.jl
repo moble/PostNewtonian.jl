@@ -12,7 +12,7 @@ import MacroTools
 import SymbolicUtils
 isdefined(Base, :get_extension) ? (import Symbolics) : (import ..Symbolics)
 
-export SymbolicPNSystem, symbolic_pnsystem, var_collect, hold
+export SymbolicPNSystem, symbolic_pnsystem, var_collect, hold, unhold
 
 ### Moved from src/utilities/macros.jl
 
@@ -26,10 +26,10 @@ gets registered with `Symbolics` to avoid evaluation of the argument.  For examp
 preserve expressions like `π^2`, which Julia would normally convert directly to a `Float64`.
 
 Note that you probably don't want to use this function directly; this will probably be done
-for you by [`@pn_expression`](@ref) or similar.  If you *do* want to use this directly, you
-probably want another layer of indirection to construct something like
-`Symbolics.Num(SymbolicUtils.Term(hold, [x]))` so that you can use the result in a symbolic
-expression.
+for you by [`@pn_expression`](@ref PostNewtonian.@pn_expression) or similar.  If you *do*
+want to use this directly, you probably want another layer of indirection to construct
+something like `Symbolics.Num(SymbolicUtils.Term(hold, [x]))` so that you can use the result
+in a symbolic expression.
 """
 hold(x) = x
 Symbolics.@register_symbolic hold(x)
