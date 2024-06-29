@@ -102,8 +102,9 @@ Pass `force_dtmin=true` to `solve` when using this callback.  Otherwise, the tim
 may decrease too much *within* a single time step, so that the integrator itself will quit
 before reaching this callback, leading to a less graceful exit.
 
-If this terminator is triggered while `v` is less than 1/2, a warning will always be issued;
-otherwise an `info` message will be issued only if the `quiet` flag is set to `false`.
+If this terminator is triggered while `v` is less than 0.35, a warning will always be
+issued; otherwise an `info` message will be issued only if the `quiet` flag is set to
+`false`.
 """
 function dtmin_terminator(T, quiet=false)
     sqrtϵ::T = √eps(T)  # Tricks for faster closures
@@ -115,9 +116,9 @@ function dtmin_terminator(T, quiet=false)
         message = (
             "Terminating evolution because the time-step size has become very small:\n"
             * "|dt=$(integrator.dt)| < √ϵ=$(sqrtϵ)\n"
-            * "This is only unexpected for 𝑣 ≲ 1/2; the current value is 𝑣=$v."
+            * "This is only unexpected for 𝑣 ≲ 0.35; the current value is 𝑣=$v."
         )
-        if v < 1//2
+        if v < 7//20
             @warn message
         elseif !quiet
             @info message

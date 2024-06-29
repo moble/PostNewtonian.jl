@@ -131,7 +131,7 @@ are the same, regardless.
     if we detect that PN has broken down irretrievably — for example, if one of the masses
     is no longer strictly positive, if a spin is super-extremal, or the PN velocity
     parameter `v` is decreasing, or is no longer in the range `(0,1)`.  Warnings will
-    usually only be issued if `v < 1//2`, but if `quiet=true` informational messages will be
+    usually only be issued if `v < 0.35`, but if `quiet=true` informational messages will be
     issued.
   * `Rᵢ=Rotor(1)` or `R_i`: Initial orientation of binary.
   * `approximant="TaylorT1"`: Method of evaluating the right-hand side of the evolution
