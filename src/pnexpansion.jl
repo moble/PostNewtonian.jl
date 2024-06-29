@@ -122,12 +122,28 @@ end
 Base.:/(p::PNExpansion, x::Number) = p * (1/x)
 
 
-# TODO: Create a `PNExpansionParameter` object that can only be raised to an integer power,
-#       or divide a number or `PNExpansion` (which creates a `PNExpansion`).
-# c⁻¹(pnsystem) = PNExpansion((0, 1), pn_order(pnsystem))
 
+"""
+    struct PNExpansionParameter{Exp, MaxN}
+
+A struct representing a Post-Newtonian expansion parameter. It is parameterized by `Exp` and `MaxN`.
+
+## Fields
+- `Exp`: The exponent of the expansion parameter.
+- `MaxN`: The maximum order of the expansion.
+
+## Constructors
+- `PNExpansionParameter{Exp, MaxN}() where {Exp, MaxN}`: Constructs a `PNExpansionParameter` with default values for `Exp` and `MaxN`.
+- `PNExpansionParameter(exp, maxN)`: Constructs a `PNExpansionParameter` with the given values for `Exp` and `MaxN`.
+- `PNExpansionParameter(; exp=1, pnorder=(typemax(Int)-2)//2)`: Constructs a `PNExpansionParameter` with the given values for `exp` and `pnorder`.
+
+## Methods
+- `Base.:^(::PNExpansionParameter{Exp, MaxN}, n::Int) where {Exp, MaxN}`: Raises a `PNExpansionParameter` to the power of an integer `n`.
+- `Base.:/(x, ::PNExpansionParameter{Exp, MaxN}) where {Exp, MaxN}`: Divides a value `x` by a `PNExpansionParameter`.
+"""
 struct PNExpansionParameter{Exp, MaxN}
     PNExpansionParameter{Exp, MaxN}() where {Exp, MaxN} = new{Exp, MaxN}()
+    PNExpansionParameter(exp, maxN) = new{exp, maxN}()
     function PNExpansionParameter(; exp=1, pnorder=(typemax(Int)-2)//2)
         MaxN = 2pnorder + 1
         if !isinteger(MaxN)
@@ -138,7 +154,8 @@ struct PNExpansionParameter{Exp, MaxN}
 end
 
 function Base.:^(::PNExpansionParameter{Exp, MaxN}, n::Int) where {Exp, MaxN}
-    PNExpansionParameter{Exp*n, MaxN}()
+    PNExpansionParameter(Exp*n, MaxN)
+    # PNExpansionParameter{Exp*n, MaxN}()
 end
 
 function Base.:/(x, ::PNExpansionParameter{Exp, MaxN}) where {Exp, MaxN}
@@ -148,12 +165,10 @@ function Base.:/(x, ::PNExpansionParameter{Exp, MaxN}) where {Exp, MaxN}
         ))
     end
     if 1+Exp > MaxN
-        PNExpansion(NTuple{0, typeof(x)}(), MaxN)
+        PNExpansion(NTuple{1, typeof(x)}(zero(x)), MaxN)
     else
         PNExpansion(ntuple(i->i==1+Exp ? x : zero(x), Val(1+Exp)), MaxN)
     end
 end
-
-
 
 const c = PNExpansionParameter{1, typemax(Int)-1}()
