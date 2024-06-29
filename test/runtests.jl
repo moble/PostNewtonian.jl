@@ -61,6 +61,7 @@ end
     addtests("orbital_evolution.jl")
     addtests("gwframes.jl")
     addtests("truncated_series_monoid.jl")
+    addtests("pnexpansion.jl")
 end
 
 if help
