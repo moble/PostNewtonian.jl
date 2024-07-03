@@ -180,7 +180,7 @@ A `PNSystem` that contains information as variables from
 [`FastDifferentiation.jl`](https://docs.juliahub.com/General/FastDifferentiation/stable/).
 
 See also [`fd_pnsystem`](@ref) for a particular instance of this type.  The correct type of
-`FDPNSystem` is used in calculating `ℰ′`.
+`FDPNSystem` is used in calculating `𝓔′`.
 """
 struct FDPNSystem{FT, PNOrder} <: PNSystem{Vector{FastDifferentiation.Node}, PNOrder}
     state::Vector{FastDifferentiation.Node}

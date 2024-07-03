@@ -142,24 +142,24 @@ function for details of the PN formulas.
     # two tidal-coupling parameters
     vars = FastDifferentiation.Node[fdpnsystem.state; Λ₁(fdpnsystem); Λ₂(fdpnsystem)]
 
-    # Now we evaluate ℰ using the FD variables.  This will expand all derived variables in
+    # Now we evaluate 𝓔 using the FD variables.  This will expand all derived variables in
     # terms of the fundamental variables, but FD will take care of evaluating those
     # efficiently via common subexpression elimination (CSE).
     𝓔formula = 𝓔(fdpnsystem)
 
-    # Now we take the derivative of ℰ with respect to v.
+    # Now we take the derivative of 𝓔 with respect to v.
     𝓔′ = FastDifferentiation.derivative(𝓔formula, v(fdpnsystem))
 
     # Here, 𝓔′ is a tree (or DAG) with lots of FD expressions (Nodes), so we want to make a
     # function out of it.  We choose `in_place=true` to avoid allocating memory and FD's
     # attempts to convert to `Float64`.
-    ℰ′func = FastDifferentiation.make_function([𝓔′], vars, in_place=true)
+    𝓔′func = FastDifferentiation.make_function([𝓔′], vars, in_place=true)
 
     # Unfortunately, FD produces a function with signature `function (result, vars)`, where
     # `result` is an array of the same type as `vars`, and `vars` is as given above.  We
-    # want a function with signature `function (pnsystem)`, so we need to massage `ℰ′func`
+    # want a function with signature `function (pnsystem)`, so we need to massage `𝓔′func`
     # into that form.  Here, we get the actual `Expr` from which the function is built.
-    𝓔′expr = RuntimeGeneratedFunctions.get_expression(ℰ′func)
+    𝓔′expr = RuntimeGeneratedFunctions.get_expression(𝓔′func)
 
     # Now, we use `MacroTools` to get the body of the function.
     𝓔′body = MacroTools.unblock(MacroTools.splitdef(𝓔′expr)[:body])
