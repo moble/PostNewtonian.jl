@@ -55,11 +55,20 @@
         # Test PNExpressions
         @test_throws ArgumentError PNExpansion(())
         for (expr, expected) ∈ (
+            (w - (x - y/c), (w-x, y, z, z, z, z, z, z, z, z)),
+            (w - (x/c - y), (w+y, -x, z, z, z, z, z, z, z, z)),
+            (x - y/c, (x, -y, z, z, z, z, z, z, z, z)),
+            (x/c - y, (-y, x, z, z, z, z, z, z, z, z)),
             (x / c^6 + y/c, (z, y, z, z, z, z, x, z, z, z)),
             (x / c^6 + y/c + w/c^10, (z, y, z, z, z, z, x, z, z, z)),
-            #(x / c^6 - y/c, (z, -y, z, z, z, z, x, z, z, z)),
-            #(x / c^6 - y/c - w, (-w, -y, z, z, z, z, x, z, z, z)),
-            #(x / c^6 - y/c - w/c^10, (z, -y, z, z, z, z, x, z, z, z)),
+            (x / c^6 - y/c, (z, -y, z, z, z, z, x, z, z, z)),
+            (x / c^6 - y/c - w, (-w, -y, z, z, z, z, x, z, z, z)),
+            (x / c^6 - y/c - w/c^10, (z, -y, z, z, z, z, x, z, z, z)),
+            (x / c^6 - (y/c - w), (w, -y, z, z, z, z, x, z, z, z)),
+            (x / c^6 - (y/c - w/c^10), (z, -y, z, z, z, z, x, z, z, z)),
+            (-(x / c^6) - y/c, (z, -y, z, z, z, z, -x, z, z, z)),
+            (-(x / c^6) - y/c - w, (-w, -y, z, z, z, z, -x, z, z, z)),
+            (-(x / c^6) - y/c - w/c^10, (z, -y, z, z, z, z, -x, z, z, z)),
             ((x * c^2) / c^4 + y/c, (z, y, x, z, z, z, z, z, z, z)),
             ((x * c^2) / c^4 + y/c + w, (w, y, x, z, z, z, z, z, z, z)),
             ((x * c^2) / c^9 + y/c + w, (w, y, z, z, z, z, z, x, z, z)),
