@@ -56,6 +56,10 @@ function Base.:+(pn::PNExpansion{N,T1}, x::T2) where {N,T1,T2<:Number}
 end
 Base.:+(x::T, pn::PNExpansion) where {T<:Number} = pn + x
 
+function Base.:-(pn::PNExpansion)
+    PNExpansion((-).(pn.coeffs))
+end
+
 function Base.:*(pn::PNExpansion{N,T1}, x::T2) where {N,T1,T2<:Number}
     T3 = promote_type(T1, T2)
     PNExpansion(@. T3(pn.coeffs * x))
@@ -167,6 +171,10 @@ function Base.:+(x::T1, term::PNTerm{T2,PNOrder}) where {T1<:Number,T2,PNOrder}
 end
 Base.:+(term::PNTerm{T1,PNOrder}, x::T2) where {T1,T2<:Number,PNOrder} = x + term
 
+function Base.:-(term::PNTerm{T,PNOrder}) where {T,PNOrder}
+    PNTerm{T,PNOrder}(term.c⁻¹exp, -term.coeff)
+end
+
 function Base.:*(term1::PNTerm{T1,PNOrder}, term2::PNTerm{T2,PNOrder}) where {T1,T2,PNOrder}
     c⁻¹exp = term1.c⁻¹exp + term2.c⁻¹exp
     coeff = term1.coeff * term2.coeff
@@ -206,6 +214,7 @@ function Base.:+(term1::PNTerm{T1,PNOrder}, term2::PNTerm{T2,PNOrder}) where {T1
     end
     PNExpansion{N,T}(Tuple(coeffs))
 end
+Base.:-(term1::PNTerm, term2::PNTerm) = term1 + (-term2)
 
 function Base.:+(term::PNTerm{T1,PNOrder}, expansion::PNExpansion{N,T2}) where {T1,T2,N,PNOrder}
     if term.c⁻¹exp < 0
@@ -229,6 +238,13 @@ function Base.:+(term::PNTerm{T1,PNOrder}, expansion::PNExpansion{N,T2}) where {
     PNExpansion{N,T}(Tuple(coeffs))
 end
 Base.:+(expansion::PNExpansion, term::PNTerm) = term + expansion
+
+Base.:-(term::PNTerm, x::Number) = term + (-x)
+Base.:-(x::Number, term::PNTerm) = x + (-term)
+Base.:-(term::PNTerm, expansion::PNExpansion) = term + (-expansion)
+Base.:-(expansion::PNExpansion, term::PNTerm) = expansion + (-term)
+Base.:-(x::Number, expansion::PNExpansion) = x + (-expansion)
+Base.:-(expansion::PNExpansion, x::Number) = expansion + (-x)
 
 function Base.:/(expansion::PNExpansion{N,T1}, term::PNTerm{T2,PNOrder}) where {N,T1,T2,PNOrder}
     T = promote_type(T1, T2)
