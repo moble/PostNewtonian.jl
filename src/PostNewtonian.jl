@@ -22,7 +22,7 @@ using SciMLBase: ODESolution, parameterless_type, FullSpecialize,
     AbstractDiffEqInterpolation, build_solution, get_du
 using SciMLBase.ReturnCode: ReturnCode
 using SphericalFunctions: D!, Diterator, Dprep, Yiterator
-using StaticArrays: SVector
+using StaticArrays: SVector, MVector
 using SymbolicIndexingInterface: SymbolCache
 
 # See the "Code structure" section of the documentation for a description of the simple
@@ -38,6 +38,10 @@ using .MathConstants
 
 include("systems.jl")
 export PNSystem, pn_order, BBH, BHNS, NSNS, FDPNSystem, fd_pnsystem
+
+
+include("pnexpansion.jl")
+export PNExpansion, PNTerm, PNExpansionParameter
 
 
 include("fundamental_variables.jl")
@@ -73,7 +77,6 @@ export total_mass,  # M,  # Avoid clashes: don't export nicer names for importan
     Î₀₁, Î₀₂,
     κ₁, κ₂, κ₊, κ₋,
     λ₁, λ₂, λ₊, λ₋
-
 
 
 include("pn_expressions.jl")
