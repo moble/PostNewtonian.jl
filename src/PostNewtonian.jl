@@ -38,7 +38,7 @@ include("systems.jl")
 export PNSystem, pn_order, BBH, BHNS, NSNS, FDPNSystem, fd_pnsystem
 
 
-include("pnexpansion.jl")
+include("pn_expansion.jl")
 export PNExpansion, PNTerm, PNExpansionParameter
 
 
