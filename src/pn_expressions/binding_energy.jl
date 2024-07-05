@@ -38,29 +38,29 @@ terms again with ``1 ↔ 2``.  Finally, note the normalization difference, where
 overall factor is used, leading to a sign difference.
 """
 @pn_expression function 𝓔(pnsystem)
-    -1//2 * μ * v^2 * @pn_expansion(
+    -1//2 * μ * (v/c)^2 * @pn_expansion(
         # Non-spinning terms; Eq. (233) of Blanchet (2014)
         1
-        + v^2 * (-ν/12 - 3//4)
-        + v^4 * (-ν^2/24 + 19ν/8 - 27//8)
-        + v^6 * (-35ν^3/5184 - 155ν^2/96 + (34445//576 - 205π^2/96)ν - 675//64)
+        + (v/c)^2 * (-ν/12 - 3//4)
+        + (v/c)^4 * (-ν^2/24 + 19ν/8 - 27//8)
+        + (v/c)^6 * (-35ν^3/5184 - 155ν^2/96 + (34445//576 - 205π^2/96)ν - 675//64)
 
         # Eq. (5.2d) of Jaranowski and Schäfer
-        + v^8 * (
+        + (v/c)^8 * (
             -3969//128 + 77ν^4/31104 + 301ν^3/1728 + (-498449//3456 + 3157π^2/576)ν^2
             + (-123671//5760 + 1792ln2/15 + 9037π^2/1536 + 896γₑ/15)ν
             + 2ln(v) * (448ν/15)
         )
 
         # Below are the incomplete terms from Eq. (74) of https://arxiv.org/abs/1312.2503v2
-        + v^10 * (
+        + (v/c)^10 * (
             -45927//512 + ν^5/512 + 55ν^4/512 + (-1353π^2/256 + 69423//512)ν^3
             + (-21337π^2/1024 + 3a₆ᶜ¹ - 896ln2/5 - 448γₑ/5 + 893429//2880)ν^2
             + (-228916843//115200 - 9976γₑ/35 + 729ln3/7 - 23672ln2/35 + 126779π^2/512)ν
             + 2ln(v) * (-4988ν/35 - 656ν^2/5)
         )
-        + v^11 * (10ν/3 * (13696π/525 + ν*a₆₅ᶜ¹))
-        + v^12 * (
+        + (v/c)^11 * (10ν/3 * (13696π/525 + ν*a₆₅ᶜ¹))
+        + (v/c)^12 * (
             -264627//1024
             + 2717ν^6/6718464
             + 5159ν^5/248832
@@ -86,24 +86,24 @@ overall factor is used, leading to a sign difference.
         )
 
         # Spin-orbit; Eq. (4.6) of Bohé et al. (2012)
-        + v^3 * (14sₗ/3 + 2δ * σₗ)
-        + v^5 * ((11-61ν/9) * sₗ + (3 - 10ν/3)δ * σₗ)
-        + v^7 * ((135//4 - 367ν/4 + 29ν^2/12) * sₗ + (27//4 - 39ν + 5ν^2/4)δ * σₗ)
+        + (v/c)^3 * (14sₗ/3 + 2δ * σₗ)
+        + (v/c)^5 * ((11-61ν/9) * sₗ + (3 - 10ν/3)δ * σₗ)
+        + (v/c)^7 * ((135//4 - 367ν/4 + 29ν^2/12) * sₗ + (27//4 - 39ν + 5ν^2/4)δ * σₗ)
 
         # Spin-squared; Eq. (3.33) of Bohé et al. (2015)
-        + v^4 * (
+        + (v/c)^4 * (
             sₗ^2 * (-κ₊ - 2)
             + sₗ * σₗ * (-δ*κ₊ - 2δ + κ₋)
             + σₗ^2 * (δ*κ₋/2 - κ₊/2 + (κ₊ + 2)ν)
         )
-        + v^6 * (
+        + (v/c)^6 * (
             sₗ^2 * (-5δ*κ₋/3 - 25*κ₊/6 + 50//9 + (5κ₊/6 + 5//3)ν)
             + sₗ * σₗ * (-5*δ*κ₊/2 + 25*δ/3 + 5κ₋/2 + (5δ*κ₊/6 + 5δ/3 + 35κ₋/6)ν)
             + σₗ^2 * (5δ*κ₋/4 - 5κ₊/4 + 5 + (5δ*κ₋/4 + 5κ₊/4 - 10)ν + (-5κ₊/6 - 5//3)ν^2)
         )
 
         # Spin-cubed; Eq. (6.17) of Marsat (2014)
-        + v^7 * (
+        + (v/c)^7 * (
             sₗ^3 * (2κ₊ + 4λ₊ - 20)
             + sₗ^2 * σₗ * (2δ*κ₊ + 6δ*λ₊ - 32δ + 4κ₋ - 6λ₋)
             + sₗ * σₗ^2 * (5δ*κ₋ - 6δ*λ₋ - 5κ₊ + 6λ₊ - 12 + (-2κ₊ - 12λ₊ + 68)ν)
@@ -111,11 +111,11 @@ overall factor is used, leading to a sign difference.
         )
 
         # NS tidal coupling; Eq. (2.11) of Vines et al. (2011) with λ̂=v^10*Λ₂*(M₂/M)^5
-        + v^10 * (
+        + (v/c)^10 * (
             - 9Λ₁ * ν * X₁^3
             - 9Λ₂ * ν * X₂^3
         )
-        + v^12 * (
+        + (v/c)^12 * (
             - 11//2 * (3 + 2X₁ + 3X₁^2)Λ₁ * ν * X₁^3
             - 11//2 * (3 + 2X₂ + 3X₂^2)Λ₂ * ν * X₂^3
         )
@@ -133,7 +133,10 @@ Compute the derivative with respect to ``v`` of the binding energy of a compact 
 This is computed automatically (via `FastDifferentiation`) from [`𝓔`](@ref); see that
 function for details of the PN formulas.
 """
-@generated function 𝓔′(pnsystem::PNSystem{ST, PNOrder}) where {ST, PNOrder}
+@generated function 𝓔′(
+    pnsystem::PNSystem{ST, PNOrder};
+    pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum)
+) where {ST, PNOrder, PNExpansionReducer}
     # Create a `PNSystem` with `FastDifferentiation` (henceforth FD) variables, using the
     # same PNOrder as the input `pnsystem`.
     fdpnsystem = FDPNSystem(eltype(ST), PNOrder)
@@ -145,56 +148,110 @@ function for details of the PN formulas.
     # Now we evaluate 𝓔 using the FD variables.  This will expand all derived variables in
     # terms of the fundamental variables, but FD will take care of evaluating those
     # efficiently via common subexpression elimination (CSE).
-    𝓔formula = 𝓔(fdpnsystem)
+    𝓔formula = 𝓔(fdpnsystem; pn_expansion_reducer=Val(PNExpansionReducer))
 
     # Now we take the derivative of 𝓔 with respect to v.
-    𝓔′ = FastDifferentiation.derivative(𝓔formula, v(fdpnsystem))
+    𝓔′ = SVector(FastDifferentiation.derivative(𝓔formula, v(fdpnsystem)))
 
-    # Here, 𝓔′ is a tree (or DAG) with lots of FD expressions (Nodes), so we want to make a
-    # function out of it.  We choose `in_place=true` to avoid allocating memory and FD's
-    # attempts to convert to `Float64`.
-    𝓔′func = FastDifferentiation.make_function([𝓔′], vars, in_place=true)
-
-    # Unfortunately, FD produces a function with signature `function (result, vars)`, where
-    # `result` is an array of the same type as `vars`, and `vars` is as given above.  We
-    # want a function with signature `function (pnsystem)`, so we need to massage `𝓔′func`
-    # into that form.  Here, we get the actual `Expr` from which the function is built.
-    𝓔′expr = RuntimeGeneratedFunctions.get_expression(𝓔′func)
+    # Turn that into an Expr (FD insists on making it a function)
+    𝓔′expr = FastDifferentiation.make_Expr(𝓔′, vars, false, false, true)
 
     # Now, we use `MacroTools` to get the body of the function.
     𝓔′body = MacroTools.unblock(MacroTools.splitdef(𝓔′expr)[:body])
 
-    # At this point, the function is just a long series of statements inside an `@inbounds`
-    # block, which we will want later, but first we need to extract them.
+    # # At this point, the function is just a long series of statements inside an `@inbounds`
+    # # block, which we will want later, but first we need to extract them.
     MacroTools.@capture(𝓔′body, @inbounds begin 𝓔′statements__ end) ||
         throw(ArgumentError(
-            "\n    No @inbounds block found in 𝓔′ expression." *
-            "\n    Something may have changed in FastDifferentiation." *
-            "\n    Open an issue citing this PNSystem:" *
-            "\n    $pnsystem"
+            "\nNo @inbounds block found in 𝓔′ expression." *
+            "\nSomething may have changed in FastDifferentiation." *
+            "\nOpen an issue citing this Julia call:" *
+            "\n```julia" *
+            "\nusing PostNewtonian" *
+            "\n𝓔′($pnsystem)" *
+            "\n```"
         ))
 
-    # The 𝓔′statements are mostly what we want, except that FD makes the second-to-last
-    # line set element 1 of the result array to the desired result; we just want to return
-    # the desired result, so we get that right-hand side here.  Also note that the last line
-    # is just `return nothing`, so we never use `𝓔′statements[end]`.
-    MacroTools.@capture(𝓔′statements[end-1], _ = 𝓔′return_) ||
+    # The 𝓔′statements are mostly what we want, except that the last line is a return
+    # statement.  We want that result, but we don't to return it yet; we want to wrap that
+    # result, so we just get that returned quantity here.
+    MacroTools.@capture(𝓔′statements[end], return 𝓔′return_) ||
         throw(ArgumentError(
-            "\n    No return statement found in 𝓔′ expression." *
-            "\n    Something may have changed in FastDifferentiation." *
-            "\n    Open an issue citing this PNSystem:" *
-            "\n    $pnsystem"
+            "\nNo return statement found in 𝓔′ expression." *
+            "\nSomething may have changed in FastDifferentiation." *
+            "\nOpen an issue citing this Julia call:" *
+            "\n```julia" *
+            "\nusing PostNewtonian" *
+            "\n𝓔′($pnsystem)" *
+            "\n```"
         ))
+    𝓔′statements[end] = 𝓔′return
 
-    # Finally, we build the expression we want to return, constructing the required input
-    # variables from `pnsystem`, reinstating the `@inbounds` block and adding `@fastmath`,
-    # and otherwise just reusing the statements and return from the FD-generated function.
-    return quote
-        input_variables = SVector(pnsystem)
-        @fastmath @inbounds begin
-            $(𝓔′statements[1:end-2]...)
+    if PNExpansionReducer === identity
+        # When `pn_expansion_reducer=Val(identity)` is passed, we return a PNExpansion
+        return quote
+            input_variables = SVector(pnsystem)
+            𝓔′val = @fastmath @inbounds begin
+                $(𝓔′statements...)
+            end
+            return PNExpansion{$(length(𝓔′)), $(eltype(ST))}(𝓔′val)
         end
-        return $(𝓔′return)
+    else
+        # Otherwise, FD produces a 1-tuple, so we just extract the value from that.
+        return quote
+            input_variables = SVector(pnsystem)
+            𝓔′val = @fastmath @inbounds begin
+                $(𝓔′statements...)
+            end
+            return 𝓔′val[1]
+        end
     end
+
+    # # Here, 𝓔′ is a tree (or DAG) with lots of FD expressions (Nodes), so we want to make a
+    # # function out of it.  We choose `in_place=true` to avoid allocating memory and FD's
+    # # attempts to convert to `Float64`.
+    # 𝓔′func = FastDifferentiation.make_function(SVector(𝓔′), vars, in_place=true)
+
+    # # Unfortunately, FD produces a function with signature `function (result, vars)`, where
+    # # `result` is an array of the same type as `vars`, and `vars` is as given above.  We
+    # # want a function with signature `function (pnsystem)`, so we need to massage `𝓔′func`
+    # # into that form.  Here, we get the actual `Expr` from which the function is built.
+    # 𝓔′expr = RuntimeGeneratedFunctions.get_expression(𝓔′func)
+
+    # # Now, we use `MacroTools` to get the body of the function.
+    # 𝓔′body = MacroTools.unblock(MacroTools.splitdef(𝓔′expr)[:body])
+
+    # # At this point, the function is just a long series of statements inside an `@inbounds`
+    # # block, which we will want later, but first we need to extract them.
+    # MacroTools.@capture(𝓔′body, @inbounds begin 𝓔′statements__ end) ||
+    #     throw(ArgumentError(
+    #         "\n    No @inbounds block found in 𝓔′ expression." *
+    #         "\n    Something may have changed in FastDifferentiation." *
+    #         "\n    Open an issue citing this PNSystem:" *
+    #         "\n    $pnsystem"
+    #     ))
+
+    # # The 𝓔′statements are mostly what we want, except that FD makes the second-to-last
+    # # line set element 1 of the result array to the desired result; we just want to return
+    # # the desired result, so we get that right-hand side here.  Also note that the last line
+    # # is just `return nothing`, so we never use `𝓔′statements[end]`.
+    # MacroTools.@capture(𝓔′statements[end-1], _ = 𝓔′return_) ||
+    #     throw(ArgumentError(
+    #         "\n    No return statement found in 𝓔′ expression." *
+    #         "\n    Something may have changed in FastDifferentiation." *
+    #         "\n    Open an issue citing this PNSystem:" *
+    #         "\n    $pnsystem"
+    #     ))
+
+    # # Finally, we build the expression we want to return, constructing the required input
+    # # variables from `pnsystem`, reinstating the `@inbounds` block and adding `@fastmath`,
+    # # and otherwise just reusing the statements and return from the FD-generated function.
+    # return quote
+    #     input_variables = SVector(pnsystem)
+    #     @fastmath @inbounds begin
+    #         $(𝓔′statements[1:end-2]...)
+    #     end
+    #     return $(𝓔′return)
+    # end
 end
 const binding_energy_deriv=𝓔′

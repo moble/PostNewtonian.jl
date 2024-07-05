@@ -35,7 +35,7 @@ energy are known to 3pN order, and given in [Eq. (3.32) of Bohé et al.
 See also [`R`](@ref PostNewtonian.R).
 """
 @pn_expression function 𝛡(pnsystem)
-    (γₚₙ(pnsystem) * aₗ(pnsystem) / v^3) * n̂
+    (γₚₙ(pnsystem) * aₗ(pnsystem) / (v/c)^3) * n̂
 end
 
 
@@ -54,25 +54,25 @@ Note that there is a 3PN gauge term of ``-22ν\\ln(r/r₀′)/3`` that is simply
 it should cancel out of any physical quantity.
 """
 @pn_expression function γₚₙ(pnsystem)
-    v^2 * @pn_expansion(
+    (v/c)^2 * @pn_expansion(
         # Non-spinning terms; Eq. (4.3) of Bohé et al. (2013)
         1
-        + v^2 * (1 - ν / 3)
-        + v^4 * (1 - 65ν / 12)
-        + v^6 * (1 + (-2203//2520 - 41π^2 / 192)ν + 229ν^2 / 36 + ν^3 / 81)
+        + (v/c)^2 * (1 - ν / 3)
+        + (v/c)^4 * (1 - 65ν / 12)
+        + (v/c)^6 * (1 + (-2203//2520 - 41π^2 / 192)ν + 229ν^2 / 36 + ν^3 / 81)
 
         # Spin-orbit terms; Eq. (4.3) of Bohé et al. (2013)
-        + v^3 * (5//3 * sₗ + δ * σₗ)
-        + v^5 * ((10//3 + 8ν/9) * sₗ + 2δ * σₗ)
-        + v^7 * ((5 - 127ν/12 - 6ν^2) * sₗ + δ * (3 - 61ν/6 - 8ν^2/3) * σₗ)
+        + (v/c)^3 * (5//3 * sₗ + δ * σₗ)
+        + (v/c)^5 * ((10//3 + 8ν/9) * sₗ + 2δ * σₗ)
+        + (v/c)^7 * ((5 - 127ν/12 - 6ν^2) * sₗ + δ * (3 - 61ν/6 - 8ν^2/3) * σₗ)
 
         # Spin-squared terms; Eq. (3.32) of Bohé et al. (2015)
-        + v^4 * (
+        + (v/c)^4 * (
             sₗ^2 * (-κ₊/2 - 1)
             + sₗ * σₗ * (-δ*κ₊/2 - δ + κ₋/2)
             + σₗ^2 * (δ*κ₋/4 - κ₊/4 + (κ₊/2 + 1)ν)
         )
-        + v^6 * (
+        + (v/c)^6 * (
             sₗ^2 * (-11δ*κ₋/12 - 11κ₊/12 + 14//9 + (-κ₊/6 - 1//3)ν)
             + sₗ * σₗ * (5δ/3 + (-δ*κ₊/6 - δ/3 + 23κ₋/6)ν)
             + σₗ^2 * (1 + (δ*κ₋ - κ₊ - 2)ν + (κ₊/6 + 1//3)ν^2)
@@ -88,10 +88,10 @@ Eq. (4.4) of [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520).  This term 
 to [`𝛡`](@ref).
 """
 @pn_expression function aₗ(pnsystem)
-    v^7/M^3 * @pn_expansion(
+    (v/c)^7/M^3 * @pn_expansion(
         (7Sₙ + 3δ*Σₙ)
-        + v^2 * ((-10 - 29ν/3) * Sₙ + δ*(-6 - 9ν/2) * Σₙ)
-        + v^4 * (
+        + (v/c)^2 * ((-10 - 29ν/3) * Sₙ + δ*(-6 - 9ν/2) * Σₙ)
+        + (v/c)^4 * (
             (3//2 + 59ν/4 + 52ν^2/9) * Sₙ
             + δ*(3//2 + 73ν/8 + 17ν^2/6) * Σₙ
         )
@@ -148,23 +148,26 @@ of [Bohé et al. (2013)](http://arxiv.org/abs/1212.5520v2); and the quadrupole-m
 by Eq. (2.7) [Racine (2008)](http://link.aps.org/doi/10.1103/PhysRevD.78.044021).
 """
 function Ω⃗ᵪ(Mⱼ, Mₖ, χ⃗ⱼ, χ⃗ₖ, v, R, pnsystem)
-    let M=M(Mⱼ, Mₖ), ν=ν(Mⱼ, Mₖ), δ=δ(Mⱼ, Mₖ), n̂=n̂(R), ℓ̂=ℓ̂(R)
+    # Note that we don't use the `@pn_expression` macro here, because we're swapping
+    # the order of certain arguments above, so we do it manually here, and don't just
+    # call things like `δ(pnsystem)` because that would fail to swap.
+    let M=M(Mⱼ, Mₖ), ν=ν(Mⱼ, Mₖ), δ=δ(Mⱼ, Mₖ), n̂=n̂(R), ℓ̂=ℓ̂(R), c = one(eltype(pnsystem))
         χⱼₙ = χ⃗ⱼ ⋅ n̂
         χₖₙ = χ⃗ₖ ⋅ n̂
 
-        v^5/M * @pn_expansion pnsystem (
+        (v/c)^5/M * @pn_expansion pnsystem (
             # Spin-spin term from Eq. (2.4) of Kidder
-            v * (Mₖ^2 / M^2) * (-χ⃗ₖ + 3χₖₙ * n̂)
+            v/c * (Mₖ^2 / M^2) * (-χ⃗ₖ + 3χₖₙ * n̂)
 
             # Spin-orbit terms from Eq. (4.5) of Bohé et al.
             + (
                 (3//4 + ν/2 - 3δ/4)
-                + v^2 * (9//16 + 5ν/4 - ν^2/24 + δ*(-9//16 + 5ν/8))
-                + v^4 * (27//32 + 3ν/16 - 105ν^2/32 - ν^3/48 + δ*(-27//32 + 39ν/8 - 5ν^2/32))
+                + (v/c)^2 * (9//16 + 5ν/4 - ν^2/24 + δ*(-9//16 + 5ν/8))
+                + (v/c)^4 * (27//32 + 3ν/16 - 105ν^2/32 - ν^3/48 + δ*(-27//32 + 39ν/8 - 5ν^2/32))
             ) * ℓ̂
 
             # Quadrupole-monopole term from Eq. (2.7) of Racine
-            + v * (3ν * χⱼₙ * n̂)
+            + v/c * (3ν * χⱼₙ * n̂)
         )
     end
 end
