@@ -112,6 +112,12 @@ include("assorted_binaries/random.jl")
 
 include("precompilation.jl")
 
+
+# Pre-define a few functions that the Symbolics extension can extend
+function var_collect end
+function hold end
+function unhold end
+
 if !isdefined(Base, :get_extension)
     using Requires
 end
