@@ -1,7 +1,13 @@
-@testset verbose=true "Aqua quality assurance tests" begin
-    Aqua.test_all(PostNewtonian; ambiguities=false)
+@testitem "Aqua quality assurance tests" begin
+    import Aqua
+    Aqua.test_all(
+        PostNewtonian;
+        ambiguities=false,
+        unbound_args=(broken=true,),
+    )
 end
-@testset verbose=true "ExplicitImports tests" begin
+@testitem "ExplicitImports tests" begin
+    import ExplicitImports
     @test ExplicitImports.check_no_implicit_imports(PostNewtonian) === nothing
     @test ExplicitImports.check_all_explicit_imports_via_owners(PostNewtonian) === nothing
     #@test ExplicitImports.check_all_explicit_imports_are_public(PostNewtonian) === nothing

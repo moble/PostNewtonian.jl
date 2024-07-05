@@ -1,4 +1,6 @@
-@testset verbose=true "macros" begin
+let # ignore: # @testitem "macros" begin
+    using Quaternionic
+    using Symbolics
     using PostNewtonian: var_collect
     @test var_collect(:(v^2 * (10ν/3)), :v) == (2, :((0, 0, 1 * ((10ν) / 3))))
     @test var_collect(:(v^3 * x + 1), :v) == (3, :((1, 0, 0, 1x)))

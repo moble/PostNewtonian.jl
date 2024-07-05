@@ -110,7 +110,9 @@ is due to its rotation alone, and is given by ``Ω⃗ᵪ₁ × χ⃗₁``.
 Note that this function simply calls [`Ω⃗ᵪ`](@ref) with the appropriate parameters.
 """
 @pn_expression function Ω⃗ᵪ₁(pnsystem)
-    QuatVec(Ω⃗ᵪ(M₁, M₂, χ⃗₁, χ⃗₂, v, R, pnsystem))
+    # Note that `PNExpansionReducer` appears magically via the `@pn_expression` macro, along
+    # with other magic variables, as usual.
+    QuatVec(Ω⃗ᵪ(M₁, M₂, χ⃗₁, χ⃗₂, v, R, pnsystem, PNExpansionReducer))
 end
 const Omega_chi1 = Ω⃗ᵪ₁
 
@@ -126,7 +128,9 @@ is due to its rotation alone, and is given by ``Ω⃗ᵪ₂ × χ⃗₂``.
 Note that this function simply calls [`Ω⃗ᵪ`](@ref) with the appropriate parameters.
 """
 @pn_expression function Ω⃗ᵪ₂(pnsystem)
-    QuatVec(Ω⃗ᵪ(M₂, M₁, χ⃗₂, χ⃗₁, v, R, pnsystem))
+    # Note that `PNExpansionReducer` appears magically via the `@pn_expression` macro, along
+    # with other magic variables, as usual.
+    QuatVec(Ω⃗ᵪ(M₂, M₁, χ⃗₂, χ⃗₁, v, R, pnsystem, PNExpansionReducer))
 end
 const Omega_chi2 = Ω⃗ᵪ₂
 
@@ -147,7 +151,7 @@ The spin-spin term is given by Eq. (2.4) of [Kidder
 of [Bohé et al. (2013)](http://arxiv.org/abs/1212.5520v2); and the quadrupole-monopole term
 by Eq. (2.7) [Racine (2008)](http://link.aps.org/doi/10.1103/PhysRevD.78.044021).
 """
-function Ω⃗ᵪ(Mⱼ, Mₖ, χ⃗ⱼ, χ⃗ₖ, v, R, pnsystem)
+function Ω⃗ᵪ(Mⱼ, Mₖ, χ⃗ⱼ, χ⃗ₖ, v, R, pnsystem, PNExpansionReducer)
     # Note that we don't use the `@pn_expression` macro here, because we're swapping
     # the order of certain arguments above, so we do it manually here, and don't just
     # call things like `δ(pnsystem)` because that would fail to swap.

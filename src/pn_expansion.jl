@@ -150,6 +150,14 @@ end
 Base.length(pn::PNTerm) = 1
 Base.eltype(pn::PNTerm{T}) where {T} = T
 
+function Base.sum(pn::PNTerm)
+    pn.coeff
+end
+
+function Base.:+(pn::PNTerm)
+    pn
+end
+
 function Base.inv(term::PNTerm{T,PNOrder}) where {T,PNOrder}
     PNTerm{T,PNOrder}(-term.c⁻¹exp, inv(term.coeff))
 end

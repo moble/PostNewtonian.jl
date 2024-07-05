@@ -1,4 +1,5 @@
-@testset verbose=true "truncated series monoid" begin
+@testitem "truncated series monoid" begin
+    using Symbolics
     using PostNewtonian: truncated_series_inverse, truncated_series_product,
         truncated_series_ratio
     @variables a[1:10] b[1:10] v
