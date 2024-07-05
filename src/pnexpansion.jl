@@ -1,3 +1,14 @@
+# This a utility that allow us to interoperate with FastDifferentiation.Node and other
+# Number types.
+function _efficient_vector(N, T)
+    if isbitstype(T)
+        MVector{N, T}(undef)
+    else
+        Vector{T}(undef, N)
+    end
+end
+
+
 @doc raw"""
 
 This object can be multiplied by a scalar or another `PNExpansion` object, and contains a
@@ -100,6 +111,19 @@ end
 
 Base.:/(p::PNExpansion, x::Number) = p * (1 / x)
 
+function FastDifferentiation.derivative(
+    pn_expansion::PNExpansion{N,T},
+    fd_node::FastDifferentiation.Node
+) where {N,T}
+    PNExpansion(ntuple(
+        i -> FastDifferentiation.derivative(pn_expansion[i], fd_node),
+        Val(N)
+    ))
+end
+
+Base.Tuple(pn::PNExpansion) = pn.coeffs
+SVector(pn::PNExpansion) = SVector(pn.coeffs)
+
 
 """
     struct PNTerm{PNOrder}
@@ -161,7 +185,7 @@ function Base.:+(x::T1, term::PNTerm{T2,PNOrder}) where {T1<:Number,T2,PNOrder}
     end
     T = promote_type(T1, T2)
     N = Int(2PNOrder + 1)
-    coeffs = MVector{N, T}(undef)
+    coeffs = _efficient_vector(N, T)
     coeffs .= zero(T)
     @inbounds coeffs[1] = x
     @inbounds if term.c⁻¹exp < N
@@ -204,7 +228,7 @@ function Base.:+(term1::PNTerm{T1,PNOrder}, term2::PNTerm{T2,PNOrder}) where {T1
     end
     T = promote_type(T1, T2)
     N = Int(2PNOrder + 1)
-    coeffs = MVector{N, T}(undef)
+    coeffs = _efficient_vector(N, T)
     coeffs .= zero(T)
     @inbounds if term1.c⁻¹exp < N
         coeffs[term1.c⁻¹exp + 1] += term1.coeff
@@ -225,7 +249,7 @@ function Base.:+(term::PNTerm{T1,PNOrder}, expansion::PNExpansion{N,T2}) where {
         ))
     end
     T = promote_type(T1, T2)
-    coeffs = MVector{N, T}(undef)
+    coeffs = _efficient_vector(N, T)
     coeffs .= zero(T)
     @inbounds if term.c⁻¹exp < N
         coeffs[term.c⁻¹exp + 1] += term.coeff
@@ -248,7 +272,7 @@ Base.:-(expansion::PNExpansion, x::Number) = expansion + (-x)
 
 function Base.:/(expansion::PNExpansion{N,T1}, term::PNTerm{T2,PNOrder}) where {N,T1,T2,PNOrder}
     T = promote_type(T1, T2)
-    coeffs = MVector{N, T}(undef)
+    coeffs = _efficient_vector(N, T)
     coeffs .= zero(T)
     @inbounds for i ∈ max(1,1+term.c⁻¹exp):min(N,N+term.c⁻¹exp)
         coeffs[i - term.c⁻¹exp] = expansion[i] / term.coeff
