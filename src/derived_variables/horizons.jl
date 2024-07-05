@@ -79,9 +79,11 @@ end
 Rate of rotation of black hole 2 about the spin of black hole 1, relative to orbital
 rotation rate.
 
-This is the rotation rate divided by ``v^3  = M\, \Omega``.
+This is the rotation rate ϕ̇ as defined in Eq. (19) of [Alvi
+(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020), divided by ``v^3  = M\,
+\Omega``.  This division is done to make sure we can track the relative PN order of terms
+that depend on this.
 
-As defined in Eq. (19) of [Alvi (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).
 See the documentation section on ["Horizons"](@ref Horizons) for more details.
 """
 function ϕ̇̂₁(s::VecOrPNSystem)
@@ -104,9 +106,11 @@ end
 Rate of rotation of black hole 1 about the spin of black hole 2, relative to orbital
 rotation rate.
 
-This is the rotation rate divided by ``v^3  = M\, \Omega``.
+This is the rotation rate ϕ̇ as defined in Eq. (19) of [Alvi
+(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020), divided by ``v^3  = M\,
+\Omega``.  This division is done to make sure we can track the relative PN order of terms
+that depend on this.
 
-As defined in Eq. (19) of [Alvi (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).
 See the documentation section on ["Horizons"](@ref Horizons) for more details.
 """
 function ϕ̇̂₂(s::VecOrPNSystem)
@@ -129,7 +133,7 @@ end
 
 Horizon moment of inertia of black hole 1.
 
-This is the moment divided by ``v^{12}``, as given by Eq. (10) of [Alvi
+This is the moment divided by ``ν^2 v^{12}``, as given by Eq. (10) of [Alvi
 (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See the documentation section
 on ["Horizons"](@ref Horizons) for more details.
 """
@@ -146,7 +150,7 @@ end
 
 Horizon moment of inertia of black hole 2.
 
-This is the moment divided by ``v^{12}``, as given by Eq. (10) of [Alvi
+This is the moment divided by ``ν^2 v^{12}``, as given by Eq. (10) of [Alvi
 (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See the documentation section
 on ["Horizons"](@ref Horizons) for more details.
 """
