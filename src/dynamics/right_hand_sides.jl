@@ -1,18 +1,18 @@
-function v̇_numerator(p)
-    (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(p)
-    - (𝓕(p) + Ṁ₁ + Ṁ₂)
+function v̇_numerator(p; pn_expansion_reducer=Val(sum))
+    (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(p; pn_expansion_reducer)
+    - (𝓕(p; pn_expansion_reducer) + Ṁ₁ + Ṁ₂)
 end
 
-function v̇_denominator(p)
-    𝓔′(p)
+function v̇_denominator(p; pn_expansion_reducer=Val(sum))
+    𝓔′(p; pn_expansion_reducer)
 end
 
 function v̇_numerator_coeffs(p)
-    error("Not yet implemented")
+    v̇_numerator(p; pn_expansion_reducer=Val(identity))
 end
 
 function v̇_denominator_coeffs(p)
-    error("Not yet implemented")
+    v̇_denominator(p; pn_expansion_reducer=Val(identity))
 end
 
 
