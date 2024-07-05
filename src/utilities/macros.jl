@@ -69,8 +69,10 @@ function pn_expression(pnsystem::Symbol, body)
         recursive=true
     ))
 
-    # Finally, just wrap `new_body` in a `let` block, where we include exprs created above
+    # Finally, just wrap `new_body` in a `let` block, where we include exprs created above.
+    # Also include the definition `c=1` (to be overwritten inside any `@pn_expansion`).
     full_body = MacroTools.unblock(quote
+        c = one(eltype($pnsystem))
         @fastmath let $(exprs...)
             $(new_body)
         end
@@ -81,8 +83,12 @@ end
 function pn_expression(arg_index::Integer, func)
     splitfunc = MacroTools.splitdef(func)
     pnsystem = MacroTools.namify(splitfunc[:args][arg_index])
-    body = splitfunc[:body]
-    splitfunc[:body] = pn_expression(pnsystem, body)
+    splitfunc[:kwargs] = [
+        splitfunc[:kwargs];
+        :($(Expr(:kw, :(pn_expansion_reducer::Val{PNExpansionReducer}), :(Val(sum)))))
+    ]
+    splitfunc[:whereparams] = (splitfunc[:whereparams]..., :PNExpansionReducer)
+    splitfunc[:body] = pn_expression(pnsystem, splitfunc[:body])
     MacroTools.combinedef(splitfunc)
 end
 
@@ -98,20 +104,25 @@ function `func` is a `PNSystem`.  For example, the variables defined in
 argument of `pnsystem`, which is used to compute the values for those variables; this macro
 just needs to know where to find `pnsystem`.
 
-Once it has this information, there are four types of transformations it will make:
+Once it has this information, there are five types of transformations it will make:
 
- 1. For every [fundamental](@ref "Fundamental variables") or [derived](@ref "Derived
+ 1. Adds a keyword argument `pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum)` to the
+    function signature.  This is used to determine how to reduce the PN expansion terms.
+    The default is `Val(sum)`, which will just return a single number,  but `Val(identity)`
+    can be used to return the expansion.  This should be used inside the function as
+    `PNExpansionReducer`, and will be automatically used inside any `@pn_expansion`.
+ 2. For every [fundamental](@ref "Fundamental variables") or [derived](@ref "Derived
     variables") variable, the name of that variable used in the body of `func` will be
     replaced by its value when called with `pnsystem`.  For example, you can simply use the
     symbols `M₁` or `μ` in your code, rather than calling them as [`M₁(pnsystem)`](@ref M₁)
     or [`μ(pnsystem)`](@ref μ) every time they appear.
- 2. Every `Irrational` defined in `Base.MathConstants` or `PostNewtonian.MathConstants` will
+ 3. Every `Irrational` defined in `Base.MathConstants` or `PostNewtonian.MathConstants` will
     be transformed to the `eltype` of `pnsystem`.  This lets you naturally use such
     constants in expressions like `2π/3` without automatically converting to `Float64`.
- 3. Each of a short list of functions given by `unary_funcs` in `utilities/macros.jl` will
+ 4. Each of a short list of functions given by `unary_funcs` in `utilities/macros.jl` will
     first convert their arguments to the `eltype` of `pnsystem`.  In particular, you can use
     expressions like `√10` or `ln(2)` without the result being converted to a `Float64`.
- 4. Insert the `pnsystem` argument as the first argument to each occurrence of
+ 5. Insert the `pnsystem` argument as the first argument to each occurrence of
     `@pn_expansion` that needs it.
 
 To be more explicit, the first three are achieved by defining the relevant quantities in a
@@ -166,182 +177,9 @@ macro pn_expansion(pnsystem, expr)
 end
 
 function pn_expansion(offset, pnsystem, expr)
-    max_k, coefficients = var_collect(expr, :v)
-    max_index = max_k + 1
-    if offset != 0
-        max_index_var = gensym("max_index")
-        quote
-            $max_index_var = min($max_index, order_index($pnsystem)-$offset)
-            if $max_index_var < 1
-                zero(v)
-            else
-                evalpoly(
-                    v,
-                    $coefficients[1:$max_index_var]
-                )
-            end
+    quote
+        let c = PNExpansionParameter($pnsystem)
+            PNExpansionReducer($expr)
         end
-    else
-        :(evalpoly(
-            v,
-            $coefficients[1:min($max_index, order_index($pnsystem))]
-        ))
     end
 end
-
-
-"""
-    extract_var_factor(term, var)
-
-Extract a factor of `var` from the product `term`.
-
-This is a helper function for [`var_collect`](@ref).
-"""
-function extract_var_factor(term, var)
-    if MacroTools.isexpr(term, :call) && term.args[1] ∈ ((/), :/)
-        k₂, term₂ = extract_var_factor(term.args[2], var)
-        k₃, term₃ = extract_var_factor(term.args[3], var)
-        return k₂-k₃, Expr(:call, term.args[1], term₂, term₃)
-        #return k₂-k₃, :($(term.args[1]), $term₂, $term₃)
-    end
-    if !MacroTools.isexpr(term, :call) || term.args[1] ∉ ((*), :*)
-        if term == var
-            return 1, 1
-        end
-        m = MacroTools.trymatch(:((^)(v_, k_)), term)
-        m = !isnothing(m) ? m : MacroTools.trymatch(:($(^)(v_, k_)), term)
-        if !isnothing(m) && m[:v] == var
-            return m[:k], 1
-        end
-        return 0, term
-    end
-    term = flatten_mul!(deepcopy(term))
-    k = 0
-    indices = Int[]
-    for (i,factor) ∈ enumerate(term.args)
-        if i==1
-            continue  # Skip the :*
-        end
-        if MacroTools.isexpr(factor, :call)
-            k′, term′ = extract_var_factor(factor, var)
-            # if term′ isa Expr
-            #     term′ = Expr(:call, term′.args...)
-            # end
-            if k′ > 0
-                k += k′
-                term.args[i] = term′
-            end
-        else
-            if factor == var
-                k += 1
-                push!(indices, i)
-                continue
-            end
-            m = MacroTools.trymatch(:((^)(v_, k_)), factor)
-            m = !isnothing(m) ? m : MacroTools.trymatch(:($(^)(v_, k_)), factor)
-            if !isnothing(m) && m[:v] == var
-                k += m[:k]
-                push!(indices, i)
-            end
-        end
-    end
-    if !isempty(indices)
-        splice!(term.args, indices)
-    end
-    # TODO: If there's just 1 arg left over, return it alone
-    if length(term.args) == 2
-        k, term.args[2]
-    else
-        k, term
-    end
-end
-
-"""
-    var_collect(expr, var)
-
-Collect coefficients in `expr` of various powers of the variable `var`.
-
-The inputs should be an
-[`Expr`](https://docs.julialang.org/en/v1/manual/metaprogramming/#Program-representation)
-and a single `Symbol` to be found in that `Expr`.
-
-The return value is an `Int` representing the highest power of `v` in the expression, and an
-`Expr` representing a `Tuple` of values corresponding to the coefficients of `var` to
-various powers.  For example,
-```jl-doctest
-julia> PostNewtonian.var_collect(:(1 + a*v + b*v^2 + c*v^4), :v)
-4, :((1, a, b, 0, c))
-```
-(Note that there was *no* factor in `v^3`.)  This result is convenient for passing to
-`evalpoly`, for example.
-"""
-function var_collect(expr, var)
-    if !MacroTools.isexpr(expr, :call)
-        error("Input expression is not a call at its highest level: $expr")
-    end
-    terms = Dict{Int,Any}()
-    if expr.args[1] ∉ ((+), :+, (-), :-)
-        k, term = extract_var_factor(expr, var)
-        terms[k] = term
-    else
-        for (i,term) ∈ enumerate(expr.args[2:end])
-            k, term = extract_var_factor(term, var)
-            if expr.args[1] ∈ ((-), :-) && i==2
-                if k ∈ keys(terms)
-                    terms[k] = :($(terms[k]) - $(term))
-                else
-                    terms[k] = :(-$(term))
-                end
-            else
-                if k ∈ keys(terms)
-                    terms[k] = :($(terms[k]) + $(term))
-                else
-                    terms[k] = term
-                end
-            end
-        end
-    end
-    max_k = maximum(keys(terms))
-    term_exprs = [get(terms, k, 0) for k ∈ 0:max_k]
-    max_k, :(($(term_exprs...),))
-end
-
-
-# function symbolic_collect(expr::Num, var)
-#     ex = Symbolics.unwrap(expr)
-#     if Symbolics.operation(ex) != (+)
-#         error("Input expression is not a sum")
-#     end
-#     terms = Dict{Int,Any}()
-#     predicate(x) = isequal(x, var)
-#     rulekLR = @acrule (~~a) * (~v::predicate)^(~k) * (~~b) => (~k, *(~~a..., ~~b...))
-#     rulekL = @acrule (~~a) * (~v::predicate)^(~k) => (~k, *(~~a...))
-#     rulekR = @acrule (~v::predicate)^(~k) * (~~b) => (~k, *(~~b...))
-#     rulek = @acrule (~v::predicate)^(~k) => (~k, 1)
-#     rule1LR = @acrule (~~a) * (~v::predicate) * (~~b) => (1, *(~~a..., ~~b...))
-#     rule1L = @acrule (~~a) * (~v::predicate) => (1, *(~~a...))
-#     rule1R = @acrule (~v::predicate) * (~~b) => (1, *(~~b...))
-#     rule1 = @acrule (~v::predicate) => (1, 1)
-#     rule0 = @acrule (~a::!predicate) => (0, a)
-#     rules = SymbolicUtils.Chain([
-#         rulekLR, rule1LR,
-#         rulekL, rule1L,
-#         rulekR, rule1R,
-#         rulek, rule1,
-#         rule0
-#     ])
-#     for x ∈ Symbolics.arguments(ex)
-#         result = rules(x)
-#         k, c = if result == x
-#             0, x
-#         else
-#             result
-#         end
-#         if k ∈ keys(terms)
-#             terms[k] = terms[k] + c
-#         else
-#             terms[k] = c
-#         end
-#     end
-#     terms
-# end
