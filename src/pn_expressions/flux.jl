@@ -27,19 +27,19 @@ terms again with ``1 ↔ 2``.  Finally, note the normalization difference, where
 overall factor is used, leading to a sign difference.
 """
 @pn_expression function 𝓕(pnsystem)
-    32ν^2/5 * v^10 * @pn_expansion(
+    32ν^2/5 * (v/c)^10 * @pn_expansion(
         # Non-spinning terms; Eq. (314) of Blanchet (2014)
         1
-        + v^2 * (-1247//336 - 35ν/12)
-        + v^3 * (4π)
-        + v^4 * (-44711//9072 + 9271ν/504 + 65ν^2/18)
-        + v^5 * ((-8191//672 - 583*ν/24)π)
-        + v^6 * (
+        + (v/c)^2 * (-1247//336 - 35ν/12)
+        + (v/c)^3 * (4π)
+        + (v/c)^4 * (-44711//9072 + 9271ν/504 + 65ν^2/18)
+        + (v/c)^5 * ((-8191//672 - 583*ν/24)π)
+        + (v/c)^6 * (
             6643739519//69854400 + 16π^2/3 - 1712*(γₑ+2ln2+ln(v))/105
             + (-134543//7776 + 41π^2/48)ν - 94403ν^2/3024 - 775ν^3/324
         )
-        + v^7 * ((-16285//504 + 214745ν/1728 + 193385ν^2/3024)π)
-        + v^8 * (
+        + (v/c)^7 * ((-16285//504 + 214745ν/1728 + 193385ν^2/3024)π)
+        + (v/c)^8 * (
             - 323105549467//3178375200 + 232597γₑ/4410 - 1369π^2/126
             + 39931ln2/294 - 47385ln3/1568 + 232597ln(v)/4410
             + (
@@ -48,7 +48,7 @@ overall factor is used, leading to a sign difference.
             )ν
             + (1607125//6804 - 3157π^2/384)ν^2 + 6875ν^3/504 + 5ν^4/6
         )
-        + v^9 * (
+        + (v/c)^9 * (
             (
                 265978667519//745113600 - 6848*(γₑ+2ln2+ln(v))/105
                 + (2062241//22176 + 41π^2/12)ν - 133112905ν^2/290304 - 3719141ν^3/38016
@@ -56,25 +56,25 @@ overall factor is used, leading to a sign difference.
         )
 
         # Spin-orbit terms; Eq. (4.9) of Marsat et al. (2013)
-        + v^3 * (-4 * sₗ - 5δ/4 * σₗ)
-        + v^5 * ((-9//2 + 272ν/9) * sₗ + (-13//16 + 43ν/4)δ * σₗ)
-        + v^6 * ((-16π) * sₗ + (-31π/6)δ * σₗ)
-        + v^7 * (
+        + (v/c)^3 * (-4 * sₗ - 5δ/4 * σₗ)
+        + (v/c)^5 * ((-9//2 + 272ν/9) * sₗ + (-13//16 + 43ν/4)δ * σₗ)
+        + (v/c)^6 * ((-16π) * sₗ + (-31π/6)δ * σₗ)
+        + (v/c)^7 * (
             (476645//6804 + 6172ν/189 - 2810ν^2/27) * sₗ
             + (9535//336 + 1849ν/126 - 1501ν^2/36)δ * σₗ
         )
-        + v^8 * (
+        + (v/c)^8 * (
             (-3485//96 + 13879ν/72)π * sₗ
             + (-7163//672 + 130583ν/2016)π*δ * σₗ
         )
 
         # Spin-squared terms; Eq. (4.14) of Bohé et al. (2015)
-        + v^4 * (
+        + (v/c)^4 * (
             sₗ^2 * (2κ₊ + 4)
             + sₗ * σₗ * (2δ*κ₊ + 4δ - 2κ₋)
             + σₗ^2 * (-δ*κ₋ + κ₊ + 1//16 + (-2κ₊ - 4)ν)
         )
-        + v^6 * (
+        + (v/c)^6 * (
             sₗ^2 * (41δ*κ₋/16 - 271κ₊/112 - 5239//504 + (-43κ₊/4 - 43//2)ν)
             + sₗ * σₗ * (-279δ*κ₊/56 - 817δ/56 + 279κ₋/56 + (-43δ*κ₊/4 - 43δ/2 + κ₋/2)ν)
             + σₗ^2 * (
@@ -85,7 +85,7 @@ overall factor is used, leading to a sign difference.
         )
 
         # Spin-cubed; Eq. (6.19) of Marsat (2014)
-        + v^7 * (
+        + (v/c)^7 * (
             sₗ^3 * (-16κ₊/3 - 4λ₊ + 40//3)
             + sₗ^2 * σₗ * (-35δ*κ₊/6 - 6δ*λ₊ + 73δ/3 - 3κ₋/4 + 6λ₋)
             + sₗ * σₗ^2 * (
@@ -100,15 +100,15 @@ overall factor is used, leading to a sign difference.
 
         # EMRI terms; Appendix A of Fujita (2012), with lower-order terms removed because
         # they have since been incorporated into non-EMRI terms above
-        + v^10 * (
+        + (v/c)^10 * (
             - 2500861660823683//2831932303200 - 424223π^2/6804 - 83217611ln2/1122660
             + 916628467γₑ/7858620 + 47385ln3/196 + 916628467ln(v)/7858620
         )
-        + v^11 * (
+        + (v/c)^11 * (
             - 142155π*ln3/784 + 8399309750401π/101708006400 + 177293γₑ*π/1176
             + 8521283π*ln2/17640 + 177293π*ln(v)/1176
         )
-        + v^12 * (
+        + (v/c)^12 * (
             - 271272899815409ln2/157329572400
             - 54784π^2*ln2/315 - 246137536815857γₑ/157329572400 - 437114506833ln3/789268480
             - 256π^4/45 - 27392γₑ*π^2/315 - 27392ζ3/105 - 37744140625ln5/260941824
@@ -122,14 +122,186 @@ overall factor is used, leading to a sign difference.
         )
 
         # NS tidal heating; Eq. (3.6) [(3.7) on arXiv] of Vines et al. (2011)
-        + v^10 * (
+        + (v/c)^10 * (
             (18 - 12X₁)Λ₁ * X₁^4
             + (18 - 12X₂)Λ₂ * X₂^4
         )
-        + v^12 * (
+        + (v/c)^12 * (
             (-704 - 1803X₁ + 4501X₁^2 - 2170X₁^3)Λ₁ * X₁^4 / 28
             + (-704 - 1803X₂ + 4501X₂^2 - 2170X₂^3)Λ₂ * X₂^4 / 28
         )
     )
 end
 const gw_energy_flux = 𝓕
+
+
+@pn_expression function 𝓕2(pnsystem)
+    c = PNExpansionParameter(pnsystem)
+    32ν^2/5 * v^10 * sum(
+        # Non-spinning terms; Eq. (314) of Blanchet (2014)
+        1
+        + (v/c)^2 * (-1247//336 - 35ν/12)
+        + (v/c)^3 * (4π)
+        + (v/c)^4 * (-44711//9072 + 9271ν/504 + 65ν^2/18)
+        + (v/c)^5 * ((-8191//672 - 583*ν/24)π)
+        + (v/c)^6 * (
+            6643739519//69854400 + 16π^2/3 - 1712*(γₑ+2ln2+ln(v))/105
+            + (-134543//7776 + 41π^2/48)ν - 94403ν^2/3024 - 775ν^3/324
+        )
+        + (v/c)^7 * ((-16285//504 + 214745ν/1728 + 193385ν^2/3024)π)
+        + (v/c)^8 * (
+            - 323105549467//3178375200 + 232597γₑ/4410 - 1369π^2/126
+            + 39931ln2/294 - 47385ln3/1568 + 232597ln(v)/4410
+            + (
+                -1452202403629//1466942400 + 41478γₑ/245 - 267127π^2/4608
+                + 479062ln2/2205 + 47385ln3/392 + 41478ln(v)/245
+            )ν
+            + (1607125//6804 - 3157π^2/384)ν^2 + 6875ν^3/504 + 5ν^4/6
+        )
+        + (v/c)^9 * (
+            (
+                265978667519//745113600 - 6848*(γₑ+2ln2+ln(v))/105
+                + (2062241//22176 + 41π^2/12)ν - 133112905ν^2/290304 - 3719141ν^3/38016
+            )π
+        )
+
+        # Spin-orbit terms; Eq. (4.9) of Marsat et al. (2013)
+        + (v/c)^3 * (-4 * sₗ - 5δ/4 * σₗ)
+        + (v/c)^5 * ((-9//2 + 272ν/9) * sₗ + (-13//16 + 43ν/4)δ * σₗ)
+        + (v/c)^6 * ((-16π) * sₗ + (-31π/6)δ * σₗ)
+        + (v/c)^7 * (
+            (476645//6804 + 6172ν/189 - 2810ν^2/27) * sₗ
+            + (9535//336 + 1849ν/126 - 1501ν^2/36)δ * σₗ
+        )
+        + (v/c)^8 * (
+            (-3485//96 + 13879ν/72)π * sₗ
+            + (-7163//672 + 130583ν/2016)π*δ * σₗ
+        )
+
+        # Spin-squared terms; Eq. (4.14) of Bohé et al. (2015)
+        + (v/c)^4 * (
+            sₗ^2 * (2κ₊ + 4)
+            + sₗ * σₗ * (2δ*κ₊ + 4δ - 2κ₋)
+            + σₗ^2 * (-δ*κ₋ + κ₊ + 1//16 + (-2κ₊ - 4)ν)
+        )
+        + (v/c)^6 * (
+            sₗ^2 * (41δ*κ₋/16 - 271κ₊/112 - 5239//504 + (-43κ₊/4 - 43//2)ν)
+            + sₗ * σₗ * (-279δ*κ₊/56 - 817δ/56 + 279κ₋/56 + (-43δ*κ₊/4 - 43δ/2 + κ₋/2)ν)
+            + σₗ^2 * (
+                279δ*κ₋/112 - 279*κ₊/112 - 25//8
+                + (45δ*κ₋/16 + 243κ₊/112 + 344//21)ν
+                + (43κ₊/4 + 43//2)ν^2
+            )
+        )
+
+        # Spin-cubed; Eq. (6.19) of Marsat (2014)
+        + (v/c)^7 * (
+            sₗ^3 * (-16κ₊/3 - 4λ₊ + 40//3)
+            + sₗ^2 * σₗ * (-35δ*κ₊/6 - 6δ*λ₊ + 73δ/3 - 3κ₋/4 + 6λ₋)
+            + sₗ * σₗ^2 * (
+                -35δ*κ₋/12 + 6δ*λ₋ + 35κ₊/12 - 6λ₊ + 32//3
+                + (22κ₊/3 + 12λ₊ - 172//3)ν
+            )
+            + σₗ^3 * (
+                67δ*κ₊/24 - 2δ*λ₊ - δ/8 - 67κ₋/24 + 2λ₋
+                + (δ*κ₊/2 + 2δ*λ₊ - 11δ + 61κ₋/12 - 6λ₋)ν
+            )
+        )
+
+        # EMRI terms; Appendix A of Fujita (2012), with lower-order terms removed because
+        # they have since been incorporated into non-EMRI terms above
+        + (v/c)^10 * (
+            - 2500861660823683//2831932303200 - 424223π^2/6804 - 83217611ln2/1122660
+            + 916628467γₑ/7858620 + 47385ln3/196 + 916628467ln(v)/7858620
+        )
+        + (v/c)^11 * (
+            - 142155π*ln3/784 + 8399309750401π/101708006400 + 177293γₑ*π/1176
+            + 8521283π*ln2/17640 + 177293π*ln(v)/1176
+        )
+        + (v/c)^12 * (
+            - 271272899815409ln2/157329572400
+            - 54784π^2*ln2/315 - 246137536815857γₑ/157329572400 - 437114506833ln3/789268480
+            - 256π^4/45 - 27392γₑ*π^2/315 - 27392ζ3/105 - 37744140625ln5/260941824
+            + 1465472γₑ^2/11025 + 5861888γₑ*ln2/11025 + 5861888ln2^2/11025
+            + 2067586193789233570693//602387400044430000 + 3803225263π^2/10478160
+            + ln(v) * (
+                - 246137536815857//157329572400 - 27392π^2/315
+                + 2930944γₑ/11025 + 5861888ln2/11025
+                + 1465472ln(v)/11025
+            )
+        )
+
+        # NS tidal heating; Eq. (3.6) [(3.7) on arXiv] of Vines et al. (2011)
+        + (v/c)^10 * (
+            (18 - 12X₁)Λ₁ * X₁^4
+            + (18 - 12X₂)Λ₂ * X₂^4
+        )
+        + (v/c)^12 * (
+            (-704 - 1803X₁ + 4501X₁^2 - 2170X₁^3)Λ₁ * X₁^4 / 28
+            + (-704 - 1803X₂ + 4501X₂^2 - 2170X₂^3)Λ₂ * X₂^4 / 28
+        )
+    )
+end
+
+
+@generated function 𝓕3(pnsystem::PNSystem{ST, PNOrder}) where {ST, PNOrder}
+    # Create a `PNSystem` with `FastDifferentiation` (henceforth FD) variables, using the
+    # same PNOrder as the input `pnsystem`.
+    fdpnsystem = FDPNSystem(eltype(ST), PNOrder)
+
+    # FD expects a single vector of variables, so we concatenate the state vector with the
+    # two tidal-coupling parameters
+    vars = FastDifferentiation.Node[fdpnsystem.state; Λ₁(fdpnsystem); Λ₂(fdpnsystem)]
+
+    # Now we evaluate 𝓕 using the FD variables.  This will expand all derived variables in
+    # terms of the fundamental variables, but FD will take care of evaluating those
+    # efficiently via common subexpression elimination (CSE).
+    𝓕formula = 𝓕(fdpnsystem)
+
+    # Here, 𝓕 is a tree (or DAG) with lots of FD expressions (Nodes), so we want to make a
+    # function out of it.  We choose `in_place=true` to avoid allocating memory and FD's
+    # attempts to convert to `Float64`.
+    𝓕func = FastDifferentiation.make_function([𝓕formula], vars, in_place=true)
+
+    # Unfortunately, FD produces a function with signature `function (result, vars)`, where
+    # `result` is an array of the same type as `vars`, and `vars` is as given above.  We
+    # want a function with signature `function (pnsystem)`, so we need to massage `𝓕func`
+    # into that form.  Here, we get the actual `Expr` from which the function is built.
+    𝓕expr = RuntimeGeneratedFunctions.get_expression(𝓕func)
+
+    # Now, we use `MacroTools` to get the body of the function.
+    𝓕body = MacroTools.unblock(MacroTools.splitdef(𝓕expr)[:body])
+
+    # At this point, the function is just a long series of statements inside an `@inbounds`
+    # block, which we will want later, but first we need to extract them.
+    MacroTools.@capture(𝓕body, @inbounds begin 𝓕statements__ end) ||
+        throw(ArgumentError(
+            "\n    No @inbounds block found in 𝓕 expression." *
+            "\n    Something may have changed in FastDifferentiation." *
+            "\n    Open an issue citing this PNSystem:" *
+            "\n    $pnsystem"
+        ))
+
+    # The 𝓕statements are mostly what we want, except that FD makes the second-to-last
+    # line set element 1 of the result array to the desired result; we just want to return
+    # the desired result, so we get that right-hand side here.  Also note that the last line
+    # is just `return nothing`, so we never use `𝓕statements[end]`.
+    MacroTools.@capture(𝓕statements[end-1], _ = 𝓕return_) ||
+        throw(ArgumentError(
+            "\n    No return statement found in 𝓕 expression." *
+            "\n    Something may have changed in FastDifferentiation." *
+            "\n    Open an issue citing this PNSystem:" *
+            "\n    $pnsystem"
+        ))
+
+    # Finally, we build the expression we want to return, constructing the required input
+    # variables from `pnsystem`, reinstating the `@inbounds` block and adding `@fastmath`,
+    # and otherwise just reusing the statements and return from the FD-generated function.
+    return quote
+        input_variables = SVector(pnsystem)
+        @fastmath @inbounds begin
+            $(𝓕statements[1:end-2]...)
+        end
+        return $(𝓕return)
+    end
+end

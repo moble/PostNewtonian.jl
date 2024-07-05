@@ -28,11 +28,26 @@ computation of horizon quantities used in this function.
 @pn_expression function tidal_heating(pnsystem)
     # References to pages and equation numbers are from Alvi (2001)
 
+    # Un-normalize these quantities (they could now be defined this way...)
+    ϕ̇₁ = (v/c)^3 * ϕ̇̂₁
+    ϕ̇₂ = (v/c)^3 * ϕ̇̂₂
+    I₀₁ = ν^2 * (v/c)^12 * Î₀₁
+    I₀₂ = ν^2 * (v/c)^12 * Î₀₂
+
     # Eq. (21)
-    Ṡ₁ = ν^2 * Î₀₁ * v^12 * @pn_expansion (v^3 * ϕ̇̂₁ - Ωₕ₁)
-    Ṁ₁ = ν^2 * Î₀₁ * v^12 * v^3 * ϕ̇̂₁ * @pn_expansion 5 (v^3 * ϕ̇̂₁ - Ωₕ₁)  # ϕ̇₁ * Ṡ₁
-    Ṡ₂ = ν^2 * Î₀₂ * v^12 * @pn_expansion (v^3 * ϕ̇̂₂ - Ωₕ₂)
-    Ṁ₂ = ν^2 * Î₀₂ * v^12 * v^3 * ϕ̇̂₂ * @pn_expansion 5 (v^3 * ϕ̇̂₂ - Ωₕ₂)  # ϕ̇₂ * Ṡ₂
+    # Note that the Ṁ₁ and Ṁ₂ terms start at 2.5pN order relative to the flux (because
+    # ϕ̇ᵢ * I₀ᵢ is at absolute 7.5pN order, while flux starts at absolute 5pN order).  That's
+    # why they're divided by c^5 inside the `@pn_expansion`.
+    Ṡ₁ = I₀₁ * @pn_expansion (ϕ̇₁ / c^3 - Ωₕ₁)
+    Ṁ₁ = ϕ̇₁ * I₀₁ * c^5 * @pn_expansion (ϕ̇₁ / c^3 - Ωₕ₁) / c^5  # = ϕ̇₁ * Ṡ₁
+    Ṡ₂ = I₀₂ * @pn_expansion (ϕ̇₂ / c^3 - Ωₕ₂)
+    Ṁ₂ = ϕ̇₂ * I₀₂ * c^5 * @pn_expansion (ϕ̇₂ / c^3 - Ωₕ₂) / c^5  # = ϕ̇₂ * Ṡ₂
+
+    # # Eq. (21)
+    # Ṡ₁ = ν^2 * Î₀₁ * v^12 * @pn_expansion (v^3 * ϕ̇̂₁ - Ωₕ₁)
+    # Ṁ₁ = ν^2 * Î₀₁ * v^12 * v^3 * ϕ̇̂₁ * @pn_expansion 5 (v^3 * ϕ̇̂₁ - Ωₕ₁)  # ϕ̇₁ * Ṡ₁
+    # Ṡ₂ = ν^2 * Î₀₂ * v^12 * @pn_expansion (v^3 * ϕ̇̂₂ - Ωₕ₂)
+    # Ṁ₂ = ν^2 * Î₀₂ * v^12 * v^3 * ϕ̇̂₂ * @pn_expansion 5 (v^3 * ϕ̇̂₂ - Ωₕ₂)  # ϕ̇₂ * Ṡ₂
 
     (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂)
 end
