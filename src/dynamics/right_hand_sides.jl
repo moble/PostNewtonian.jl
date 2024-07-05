@@ -8,11 +8,11 @@ function v̇_denominator(p; pn_expansion_reducer=Val(sum))
 end
 
 function v̇_numerator_coeffs(p)
-    v̇_numerator(p; pn_expansion_reducer=Val(identity))
+    v̇_numerator(p; pn_expansion_reducer=Val(identity)).coeffs
 end
 
 function v̇_denominator_coeffs(p)
-    v̇_denominator(p; pn_expansion_reducer=Val(identity))
+    v̇_denominator(p; pn_expansion_reducer=Val(identity)).coeffs
 end
 
 
