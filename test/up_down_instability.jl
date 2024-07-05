@@ -1,4 +1,7 @@
-@testset verbose=true "Up-down instability" begin
+@testitem "Up-down instability" begin
+    using Logging
+    using Quaternionic
+
     # These parameters are taken more-or-less exactly from 064_CCE,
     # which is subject to this instability
     M₁ = 0.561844712025

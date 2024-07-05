@@ -9,9 +9,10 @@ So this test does all that a little more manually and compares the results at ea
 
 # =#
 
-@testset verbose=true "binding_energy" begin
+@testitem "binding_energy" begin
 
 using PostNewtonian: a₆ᶜ¹, a₆₅ᶜ¹, a₇ˡⁿ¹, a₇ᶜ¹
+using DoubleFloats
 
 function be(pnsystem, deriv)
 

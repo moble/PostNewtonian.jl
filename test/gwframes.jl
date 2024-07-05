@@ -1,4 +1,8 @@
-@testset verbose=true "GWFrames" begin
+@testitem "GWFrames" begin
+    using Random
+    using Logging
+    using Quaternionic
+
     Random.seed!(1234)
     T = Float64
     M₁ = T(5//8)

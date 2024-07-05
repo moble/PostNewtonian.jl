@@ -19,55 +19,59 @@ code you don't want to measure:
 
 """
 
-using PostNewtonian
-using Test
+using TestItemRunner
 
-using Logging
-using Random
-using SciMLBase
-using OrdinaryDiffEq
-using Symbolics
-using SymbolicUtils
-using DoubleFloats
-using Quaternionic
+@run_package_tests verbose=true
 
-import Aqua
-import ExplicitImports
+# using PostNewtonian
+# using Test
 
-enabled_tests = lowercase.(ARGS)
+# using Logging
+# using Random
+# using SciMLBase
+# using OrdinaryDiffEq
+# using Symbolics
+# using SymbolicUtils
+# using DoubleFloats
+# using Quaternionic
 
-help = ("help" ∈ enabled_tests || "--help" ∈ enabled_tests)
-helptests = []
+# import Aqua
+# import ExplicitImports
 
-# This block is cribbed from StaticArrays.jl/test/runtests.jl
-function addtests(fname)
-    key = lowercase(splitext(fname)[1])
-    if help
-        push!(helptests, key)
-    else
-        if isempty(enabled_tests) || key in enabled_tests
-            println("Running $key.jl")
-            Random.seed!(42)
-            include(fname)
-        end
-    end
-end
+# enabled_tests = lowercase.(ARGS)
 
-@testset verbose=true "PostNewtonian" begin
-    addtests("aqua.jl")
-    addtests("macros.jl")
-    addtests("binding_energy.jl")
-    addtests("up_down_instability.jl")
-    addtests("orbital_evolution.jl")
-    addtests("gwframes.jl")
-    addtests("truncated_series_monoid.jl")
-    addtests("pnexpansion.jl")
-end
+# help = ("help" ∈ enabled_tests || "--help" ∈ enabled_tests)
+# helptests = []
 
-if help
-    println()
-    println("Pass no args to run all tests, or select one or more of the following:")
-    for helptest in helptests
-        println("    ", helptest)
-    end
-end
+# # This block is cribbed from StaticArrays.jl/test/runtests.jl
+# function addtests(fname)
+#     key = lowercase(splitext(fname)[1])
+#     if help
+#         push!(helptests, key)
+#     else
+#         if isempty(enabled_tests) || key in enabled_tests
+#             println("Running $key.jl")
+#             Random.seed!(42)
+#             include(fname)
+#         end
+#     end
+# end
+
+# @testset verbose=true "PostNewtonian" begin
+#     addtests("aqua.jl")
+#     addtests("macros.jl")
+#     addtests("binding_energy.jl")
+#     addtests("up_down_instability.jl")
+#     addtests("orbital_evolution.jl")
+#     addtests("gwframes.jl")
+#     addtests("truncated_series_monoid.jl")
+#     addtests("pnexpansion.jl")
+# end
+
+# if help
+#     println()
+#     println("Pass no args to run all tests, or select one or more of the following:")
+#     for helptest in helptests
+#         println("    ", helptest)
+#     end
+# end

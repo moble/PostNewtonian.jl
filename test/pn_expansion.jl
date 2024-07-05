@@ -1,5 +1,7 @@
-@testset verbose=true "PNExpansion" begin
-    using PostNewtonian: PNExpansion
+@testitem "PNExpansion" begin
+    using DoubleFloats
+    using Symbolics
+    #using PostNewtonian: PNExpansion
 
     for N ∈ 1:9
         @variables c⁻¹ x[1:N] y[1:N] z
