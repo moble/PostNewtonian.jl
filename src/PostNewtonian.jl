@@ -3,8 +3,6 @@ module PostNewtonian
 # Always explicitly address functions similar to functions defined in this package,
 # which come from these packages:
 import MacroTools
-import Symbolics
-import SymbolicUtils
 import FastDifferentiation
 import RuntimeGeneratedFunctions
 
@@ -109,37 +107,24 @@ export GWFrames
 include("assorted_binaries/examples.jl")
 export superkick, hangup_kick
 include("assorted_binaries/random.jl")
-# Base.rand is the only function in that file
-
-
-### NOTE!!! This is hopefully temporary, until we can refactor @pn_expression to
-### avoid the use of `var_collect`, which requires Symbolics.jl.  At that point,
-### we should be able to make this a true extension
-### TODO: Make @pn_expression independent of Symbolics.jl
-### TODO: Remove these lines
-### TODO: Uncomment the :get_extension lines below
-### TODO: Remove Symbolics and SymbolicUtils from Project.toml
-### TODO: Uncomment the extension properties in Project.toml
-include("../ext/PostNewtonianSymbolicsExt.jl")
-using .PostNewtonianSymbolicsExt
-export SymbolicPNSystem, symbolic_pnsystem, var_collect, hold, unhold
+# Base.rand is the only function in that file, hence no need for exports
 
 
 include("precompilation.jl")
 
-# if !isdefined(Base, :get_extension)
-#     using Requires
-# end
+if !isdefined(Base, :get_extension)
+    using Requires
+end
 
-# @static if !isdefined(Base, :get_extension)
-#     # COV_EXCL_START
+@static if !isdefined(Base, :get_extension)
+    # COV_EXCL_START
 
-#     function __init__()
-#         @require Symbolics="0c5d862f-8b57-4792-8d23-62f2024744c7" include("../ext/PostNewtonianSymbolicsExt.jl")
-#     end
+    function __init__()
+        @require Symbolics="0c5d862f-8b57-4792-8d23-62f2024744c7" include("../ext/PostNewtonianSymbolicsExt.jl")
+    end
 
-#     # COV_EXCL_STOP
-# end
+    # COV_EXCL_STOP
+end
 
 
 end  # module PostNewtonian
