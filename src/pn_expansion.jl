@@ -1,6 +1,6 @@
 # This a utility that allow us to interoperate with FastDifferentiation.Node and other
 # Number types.
-function _efficient_vector(N, T)
+function _efficient_vector(::Val{N}, ::Val{T}) where {N,T}
     if isbitstype(T)
         MVector{N, T}(undef)
     else
@@ -165,7 +165,7 @@ SVector(pn::PNExpansion) = SVector(pn.coeffs)
 
 
 """
-    struct PNTerm{PNOrder}
+    struct PNTerm{T,PNOrder}
 
 This object represents a single term in a PNExpansion.  It has two fields: `c⁻¹exp`, which
 represents the exponent of the PN expansion parameter ``1/c`` and thus will always be an
@@ -234,7 +234,7 @@ function Base.:+(x::T1, term::PNTerm{T2,PNOrder}) where {T1<:Number,T2,PNOrder}
     N₀ = term.c⁻¹exp + 1
     NMax = Int(2PNOrder + 1)
     N = min(N₀, NMax)
-    coeffs = _efficient_vector(N, T)
+    coeffs = _efficient_vector(Val(N), Val(T))
     coeffs .= zero(T)
     @inbounds coeffs[1] = x
     @inbounds if N₀ ≤ NMax
@@ -280,7 +280,7 @@ function Base.:+(term1::PNTerm{T1,PNOrder}, term2::PNTerm{T2,PNOrder}) where {T1
     N2₀ = term2.c⁻¹exp + 1
     NMax = Int(2PNOrder + 1)
     N = min(max(N1₀, N2₀), NMax)
-    coeffs = _efficient_vector(N, T)
+    coeffs = _efficient_vector(Val(N), Val(T))
     coeffs .= zero(T)
     @inbounds if N1₀ ≤ N
         coeffs[N1₀] += term1.coeff
@@ -306,7 +306,7 @@ function Base.:+(term::PNTerm{T1,PNOrder}, expansion::PNExpansion{N2,T2,NMax2}) 
     NMax = min(NMax1, NMax2)
     N = min(max(N1, N2), NMax)
     T = promote_type(T1, T2)
-    coeffs = _efficient_vector(N, T)
+    coeffs = _efficient_vector(Val(N), Val(T))
     coeffs .= zero(T)
     @inbounds if N1 ≤ N
         coeffs[N1] += term.coeff
@@ -346,7 +346,7 @@ function Base.:*(expansion::PNExpansion{N1,T1,NMax1}, term::PNTerm{T2,PNOrder}) 
     end
 
     T = promote_type(T1, T2)
-    coeffs = _efficient_vector(N, T)
+    coeffs = _efficient_vector(Val(N), Val(T))
     coeffs .= zero(T)
     @inbounds for i ∈ max(1,1-ΔN):min(N1,N-ΔN)
         coeffs[i+ΔN] = expansion[i] * term.coeff
