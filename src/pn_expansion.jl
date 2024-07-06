@@ -174,20 +174,26 @@ parameter `PNOrder` is a half-integer (just as in [`PNSystem`](@ref)s) represent
 order of the PN expansion.  If `c⁻¹exp > 2PNOrder`, then `coeff` will be zero.
 
 """
-struct PNTerm{T,PNOrder}
-    c⁻¹exp::Int
+struct PNTerm{T,PNOrder,c⁻¹Exponent}
     coeff::T
 
-    function PNTerm{T,PNOrder}(c⁻¹exp, coeff) where {T,PNOrder}
+    function PNTerm{T,PNOrder,c⁻¹Exponent}(coeff) where {T,PNOrder,c⁻¹Exponent}
+        if c⁻¹Exponent > 2PNOrder
+            coeff = zero(coeff)
+        end
+        new{T,PNOrder,c⁻¹Exponent}(coeff)
+    end
+    function PNTerm{T,PNOrder}(c⁻¹exp::Int, coeff) where {T,PNOrder}
         if c⁻¹exp > 2PNOrder
             coeff = zero(coeff)
         end
-        new{T,PNOrder}(c⁻¹exp, coeff)
+        new{T,PNOrder,c⁻¹exp}(coeff)
     end
 end
 
 Base.length(pn::PNTerm) = 1
 Base.eltype(pn::PNTerm{T}) where {T} = T
+c⁻¹exp(pn::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent} = c⁻¹Exponent
 
 function Base.sum(pn::PNTerm)
     pn.coeff
@@ -197,41 +203,41 @@ function Base.:+(pn::PNTerm)
     pn
 end
 
-function Base.inv(term::PNTerm{T,PNOrder}) where {T,PNOrder}
-    PNTerm{T,PNOrder}(-term.c⁻¹exp, inv(term.coeff))
+function Base.inv(term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent}
+    PNTerm{T,PNOrder}(-c⁻¹exp(term), inv(term.coeff))
 end
 
-function Base.:^(term::PNTerm{T,PNOrder}, n::Int) where {T,PNOrder}
+function Base.:^(term::PNTerm{T,PNOrder,c⁻¹Exponent}, n::Int) where {T,PNOrder,c⁻¹Exponent}
     coeff = term.coeff^n
-    PNTerm{typeof(coeff),PNOrder}(term.c⁻¹exp * n, coeff)
+    PNTerm{typeof(coeff),PNOrder}(c⁻¹exp(term) * n, coeff)
 end
 
-function Base.:*(x::Number, term::PNTerm{T,PNOrder}) where {T,PNOrder}
+function Base.:*(x::Number, term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent}
     coeff = x * term.coeff
-    PNTerm{typeof(coeff),PNOrder}(term.c⁻¹exp, coeff)
+    PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
 end
 Base.:*(term::PNTerm, x::Number) = x * term
 
-function Base.:/(term::PNTerm{T,PNOrder}, x::Number) where {T,PNOrder}
+function Base.:/(term::PNTerm{T,PNOrder,c⁻¹Exponent}, x::Number) where {T,PNOrder,c⁻¹Exponent}
     coeff = term.coeff / x
-    PNTerm{typeof(coeff),PNOrder}(term.c⁻¹exp, coeff)
+    PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
 end
 
-function Base.:/(x::Number, term::PNTerm{T,PNOrder}) where {T,PNOrder}
+function Base.:/(x::Number, term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent}
     coeff = x / term.coeff
-    PNTerm{typeof(coeff),PNOrder}(-term.c⁻¹exp, coeff)
+    PNTerm{typeof(coeff),PNOrder}(-c⁻¹exp(term), coeff)
 end
 
-function Base.:+(x::T1, term::PNTerm{T2,PNOrder}) where {T1<:Number,T2,PNOrder}
-    if term.c⁻¹exp < 0
+function Base.:+(x::T1, term::PNTerm{T2,PNOrder,c⁻¹Exponent}) where {T1<:Number,T2,PNOrder,c⁻¹Exponent}
+    if c⁻¹exp(term) < 0
         throw(ArgumentError(
             "Cannot add a `PNTerm` with a negative exponent: "
-            * "term.c⁻¹exp=$(term.c⁻¹exp)."
+            * "c⁻¹exp(term)=$(c⁻¹exp(term))."
             * "\nResult will be a `PNExpansion`, which cannot store positive exponents."
         ))
     end
     T = promote_type(T1, T2)
-    N₀ = term.c⁻¹exp + 1
+    N₀ = c⁻¹exp(term) + 1
     NMax = Int(2PNOrder + 1)
     N = min(N₀, NMax)
     coeffs = _efficient_vector(Val(N), Val(T))
@@ -242,42 +248,45 @@ function Base.:+(x::T1, term::PNTerm{T2,PNOrder}) where {T1<:Number,T2,PNOrder}
     end
     PNExpansion{N,T,NMax}(Tuple(coeffs))
 end
-Base.:+(term::PNTerm{T1,PNOrder}, x::T2) where {T1,T2<:Number,PNOrder} = x + term
+Base.:+(term::PNTerm, x::Number) = x + term
 
-function Base.:-(term::PNTerm{T,PNOrder}) where {T,PNOrder}
-    PNTerm{T,PNOrder}(term.c⁻¹exp, -term.coeff)
+function Base.:-(term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent}
+    PNTerm{T,PNOrder,c⁻¹Exponent}(-term.coeff)
 end
 
-function Base.:*(term1::PNTerm{T1,PNOrder}, term2::PNTerm{T2,PNOrder}) where {T1,T2,PNOrder}
-    c⁻¹exp = term1.c⁻¹exp + term2.c⁻¹exp
+function Base.:*(term1::PNTerm{T1,PNOrder,c⁻¹E1}, term2::PNTerm{T2,PNOrder,c⁻¹E2}) where
+{T1,T2,PNOrder,c⁻¹E1,c⁻¹E2}
+    c⁻¹Exponent = c⁻¹exp(term1) + c⁻¹exp(term2)
     coeff = term1.coeff * term2.coeff
-    PNTerm{typeof(coeff),PNOrder}(c⁻¹exp, coeff)
+    PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
 end
 
-function Base.:/(term1::PNTerm{T1,PNOrder}, term2::PNTerm{T2,PNOrder}) where {T1,T2,PNOrder}
-    c⁻¹exp = term1.c⁻¹exp - term2.c⁻¹exp
+function Base.:/(term1::PNTerm{T1,PNOrder,c⁻¹E1}, term2::PNTerm{T2,PNOrder,c⁻¹E2}) where
+{T1,T2,PNOrder,c⁻¹E1,c⁻¹E2}
+    c⁻¹Exponent = c⁻¹E1 - c⁻¹E2
     coeff = term1.coeff / term2.coeff
-    PNTerm{typeof(coeff),PNOrder}(c⁻¹exp, coeff)
+    PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
 end
 
-function Base.:+(term1::PNTerm{T1,PNOrder}, term2::PNTerm{T2,PNOrder}) where {T1,T2,PNOrder}
-    if term1.c⁻¹exp < 0
+function Base.:+(term1::PNTerm{T1,PNOrder,c⁻¹E1}, term2::PNTerm{T2,PNOrder,c⁻¹E2}) where
+{T1,T2,PNOrder,c⁻¹E1,c⁻¹E2}
+    if c⁻¹exp(term1) < 0
         throw(ArgumentError(
             "Cannot add a `PNTerm` with a negative exponent: "
-            * "term1.c⁻¹exp=$(term1.c⁻¹exp)."
+            * "c⁻¹exp(term1)=$(c⁻¹exp(term1))."
             * "\nResult will be a `PNExpansion`, which cannot store positive exponents."
         ))
     end
-    if term2.c⁻¹exp < 0
+    if c⁻¹exp(term2) < 0
         throw(ArgumentError(
             "Cannot add a `PNTerm` with a negative exponent: "
-            * "term2.c⁻¹exp=$(term2.c⁻¹exp)."
+            * "c⁻¹exp(term2)=$(c⁻¹exp(term2))."
             * "\nResult will be a `PNExpansion`, which cannot store positive exponents."
         ))
     end
     T = promote_type(T1, T2)
-    N1₀ = term1.c⁻¹exp + 1
-    N2₀ = term2.c⁻¹exp + 1
+    N1₀ = c⁻¹exp(term1) + 1
+    N2₀ = c⁻¹exp(term2) + 1
     NMax = Int(2PNOrder + 1)
     N = min(max(N1₀, N2₀), NMax)
     coeffs = _efficient_vector(Val(N), Val(T))
@@ -290,18 +299,19 @@ function Base.:+(term1::PNTerm{T1,PNOrder}, term2::PNTerm{T2,PNOrder}) where {T1
     end
     PNExpansion{N,T,NMax}(Tuple(coeffs))
 end
+
 Base.:-(term1::PNTerm, term2::PNTerm) = term1 + (-term2)
 
-function Base.:+(term::PNTerm{T1,PNOrder}, expansion::PNExpansion{N2,T2,NMax2}) where
-{T1,PNOrder,N2,T2,NMax2}
-    if term.c⁻¹exp < 0
+function Base.:+(term::PNTerm{T1,PNOrder,c⁻¹E1}, expansion::PNExpansion{N2,T2,NMax2}) where
+{T1,PNOrder,c⁻¹E1,N2,T2,NMax2}
+    if c⁻¹exp(term) < 0
         throw(ArgumentError(
             "Cannot add a `PNTerm` with a negative exponent: "
-            * "term.c⁻¹exp=$(term.c⁻¹exp)."
+            * "c⁻¹exp(term)=$(c⁻¹exp(term))."
             * "\nResult will be a `PNExpansion`, which cannot store positive exponents."
         ))
     end
-    N1 = term.c⁻¹exp + 1
+    N1 = c⁻¹exp(term) + 1
     NMax1 = Int(2PNOrder + 1)
     NMax = min(NMax1, NMax2)
     N = min(max(N1, N2), NMax)
@@ -327,9 +337,9 @@ Base.:-(expansion::PNExpansion, term::PNTerm) = expansion + (-term)
 Base.:-(x::Number, expansion::PNExpansion) = x + (-expansion)
 Base.:-(expansion::PNExpansion, x::Number) = expansion + (-x)
 
-function Base.:*(expansion::PNExpansion{N1,T1,NMax1}, term::PNTerm{T2,PNOrder}) where
-{N1,T1,NMax1,T2,PNOrder}
-    ΔN = term.c⁻¹exp  # Note that ΔN may be negative!
+function Base.:*(expansion::PNExpansion{N1,T1,NMax1}, term::PNTerm{T2,PNOrder,c⁻¹E2}) where
+{N1,T1,NMax1,T2,PNOrder,c⁻¹E2}
+    ΔN = c⁻¹exp(term)  # Note that ΔN may be negative!
     NMax2 = Int(2PNOrder + 1)
     NMax = min(NMax1, NMax2)
     N = min(max(N1, N1+ΔN), NMax)
@@ -339,7 +349,7 @@ function Base.:*(expansion::PNExpansion{N1,T1,NMax1}, term::PNTerm{T2,PNOrder}) 
         if !iszero(expansion[i])
             throw(ArgumentError(
                 "Cannot multiply `PNExpansion` by `PNTerm` with negative exponent: "
-                * "term.c⁻¹exp=$(term.c⁻¹exp)."
+                * "c⁻¹exp(term)=$(c⁻¹exp(term))."
                 * "\nResult will be a `PNExpansion`, which cannot store positive exponents."
             ))
         end

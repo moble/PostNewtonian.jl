@@ -194,7 +194,7 @@ function for details of the PN formulas.
             𝓔′val = @fastmath @inbounds begin
                 $(𝓔′statements...)
             end
-            return PNExpansion{$(length(𝓔′)), $(eltype(ST))}(𝓔′val)
+            return PNExpansion{$(length(𝓔′)), $(eltype(ST)), PNOrder}(𝓔′val)
         end
     else
         # Otherwise, FD produces a 1-tuple, so we just extract the value from that.
