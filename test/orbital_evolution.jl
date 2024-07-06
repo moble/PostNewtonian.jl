@@ -2,6 +2,7 @@
     using Random
     using Logging
     using Quaternionic
+    import OrdinaryDiffEq: ReturnCode
 
     Random.seed!(1234)
     T = Float64

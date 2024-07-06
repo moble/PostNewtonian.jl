@@ -2,17 +2,22 @@ module PostNewtonianSymbolicsExt
 
 using PostNewtonian
 import PostNewtonian: type_converter, fundamental_quaternionic_variables, derived_variables,
-    var_collect, causes_domain_error!, prepare_pn_order,
+    var_collect, hold, unhold, causes_domain_error!, prepare_pn_order,
     apply_to_first_add!, flatten_add!, pn_expression, order_index,
     M₁, M₂, χ⃗₁, χ⃗₂, v, Φ, Λ₁, Λ₂,
     R, M, μ, ν, δ, q, ℳ, X₁, X₂,
-    ln, ln2, ln3, ln5, ζ3, γₑ
+    ln, ln2, ln3, ln5, ζ3, γₑ,
+    _efficient_vector
 
 import MacroTools
 import SymbolicUtils
 isdefined(Base, :get_extension) ? (import Symbolics) : (import ..Symbolics)
 
-export SymbolicPNSystem, symbolic_pnsystem, var_collect, hold, unhold
+export SymbolicPNSystem, symbolic_pnsystem
+
+function _efficient_vector(N, ::Type{Symbolics.Num})
+    Symbolics.variables(string(gensym()), 1:N)
+end
 
 ### Moved from src/utilities/macros.jl
 
