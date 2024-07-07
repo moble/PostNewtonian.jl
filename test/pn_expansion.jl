@@ -12,12 +12,12 @@
         v = T(27)/13
 
         # Test behavior of `c` as the basic PNTerm
-        for (term, c⁻¹exp, coeff) ∈ (
+        for (term, c⁻¹exponent, coeff) ∈ (
             (c, -1, 1), (c^2, -2, 1), (x*c^2, -2, x), (c^2*x, -2, x), (c^2/x, -2, 1/x),
             ((x*c)^2, -2, x^2), ((x*c^2) / c^4, 2, x), ((x*c^2) / c^-4, -6, x),
             ((x/c^2) / c^4, 6, x), ((x/c^2) * (y/c^4), 6, x*y),
         )
-            @test term.c⁻¹exp == c⁻¹exp
+            @test PostNewtonian.c⁻¹exp(term) == c⁻¹exponent
             @test term.coeff == coeff
             @test term.coeff isa eltype(pn)
             @test length(term) == 1
