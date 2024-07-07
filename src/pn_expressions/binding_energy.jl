@@ -189,12 +189,13 @@ function for details of the PN formulas.
 
     if PNExpansionReducer === identity
         # When `pn_expansion_reducer=Val(identity)` is passed, we return a PNExpansion
+        NMax = Int(2PNOrder+1)
         return quote
             input_variables = SVector(pnsystem)
             𝓔′val = @fastmath @inbounds begin
                 $(𝓔′statements...)
             end
-            return PNExpansion{$(length(𝓔′)), $(eltype(ST)), PNOrder}(𝓔′val)
+            return PNExpansion{$(length(𝓔′)), $(eltype(ST)), $NMax}(𝓔′val)
         end
     else
         # Otherwise, FD produces a 1-tuple, so we just extract the value from that.

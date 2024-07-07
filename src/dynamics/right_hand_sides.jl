@@ -119,15 +119,15 @@ const TaylorT4RHS! = ODEFunction{true, FullSpecialize}(
 Compute the right-hand side for the orbital evolution of a non-eccentric binary in the
 "TaylorT5" approximant.
 
-In this approximant, we compute ``\dot{v}`` by expanding the right-hand side of *the inverse
-of* the usual expression
+In this approximant, we compute ``\dot{v}`` by expanding the right-hand side of *the
+multiplicative inverse of* the usual expression
 ```math
 \frac{1}{\dot{v}}=\frac{dt}{dv} = -\frac{\mathcal{E}'} {\mathcal{F} + \dot{M}_1 + \dot{M}_2}
 ```
 as a series in ``v``, truncating again at the specified PN order, evaluating the result, and
-then taking the inverse.  This approximant was introduced by [Ajith
-(2011)](https://arxiv.org/abs/1107.1267).  Compare [`TaylorT1!`](@ref) and
-[`TaylorT5!`](@ref).
+then taking the multiplicative inverse again to find ``\dot{v}``.  This approximant was
+introduced by [Ajith (2011)](https://arxiv.org/abs/1107.1267) [see Eq. (3.5)].  Compare
+[`TaylorT1!`](@ref) and [`TaylorT4!`](@ref).
 
 Here, `u` is the ODE state vector, which should just refer to the `state` vector stored in
 the [`PNSystem`](@ref) object `p`.  The parameter `t` represents the time, and will surely

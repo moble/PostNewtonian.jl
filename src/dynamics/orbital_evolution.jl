@@ -362,10 +362,15 @@ function orbital_evolution(
 )
     # Sanity checks for the inputs
 
-    if approximant != "TaylorT1"
+    RHS! = if approximant == "TaylorT1"
+        TaylorT1RHS!
+    elseif approximant == "TaylorT4"
+        TaylorT4RHS!
+    elseif approximant == "TaylorT5"
+        TaylorT5RHS!
+    else
         error("Approximant `$approximant` is not currently supported")
     end
-    RHS! = TaylorT1RHS!
 
     if M₁ ≤ 0 || M₂ ≤ 0
         error("Unphysical masses: M₁=$M₁, M₂=$M₂.")
@@ -452,6 +457,7 @@ function orbital_evolution(
         )
     end
 
+    # Now that we've figured out all the types, put in a function barrier
     _orbital_evolution(
         pnsystem, RHS!;
         Λ₁, Λ₂, v₁, vₑ, Rᵢ,
