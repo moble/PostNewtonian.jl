@@ -16,8 +16,8 @@ let
         inspiral = inspiral(t′)
         h = inertial_waveform(inspiral)
 
-        # Exercise all (relevant) explicit PN orders
-        for PNOrder ∈ [7//2, 4//1, 6//1, typemax(Int)]
+        # Exercise a couple explicit PN orders
+        for PNOrder ∈ [4//1, typemax(Int)]
             coorbital_waveform(
                 orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; Ω₁, Ωₑ, PNOrder);
                 PNOrder
