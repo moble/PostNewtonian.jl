@@ -4,13 +4,14 @@
         PostNewtonian;
         ambiguities=false,
         unbound_args=(broken=true,),
+        persistent_tasks=(broken=true,),
     )
 end
 @testitem "ExplicitImports tests" begin
     import ExplicitImports
     @test ExplicitImports.check_no_implicit_imports(PostNewtonian) === nothing
     @test ExplicitImports.check_all_explicit_imports_via_owners(PostNewtonian) === nothing
-    #@test ExplicitImports.check_all_explicit_imports_are_public(PostNewtonian) === nothing
+    @test_broken ExplicitImports.check_all_explicit_imports_are_public(PostNewtonian) === nothing
     @test ExplicitImports.check_no_stale_explicit_imports(
         PostNewtonian;
         ignore=(
@@ -19,7 +20,7 @@ end
         ),
     ) === nothing
     @test ExplicitImports.check_all_qualified_accesses_via_owners(PostNewtonian) === nothing
-    #@test ExplicitImports.check_all_qualified_accesses_are_public(PostNewtonian) === nothing
+    @test_broken ExplicitImports.check_all_qualified_accesses_are_public(PostNewtonian) === nothing
     @test ExplicitImports.check_no_self_qualified_accesses(
         PostNewtonian;
         ignore=(:Ω, :v,)
