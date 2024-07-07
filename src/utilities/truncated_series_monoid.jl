@@ -41,9 +41,15 @@ compute
 b_{i+1} = -b_0\sum_{j=1}^{i} a_j b_{i-j}.
 ```
 """
-function truncated_series_inverse(a)
+function truncated_series_inverse(a::AbstractVector)
     b = similar(a)
     truncated_series_inverse!(b, a)
+end
+
+function truncated_series_inverse(a::NTuple{N, T}) where {N, T}
+    b = MVector{N, T}(undef)
+    truncated_series_inverse!(b, SVector{N, T}(a))
+    Tuple(b)
 end
 
 @inbounds @fastmath function truncated_series_inverse!(b, a)
@@ -85,6 +91,17 @@ function truncated_series_product(a, b, v)
     ex = b[N+1] * a[1]
     for n ∈ N-1:-1:0
         ex = muladd(v, ex, b[n+1] * evalpoly(v, @view a[1:(N-n)+1]))
+    end
+    ex
+end
+
+function truncated_series_product(a::NTuple{N,T}, b, v) where {N,T}
+    if N < 1
+        return zero(v)
+    end
+    ex = b[N] * a[1]
+    for n ∈ N-2:-1:0
+        ex = muladd(v, ex, b[n+1] * evalpoly(v, a[1:(N-n-1)+1]))
     end
     ex
 end
