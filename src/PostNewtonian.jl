@@ -22,6 +22,7 @@ using SciMLBase.ReturnCode: ReturnCode
 using SphericalFunctions: D!, Diterator, Dprep, Yiterator
 using StaticArrays: SVector, MVector
 using SymbolicIndexingInterface: SymbolCache
+using TestItems: @testitem
 
 # See the "Code structure" section of the documentation for a description of the simple
 # hierarchy into which this code is organized.  The different levels of that hierarchy are

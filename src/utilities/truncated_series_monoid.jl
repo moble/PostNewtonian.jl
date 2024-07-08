@@ -36,7 +36,8 @@ The inverse coefficients can be computed fairly easily by induction.  Start by d
 b_0 = 1/a_0.
 ```
 Now, assuming that we've computed all coefficients up to and including ``b_{i}``, we can
-compute
+compute ``b_{i+1}`` from the condition that the term proportional to ``v^{i+1}`` in the
+product of the series and its inverse must be zero.  This gives
 ```math
 b_{i+1} = -b_0\sum_{j=1}^{i} a_j b_{i-j}.
 ```
@@ -52,12 +53,13 @@ function truncated_series_inverse(a::NTuple{N, T}) where {N, T}
     Tuple(b)
 end
 
-@inbounds @fastmath function truncated_series_inverse!(b, a)
+function truncated_series_inverse!(b, a)
+    @assert length(b) == length(a)
     n = length(a)
-    if n > 0
+    @inbounds @fastmath if n > 0
         b[0+1] = inv(a[0+1])
     end
-    for i ∈ 0:n-2
+    @inbounds @fastmath for i ∈ 0:n-2
         b[i+1+1] = -b[0+1] * sum((a[j+1]*b[i+1-j+1] for j ∈ 1:i+1), init=zero(eltype(a)))
     end
     b
@@ -84,6 +86,7 @@ Internally, the sums are performed using `evalpoly`.
 See also [`truncated_series_ratio`](@ref).
 """
 function truncated_series_product(a, b, v)
+    @assert length(a) == length(b)
     N = length(a)-1
     if N < 0
         return zero(v)
@@ -96,6 +99,7 @@ function truncated_series_product(a, b, v)
 end
 
 function truncated_series_product(a::NTuple{N,T}, b, v) where {N,T}
+    @assert length(a) == length(b)
     if N < 1
         return zero(v)
     end
@@ -126,4 +130,65 @@ This function simply combines [`truncated_series_product`](@ref) and
 """
 function truncated_series_ratio(a, b, v)
     truncated_series_product(a, truncated_series_inverse(b), v)
+end
+
+
+@doc raw"""
+    truncated_series_ratio(a, b)
+
+Evaluate the truncated ratio of the series `a` and `b`, evaluated at expansion value 1.
+This is relevant when the expansion is not in the dynamic variable `v`, for example, but in
+powers of ``1/c`` as in post-Newtonian expansions.  (That is, when the `v` dependence is
+already include in the input coefficients.)
+"""
+function truncated_series_ratio(a::NTuple{N1,T1}, b::NTuple{N2,T2}) where {N1,N2,T1,T2}
+    N = max(N1, N2)
+    T = promote_type(T1, T2)
+    if N2 == 0
+        throw(DomainError("truncated_series_ratio(a,b): b must have at least one term"))
+    elseif N1 == 0
+        return zero(T)
+    end
+    b⁻¹ = MVector{N, T}(undef)
+
+    @inbounds @fastmath begin
+        b⁻¹[0+1] = inv(b[0+1])
+        for i ∈ 0:N2-2
+            b⁻¹[i+1+1] = -b⁻¹[0+1] * sum((b[j+1]*b⁻¹[i+1-j+1] for j ∈ 1:i+1), init=zero(T))
+        end
+        for i ∈ N2-1:N-2
+            b⁻¹[i+1+1] = -b⁻¹[0+1] * sum((b[j+1]*b⁻¹[i+1-j+1] for j ∈ 1:N2-1), init=zero(T))
+        end
+
+        a╱b = zero(T)
+        for i1 ∈ 1:N1
+            a╱b += a[i1] * sum((b⁻¹[i2] for i2 ∈ 1:N-i1+1), init=zero(T))
+        end
+        a╱b
+    end
+end
+
+@testitem "truncated_series_ratio(a,b)" begin
+    using Random
+    using DoubleFloats
+    import PostNewtonian: truncated_series_inverse, truncated_series_ratio
+    Random.seed!(123)
+    for T ∈ [Float32, Float64, Double64]
+        for N ∈ 1:20
+            A = rand(T, N)
+            A[1] = one(T) + rand(T) / 100
+            a = Tuple(A)
+            x = rand(T)
+            ϵ = sum(a) * N * eps(T)
+            for N1 ∈ 1:N
+                expected = sum(truncated_series_inverse(a))
+                unit = zeros(T, N1)
+                unit[1] = one(T)
+                @test truncated_series_ratio(Tuple(unit), a) ≈ expected rtol=ϵ
+            end
+            @test truncated_series_ratio(a, a) ≈ 1 rtol=ϵ
+            @test truncated_series_ratio(a, x.*a) ≈ 1/x rtol=ϵ
+            @test truncated_series_ratio(x.*a, a) ≈ x rtol=ϵ
+        end
+    end
 end
