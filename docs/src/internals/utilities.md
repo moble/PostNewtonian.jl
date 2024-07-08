@@ -87,35 +87,40 @@ PostNewtonian.ln⁵╱₂
 
 ## Truncated series
 
-We also have some utilities for dealing with series — or more precisely
-summations, since we only handle finitely many terms.  In particular, we need
-*truncated* multiplication (and some times division) of truncated series.  This
-multiplication is associative, and there is an identity element, which means
-that this structure naturally forms a
-[monoid](https://en.wikipedia.org/wiki/Monoid).
+We also have some utilities for dealing with series — or more
+precisely summations, since we only handle finitely many terms.  In
+particular, we need *truncated* multiplication (and some times
+division) of truncated series.  This multiplication is associative and
+there is a multiplicative identity element — though not always a
+multiplicative inverse — which means that this structure naturally
+forms a [monoid](https://en.wikipedia.org/wiki/Monoid).  (In fact, it
+also forms more general structures, like a commutative algebra; all we
+need is the monoidal structure.)
 
-Here, we are assuming that there is a fixed order at which the series are
-truncated, and that truncated multiplication preserves that order.  That is, if
-``A`` and ``B`` are summations in terms up to ``v^N`` for some integer ``N``, we
-want their product (and ratio, if it exists) to also be a summation in terms up
-to ``v^N``.
+Here, we are assuming that there is a fixed order at which the series
+are truncated, and that truncated multiplication preserves that order.
+That is, if ``A`` and ``B`` are summations in terms up to ``v^N`` for
+some integer ``N``, we want their product and ratio (if it exists) to
+also be a summation in terms up to ``v^N``.
 
-Note that we are not referring to these summations as "polynomials" in ``v``,
-because the coefficients will sometimes involve ``\ln(v)`` — which is not
-technically permitted for polynomials.  In particular, the presence of
-logarithms is irrelevant to our meaning of the "order" of the truncated series.
-This is standard practice in post-Newtonian theory.[^1]
+Note that we are not referring to these summations as "polynomials" in
+``v``, because the coefficients will sometimes involve ``\ln(v)`` —
+which is not technically permitted for polynomials.  In particular,
+the presence of logarithms is irrelevant to our meaning of the "order"
+of the truncated series.  This is standard practice in post-Newtonian
+theory.[^1]
 
-[^1]: Different texts in post-Newtonian theory treat these logarithmic terms
-      with varying levels of rigor.  The preferred method is [Hadamard
+[^1]: Different texts in post-Newtonian theory treat these logarithmic
+      terms with varying levels of rigor.  The preferred method is
+      [Hadamard
       regularization](https://en.wikipedia.org/wiki/Hadamard_regularization)
-      (often referred to in the literature as the *partie finie*).  A good
-      summary is found in Section 6 of [Blanchet's Living
-      Review](https://link.springer.com/article/10.12942/lrr-2014-2).  Another
-      potential approach could be taken following [this
-      paper](https://doi.org/10.1016/0001-8708(89)90079-0).  But for our
-      purposes, it will suffice to take the simplistic approach of treating
-      logarithmic terms as if they were any other constant.
+      (often referred to in the literature as the *partie finie*).  A
+      good summary is found in Section 6 of [Blanchet's Living
+      Review](https://link.springer.com/article/10.12942/lrr-2014-2).
+      Another potential approach could be taken following [this
+      paper](https://doi.org/10.1016/0001-8708(89)90079-0).  But for
+      our purposes, it will suffice to take the simplistic approach of
+      treating logarithmic terms as if they were any other constant.
 
 The following functions implement this behavior:
 

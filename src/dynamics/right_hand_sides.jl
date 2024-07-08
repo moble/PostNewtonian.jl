@@ -114,7 +114,7 @@ always be unused in this package, but is part of the `DifferentialEquations` API
     causes_domain_error!(u̇, p) && return
 
     # This expression is what makes this TaylorT4 (evaluating at c=1)
-    v̇ = truncated_series_ratio(v̇_numerator_coeffs(p), v̇_denominator_coeffs(p), one(eltype(p)))
+    v̇ = truncated_series_ratio(v̇_numerator_coeffs(p), v̇_denominator_coeffs(p))
 
     $RHS_body
 end
@@ -150,7 +150,7 @@ always be unused in this package, but is part of the `DifferentialEquations` API
     causes_domain_error!(u̇, p) && return
 
     # This expression is what makes this TaylorT5 (evaluating at c=1)
-    v̇ = inv(truncated_series_ratio(v̇_denominator_coeffs(p), v̇_numerator_coeffs(p), one(eltype(p))))
+    v̇ = inv(truncated_series_ratio(v̇_denominator_coeffs(p), v̇_numerator_coeffs(p)))
 
     $RHS_body
 end

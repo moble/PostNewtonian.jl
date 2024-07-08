@@ -19,6 +19,14 @@ SciMLBase = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
 SphericalFunctions = "af6d55de-b1f7-4743-b797-0829a72cf84e"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 SymbolicIndexingInterface = "2efcf032-c050-4f8e-a9bb-153293bab1f5"
+TestItems = "1c621080-faea-4a02-84b6-bbd5e436b8fe"
+
+[weakdeps]
+SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
+Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
+
+[extensions]
+PostNewtonianSymbolicsExt = ["Symbolics", "SymbolicUtils"]
 
 [compat]
 Aqua = "0.8"
@@ -45,13 +53,6 @@ Test = "1.11"
 TestItemRunner = "0.2"
 julia = "1.9"
 
-[weakdeps]
-SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
-Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
-
-[extensions]
-PostNewtonianSymbolicsExt = ["Symbolics", "SymbolicUtils"]
-
 [extras]
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 DoubleFloats = "497a8b3b-efae-58df-a0af-a86822472b78"
@@ -68,8 +69,4 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestItemRunner = "f8b46487-2199-4994-9208-9a1283c18c0a"
 
 [targets]
-test = [
-    "Aqua", "DoubleFloats", "ExplicitImports", "FastDifferentiation",
-    "Logging", "OrdinaryDiffEq", "Quaternionic", "Random", "SciMLBase",
-    "SymbolicUtils", "Symbolics", "Test", "TestItemRunner"
-]
+test = ["Aqua", "DoubleFloats", "ExplicitImports", "FastDifferentiation", "Logging", "OrdinaryDiffEq", "Quaternionic", "Random", "SciMLBase", "SymbolicUtils", "Symbolics", "Test", "TestItemRunner"]
