@@ -38,7 +38,7 @@ terms again with ``1 ↔ 2``.  Finally, note the normalization difference, where
 overall factor is used, leading to a sign difference.
 """
 @pn_expression function 𝓔(pnsystem)
-    -1//2 * μ * (v/c)^2 * @pn_expansion(
+    -μ * c^2 * (v/c)^2 / 2 * @pn_expansion(
         # Non-spinning terms; Eq. (233) of Blanchet (2014)
         1
         + (v/c)^2 * (-ν/12 - 3//4)
