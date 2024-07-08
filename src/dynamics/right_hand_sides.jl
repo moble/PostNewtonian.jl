@@ -96,6 +96,17 @@ result evaluated.  Compare [`TaylorT1!`](@ref) and [`TaylorT5!`](@ref).
 Here, `u` is the ODE state vector, which should just refer to the `state` vector stored in
 the [`PNSystem`](@ref) object `p`.  The parameter `t` represents the time, and will surely
 always be unused in this package, but is part of the `DifferentialEquations` API.
+
+!!! note "Truncation order vs. `PNOrder` vs. PN order"
+    When expanding the fraction given above as a series in ``v``, the truncation order is
+    not necessarily the value of `PNOrder` given in the input `p`.  Instead, it is the
+    highest order of the series that is present in the numerator or denominator — which is
+    what we would normally *call* the PN order of those expansions.  The `PNOrder` parameter
+    is the highest order of the series that is *allowed* to be present in those expansions,
+    so that if `PNOrder` is `typemax(Int)`, the series will be expanded to the highest order
+    given in any of the PN expansions, but the expansion of the ratio will not go to
+    infinite order.  This is the reason that `TaylorT4` and `TaylorT5` do not approach
+    `TaylorT1` as `PNOrder` approaches `typemax(Int)`.
 """
 @pn_expression 2 function TaylorT4!(u̇, p)
     # If these parameters result in v≤0, fill u̇ with NaNs so that `solve` will

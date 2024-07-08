@@ -135,13 +135,14 @@ are the same, regardless.
     issued.
   * `Rᵢ=Rotor(1)` or `R_i`: Initial orientation of binary.
   * `approximant="TaylorT1"`: Method of evaluating the right-hand side of the evolution
-    equations.
+    equations.  Other possibilities are [`"TaylorT4"`](@ref TaylorT4!) and
+    [`"TaylorT5"`](@ref TaylorT5!).  See the documentation of [`TaylorT1!`](@ref) for more
+    details.
   * `PNOrder=typemax(Int)`: Order to which to retain powers of ``v^2`` in PN expansions.
     The default is to include all available terms in each PN expression.
   * `check_up_down_instability=true`: Warn if the "up-down instability" (see below) is
     likely to affect this system.
-  * `time_stepper=Vern9()`: Choice of solver in OrdinaryDiffEq to integrate
-    ODE.
+  * `time_stepper=Vern9()`: Choice of solver in OrdinaryDiffEq to integrate ODE.
   * `abstol=eps(T)^(11//16)`: Absolute tolerance of ODE solver, where `T` is the common type
     to which all the positional arguments are promoted.  This is the tolerance on local
     error estimates, not necessarily the global error.  Note that `11//16` is just chosen to
