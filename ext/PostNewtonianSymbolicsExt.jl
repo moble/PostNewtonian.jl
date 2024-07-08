@@ -131,10 +131,10 @@ end
 
 A symbolic `PNSystem` that contains symbolic information for all types of `PNSystem`s.
 
-In particular, note that this object has an (essentially) infinite `PNOrder`, uses the
-`TaylorT1` approximant, and has nonzero values for quantities like `Λ₁` and `Λ₂`.  If you
-want different choices, you may need to call [`SymbolicPNSystem`](@ref) yourself, or even
-construct a different specialized subtype of `PNSystem` (it's not hard).
+In particular, note that this object has an (essentially) infinite `PNOrder` and has nonzero
+values for quantities like `Λ₁` and `Λ₂`.  If you want different choices, you may need to
+call [`SymbolicPNSystem`](@ref) yourself, or even construct a different specialized subtype
+of `PNSystem` (it's not hard).
 
 # Examples
 ```jldoctest

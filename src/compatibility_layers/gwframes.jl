@@ -46,7 +46,8 @@ function.
 
 ## Required arguments
 
-  * `Approximant`: Currently, only `"TaylorT1"` is supported.
+  * `Approximant`: Currently, supported arguments are `"TaylorT1"`, `"TaylorT4"`, and
+    `"TaylorT5"`.
   * `delta`: Fractional mass difference ``(M₁-M₂)/(M₁+M₂)``
   * `chi1_i`: Normalized spin vector ``S⃗₁/M₁²``
   * `chi2_i`: Normalized spin vector ``S⃗₂/M₂²``
