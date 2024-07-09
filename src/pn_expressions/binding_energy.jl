@@ -154,7 +154,9 @@ function for details of the PN formulas.
     𝓔′ = SVector(FastDifferentiation.derivative(𝓔formula, v(fdpnsystem)))
 
     # Turn that into an Expr (FD insists on making it a function)
-    𝓔′expr = FastDifferentiation.make_Expr(𝓔′, vars, false, false, true)
+    in_place = true
+    init_with_zeros = false
+    𝓔′expr = FastDifferentiation.make_Expr(𝓔′, vars, in_place, init_with_zeros)
 
     # Now, we use `MacroTools` to get the body of the function.
     𝓔′body = MacroTools.unblock(MacroTools.splitdef(𝓔′expr)[:body])
@@ -192,67 +194,24 @@ function for details of the PN formulas.
         NMax = Int(2PNOrder+1)
         return quote
             input_variables = SVector(pnsystem)
-            𝓔′val = @fastmath @inbounds begin
+            result = MVector{$(length(𝓔′)), $(eltype(ST))}(undef)
+            result .= 0
+            @fastmath @inbounds begin
                 $(𝓔′statements...)
             end
-            return PNExpansion{$(length(𝓔′)), $(eltype(ST)), $NMax}(𝓔′val)
+            return PNExpansion{$(length(𝓔′)), $(eltype(ST)), $NMax}(Tuple(result))
         end
     else
         # Otherwise, FD produces a 1-tuple, so we just extract the value from that.
         return quote
             input_variables = SVector(pnsystem)
-            𝓔′val = @fastmath @inbounds begin
+            result = MVector{1, $(eltype(ST))}(undef)
+            result .= 0
+            @fastmath @inbounds begin
                 $(𝓔′statements...)
             end
-            return 𝓔′val[1]
+            return result[1]
         end
     end
-
-    # # Here, 𝓔′ is a tree (or DAG) with lots of FD expressions (Nodes), so we want to make a
-    # # function out of it.  We choose `in_place=true` to avoid allocating memory and FD's
-    # # attempts to convert to `Float64`.
-    # 𝓔′func = FastDifferentiation.make_function(SVector(𝓔′), vars, in_place=true)
-
-    # # Unfortunately, FD produces a function with signature `function (result, vars)`, where
-    # # `result` is an array of the same type as `vars`, and `vars` is as given above.  We
-    # # want a function with signature `function (pnsystem)`, so we need to massage `𝓔′func`
-    # # into that form.  Here, we get the actual `Expr` from which the function is built.
-    # 𝓔′expr = RuntimeGeneratedFunctions.get_expression(𝓔′func)
-
-    # # Now, we use `MacroTools` to get the body of the function.
-    # 𝓔′body = MacroTools.unblock(MacroTools.splitdef(𝓔′expr)[:body])
-
-    # # At this point, the function is just a long series of statements inside an `@inbounds`
-    # # block, which we will want later, but first we need to extract them.
-    # MacroTools.@capture(𝓔′body, @inbounds begin 𝓔′statements__ end) ||
-    #     throw(ArgumentError(
-    #         "\n    No @inbounds block found in 𝓔′ expression." *
-    #         "\n    Something may have changed in FastDifferentiation." *
-    #         "\n    Open an issue citing this PNSystem:" *
-    #         "\n    $pnsystem"
-    #     ))
-
-    # # The 𝓔′statements are mostly what we want, except that FD makes the second-to-last
-    # # line set element 1 of the result array to the desired result; we just want to return
-    # # the desired result, so we get that right-hand side here.  Also note that the last line
-    # # is just `return nothing`, so we never use `𝓔′statements[end]`.
-    # MacroTools.@capture(𝓔′statements[end-1], _ = 𝓔′return_) ||
-    #     throw(ArgumentError(
-    #         "\n    No return statement found in 𝓔′ expression." *
-    #         "\n    Something may have changed in FastDifferentiation." *
-    #         "\n    Open an issue citing this PNSystem:" *
-    #         "\n    $pnsystem"
-    #     ))
-
-    # # Finally, we build the expression we want to return, constructing the required input
-    # # variables from `pnsystem`, reinstating the `@inbounds` block and adding `@fastmath`,
-    # # and otherwise just reusing the statements and return from the FD-generated function.
-    # return quote
-    #     input_variables = SVector(pnsystem)
-    #     @fastmath @inbounds begin
-    #         $(𝓔′statements[1:end-2]...)
-    #     end
-    #     return $(𝓔′return)
-    # end
 end
 const binding_energy_deriv=𝓔′
