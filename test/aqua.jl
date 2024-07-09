@@ -4,7 +4,7 @@
         PostNewtonian;
         ambiguities=false,
         unbound_args=(broken=true,),
-        persistent_tasks=(broken=true,),
+        #persistent_tasks=(broken=true,),
     )
 end
 @testitem "ExplicitImports tests" begin
