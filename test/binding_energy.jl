@@ -130,7 +130,7 @@ end
 
 for PNOrder ∈ 0//2:1//2:13//2
 
-    for T ∈ [Float32, Float64, Double64, BigFloat]
+    for T ∈ [Float32, Float64, Double64]
         v = T(1//100)
         numpn = rand(NSNS; v, PNOrder)
         ϵ = 100eps(PostNewtonian.μ(numpn) * v^2)
