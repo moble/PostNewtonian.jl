@@ -20,10 +20,10 @@ tuples of coefficients.
 
 Blanchet (2014) defines the post-Newtonian expansion parameter as follows:
 
-> This parameter represents essentially a slow motion estimate ``𝜖 ∼ 𝑣/𝑐``, where ``𝑣``
+> This parameter represents essentially a slow motion estimate ``ϵ ∼ 𝑣/𝑐``, where ``𝑣``
 > denotes a typical internal velocity.  By a slight abuse of notation, following
-> Chandrasekhar et al. [...], we shall henceforth write formally ``𝜖 ≡ 1/𝑐``, even though
-> ``𝜖`` is dimensionless whereas ``𝑐`` has the dimension of a velocity. Thus, ``1/𝑐 ≪ 1``
+> Chandrasekhar et al. [...], we shall henceforth write formally ``ϵ ≡ 1/𝑐``, even though
+> ``ϵ`` is dimensionless whereas ``𝑐`` has the dimension of a velocity. Thus, ``1/𝑐 ≪ 1``
 > in the case of post-Newtonian sources. The small post-Newtonian remainders will be denoted
 > ``𝒪(1/𝑐^𝑛)``. Furthermore, [...] we shall refer to a small post-Newtonian term with
 > formal order ``𝒪(1/𝑐^𝑛)`` relative to the Newtonian acceleration in the equations of
