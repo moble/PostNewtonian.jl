@@ -12,11 +12,12 @@ using PostNewtonian
 import PostNewtonian: hold, unhold, SymbolicPNSystem,
     type_converter, fundamental_quaternionic_variables, derived_variables,
     causes_domain_error!, prepare_pn_order,
-    apply_to_first_add!, flatten_add!, pn_expression, order_index,
+    order_index,
     M₁, M₂, χ⃗₁, χ⃗₂, v, Φ, Λ₁, Λ₂,
     R, M, μ, ν, δ, q, ℳ, X₁, X₂,
     ln, ln2, ln3, ln5, ζ3, γₑ,
     _efficient_vector
+    #apply_to_first_add!, flatten_add!, pn_expression,
 
 
 function _efficient_vector(N, ::Type{Symbolics.Num})
