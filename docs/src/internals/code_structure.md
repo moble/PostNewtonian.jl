@@ -23,14 +23,16 @@ post-Newtonian calculations *per se*, we have the following:
 
 2. **Fundamental variables** 
    
-   This consists of the basic variables describing the system such as
-   `M₁`, `M₂`, `χ⃗₁`, `χ⃗₂`, `R`, `v`.  For systems with matter, this
-   may also include tidal deformability for each star, `Λ₁` and `Λ₂`.
+   This consists of the basic variables describing the instantaneous
+   state of the system, including `M₁`, `M₂`, `χ⃗₁`, `χ⃗₂`, `R`, `v`.
+   For systems with matter, this may also include tidal deformability
+   for each star, `Λ₁` and `Λ₂`.
 
-   It's important to note that these should all be accessed through
-   functions like `M₁(pnsystem)` rather than directly like
-   `pnsystem.M₁`.  This allows Julia's type system to get involved,
-   enabling important optimizations.
+   These are encapsulated within a `PNSystem`, but it's important to
+   note that these should all be accessed through functions like
+   `M₁(pnsystem)` rather than directly like `pnsystem.M₁`.  This
+   allows Julia's type system to get involved, enabling important
+   optimizations.
 
    Also, these variables can be automatically computed in functions
    that need them with the `@pn_expression` macro.  For example, you
@@ -61,12 +63,13 @@ post-Newtonian calculations *per se*, we have the following:
 
 4. **PN expressions**
 
-   Unlike derived variables, these are not *defined* in terms of the
-   fundamental variables, but they can be calculated in terms of both
-   fundamental and derived variables.  These are generally the result
-   of post-Newtonian expansions — the most important examples being
-   the flux [`𝓕`](@ref), binding energy [`𝓔`](@ref), and the
-   waveform mode weights [`h!`](@ref) themselves.
+   Unlike derived variables, these are not necessarily defined in
+   terms of only the fundamental variables, but they can be calculated
+   in terms of both fundamental and derived variables.  These are
+   generally the result of post-Newtonian expansions — the most
+   important examples being the flux [`𝓕`](@ref), binding energy
+   [`𝓔`](@ref), and the waveform mode weights [`h!`](@ref)
+   themselves.
 
 5. **PN expansions**
 

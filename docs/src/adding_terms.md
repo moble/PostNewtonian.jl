@@ -30,7 +30,14 @@ rewriting expressions to optimize evaluation; Julia will probably do a
 better job automatically anyway.)  There are, however, a few important
 exceptions to this rule:
 
-   1. It is crucial to explicitly include factors of ``1/c`` to the
+   1. If you need any new variables to be computed from the
+      ["fundamental variables"](@ref Fundamental-variables), you
+      should define them in the
+      [`PostNewtonian.DerivedVariables`](@ref Derived-variables)
+      module.  This will ensure that they can be automatically
+      computed using the [`@pn_expression`](@ref
+      PostNewtonian.@pn_expression).
+   2. It is crucial to explicitly include factors of ``1/c`` to the
       appropriate power *relative to the 0-pN order term* inside the
       `@pn_expansion` macro.  For example, the first couple terms in
       the binding energy expansion look like
@@ -54,7 +61,7 @@ exceptions to this rule:
       `1/c^12` factor inside the `@pn_expansion` macro.  This tells
       the compiler that this is a 6-pN term, so if the user requests a
       lower pN order, the term should be ignored.
-   2. It should be possible to evaluate PN expressions using different
+   3. It should be possible to evaluate PN expressions using different
       precisions.  To ensure this, enter fractions as `Irrational`s —
       e.g., `9//5` instead of `9/5`.  The latter would be immediately
       converted to the inexact 64-bit float value `1.8`, which would
@@ -66,13 +73,13 @@ exceptions to this rule:
       precision.  Note that a helpful regex to search for this case is
       `(?<!(ζ|n|\^))[0-9]+/[0-9]`, which has relatively few false
       positives in this repo.
-   3. A slight caveat to the above is that an expression like `3λ/2`
+   4. A slight caveat to the above is that an expression like `3λ/2`
       could *still* be converted to `Float64` if `λ` is defined at
       compile time to be `0`.  For type-stability reasons, Julia will
       always treat `0/2` just like it would treat `7/2`, which is
       converted to `Float64`.  Thus, it is probably safest to write
       expressions like `3//2 * λ`.
-   4. If you happen to use any other math functions, similarly ensure
+   5. If you happen to use any other math functions, similarly ensure
       that their arguments are converted appropriately to retain
       precision.  For unary functions, this can be done automatically
       by including the function name in the `unary_funcs` list used by
