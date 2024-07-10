@@ -165,13 +165,26 @@ SVector(pn::PNExpansion) = SVector(pn.coeffs)
 
 
 """
-    struct PNTerm{T,PNOrder}
+    PNTerm{T,PNOrder,c⁻¹Exponent}
 
-This object represents a single term in a PNExpansion.  It has two fields: `c⁻¹exp`, which
-represents the exponent of the PN expansion parameter ``1/c`` and thus will always be an
-integer, usually positive; and `coeff`, which is the coefficient of the term.  The type
-parameter `PNOrder` is a half-integer (just as in [`PNSystem`](@ref)s) representing the
-order of the PN expansion.  If `c⁻¹exp > 2PNOrder`, then `coeff` will be zero.
+This object represents a single term in a PNExpansion.  It has a single field: `coeff`,
+which is the coefficient of the term.  The type parameter `T` is the type of the
+coefficient.  The type parameter `PNOrder` is a half-integer (just as in
+[`PNSystem`](@ref)s) representing the PN order of the expansion.  And the type parameter
+`c⁻¹Exponent` is an integer representing the exponent of the PN expansion parameter ``1/c``.
+
+`PNTerm`s can be multiplied and divided by scalars and exponentiated by integers, to produce
+another `PNTerm`.  They can also be added to other `PNTerm`s to produce a `PNExpansion`.
+
+A simple way to define a `PNTerm` or a `PNExpansion` is to define the PN expansion parameter
+```julia
+c = PNExpansionParameter(pnsystem)
+```
+and use that naturally in formulas, as in
+```julia
+e = 1 + (v/c)^2 * (-ν/12 - 3//4) + (v/c)^4 * (-ν^2/24 + 19ν/8 - 27//8)
+```
+Any exponent higher than the desired `PNOrder` will be automatically set to zero.
 
 """
 struct PNTerm{T,PNOrder,c⁻¹Exponent}
@@ -369,6 +382,14 @@ Base.:*(term::PNTerm, expansion::PNExpansion) = expansion * term
 Base.:/(expansion::PNExpansion, term::PNTerm) = expansion * inv(term)
 
 
+"""
+    PNExpansionParameter(pnsystem)
+
+Create a [`PNTerm`](@ref) object representing the post-Newtonian expansion parameter ``c``.
+This can be used to automatically create more complicated `PNTerm`s, which combine to form a
+[`PNExpansion`](@ref).  This is a simple but effective way to write PN formulas while
+automatically tracking the PN order of each term.
+"""
 function PNExpansionParameter(::PNSystem{ST, PNOrder}) where {ST,PNOrder}
     PNTerm{eltype(ST), PNOrder}(-1, one(eltype(ST)))
 end

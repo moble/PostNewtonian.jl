@@ -62,12 +62,22 @@ calculations *per se*, we have the following:
    expansions — the most important examples being the flux [`𝓕`](@ref), binding
    energy [`𝓔`](@ref), and the waveform mode weights [`h!`](@ref) themselves.
 
-5. **Dynamics**
+5. **PN expansions**
+
+   These are the specific parts of a "PN expression" that are expanded
+   in powers of ``1/c``.  For example, the binding energy `𝓔` is
+   expanded in powers of `v/c`.  When PN expansions are defined using
+   the [`@pn_expression`](@ref PostNewtonian.@pn_expression) macro,
+   the expansion is automatically truncated at the appropriate order.
+   See [`PNTerm`](@ref PostNewtonian.PNTerm) and [`PNExpansion`](@ref
+   PostNewtonian.PNExpansion) for more details.
+
+6. **Dynamics**
 
    This is where the ODE integration actually occurs, to evolve the orbital
    dynamics of the system.
 
-6. **Evaluation**
+7. **Evaluation**
 
    Finally, we construct the waveforms themselves.  This level contains the main
    interface that will usually be used from Julia code, and should be restricted
@@ -75,7 +85,7 @@ calculations *per se*, we have the following:
    handling the full range of options that will be present in "Dynamics", for
    example.
 
-7. **Compatibility layers**
+8. **Compatibility layers**
 
    This is an optional level of abstraction that allows us to wrap the
    evaluation layer in functions that are designed to look and act more like

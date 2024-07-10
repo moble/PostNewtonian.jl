@@ -1,6 +1,3 @@
-# It's more common in PN to use `ln` — which I also prefer, as `log` seems ambiguous.
-const ln = log
-
 """
     value(x)
 
