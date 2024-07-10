@@ -179,8 +179,10 @@ end
 A `PNSystem` that contains information as variables from
 [`FastDifferentiation.jl`](https://docs.juliahub.com/General/FastDifferentiation/stable/).
 
-See also [`fd_pnsystem`](@ref) for a particular instance of this type.  The correct type of
-`FDPNSystem` is used in calculating `𝓔′`.
+See also [`fd_pnsystem`](@ref) for a particular instance of this type.  Note that this type
+also involves the type `FT`, which will be the float type of actual numbers that eventually
+get fed into (and will be passed out from) functions that use this system.  The correct type
+of `FDPNSystem` is used in calculating `𝓔′`.
 """
 struct FDPNSystem{FT, PNOrder} <: PNSystem{Vector{FastDifferentiation.Node}, PNOrder}
     state::Vector{FastDifferentiation.Node}
@@ -210,16 +212,19 @@ yourself, or even construct a different specialized subtype of `PNSystem` (it's 
 
 # Examples
 ```jldoctest
-julia> using PostNewtonian: M₁, M₂, χ⃗₁, χ⃗₂
+julia> using PostNewtonian: M₁, M₂, χ⃗₁, χ⃗₂, FDPNSystem
 
-julia> M₁(symbolic_pnsystem), M₂(symbolic_pnsystem)
+julia> fd_pnsystem = FDPNSystem(Float64)
+FDPNSystem{Float64, 9223372036854775805//2}(FastDifferentiation.Node[M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ], Λ₁, Λ₂)
+
+julia> M₁(fd_pnsystem), M₂(fd_pnsystem)
 (M₁, M₂)
 
-julia> χ⃗₁(symbolic_pnsystem)
-χ⃗₁
+julia> χ⃗₁(fd_pnsystem)
+ + χ⃗₁ˣ𝐢 + χ⃗₁ʸ𝐣 + χ⃗₁ᶻ𝐤
 
-julia> χ⃗₂(symbolic_pnsystem)
-χ⃗₂
+julia> χ⃗₂(fd_pnsystem)
+ + χ⃗₂ˣ𝐢 + χ⃗₂ʸ𝐣 + χ⃗₂ᶻ𝐤
 ```
 """
 const fd_pnsystem = FDPNSystem(Float64)

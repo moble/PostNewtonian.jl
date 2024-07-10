@@ -1,8 +1,13 @@
 module PostNewtonianSymbolicsExt
 
+# See ../../src/predefinitions_Symbolics.jl for a few predefinitions of things that really
+# only exist here, but will be needed elsewhere.  The documentation evidently needs to
+# occur there as well.
+
 using PostNewtonian
-import PostNewtonian: type_converter, fundamental_quaternionic_variables, derived_variables,
-    var_collect, hold, unhold, causes_domain_error!, prepare_pn_order,
+import PostNewtonian: hold, unhold, SymbolicPNSystem,
+    type_converter, fundamental_quaternionic_variables, derived_variables,
+    causes_domain_error!, prepare_pn_order,
     apply_to_first_add!, flatten_add!, pn_expression, order_index,
     M₁, M₂, χ⃗₁, χ⃗₂, v, Φ, Λ₁, Λ₂,
     R, M, μ, ν, δ, q, ℳ, X₁, X₂,
@@ -13,7 +18,6 @@ import MacroTools
 import SymbolicUtils
 isdefined(Base, :get_extension) ? (import Symbolics) : (import ..Symbolics)
 
-export SymbolicPNSystem, symbolic_pnsystem
 
 function _efficient_vector(N, ::Type{Symbolics.Num})
     Symbolics.variables(string(gensym()), 1:N)
@@ -21,30 +25,10 @@ end
 
 ### Moved from src/utilities/macros.jl
 
-"""
-    hold(x)
-
-Delay evaluation of the argument in `Symbolics` expressions.
-
-This is just a helper function that acts trivially — like the `identity` function — but also
-gets registered with `Symbolics` to avoid evaluation of the argument.  For example, we can
-preserve expressions like `π^2`, which Julia would normally convert directly to a `Float64`.
-
-Note that you probably don't want to use this function directly; this will probably be done
-for you by [`@pn_expression`](@ref PostNewtonian.@pn_expression) or similar.  If you *do*
-want to use this directly, you probably want another layer of indirection to construct
-something like `Symbolics.Num(SymbolicUtils.Term(hold, [x]))` so that you can use the result
-in a symbolic expression.
-"""
 hold(x) = x
 Symbolics.@register_symbolic hold(x)
 Symbolics.derivative(::typeof(hold), args::NTuple{1,Any}, ::Val{1}) = 1
 
-"""
-    unhold(expr)
-
-Remove occurrences of [`hold`](@ref) from an `Expr`.
-"""
 function unhold(expr)
     MacroTools.postwalk(expr) do x
         m = MacroTools.trymatch(:(f_(i_)), x)
@@ -103,28 +87,15 @@ end
 causes_domain_error!(u̇, ::PNSystem{VT}) where {VT<:Vector{Symbolics.Num}} = false
 
 
-"""
-    SymbolicPNSystem{T, PNOrder}(state, Λ₁, Λ₂)
-
-A `PNSystem` that contains information as variables from
-[`Symbolics.jl`](https://symbolics.juliasymbolics.org/).
-
-See also [`symbolic_pnsystem`](@ref) for a particular general instance of this type.
-"""
-struct SymbolicPNSystem{ST, PNOrder, ET} <: PNSystem{ST, PNOrder}
-    state::ST
-    Λ₁::ET
-    Λ₂::ET
-
-    function SymbolicPNSystem(PNOrder=typemax(Int))
-        Symbolics.@variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
-        ET = typeof(M₁)
-        new{Vector{ET}, prepare_pn_order(PNOrder), ET}(
-            [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
-            Λ₁, Λ₂
-        )
-    end
+function SymbolicPNSystem(PNOrder=typemax(Int))
+    Symbolics.@variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
+    ET = typeof(M₁)
+    SymbolicPNSystem{Vector{ET}, prepare_pn_order(PNOrder), ET}(
+        [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
+        Λ₁, Λ₂
+    )
 end
+
 
 """
     symbolic_pnsystem
@@ -158,26 +129,26 @@ const symbolic_pnsystem = SymbolicPNSystem()
 Λ₂(pn::SymbolicPNSystem) = pn.Λ₂
 
 
-## Moved from src/pn_expressions/binding_energy.jl and renamed
-const 𝓔′Symbolics = let 𝓔=𝓔(symbolic_pnsystem), v=v(symbolic_pnsystem)
-    ∂ᵥ = Symbolics.Differential(v)
-    # Evaluate derivative symbolically
-    𝓔′ = SymbolicUtils.simplify(Symbolics.expand_derivatives(∂ᵥ(𝓔)), expand=true)#, simplify_fractions=false)
-    # Turn it into (an Expr of) a function taking one argument: `pnsystem`
-    𝓔′ = Symbolics.build_function(𝓔′, :pnsystem, nanmath=false)
-    # Remove `hold` (which we needed for Symbolics.jl to not collapse to Float64)
-    𝓔′ = unhold(𝓔′)
-    # "Flatten" the main sum, because Symbolics nests sums for some reason
-    𝓔′ = apply_to_first_add!(𝓔′, flatten_add!)
-    # Apply `@pn_expansion` to the main sum
-    splitfunc = MacroTools.splitdef(𝓔′)
-    splitfunc[:body] = apply_to_first_add!(
-        splitfunc[:body],
-        x->:(@pn_expansion(-1, $x))
-    )
-    𝓔′ = MacroTools.combinedef(splitfunc)
-    # Finally, apply the "macro" to it and get a full function out
-    eval(pn_expression(1, 𝓔′))::Function
-end
+# ## Moved from src/pn_expressions/binding_energy.jl and renamed
+# const 𝓔′Symbolics = let 𝓔=𝓔(symbolic_pnsystem), v=v(symbolic_pnsystem)
+#     ∂ᵥ = Symbolics.Differential(v)
+#     # Evaluate derivative symbolically
+#     𝓔′ = SymbolicUtils.simplify(Symbolics.expand_derivatives(∂ᵥ(𝓔)), expand=true)#, simplify_fractions=false)
+#     # Turn it into (an Expr of) a function taking one argument: `pnsystem`
+#     𝓔′ = Symbolics.build_function(𝓔′, :pnsystem, nanmath=false)
+#     # Remove `hold` (which we needed for Symbolics.jl to not collapse to Float64)
+#     𝓔′ = unhold(𝓔′)
+#     # "Flatten" the main sum, because Symbolics nests sums for some reason
+#     𝓔′ = apply_to_first_add!(𝓔′, flatten_add!)
+#     # Apply `@pn_expansion` to the main sum
+#     splitfunc = MacroTools.splitdef(𝓔′)
+#     splitfunc[:body] = apply_to_first_add!(
+#         splitfunc[:body],
+#         x->:(@pn_expansion(-1, $x))
+#     )
+#     𝓔′ = MacroTools.combinedef(splitfunc)
+#     # Finally, apply the "macro" to it and get a full function out
+#     eval(pn_expression(1, 𝓔′))::Function
+# end
 
 end #module

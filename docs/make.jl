@@ -1,4 +1,5 @@
 using PostNewtonian
+using Symbolics  # To document the extension
 using Documenter
 
 DocMeta.setdocmeta!(
@@ -25,8 +26,7 @@ makedocs(;
         "Interface" => [
             "interface/high-level.md",
             "Units" => "interface/units.md",
-            #"High-level functions" => "interface/interface.md",
-            "interface/symbolics.md",
+            #"interface/symbolics.md",
             "interface/differentiation.md",
             "interface/assorted_binaries.md",
             "Python" => "interface/python.md",

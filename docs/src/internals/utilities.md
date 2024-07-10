@@ -1,5 +1,19 @@
 # Utilities
 
+## PN terms and PN expansions
+
+The basic building blocks of post-Newtonian theory are the terms and
+expansions.  These are used to build up the various expressions that
+describe the dynamics of the system.  The terms are the individual
+parts of the expansions, while the expansions are the full expressions
+that are expanded in powers of ``1/c``.
+
+```@docs
+PostNewtonian.PNTerm
+PostNewtonian.PNExpansionParameter
+PostNewtonian.PNExpansion
+```
+
 ## Macros
 
 Some of the most useful features of this package are the macros allowing us to
@@ -11,20 +25,11 @@ this, we rely primarily on two macros.
 ```@autodocs
 Modules = [PostNewtonian]
 Pages   = ["utilities/macros.jl"]
-Order   = [:module, :type, :constant, :function, :macro]
+Order   = [:macro, :module, :type, :constant, :function]
 ```
 
 
-## Manipulating ODE solutions
-
-```@autodocs
-Modules = [PostNewtonian]
-Pages   = ["utilities/combine_solutions.jl"]
-Order   = [:module, :type, :constant, :function, :macro]
-```
-
-
-## Termination criteria
+# Termination criteria
 
 Hopefully, it should not be necessary to directly use these termination
 criteria.  They are used by default in the [`orbital_evolution`](@ref) function.
@@ -47,7 +52,16 @@ Order   = [:module, :type, :constant, :function, :macro]
 ```
 
 
-## Irrational constants
+## Manipulating ODE solutions
+
+```@autodocs
+Modules = [PostNewtonian]
+Pages   = ["utilities/combine_solutions.jl"]
+Order   = [:module, :type, :constant, :function, :macro]
+```
+
+
+### Irrational constants
 
 These quantities are constants that appear in PN expressions, so they are not
 exported, but can be used by importing them explicitly or by using the fully

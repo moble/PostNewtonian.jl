@@ -2,6 +2,11 @@
     type_converter(pnsystem, x)
 
 Convert `x` to a type appropriate for the float type of `pnsystem`.
+
+This is sort of an expansion of the `convert` function, but with nicer syntax for types from
+this package, including the ability to do really weird things for `SymbolicPNSystem`.  It's
+needed to ensure that the types of variables and constants are correct when we use them in
+expressions, rather than just assuming everything is a `Float64`.
 """
 function type_converter(pnsystem, x)
     convert(eltype(pnsystem), x)
@@ -27,6 +32,7 @@ irrationals = unique([
     find_symbols_of_type(MathConstants, Irrational)
 ])
 
+# This should include all the unary functions that we want to use in any PN expression.
 unary_funcs = [:√, :sqrt, :log, :ln, :sin, :cos]
 
 
@@ -144,40 +150,22 @@ end
 
 
 """
-    @pn_expansion [[offset] pnsystem] expansion
+    @pn_expansion [pnsystem] expansion
 
-Gather terms in `expansion` by the powers of `v` involved, the choose on the powers chosen
-by the `pnsystem`'s `PNOrder` parameter, and evaluate efficiently in Horner form.
+Gather terms in `expansion` by the powers of ``1/c`` involved, zeroing out any terms with
+powers of ``1/c`` higher than the `pnsystem`'s `PNOrder` parameter, and combine the terms
+using the `PNExpansionReducer` specified in argument of the function that includes this
+macro call.
+
+This expansion is achieved by setting — inside a `let` block created by this macro —
 
 Note that the `pnsystem` argument can be inserted automatically by [`@pn_expression`](@ref).
-For simplicity of presentation, we will assume that this is done in the examples below.
-
-A "PN expansion" is a polynomial in ``v`` for which ``ln(v)`` factors may be present in
-coefficients of ``v^k`` for ``k≥1``.  The input may involve multiple terms with the same
-power of ``v``.  (I.e., the expansion does not have to be simplified or
-[`collect`](https://docs.sympy.org/latest/tutorials/intro-tutorial/simplification.html#collect)ed
-in sympy parlance.)
-
-However, note that the sum must appear together — as part of the same `:+` expression —
-rather than, say, factored into two sums that multiply each other.
-
-The `offset` argument represents the *index* of the relative PN order (that is, 2 times the
-PN order) at which the PN expansion begins.  So if the first term in the expansion is really
-a relative 2.5-pN term, we should use an `offset` of 5.  For example, the
-[`tidal_heating`](@ref) expressions for `Ṁ₁` and `Ṁ₂` begin with a term proportional to
-`v^15`, and are added to the flux [`𝓕`](@ref), which begin's with a term proportional to
-`v^10`.  This means that `Ṁ₁` and `Ṁ₂` enter at 2.5-pN relative order, so we use an
-`offset` of 5.
 """
-macro pn_expansion(offset, pnsystem, expr)
-    esc(pn_expansion(offset, pnsystem, expr))
-end
-
 macro pn_expansion(pnsystem, expr)
-    esc(pn_expansion(0, pnsystem, expr))
+    esc(pn_expansion(pnsystem, expr))
 end
 
-function pn_expansion(offset, pnsystem, expr)
+function pn_expansion(pnsystem, expr)
     quote
         let c = PNExpansionParameter($pnsystem)
             PNExpansionReducer($expr)

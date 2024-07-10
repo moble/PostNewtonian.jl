@@ -29,6 +29,10 @@ using TestItems: @testitem
 # reflected cleanly in the files `include`d below.
 
 
+# It's more common in PN to use `ln` — which I also prefer, as `log` seems ambiguous.
+const ln = log
+
+
 include("utilities.jl")
 export termination_forwards, termination_backwards,
     dtmin_terminator, decreasing_v_terminator, nonfinite_terminator
@@ -114,10 +118,9 @@ include("assorted_binaries/random.jl")
 include("precompilation.jl")
 
 
-# Pre-define a few functions that the Symbolics extension can extend
-function var_collect end
-function hold end
-function unhold end
+
+include("predefinitions_Symbolics.jl")
+
 
 if !isdefined(Base, :get_extension)
     using Requires
