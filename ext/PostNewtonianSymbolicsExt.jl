@@ -4,6 +4,10 @@ module PostNewtonianSymbolicsExt
 # only exist here, but will be needed elsewhere.  The documentation evidently needs to
 # occur there as well.
 
+import MacroTools
+import SymbolicUtils
+isdefined(Base, :get_extension) ? (import Symbolics) : (import ..Symbolics)
+
 using PostNewtonian
 import PostNewtonian: hold, unhold, SymbolicPNSystem,
     type_converter, fundamental_quaternionic_variables, derived_variables,
@@ -13,10 +17,6 @@ import PostNewtonian: hold, unhold, SymbolicPNSystem,
     R, M, μ, ν, δ, q, ℳ, X₁, X₂,
     ln, ln2, ln3, ln5, ζ3, γₑ,
     _efficient_vector
-
-import MacroTools
-import SymbolicUtils
-isdefined(Base, :get_extension) ? (import Symbolics) : (import ..Symbolics)
 
 
 function _efficient_vector(N, ::Type{Symbolics.Num})
