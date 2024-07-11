@@ -49,6 +49,7 @@ Normalized spin vector ``S⃗/M²``.
 
 Symmetric spin vector ``(χ⃗₁+χ⃗₂)/2``.
 """
+χ⃗ₛ(χ⃗₁, χ⃗₂) = (χ⃗₁ + χ⃗₂) / 2
 χ⃗ₛ(M₁, M₂, χ⃗₁, χ⃗₂) = (χ⃗₁ + χ⃗₂) / 2
 χ⃗ₛ(s::VecOrPNSystem) = χ⃗ₛ(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
 
@@ -58,6 +59,7 @@ Symmetric spin vector ``(χ⃗₁+χ⃗₂)/2``.
 
 Antisymmetric spin vector ``(χ⃗₁-χ⃗₂)/2``.
 """
+χ⃗ₐ(χ⃗₁, χ⃗₂) = (χ⃗₁ - χ⃗₂) / 2
 χ⃗ₐ(M₁, M₂, χ⃗₁, χ⃗₂) = (χ⃗₁ - χ⃗₂) / 2
 χ⃗ₐ(s::VecOrPNSystem) = χ⃗ₐ(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
 
