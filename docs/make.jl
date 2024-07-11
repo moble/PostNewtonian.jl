@@ -34,7 +34,7 @@ makedocs(;
         ],
         "Internals" => [
             "Code structure" => "internals/code_structure.md",
-            "internals/systems.md",
+            "internals/pn_systems.md",
             "internals/fundamental_variables.md",
             "internals/derived_variables.md",
             "internals/pn_expressions.md",

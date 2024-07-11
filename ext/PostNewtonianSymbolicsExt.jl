@@ -83,7 +83,7 @@ function var_collect(expr::Symbolics.Num, var; max_power=100, max_gap=4)
 end
 
 
-## Moved from src/systems.jl
+## Moved from src/pn_systems.jl
 
 causes_domain_error!(u̇, ::PNSystem{VT}) where {VT<:Vector{Symbolics.Num}} = false
 
