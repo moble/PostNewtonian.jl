@@ -460,7 +460,7 @@ function orbital_evolution(
 
     # Now that we've figured out all the types, put in a function barrier
     _orbital_evolution(
-        pnsystem, RHS!;
+        deepcopy(pnsystem), RHS!;
         Λ₁, Λ₂, v₁, vₑ, Rᵢ,
         check_up_down_instability, time_stepper,
         reltol, abstol,
@@ -501,7 +501,7 @@ function _orbital_evolution(
 
     # Log an error if the initial parameters return a NaN on the right-hand side
     let
-        uᵢ = pnsystem.state
+        uᵢ = copy(pnsystem.state)
         u̇ = similar(uᵢ)
         tᵢ = zero(T)
         RHS!(u̇, uᵢ, pnsystem, tᵢ)
