@@ -142,8 +142,9 @@ eccentric systems and possibly precessing systems.  You may prefer to implement 
 solution, like detecting when `v` decreases below some threshold, or detecting when `v` is
 decreasing too quickly.  See this function's source code for a simple
 
-If this terminator is triggered while `v` is less than 1/2, a warning will always be issued;
-otherwise an `info` message will be issued only if the `quiet` flag is set to `false`.
+If this terminator is triggered while `v` is less than 0.35, a warning will always be
+issued; otherwise an `info` message will be issued only if the `quiet` flag is set to
+`false`.
 """
 function decreasing_v_terminator(quiet=false)
     function discrete_condition(state,t,integrator)
@@ -154,10 +155,10 @@ function decreasing_v_terminator(quiet=false)
         ∂ₜv = get_du(integrator)[vindex]
         message = (
             "Terminating forwards evolution because 𝑣 is decreasing:\n"
-            * "This is only unusual if 𝑣 ≲ 1/2; the current value is 𝑣=$v\n"
+            * "This is only unusual if 𝑣 ≲ 0.35; the current value is 𝑣=$v\n"
             * "∂ₜ𝑣=$∂ₜv."
         )
-        if v < 1//2
+        if v < 7//20
             @warn message
         elseif !quiet
             @info message
