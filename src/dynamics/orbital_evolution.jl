@@ -86,6 +86,40 @@ function uniform_in_phase(solution, saves_per_orbit)
 end
 
 
+function default_termination_criteria_forwards(pnsystem, vₑ, quiet)
+    CallbackSet(
+        termination_forwards(vₑ, quiet),
+        dtmin_terminator(eltype(pnsystem), quiet),
+        decreasing_v_terminator(quiet),
+        nonfinite_terminator()
+    )
+end
+
+
+function default_termination_criteria_backwards(pnsystem, v₁, quiet)
+    CallbackSet(
+        termination_backwards(v₁, quiet),
+        dtmin_terminator(eltype(pnsystem), quiet),
+        nonfinite_terminator()
+    )
+end
+
+
+function default_reltol(pnsystem)
+    T = eltype(pnsystem)
+    eps(T)^(11//16)
+end
+
+
+function default_abstol(pnsystem)
+    T = eltype(pnsystem)
+    T[
+        T[eps(T(M₁(pnsystem)+M₂(pnsystem)))^(11//16) for _ ∈ 1:2];
+        T[eps(T)^(11//16) for _ ∈ 3:length(pnsystem.state)]
+    ]
+end
+
+
 """
     orbital_evolution(pnsystem; kwargs...)
     orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; kwargs...)
@@ -339,17 +373,7 @@ criteria are needed, they could be added as additional elements of the `Callback
 the [callback documentation](https://diffeq.sciml.ai/stable/features/callback_functions/)
 for details.
 """
-function orbital_evolution(pnsystem::PNSystem; kwargs...)
-    orbital_evolution(
-        M₁(pnsystem), M₂(pnsystem),
-        χ⃗₁(pnsystem), χ⃗₂(pnsystem),
-        Ω(v=v(pnsystem), M=M(pnsystem));
-        Λ₁=Λ₁(pnsystem), Λ₂=Λ₂(pnsystem),
-        Rᵢ=R(pnsystem), PNOrder=pn_order(pnsystem), kwargs...
-    )
-end
-
-function orbital_evolution(
+Base.@constprop :aggressive function orbital_evolution(
     M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ;
     Lambda1=0, Lambda2=0, Omega_1=Ωᵢ, Omega_e=Ω(v=1,M=M₁+M₂), R_i=Rotor(true),
     Λ₁=Lambda1, Λ₂=Lambda2, Ω₁=Omega_1, Ωₑ=Omega_e, Rᵢ=R_i,
@@ -358,7 +382,7 @@ function orbital_evolution(
     reltol=nothing, abstol=nothing,
     termination_criteria_forwards=nothing,
     termination_criteria_backwards=nothing,
-    quiet=true, force_dtmin=true, saves_per_orbit=0,
+    quiet=true, force_dtmin=true, saves_per_orbit=false,
     solve_kwargs...
 )
     # Sanity checks for the inputs
@@ -419,7 +443,7 @@ function orbital_evolution(
         )
     end
 
-    if saves_per_orbit > 0 && "saveat" ∈ keys(solve_kwargs)
+    if saves_per_orbit && "saveat" ∈ keys(solve_kwargs)
         error(
             "It doesn't make sense to pass the `saves_per_orbit` argument *and* the "
             * "`saveat` argument; only one may be passed."
@@ -442,47 +466,15 @@ function orbital_evolution(
     end
 
     if isnothing(termination_criteria_forwards)
-        termination_criteria_forwards = CallbackSet(
-            termination_forwards(vₑ, quiet),
-            dtmin_terminator(eltype(pnsystem), quiet),
-            decreasing_v_terminator(quiet),
-            nonfinite_terminator()
+        termination_criteria_forwards = default_termination_criteria_forwards(
+            pnsystem, vₑ, quiet
         )
     end
 
     if isnothing(termination_criteria_backwards) && v₁ < v(pnsystem)
-        termination_criteria_backwards = CallbackSet(
-            termination_backwards(v₁, quiet),
-            dtmin_terminator(eltype(pnsystem), quiet),
-            nonfinite_terminator()
+        termination_criteria_backwards = default_termination_criteria_backwards(
+            pnsystem, v₁, quiet
         )
-    end
-
-    # Now that we've figured out all the types, put in a function barrier
-    _orbital_evolution(
-        deepcopy(pnsystem), RHS!;
-        Λ₁, Λ₂, v₁, vₑ, Rᵢ,
-        check_up_down_instability, time_stepper,
-        reltol, abstol,
-        termination_criteria_forwards,
-        termination_criteria_backwards,
-        quiet, force_dtmin, saves_per_orbit,
-        solve_kwargs...
-    )
-end
-
-function _orbital_evolution(
-        pnsystem, RHS!;
-        Λ₁, Λ₂, v₁, vₑ, Rᵢ,
-        check_up_down_instability, time_stepper,
-        reltol, abstol,
-        termination_criteria_forwards,
-        termination_criteria_backwards,
-        quiet, force_dtmin, saves_per_orbit,
-        solve_kwargs...
-)
-    if check_up_down_instability
-        up_down_instability_warn(pnsystem, v₁, vₑ)
     end
 
     # The choice of 11//16 here is just an easy way to get an idea that for Float64 this
@@ -490,20 +482,41 @@ function _orbital_evolution(
     # other types.
     T = eltype(pnsystem)
     if isnothing(reltol)
-        reltol = eps(T)^(11//16)
+        reltol = default_reltol(pnsystem)
     end
     if isnothing(abstol)
-        abstol = [
-            [eps(T(M₁(pnsystem)+M₂(pnsystem)))^(11//16) for _ ∈ 1:2];
-            [eps(T)^(11//16) for _ ∈ 3:length(pnsystem_symbols)]
-        ]
+        abstol = default_abstol(pnsystem)
+    end
+
+    orbital_evolution(
+        pnsystem; RHS! = TaylorT1RHS!, v₁, vₑ,
+        check_up_down_instability, quiet,
+        termination_criteria_forwards,
+        termination_criteria_backwards,
+        time_stepper, reltol, abstol,
+        force_dtmin, saves_per_orbit, solve_kwargs...
+    )
+end
+
+Base.@constprop :aggressive function orbital_evolution(
+    pnsystemᵢ; RHS! = TaylorT1RHS!, v₁=zero(eltype(pnsystemᵢ)), vₑ=one(eltype(pnsystemᵢ)),
+    check_up_down_instability=true, quiet=true,
+    termination_criteria_forwards=default_termination_criteria_forwards(pnsystemᵢ, vₑ, quiet),
+    termination_criteria_backwards=default_termination_criteria_backwards(pnsystemᵢ, v₁, quiet),
+    time_stepper=Vern9(), reltol=default_reltol(pnsystemᵢ), abstol=default_abstol(pnsystemᵢ),
+    force_dtmin=true, saves_per_orbit=zero(eltype(pnsystemᵢ)), solve_kwargs...
+)
+    pnsystem = deepcopy(pnsystemᵢ)
+
+    if check_up_down_instability
+        up_down_instability_warn(pnsystem, v₁, vₑ)
     end
 
     # Log an error if the initial parameters return a NaN on the right-hand side
     let
         uᵢ = copy(pnsystem.state)
         u̇ = similar(uᵢ)
-        tᵢ = zero(T)
+        tᵢ = zero(eltype(pnsystem))
         RHS!(u̇, uᵢ, pnsystem, tᵢ)
         if any(isnan, u̇) ||  any(isnan, uᵢ)
             # COV_EXCL_START
@@ -513,13 +526,12 @@ function _orbital_evolution(
         end
     end
 
-    pnsystemᵢ = deepcopy(pnsystem)
-    τ = estimated_time_to_merger(pnsystem)
-
     # Note: This estimate for the time span over which to integrate may be very bad,
     # especially close to merger.  An underestimate would lead to an inspiral ending too
     # soon, but an overestimate can lead to integration continuing very slowly in a regime
     # where PN has broken down.
+    τ = estimated_time_to_merger(pnsystem)
+
     problem_forwards = ODEProblem(
         RHS!, pnsystem.state, (zero(τ), 4τ), pnsystem,
         callback=termination_criteria_forwards
@@ -531,17 +543,16 @@ function _orbital_evolution(
         solve_kwargs...
     )
 
-    solution = if v₁ < v(pnsystemᵢ)
+    solution = if v₁ > 0
         # Reset state to initial conditions
         pnsystem.state[:] .= pnsystemᵢ.state
-
-        pnsystemᵢ.state[vindex] = v₁
-        τ = estimated_time_to_merger(pnsystemᵢ) - τ
 
         # Note: Here again, we don't want to overestimate the time span by too much, but we
         # also don't want to underestimate and get a shortened waveform.  This should be a
         # better estimate, though, because it's dealing with lower speeds, at which PN
         # approximation should be more accurate.
+        τ = estimated_time_to_merger(M(pnsystem), ν(pnsystem), v₁) - τ
+
         problem_backwards = remake(
             problem_forwards; tspan=(zero(τ), -4τ),
             callback=termination_criteria_backwards
