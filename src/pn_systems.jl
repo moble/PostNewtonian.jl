@@ -33,7 +33,6 @@ const Rindices = Rʷindex:Rᶻindex
 
 Base.eltype(::PNSystem{ST}) where {ST} = eltype(ST)
 pn_order(::PNSystem{ST, PNOrder}) where {ST, PNOrder} = PNOrder
-
 order_index(pn::PNSystem) = 1 + Int(2pn_order(pn))
 
 
@@ -94,6 +93,7 @@ systems beyond a convenient description of how "far" the system has evolved.
 struct BBH{T, PNOrder} <: PNSystem{T, PNOrder}
     state::T
 
+    BBH{T, PNOrder}(state) where {T, PNOrder} = new{T, PNOrder}(state)
     function BBH(;
         M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0,
         PNOrder=typemax(Int), kwargs...
@@ -125,6 +125,8 @@ struct BHNS{ST, PNOrder, ET} <: PNSystem{ST, PNOrder}
     state::ST
     Λ₂::ET
 
+    BHNS{T, PNOrder, ET}(state) where {T, PNOrder, ET} = new{T, PNOrder, ET}(state)
+    BHNS{T, PNOrder}(state) where {T, PNOrder} = new{T, PNOrder, eltype(T)}(state)
     function BHNS(;
         M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₂, Φ=0,
         PNOrder=typemax(Int), kwargs...
@@ -156,6 +158,8 @@ struct NSNS{ST, PNOrder, ET} <: PNSystem{ST, PNOrder}
     Λ₁::ET
     Λ₂::ET
 
+    NSNS{T, PNOrder, ET}(state) where {T, PNOrder, ET} = new{T, PNOrder, ET}(state)
+    NSNS{T, PNOrder}(state) where {T, PNOrder} = new{T, PNOrder, eltype(T)}(state)
     function NSNS(;
         M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₁, Λ₂, Φ=0,
         PNOrder=typemax(Int), kwargs...
@@ -269,4 +273,29 @@ function SVector(pnsystem::FDPNSystem)
         Λ₁(pnsystem),
         Λ₂(pnsystem)
     )
+end
+
+
+
+@testitem "PNSystem constructors" begin
+    using Quaternionic
+
+    R = randn(RotorF32)
+    pn1 = BBH(
+        M₁=1.0f0, M₂=2.0f0,
+        χ⃗₁=Float32[3.0, 4.0, 5.0], χ⃗₂=Float32[6.0, 7.0, 8.0],
+        R=R, v=0.23f0
+    )
+    @test pn1.state ≈ [1.; 2.; 3.; 4.; 5.; 6.; 7.; 8.; components(R)...; 0.23; 0.]
+
+    pn2 = BBH(
+        M₁=1.0f0, M₂=2.0f0,
+        χ⃗₁=Float32[3.0, 4.0, 5.0], χ⃗₂=Float32[6.0, 7.0, 8.0],
+        R=R, v=0.23f0, Φ=9.0f0
+    )
+    @test pn2.state ≈ [1.; 2.; 3.; 4.; 5.; 6.; 7.; 8.; components(R)...; 0.23; 9.]
+
+    pn1.state[end] = 9.0f0
+    @test pn1.state == pn2.state
+
 end
