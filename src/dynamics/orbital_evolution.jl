@@ -443,7 +443,7 @@ Base.@constprop :aggressive function orbital_evolution(
         )
     end
 
-    if saves_per_orbit && "saveat" ∈ keys(solve_kwargs)
+    if saves_per_orbit != false && "saveat" ∈ keys(solve_kwargs)
         error(
             "It doesn't make sense to pass the `saves_per_orbit` argument *and* the "
             * "`saveat` argument; only one may be passed."
