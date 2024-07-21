@@ -375,7 +375,7 @@ for details.
 """
 Base.@constprop :aggressive function orbital_evolution(
     M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ;
-    Lambda1=0, Lambda2=0, Omega_1=Ωᵢ, Omega_e=Ω(v=1,M=M₁+M₂), R_i=Rotor(true),
+    Lambda1=0, Lambda2=0, Omega_1=0, Omega_e=Ω(v=1,M=M₁+M₂), R_i=Rotor(true),
     Λ₁=Lambda1, Λ₂=Lambda2, Ω₁=Omega_1, Ωₑ=Omega_e, Rᵢ=R_i,
     approximant="TaylorT1", PNOrder=typemax(Int),
     check_up_down_instability=true, time_stepper=Vern9(),
