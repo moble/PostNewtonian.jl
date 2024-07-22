@@ -15,18 +15,23 @@ function v̇_denominator_coeffs(p)
     v̇_denominator(p; pn_expansion_reducer=Val(identity)).coeffs
 end
 
+TaylorT1_v̇(p) = v̇_numerator(p) / v̇_denominator(p)
+TaylorT4_v̇(p) = truncated_series_ratio(v̇_numerator_coeffs(p), v̇_denominator_coeffs(p))
+TaylorT5_v̇(p) = inv(truncated_series_ratio(v̇_denominator_coeffs(p), v̇_numerator_coeffs(p)))
 
-# This represents most of the lines of code needed to compute each approximant, but is
-# identical in each.  The only things that this code don't do are (1) checking
-# `causes_domain_error!` and (2) computing v̇.  The first has to be done before the second,
-# but is just one line, and the second changes depending on the approximant.
-RHS_body = quote
-    Ω⃗ = Ω⃗ₚ(p) + Ω * ℓ̂
-    (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(p)
+@pn_expression function TaylorTn!(pnsystem, u̇, TaylorTn_v̇::V̇) where V̇
+    # If these parameters result in v≤0, fill u̇ with NaNs so that `solve` will
+    # know that this was a bad step and try again.
+    causes_domain_error!(u̇, pnsystem) && return
+
+    v̇ = TaylorTn_v̇(pnsystem)
+
+    Ω⃗ = Ω⃗ₚ(pnsystem) + Ω * ℓ̂
+    (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(pnsystem)
     χ̂₁ = ifelse(iszero(χ₁), ℓ̂, χ⃗₁ / χ₁)
     χ̂₂ = ifelse(iszero(χ₂), ℓ̂, χ⃗₂ / χ₂)
-    χ⃗̇₁ = (Ṡ₁ / M₁^2) * χ̂₁ - (2Ṁ₁ / M₁) * χ⃗₁ + Ω⃗ᵪ₁(p) × χ⃗₁
-    χ⃗̇₂ = (Ṡ₂ / M₂^2) * χ̂₂ - (2Ṁ₂ / M₂) * χ⃗₂ + Ω⃗ᵪ₂(p) × χ⃗₂
+    χ⃗̇₁ = (Ṡ₁ / M₁^2) * χ̂₁ - (2Ṁ₁ / M₁) * χ⃗₁ + Ω⃗ᵪ₁(pnsystem) × χ⃗₁
+    χ⃗̇₂ = (Ṡ₂ / M₂^2) * χ̂₂ - (2Ṁ₂ / M₂) * χ⃗₂ + Ω⃗ᵪ₂(pnsystem) × χ⃗₂
     Ṙ = Ω⃗ * R / 2
     u̇[M₁index] = Ṁ₁
     u̇[M₂index] = Ṁ₂
@@ -45,9 +50,11 @@ RHS_body = quote
     nothing
 end
 
+
 sys = SymbolCache(collect(pnsystem_symbols), nothing, :t)
 
-@eval @doc raw"""
+
+@doc raw"""
     TaylorT1!(u̇, pnsystem)
 
 Compute the right-hand side for the orbital evolution of a non-eccentric binary in the
@@ -64,23 +71,18 @@ insertion directly in this expression.  Compare [`TaylorT4!`](@ref) and [`Taylor
 Here, `u̇` is the time-derivative of the state vector, which is stored in the
 [`PNSystem`](@ref) object `p`.
 """
-@pn_expression 2 function TaylorT1!(u̇, p)
-    # If these parameters result in v≤0, fill u̇ with NaNs so that `solve` will
-    # know that this was a bad step and try again.
-    causes_domain_error!(u̇, p) && return
+TaylorT1!(u̇, p) = TaylorTn!(p, u̇, TaylorT1_v̇)
+TaylorT1!(u̇,u,p,t) = (p.state.=u; TaylorT1!(u̇,p))
 
-    # This expression is what makes this TaylorT1
-    v̇ = v̇_numerator(p) / v̇_denominator(p)
+"""
+    TaylorT1RHS!
 
-    $RHS_body
-end
-
-const TaylorT1RHS! = ODEFunction{true, FullSpecialize}(
-    (u̇,u,p,t) -> (p.state.=u; TaylorT1!(u̇,p)); sys
-)
+SciMLBase.ODEFunction wrapper for [`TaylorT1!`](@ref).
+"""
+const TaylorT1RHS! = ODEFunction{true, FullSpecialize}(TaylorT1!; sys)
 
 
-@eval @doc raw"""
+@doc raw"""
     TaylorT4!(u̇, pnsystem)
 
 Compute the right-hand side for the orbital evolution of a non-eccentric binary in the
@@ -108,23 +110,18 @@ always be unused in this package, but is part of the `DifferentialEquations` API
     infinite order.  This is the reason that `TaylorT4` and `TaylorT5` do not approach
     `TaylorT1` as `PNOrder` approaches `typemax(Int)`.
 """
-@pn_expression 2 function TaylorT4!(u̇, p)
-    # If these parameters result in v≤0, fill u̇ with NaNs so that `solve` will
-    # know that this was a bad step and try again.
-    causes_domain_error!(u̇, p) && return
+TaylorT4!(u̇, p) = TaylorTn!(p, u̇, TaylorT4_v̇)
+TaylorT4!(u̇,u,p,t) = (p.state.=u; TaylorT4!(u̇,p))
 
-    # This expression is what makes this TaylorT4 (evaluating at c=1)
-    v̇ = truncated_series_ratio(v̇_numerator_coeffs(p), v̇_denominator_coeffs(p))
+"""
+    TaylorT4RHS!
 
-    $RHS_body
-end
-
-const TaylorT4RHS! = ODEFunction{true, FullSpecialize}(
-    (u̇,u,p,t) -> (p.state.=u; TaylorT4!(u̇,p)); sys
-)
+SciMLBase.ODEFunction wrapper for [`TaylorT4!`](@ref).
+"""
+const TaylorT4RHS! = ODEFunction{true, FullSpecialize}(TaylorT4!; sys)
 
 
-@eval @doc raw"""
+@doc raw"""
     TaylorT5!(u̇, pnsystem)
 
 Compute the right-hand side for the orbital evolution of a non-eccentric binary in the
@@ -144,17 +141,12 @@ Here, `u` is the ODE state vector, which should just refer to the `state` vector
 the [`PNSystem`](@ref) object `p`.  The parameter `t` represents the time, and will surely
 always be unused in this package, but is part of the `DifferentialEquations` API.
 """
-@pn_expression 2 function TaylorT5!(u̇, p)
-    # If these parameters result in v≤0, fill u̇ with NaNs so that `solve` will
-    # know that this was a bad step and try again.
-    causes_domain_error!(u̇, p) && return
+TaylorT5!(u̇, p) = TaylorTn!(p, u̇, TaylorT5_v̇)
+TaylorT5!(u̇,u,p,t) = (p.state.=u; TaylorT5!(u̇,p))
 
-    # This expression is what makes this TaylorT5 (evaluating at c=1)
-    v̇ = inv(truncated_series_ratio(v̇_denominator_coeffs(p), v̇_numerator_coeffs(p)))
+"""
+    TaylorT5RHS!
 
-    $RHS_body
-end
-
-const TaylorT5RHS! = ODEFunction{true, FullSpecialize}(
-    (u̇,u,p,t) -> (p.state.=u; TaylorT5!(u̇,p)); sys
-)
+SciMLBase.ODEFunction wrapper for [`TaylorT5!`](@ref).
+"""
+const TaylorT5RHS! = ODEFunction{true, FullSpecialize}(TaylorT5!; sys)
