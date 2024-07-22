@@ -78,8 +78,8 @@
 
     # These tests rely too heavily on ODE integration being consistent, which seems to be
     # highly architecture-dependent, so we disable them on CI.
-    @show get(ENV, "CI", "not present!")
     if get(ENV, "CI", "false") == "false"
+        @info "We appear not to be on CI; running tests that rely on ODE integration."
         compare_inspiral("inspiral1.h5", M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ)
         compare_inspiral("inspiral2.h5", M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, Ω₁=Ωᵢ/2)
         compare_inspiral("inspiral3.h5", M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, saveat=3.7)
@@ -103,6 +103,8 @@
         compare_waveforms("waveform10.h5", inspiral, inertial_waveform, PNOrder=3//2)
         compare_waveforms("waveform11.h5", inspiral, inertial_waveform, PNOrder=5//2)
         compare_waveforms("waveform12.h5", inspiral, inertial_waveform, PNOrder=7//2)
+    else
+        @info "We appear to be on CI; skipping tests that rely on ODE integration."
     end
 
 end
