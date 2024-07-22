@@ -1,18 +1,18 @@
-function v̇_numerator(p; pn_expansion_reducer=Val(sum))
-    (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(p; pn_expansion_reducer)
-    - (𝓕(p; pn_expansion_reducer) + Ṁ₁ + Ṁ₂)
+function v̇_numerator(pnsystem; pn_expansion_reducer=Val(sum))
+    (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(pnsystem; pn_expansion_reducer)
+    - (𝓕(pnsystem; pn_expansion_reducer) + Ṁ₁ + Ṁ₂)
 end
 
-function v̇_denominator(p; pn_expansion_reducer=Val(sum))
-    𝓔′(p; pn_expansion_reducer)
+function v̇_denominator(pnsystem; pn_expansion_reducer=Val(sum))
+    𝓔′(pnsystem; pn_expansion_reducer)
 end
 
-function v̇_numerator_coeffs(p)
-    v̇_numerator(p; pn_expansion_reducer=Val(identity)).coeffs
+function v̇_numerator_coeffs(pnsystem)
+    v̇_numerator(pnsystem; pn_expansion_reducer=Val(identity)).coeffs
 end
 
-function v̇_denominator_coeffs(p)
-    v̇_denominator(p; pn_expansion_reducer=Val(identity)).coeffs
+function v̇_denominator_coeffs(pnsystem)
+    v̇_denominator(pnsystem; pn_expansion_reducer=Val(identity)).coeffs
 end
 
 TaylorT1_v̇(p) = v̇_numerator(p) / v̇_denominator(p)
@@ -71,13 +71,14 @@ insertion directly in this expression.  Compare [`TaylorT4!`](@ref) and [`Taylor
 Here, `u̇` is the time-derivative of the state vector, which is stored in the
 [`PNSystem`](@ref) object `p`.
 """
-TaylorT1!(u̇, p) = TaylorTn!(p, u̇, TaylorT1_v̇)
+TaylorT1!(u̇, pnsystem) = TaylorTn!(pnsystem, u̇, TaylorT1_v̇)
 TaylorT1!(u̇,u,p,t) = (p.state.=u; TaylorT1!(u̇,p))
 
 """
     TaylorT1RHS!
 
-SciMLBase.ODEFunction wrapper for [`TaylorT1!`](@ref).
+A `SciMLBase.ODEFunction` wrapper for [`TaylorT1!`](@ref), suitable for passing into
+`OrdinaryDiffEq.solve`.
 """
 const TaylorT1RHS! = ODEFunction{true, FullSpecialize}(TaylorT1!; sys)
 
@@ -110,13 +111,14 @@ always be unused in this package, but is part of the `DifferentialEquations` API
     infinite order.  This is the reason that `TaylorT4` and `TaylorT5` do not approach
     `TaylorT1` as `PNOrder` approaches `typemax(Int)`.
 """
-TaylorT4!(u̇, p) = TaylorTn!(p, u̇, TaylorT4_v̇)
+TaylorT4!(u̇, pnsystem) = TaylorTn!(pnsystem, u̇, TaylorT4_v̇)
 TaylorT4!(u̇,u,p,t) = (p.state.=u; TaylorT4!(u̇,p))
 
 """
     TaylorT4RHS!
 
-SciMLBase.ODEFunction wrapper for [`TaylorT4!`](@ref).
+A `SciMLBase.ODEFunction` wrapper for [`TaylorT4!`](@ref), suitable for passing into
+`OrdinaryDiffEq.solve`.
 """
 const TaylorT4RHS! = ODEFunction{true, FullSpecialize}(TaylorT4!; sys)
 
@@ -141,12 +143,13 @@ Here, `u` is the ODE state vector, which should just refer to the `state` vector
 the [`PNSystem`](@ref) object `p`.  The parameter `t` represents the time, and will surely
 always be unused in this package, but is part of the `DifferentialEquations` API.
 """
-TaylorT5!(u̇, p) = TaylorTn!(p, u̇, TaylorT5_v̇)
+TaylorT5!(u̇, pnsystem) = TaylorTn!(pnsystem, u̇, TaylorT5_v̇)
 TaylorT5!(u̇,u,p,t) = (p.state.=u; TaylorT5!(u̇,p))
 
 """
     TaylorT5RHS!
 
-SciMLBase.ODEFunction wrapper for [`TaylorT5!`](@ref).
+A `SciMLBase.ODEFunction` wrapper for [`TaylorT5!`](@ref), suitable for passing into
+`OrdinaryDiffEq.solve`.
 """
 const TaylorT5RHS! = ODEFunction{true, FullSpecialize}(TaylorT5!; sys)
