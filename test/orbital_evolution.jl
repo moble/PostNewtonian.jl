@@ -32,6 +32,13 @@
         * "has reached 𝑣₁=$(v₁).  This is ideal."
     )
 
+    # Check that the input pnsystem doesn't change during evolution
+    pnsystem₁ = BBH(;M₁, M₂, χ⃗₁, χ⃗₂, R=Rᵢ, v=vᵢ)
+    pnsystem₂ = deepcopy(pnsystem₁)
+    inspiral = orbital_evolution(pnsystem₂)
+    @test pnsystem₁.state == inspiral.u[1]
+    @test pnsystem₁.state == pnsystem₂.state
+
     # Check for termination info
     sol1 = @test_logs (:info,forwards_termination) orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, Rᵢ=Rᵢ, quiet=false)
     sol2 = @test_logs (:info,forwards_termination) (:info,backwards_termination) orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ, Ω₁=Ωᵢ/2, Rᵢ=Rᵢ, quiet=false)
