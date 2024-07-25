@@ -186,12 +186,12 @@ function PNWaveform(
     # Return
     (
         t=solution.t,
-        data=h',
-        frame=stack(solution[[:Rʷ, :Rˣ, :Rʸ, :Rᶻ]])',
+        data=transpose(h),
+        frame=transpose(stack(solution[[:Rʷ, :Rˣ, :Rʸ, :Rᶻ]])),
         M1=solution[:M₁],
         M2=solution[:M₂],
-        chi1=stack(solution[[:χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ]])',
-        chi2=stack(solution[[:χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ]])',
+        chi1=transpose(stack(solution[[:χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ]])),
+        chi2=transpose(stack(solution[[:χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ]])),
         v=solution[:v],
         Phi=solution[:Φ],
     )
