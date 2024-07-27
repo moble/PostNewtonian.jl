@@ -94,7 +94,21 @@ python -c 'from sxs import julia'
 
 
 ## Testing the installation
-   
+
+!!! danger "Import this package first"
+
+    When using this package from Python with any other non-standard
+    libraries — like `scri` or `lal` — you should always import
+    `sxs.julia` or one of its components *first* in your Python session.
+    This is because those packages may use the same compiled libraries as
+    this package, in the form of shared objects, like `libfftw3`.  But
+    because Python packaging is so desperately bad, the libraries that
+    come with Python packages are often quite old and will interfere with
+    the operation of this package.  Loading this package first ensures
+    that newer versions of the libraries are loaded, which will typically
+    be backwards compatible.
+
+
 Start up a python session and run something like this:
 ```python
 # Any python imports you need go here
