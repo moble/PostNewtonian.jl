@@ -489,7 +489,7 @@ Base.@constprop :aggressive function orbital_evolution(
     end
 
     orbital_evolution(
-        pnsystem; RHS! = TaylorT1RHS!, v₁, vₑ,
+        pnsystem; RHS!, v₁, vₑ,
         check_up_down_instability, quiet,
         termination_criteria_forwards,
         termination_criteria_backwards,
