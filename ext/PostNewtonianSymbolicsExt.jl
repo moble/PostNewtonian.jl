@@ -19,9 +19,9 @@ import PostNewtonian: hold, unhold, SymbolicPNSystem,
     ln, ln2, ln3, ln5, ζ3, γₑ,
     _efficient_vector
     #apply_to_first_add!, flatten_add!, pn_expression,
-using RuntimeGeneratedFunctions
+using RuntimeGeneratedFunctions: init, @RuntimeGeneratedFunction
 
-RuntimeGeneratedFunctions.init(@__MODULE__)
+init(@__MODULE__)
 
 function _efficient_vector(N, ::Type{Symbolics.Num})
     Symbolics.variables(string(gensym()), 1:N)
