@@ -11,17 +11,22 @@ So this test does all that a little more manually and compares the results at ea
 
 @testitem "binding_energy" begin
     using DoubleFloats: Double64
+    using Random: Xoshiro
 
     include("binding_energy_reference.jl")
+
+    rng = Xoshiro(1234)
 
     for PNOrder ∈ 0//2 : 1//2 : 13//2
 
         for T ∈ [Float32, Float64, Double64]
-            v = T(1//100)
-            numpn = rand(NSNS; v, PNOrder)
-            ϵ = 100eps(PostNewtonian.μ(numpn) * v^2)
-            @test 𝓔(numpn) ≈ be(numpn, false) atol=ϵ rtol=100eps(T)
-            @test 𝓔′(numpn) ≈ be(numpn, true) atol=ϵ rtol=100eps(T)
+            v = T(1//10)
+            for _ ∈ 1:100
+                numpn = rand(rng, NSNS; v, PNOrder)
+                ϵ = 2eps(PostNewtonian.μ(numpn) * v^2)
+                @test 𝓔(numpn) ≈ be(numpn, false) atol=ϵ rtol=3eps(T)
+                @test 𝓔′(numpn) ≈ be(numpn, true) atol=ϵ rtol=3eps(T)
+            end
         end
 
     end
