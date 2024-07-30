@@ -1,13 +1,23 @@
 {
-  "MD007": {
-    "indent": 4,
-    "start_indented": false
-  },
-  "MD013": {
-    "line_length": 1000,
-    "tables": false
-  },
-  "MD033": false,
-  "MD041": false,
-  "default": true
+    "code-block-style": false,
+    "code-fence-style": {
+        "style": "backtick"
+    },
+    "default": true,
+    "first-line-heading": false,
+    "heading-style": {
+        "style": "atx"
+    },
+    "line-length": {
+        "code_blocks": false,
+        "line_length": 120,
+        "tables": false
+    },
+    "list-indent": {
+        "indent": 2
+    },
+    "ul-indent": {
+        "indent": 2,
+        "start_indented": false
+    }
 }

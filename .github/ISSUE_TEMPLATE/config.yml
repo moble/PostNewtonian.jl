@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Discussions
-    url: https://github.com/moble/PostNewtonian.jl/discussions
-    about: Create and follow discussions here
+    - name: Discussions
+      url: https://github.com/moble/PostNewtonian.jl/discussions
+      about: Create and follow discussions here

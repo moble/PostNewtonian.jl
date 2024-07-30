@@ -19,7 +19,6 @@ black-hole systems, in the post-Newtonian approximation.  See [the
 documentation](https://moble.github.io/PostNewtonian.jl/dev) for
 details.
 
-
 ## How to Cite
 
 If you use PostNewtonian.jl in your work, please cite using the reference given in [CITATION.cff](https://github.com/moble/PostNewtonian.jl/blob/main/CITATION.cff).

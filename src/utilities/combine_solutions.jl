@@ -1,24 +1,30 @@
 # This should be an internal class that just allows us to combine ODE solution objects
 struct CombinedInterpolationData <: AbstractDiffEqInterpolation
-    sol₋
-    sol₊
-    tᵢ
+    sol₋::Any
+    sol₊::Any
+    tᵢ::Any
 end
-function (interp::CombinedInterpolationData)(tvals::AbstractFloat, idxs, deriv, p, continuity::Symbol=:left)
+function (interp::CombinedInterpolationData)(
+    tvals::AbstractFloat, idxs, deriv, p, continuity::Symbol=:left
+)
     if tvals ≥ interp.tᵢ
         interp.sol₊.interp(tvals, idxs, deriv, p, continuity)
     else
         interp.sol₊.interp(tvals, idxs, deriv, p, continuity)
     end
 end
-function (interp::CombinedInterpolationData)(val, tvals::AbstractFloat, idxs, deriv, p, continuity::Symbol=:left)
+function (interp::CombinedInterpolationData)(
+    val, tvals::AbstractFloat, idxs, deriv, p, continuity::Symbol=:left
+)
     if tvals ≥ interp.tᵢ
         interp.sol₊.interp(val, tvals, idxs, deriv, p, continuity)
     else
         interp.sol₊.interp(val, tvals, idxs, deriv, p, continuity)
     end
 end
-function (interp::CombinedInterpolationData)(tvals, idxs, deriv, p, continuity::Symbol=:left)
+function (interp::CombinedInterpolationData)(
+    tvals, idxs, deriv, p, continuity::Symbol=:left
+)
     val = if idxs isa Integer
         Vector{eltype(interp.sol₊)}(undef, length(tvals))
     elseif isnothing(idxs)
@@ -26,9 +32,11 @@ function (interp::CombinedInterpolationData)(tvals, idxs, deriv, p, continuity::
     else
         [Vector{eltype(interp.sol₊)}(undef, length(idxs)) for _ in eachindex(tvals)]
     end
-    interp(val, tvals, idxs, deriv, p, continuity)
+    return interp(val, tvals, idxs, deriv, p, continuity)
 end
-function (interp::CombinedInterpolationData)(val, tvals, idxs, deriv, p, continuity::Symbol=:left)
+function (interp::CombinedInterpolationData)(
+    val, tvals, idxs, deriv, p, continuity::Symbol=:left
+)
     i₊ = tvals .≥ interp.tᵢ
     i₋ = tvals .< interp.tᵢ
     if idxs isa Integer
@@ -52,12 +60,8 @@ function (interp::CombinedInterpolationData)(val, tvals, idxs, deriv, p, continu
     variables = interp.sol₊.prob.f.sys.variables
     parameters = interp.sol₊.prob.f.sys.parameters
     independent_variables = interp.sol₊.prob.f.sys.independent_variables
-    DiffEqArray(
-        val, tvals, p;
-        variables, parameters, independent_variables
-    )
+    return DiffEqArray(val, tvals, p; variables, parameters, independent_variables)
 end
-
 
 """
     combine_solutions(sol₋, sol₊)
@@ -80,8 +84,8 @@ function combine_solutions(sol₋, sol₊)
     problem = ODEProblem(sol₊.prob.f, u[1], (t[1], t[end]), sol₊.prob.p)
     if sol₊.dense
         interp = CombinedInterpolationData(sol₋, sol₊, sol₊.t[1])
-        build_solution(problem, alg, t, u, dense=true, retcode=retcode, interp=interp)
+        build_solution(problem, alg, t, u; dense=true, retcode=retcode, interp=interp)
     else
-        build_solution(problem, alg, t, u, dense=false, retcode=retcode)
+        build_solution(problem, alg, t, u; dense=false, retcode=retcode)
     end
 end

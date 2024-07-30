@@ -32,15 +32,13 @@ julia> absvec(PostNewtonian.χ⃗₁(inspiral[1]))
 0.99
 ```
 """
-function superkick(;v=0.2, chi=0.99, χ=chi, PNOrder=typemax(Int))
+function superkick(; v=0.2, chi=0.99, χ=chi, PNOrder=typemax(Int))
     M₁ = M₂ = 0.5
     χ⃗₁ = [χ, 0, 0]
     χ⃗₂ = [-χ, 0, 0]
     R = Rotor(1)
-    BBH(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, PNOrder)
+    return BBH(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, PNOrder)
 end
-
-
 
 @doc raw"""
     hangup_kick(;v=0.2, χ=0.99, θ=deg2rad(50.98), ϕ=deg2rad(30.0), PNOrder=typemax(Int))
@@ -78,12 +76,18 @@ julia> absvec(PostNewtonian.χ⃗₁(inspiral[1]))
 ```
 """
 function hangup_kick(;
-    v=0.2, chi=0.99, χ=chi, theta=deg2rad(50.98), θ=theta,
-    phi=deg2rad(30.0), ϕ=phi, PNOrder=typemax(Int)
+    v=0.2,
+    chi=0.99,
+    χ=chi,
+    theta=deg2rad(50.98),
+    θ=theta,
+    phi=deg2rad(30.0),
+    ϕ=phi,
+    PNOrder=typemax(Int),
 )
     M₁ = M₂ = 0.5
-    χ⃗₁ = χ * [sin(ϕ)*sin(θ), cos(ϕ)*sin(θ), cos(θ)]
-    χ⃗₂ = χ * [-sin(ϕ)*sin(θ), -cos(ϕ)*sin(θ), cos(θ)]
+    χ⃗₁ = χ * [sin(ϕ) * sin(θ), cos(ϕ) * sin(θ), cos(θ)]
+    χ⃗₂ = χ * [-sin(ϕ) * sin(θ), -cos(ϕ) * sin(θ), cos(θ)]
     R = Rotor(1)
-    BBH(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, PNOrder)
+    return BBH(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, PNOrder)
 end

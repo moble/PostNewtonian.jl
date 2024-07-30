@@ -44,25 +44,27 @@ b_{i+1} = -b_0\sum_{j=1}^{i} a_j b_{i-j}.
 """
 function truncated_series_inverse(a::AbstractVector)
     b = similar(a)
-    truncated_series_inverse!(b, a)
+    return truncated_series_inverse!(b, a)
 end
 
-function truncated_series_inverse(a::NTuple{N, T}) where {N, T}
-    b = MVector{N, T}(undef)
-    truncated_series_inverse!(b, SVector{N, T}(a))
-    Tuple(b)
+function truncated_series_inverse(a::NTuple{N,T}) where {N,T}
+    b = MVector{N,T}(undef)
+    truncated_series_inverse!(b, SVector{N,T}(a))
+    return Tuple(b)
 end
 
 function truncated_series_inverse!(b, a)
     @assert length(b) == length(a)
     n = length(a)
     @inbounds @fastmath if n > 0
-        b[0+1] = inv(a[0+1])
+        b[0 + 1] = inv(a[0 + 1])
     end
-    @inbounds @fastmath for i ∈ 0:n-2
-        b[i+1+1] = -b[0+1] * sum((a[j+1]*b[i+1-j+1] for j ∈ 1:i+1), init=zero(eltype(a)))
+    @inbounds @fastmath for i in 0:(n - 2)
+        b[i + 1 + 1] =
+            -b[0 + 1] *
+            sum((a[j + 1] * b[i + 1 - j + 1] for j in 1:(i + 1)); init=zero(eltype(a)))
     end
-    b
+    return b
 end
 
 @doc raw"""
@@ -87,15 +89,15 @@ See also [`truncated_series_ratio`](@ref).
 """
 function truncated_series_product(a, b, v)
     @assert length(a) == length(b)
-    N = length(a)-1
+    N = length(a) - 1
     if N < 0
         return zero(v)
     end
-    ex = b[N+1] * a[1]
-    for n ∈ N-1:-1:0
-        ex = muladd(v, ex, b[n+1] * evalpoly(v, @view a[1:(N-n)+1]))
+    ex = b[N + 1] * a[1]
+    for n in (N - 1):-1:0
+        ex = muladd(v, ex, b[n + 1] * evalpoly(v, @view a[1:((N - n) + 1)]))
     end
-    ex
+    return ex
 end
 
 function truncated_series_product(a::NTuple{N,T}, b, v) where {N,T}
@@ -104,10 +106,10 @@ function truncated_series_product(a::NTuple{N,T}, b, v) where {N,T}
         return zero(v)
     end
     ex = b[N] * a[1]
-    for n ∈ N-2:-1:0
-        ex = muladd(v, ex, b[n+1] * evalpoly(v, a[1:(N-n-1)+1]))
+    for n in (N - 2):-1:0
+        ex = muladd(v, ex, b[n + 1] * evalpoly(v, a[1:((N - n - 1) + 1)]))
     end
-    ex
+    return ex
 end
 
 @doc raw"""
@@ -129,9 +131,8 @@ This function simply combines [`truncated_series_product`](@ref) and
 [`truncated_series_inverse`](@ref).
 """
 function truncated_series_ratio(a, b, v)
-    truncated_series_product(a, truncated_series_inverse(b), v)
+    return truncated_series_product(a, truncated_series_inverse(b), v)
 end
-
 
 @doc raw"""
     truncated_series_ratio(a, b)
@@ -149,20 +150,24 @@ function truncated_series_ratio(a::NTuple{N1,T1}, b::NTuple{N2,T2}) where {N1,N2
     elseif N1 == 0
         return zero(T)
     end
-    b⁻¹ = MVector{N, T}(undef)
+    b⁻¹ = MVector{N,T}(undef)
 
     @inbounds @fastmath begin
-        b⁻¹[0+1] = inv(b[0+1])
-        for i ∈ 0:N2-2
-            b⁻¹[i+1+1] = -b⁻¹[0+1] * sum((b[j+1]*b⁻¹[i+1-j+1] for j ∈ 1:i+1), init=zero(T))
+        b⁻¹[0 + 1] = inv(b[0 + 1])
+        for i in 0:(N2 - 2)
+            b⁻¹[i + 1 + 1] =
+                -b⁻¹[0 + 1] *
+                sum((b[j + 1] * b⁻¹[i + 1 - j + 1] for j in 1:(i + 1)); init=zero(T))
         end
-        for i ∈ N2-1:N-2
-            b⁻¹[i+1+1] = -b⁻¹[0+1] * sum((b[j+1]*b⁻¹[i+1-j+1] for j ∈ 1:N2-1), init=zero(T))
+        for i in (N2 - 1):(N - 2)
+            b⁻¹[i + 1 + 1] =
+                -b⁻¹[0 + 1] *
+                sum((b[j + 1] * b⁻¹[i + 1 - j + 1] for j in 1:(N2 - 1)); init=zero(T))
         end
 
         a╱b = zero(T)
-        for i1 ∈ 1:N1
-            a╱b += a[i1] * sum((b⁻¹[i2] for i2 ∈ 1:N-i1+1), init=zero(T))
+        for i1 in 1:N1
+            a╱b += a[i1] * sum((b⁻¹[i2] for i2 in 1:(N - i1 + 1)); init=zero(T))
         end
         a╱b
     end
@@ -173,22 +178,22 @@ end
     using DoubleFloats
     import PostNewtonian: truncated_series_inverse, truncated_series_ratio
     Random.seed!(123)
-    for T ∈ [Float32, Float64, Double64]
-        for N ∈ 1:20
+    for T in [Float32, Float64, Double64]
+        for N in 1:20
             A = rand(T, N)
             A[1] = one(T) + rand(T) / 100
             a = Tuple(A)
             x = rand(T)
             ϵ = sum(a) * N * eps(T)
-            for N1 ∈ 1:N
+            for N1 in 1:N
                 expected = sum(truncated_series_inverse(a))
                 unit = zeros(T, N1)
                 unit[1] = one(T)
-                @test truncated_series_ratio(Tuple(unit), a) ≈ expected rtol=ϵ
+                @test truncated_series_ratio(Tuple(unit), a) ≈ expected rtol = ϵ
             end
-            @test truncated_series_ratio(a, a) ≈ 1 rtol=ϵ
-            @test truncated_series_ratio(a, x.*a) ≈ 1/x rtol=ϵ
-            @test truncated_series_ratio(x.*a, a) ≈ x rtol=ϵ
+            @test truncated_series_ratio(a, a) ≈ 1 rtol = ϵ
+            @test truncated_series_ratio(a, x .* a) ≈ 1 / x rtol = ϵ
+            @test truncated_series_ratio(x .* a, a) ≈ x rtol = ϵ
         end
     end
 end

@@ -46,7 +46,6 @@ Like all the other fundamental and derived variables, these can be used directly
 in PN expressions modified by the [`@pn_expression`](@ref
 PostNewtonian.@pn_expression) macro.
 
-
 ## Horizons
 
 We can also compute some variables defined by [Alvi
@@ -64,6 +63,7 @@ plane", whereas we — and most of the rest of the post-Newtonian literature —
 [``\hat{\ell}``](@ref PostNewtonian.ℓ̂) for this vector and [``\hat{n}``](@ref
 PostNewtonian.n̂) to represent the separation vector pointing *from* object 2
 *to* object 1.  For convenience, we define
+
 ```math
 \hat{n}_i = \begin{cases}
 -\hat{n} & \text{i=1}, \\
@@ -88,6 +88,7 @@ relevance for angles.  I find it best to realize that you probably don't need
 the angle *per se*, but trigonometric functions of the angle — like ``\sin^2
 \theta_i``, which is what we actually need in this case.  In particular, I
 believe the best results come from computing
+
 ```math
 \sin^2\theta_i = \frac{
     \left|\hat{n}_i \times \vec{\chi}_i\right|^2
@@ -95,12 +96,14 @@ believe the best results come from computing
     \left| \vec{\chi}_i\right|^2
 }.
 ```
+
 If the denominator is zero, we set ``\sin^2\theta_i = 1`` from physical
 considerations.
 
 Now consider the quantity ``\hat{n}_i \times \vec{\chi}_i``.  We next aim to
 calculate the rotation rate ``\dot{\phi}_i`` of this vector about
 ``\vec{\chi}_i``.  We begin by directly calculating
+
 ```math
 \partial_t \left(\hat{n}_i \times \vec{\chi}_i\right)
 =
@@ -110,6 +113,7 @@ calculate the rotation rate ``\dot{\phi}_i`` of this vector about
 =
 \mp \Omega\, \hat{\lambda} \times \vec{\chi}_i,
 ```
+
 where the negative sign is chosen for ``i=1`` and positive for ``i=2``.  Now,
 from more fundamental considerations, we can understand the components of this
 change.  Since we assume that ``\vec{\chi}_i`` is constant at each instant for
@@ -117,6 +121,7 @@ the purposes of calculation here, the only way for ``\hat{n}_i \times
 \vec{\chi}_i`` to change is either because ``\hat{n}_i`` rotates about
 ``\vec{\chi}_i``, or because the angle ``\theta_i`` is changing.  We can express
 this as
+
 ```math
 \partial_t \left(\hat{n}_i \times \vec{\chi}_i\right)
 =
@@ -124,9 +129,11 @@ this as
 +
 \dot{\theta_i}\, \cot \theta_i\, \left(\hat{n}_i \times \vec{\chi}_i\right).
 ```
+
 Since these two components are orthogonal, we can obtain ``\dot{\phi}`` directly
 by taking the component of this quantity along ``\hat{\chi}_i \times
 \left(\hat{n}_i \times \vec{\chi}_i\right)``:
+
 ```math
 \dot{\phi}_i
 =
@@ -144,6 +151,7 @@ by taking the component of this quantity along ``\hat{\chi}_i \times
 =
 \Omega\, \frac{\hat{\ell} \cdot \hat{\chi}_i}{\sin^2 \theta_i}.
 ```
+
 Here again, we may run into numerical trouble if ``\left| \vec{\chi}_1 \right| \approx 0``,
 in which case we again use physical arguments to take ``\dot{\phi}_i = \Omega``.
 We might also expect to run into trouble if ``\sin^2 \theta_i \approx 0``, which

@@ -5,8 +5,7 @@ using ..PostNewtonian: PNSystem, BHNS, NSNS, FDPNSystem
 using ..PostNewtonian: M₁index, M₂index, χ⃗₁indices, χ⃗₂indices, Rindices, vindex, Φindex
 using Quaternionic: Quaternionic, QuatVec, Rotor
 
-export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, Λ₁, Λ₂,
-    M1, M2, chi1, chi2, Phi, Lambda1, Lambda2
+export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, Λ₁, Λ₂, M1, M2, chi1, chi2, Phi, Lambda1, Lambda2
 
 ## NOTE:
 ## This indices used below are intimately bound to choices made in the definitions of
@@ -92,7 +91,7 @@ See also [`Ω`](@ref).
 """
 v(s::PNSystem) = v(s.state)
 v(state::AbstractVector) = @inbounds state[vindex]
-v(;Ω, M=1) = ∛(M*Ω)
+v(; Ω, M=1) = ∛(M * Ω)
 
 """
     Φ(pnsystem)

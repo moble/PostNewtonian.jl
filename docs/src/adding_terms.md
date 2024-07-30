@@ -41,9 +41,11 @@ exceptions to this rule:
       appropriate power *relative to the 0-pN order term* inside the
       `@pn_expansion` macro.  For example, the first couple terms in
       the binding energy expansion look like
+
       ```julia
       32/5G * ν^2 * v^10 / c^5 * @pn_expansion(1 + (v/c)^2 * (-1247//336 - 35ν/12))
       ```
+
       The `1/c^5` factor at the beginning is useful to remind us of
       the *absolute* order of this expression, but the `1/c^2` factor
       inside the `@pn_expansion` macro is crucial to ensure that the
@@ -52,11 +54,13 @@ exceptions to this rule:
       you could either manually code it inside the `@pn_expansion`
       expression, including its `1/c^12` factor, or you could create a
       separate function that should look like this:
+
       ```julia
       @pn_expression function binding_energy_6pn(pnsystem::PNSystem)
           32/5G * ν^2 * v^12 / c^5 * @pn_expansion((v/c)^12 * 17//4)
       end
       ```
+
       Note that we have kept the `1/c^5` factor out front, and the
       `1/c^12` factor inside the `@pn_expansion` macro.  This tells
       the compiler that this is a 6-pN term, so if the user requests a

@@ -1,11 +1,24 @@
 module MathConstants
 
-export log2, ln2, log3, ln3, log5, ln5,
-    log3halves, log³╱₂, ln³╱₂, log5halves, log⁵╱₂, ln⁵╱₂,
-    apery, ζ3, γₑ, 𝒾
+export log2,
+    ln2,
+    log3,
+    ln3,
+    log5,
+    ln5,
+    log3halves,
+    log³╱₂,
+    ln³╱₂,
+    log5halves,
+    log⁵╱₂,
+    ln⁵╱₂,
+    apery,
+    ζ3,
+    γₑ,
+    𝒾
 
 Base.@irrational ln2 0.6931471805599453 log2
-Base.@irrational γₑ 0.57721566490153286061  euler
+Base.@irrational γₑ 0.57721566490153286061 euler
 Base.@irrational ln3 1.0986122886681097 big"1.098612288668109691395245236922525704647490557822749451734694333637494293218608966873615754813732088787970029"
 Base.@irrational ln5 1.6094379124341003 big"1.60943791243410037460075933322618763952560135426851772191264789147417898770765776463013387809317961"
 Base.@irrational ln³╱₂ 0.4054651081081644 big"0.40546510810816438197801311546434913657199042346249419761401432414410067124891425126775242781731340"
@@ -56,7 +69,7 @@ julia> sum((1:10_000_000).^-3)
 ```
 """
 ζ3
-const apery=ζ3
+const apery = ζ3
 
 """
     ln2
@@ -77,7 +90,7 @@ julia> exp(big(PostNewtonian.ln2))
 ```
 """
 ln2
-const log2=ln2
+const log2 = ln2
 
 """
     ln3
@@ -98,7 +111,7 @@ julia> exp(big(PostNewtonian.ln3))
 ```
 """
 ln3
-const log3=ln3
+const log3 = ln3
 
 """
     ln5
@@ -119,7 +132,7 @@ julia> exp(big(PostNewtonian.ln5))
 ```
 """
 ln5
-const log5=ln5
+const log5 = ln5
 
 """
     ln³╱₂
@@ -141,8 +154,8 @@ julia> exp(big(PostNewtonian.ln³╱₂))
 ```
 """
 ln³╱₂
-const log³╱₂=ln³╱₂
-const log3halves=ln³╱₂
+const log³╱₂ = ln³╱₂
+const log3halves = ln³╱₂
 
 """
     ln⁵╱₂
@@ -164,7 +177,7 @@ julia> exp(big(PostNewtonian.ln⁵╱₂))
 ```
 """
 ln⁵╱₂
-const log⁵╱₂=ln⁵╱₂
-const log5halves=ln⁵╱₂
+const log⁵╱₂ = ln⁵╱₂
+const log5halves = ln⁵╱₂
 
 end

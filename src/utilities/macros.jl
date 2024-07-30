@@ -9,94 +9,96 @@ needed to ensure that the types of variables and constants are correct when we u
 expressions, rather than just assuming everything is a `Float64`.
 """
 function type_converter(pnsystem, x)
-    convert(eltype(pnsystem), x)
+    return convert(eltype(pnsystem), x)
 end
-function type_converter(::FDPNSystem{FT}, x) where FT
-    convert(FT, x)
+function type_converter(::FDPNSystem{FT}, x) where {FT}
+    return convert(FT, x)
 end
 function type_converter(::FDPNSystem, x::FastDifferentiation.Node)
-    x
+    return x
 end
 
 fundamental_variables = methodswith(PNSystem, FundamentalVariables)
 fundamental_quaternionic_variables = [
-    m for m ∈ methodswith(AbstractVector, FundamentalVariables)
-    if m.name ∈ [:χ⃗₁, :χ⃗₂, :R]
+    m for
+    m in methodswith(AbstractVector, FundamentalVariables) if m.name ∈ [:χ⃗₁, :χ⃗₂, :R]
 ]
 derived_variables = methodswith(VecOrPNSystem, DerivedVariables)
-pnvariables = map(v->v.name, [fundamental_variables; derived_variables])
+pnvariables = map(v -> v.name, [fundamental_variables; derived_variables])
 
-
-irrationals = unique([
-    find_symbols_of_type(Base.MathConstants, Irrational);
-    find_symbols_of_type(MathConstants, Irrational)
-])
+irrationals = unique(
+    [
+        find_symbols_of_type(Base.MathConstants, Irrational)
+        find_symbols_of_type(MathConstants, Irrational)
+    ],
+)
 
 # This should include all the unary functions that we want to use in any PN expression.
 unary_funcs = [:√, :sqrt, :log, :ln, :sin, :cos]
-
 
 function pn_expression(pnsystem::Symbol, body)
     # Look for variables in `body` that we need to treat specially, and write exprs to do
     # so.  These three are described as bullet points in the docstring of `@pn_expression`.
     pnvariables_exprs = [
-        :($v=$v($pnsystem))
-        for v ∈ filter(v->MacroTools.inexpr(body, v), pnvariables)
+        :($v = $v($pnsystem)) for v in filter(v -> MacroTools.inexpr(body, v), pnvariables)
     ]
     irrationals_exprs = [
-        :($v=type_converter($pnsystem, $v))
-        for v ∈ filter(v->MacroTools.inexpr(body, v), irrationals)
+        :($v = type_converter($pnsystem, $v)) for
+        v in filter(v -> MacroTools.inexpr(body, v), irrationals)
     ]
     unary_funcs_exprs = [
-        :($v=(x->$v(type_converter($pnsystem, x))))
-        for v ∈ filter(v->MacroTools.inexpr(body, v), unary_funcs)
+        :($v = (x -> $v(type_converter($pnsystem, x)))) for
+        v in filter(v -> MacroTools.inexpr(body, v), unary_funcs)
     ]
 
     exprs = [
-        pnvariables_exprs;
-        irrationals_exprs;
+        pnvariables_exprs
+        irrationals_exprs
         unary_funcs_exprs
     ]
 
     # Next, add pnsystem as the argument to each @pn_expansion call
-    new_body = MacroTools.unblock(macroexpand(
-        @__MODULE__,
-        MacroTools.postwalk(body) do x
-            if MacroTools.isexpr(x, :macrocall) &&
-                x.args[1]==Symbol("@pn_expansion") &&
-                !isa(x.args[end-1], Symbol)
-                x′ = deepcopy(x)
-                insert!(x′.args, length(x′.args), pnsystem)
-                x′
-            else
-                x
-            end
-        end,
-        recursive=true
-    ))
+    new_body = MacroTools.unblock(
+        macroexpand(
+            @__MODULE__,
+            MacroTools.postwalk(body) do x
+                if MacroTools.isexpr(x, :macrocall) &&
+                    x.args[1] == Symbol("@pn_expansion") &&
+                    !isa(x.args[end - 1], Symbol)
+                    x′ = deepcopy(x)
+                    insert!(x′.args, length(x′.args), pnsystem)
+                    x′
+                else
+                    x
+                end
+            end;
+            recursive=true,
+        ),
+    )
 
     # Finally, just wrap `new_body` in a `let` block, where we include exprs created above.
     # Also include the definitions `c=G=1` (to be overwritten inside any `@pn_expansion`).
-    full_body = MacroTools.unblock(quote
-        c = one(eltype($pnsystem))
-        G = one(eltype($pnsystem))
-        @fastmath let $(exprs...)
-            $(new_body)
-        end
-    end)
-
+    return full_body = MacroTools.unblock(
+        quote
+            c = one(eltype($pnsystem))
+            G = one(eltype($pnsystem))
+            @fastmath let $(exprs...)
+                $(new_body)
+            end
+        end,
+    )
 end
 
 function pn_expression(arg_index::Integer, func)
     splitfunc = MacroTools.splitdef(func)
     pnsystem = MacroTools.namify(splitfunc[:args][arg_index])
     splitfunc[:kwargs] = [
-        splitfunc[:kwargs];
+        splitfunc[:kwargs]
         :($(Expr(:kw, :(pn_expansion_reducer::Val{PNExpansionReducer}), :(Val(sum)))))
     ]
     splitfunc[:whereparams] = (splitfunc[:whereparams]..., :PNExpansionReducer)
     splitfunc[:body] = pn_expression(pnsystem, splitfunc[:body])
-    MacroTools.combinedef(splitfunc)
+    return MacroTools.combinedef(splitfunc)
 end
 
 """
@@ -141,13 +143,12 @@ values other than those encapsulated in `pnsystem`, you'll need to address them 
 with the module name — as in `PostNewtonian.v(;Ω, M)`.
 """
 macro pn_expression(func)
-    esc(pn_expression(1, func))
+    return esc(pn_expression(1, func))
 end
 
 macro pn_expression(arg_index, func)
-    esc(pn_expression(arg_index, func))
+    return esc(pn_expression(arg_index, func))
 end
-
 
 """
     @pn_expansion [pnsystem] expansion
@@ -162,7 +163,7 @@ This expansion is achieved by setting — inside a `let` block created by this m
 Note that the `pnsystem` argument can be inserted automatically by [`@pn_expression`](@ref).
 """
 macro pn_expansion(pnsystem, expr)
-    esc(pn_expansion(pnsystem, expr))
+    return esc(pn_expansion(pnsystem, expr))
 end
 
 function pn_expansion(pnsystem, expr)

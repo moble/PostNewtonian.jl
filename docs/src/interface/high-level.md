@@ -18,6 +18,7 @@ Here, we'll work through an example, and provide some more details.
 First, we have to specify the initial masses, spins, and orbital angular
 frequency.  Let's arbitrarily choose something close to a [hangup-kick](@ref
 hangup_kick) configuration.
+
 ```@example 1
 using PostNewtonian
 
@@ -31,6 +32,7 @@ M₂ = 0.4
 inspiral = orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ)
 nothing;  # hide
 ```
+
 There are also numerous optional keyword arguments to `orbital_evolution`,
 controlling things like the range of frequencies over which to integrate
 (including possibly both forwards *and* backwards from the initial values),
@@ -45,6 +47,7 @@ integrator).  The time steps at which the solution was saved are available as
 `inspiral.t`, and the evolved variables are available as `inspiral.u`, or by
 their names as in `inspiral[:v]` or `inspiral[:Φ]`.  For example, we can plot
 the components of the spin of object 1 like this:
+
 ```@example 1
 using Plots  # Requires also installing `Plots` in your project
 plotlyjs()  # hide
@@ -56,17 +59,21 @@ plot!(inspiral.t, inspiral[:χ⃗₁ᶻ], label=raw"$\vec{\chi}_1^z$")
 plot!(xlabel="Time (𝑀)", ylabel="Dimensionless spin components")
 savefig("inspiral_spins.html"); nothing  # hide
 ```
+
 ```@raw html
 <!-- NOTE: ../ in src works on github, but not locally -->
 <iframe src="../inspiral_spins.html" style="height:500px;width:100%;"></iframe>
 ```
+
 As expected, we see *significant* precession of the spin on long time scales, as
 well as smaller nutations on orbital time scales visible mostly at later times.
 
 The evolved variables, in order, are
+
 ```@example 1
 join(stdout, PostNewtonian.pnsystem_symbols, ", ")  # hide
 ```
+
 They can be accessed by their symbols, like the spins above, or by their number
 in this list.  To access the `i`th variable at time step `j`, use `sol[i, j]`.
 You can also use colons: `sol[i, :]` is a vector of the `i`th variable at all
@@ -97,15 +104,19 @@ waveform will be distorted by
 
 For instance, suppose we want to plot the results every ``0.5M`` for the last
 ``5,000M`` of the data.  We could define the new set of times as
+
 ```@example 1
 t′ = inspiral.t[end]-5_000 : 0.5 : inspiral.t[end]
 nothing;  # hide
 ```
+
 and then interpolate to this new set of times as
+
 ```@example 1
 inspiral = inspiral(t′)
 nothing  # hide
 ```
+
 We couldn't have achieved quite the same effect with the `saveat` argument
 mentioned above because in this case, we wanted to know the point at which we
 were ``5,000M`` before the end of the inspiral.  In general, if you need the
@@ -117,11 +128,14 @@ this is the approach you'll have to take.
 Usually, we will also want the actual waveform from this system.  We can just
 call [`inertial_waveform`](@ref) (or [`coorbital_waveform`](@ref) for the
 waveform in a rotating frame in which the binary is stationary).
+
 ```@example 1
 h = inertial_waveform(inspiral)
 nothing;  # hide
 ```
+
 Again, we can plot the result:
+
 ```@example 1
 plot(inspiral.t, real.(h[1, :]), label=raw"$\Re\left\{h_{2,-2}\right\}$")
 plot!(inspiral.t, imag.(h[1, :]), label=raw"$\Im\left\{h_{2,-2}\right\}$")
@@ -129,10 +143,12 @@ plot!(inspiral.t, abs.(h[1, :]), label=raw"$\left|h_{2,-2}\right|$", linewidth=3
 plot!(xlabel="Time (𝑀)", ylabel="Mode weights", ylim=(-0.5,0.5))
 savefig("waveform.html"); nothing  # hide
 ```
+
 ```@raw html
 <!-- NOTE: ../ in src works on github, but not locally -->
 <iframe src="../waveform.html" style="height:500px;width:100%;"></iframe>
 ```
+
 We see oscillations in the *amplitude* of the ``h_{2,-2}`` mode on the orbital
 timescale, which is to be expected in a hangup-kick scenario as the system
 alternates between beaming power preferentially along the ``+z`` and ``-z``

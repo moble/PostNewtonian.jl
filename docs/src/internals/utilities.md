@@ -28,8 +28,7 @@ Pages   = ["utilities/macros.jl"]
 Order   = [:macro, :module, :type, :constant, :function]
 ```
 
-
-# Termination criteria
+## Termination criteria
 
 Hopefully, it should not be necessary to directly use these termination
 criteria.  They are used by default in the [`orbital_evolution`](@ref) function.
@@ -51,7 +50,6 @@ Pages   = ["utilities/termination_criteria.jl"]
 Order   = [:module, :type, :constant, :function, :macro]
 ```
 
-
 ## Manipulating ODE solutions
 
 ```@autodocs
@@ -59,7 +57,6 @@ Modules = [PostNewtonian]
 Pages   = ["utilities/combine_solutions.jl"]
 Order   = [:module, :type, :constant, :function, :macro]
 ```
-
 
 ### Irrational constants
 
@@ -73,6 +70,7 @@ To get full precision, you'll need to do things like `2BigFloat(ζ3)`.
 
 One approach to avoiding this is to explicitly redefine these constants as
 floats of the desired precision, using `let` to essentially overwrite the name:
+
 ```julia
 function foo(x)
     let ζ3=oftype(x, ζ3)
@@ -80,6 +78,7 @@ function foo(x)
     end
 end
 ```
+
 Inside the `let` block, `ζ3` is no longer an `Irrational`; it has been converted
 to whatever number type `x` is.  Thus, when multiplying by 2, it is not
 converted to a `Float64`; its precision matches that of `x`.
@@ -97,7 +96,6 @@ PostNewtonian.ln5
 PostNewtonian.ln³╱₂
 PostNewtonian.ln⁵╱₂
 ```
-
 
 ## Truncated series
 
@@ -143,7 +141,6 @@ PostNewtonian.truncated_series_inverse
 PostNewtonian.truncated_series_product
 PostNewtonian.truncated_series_ratio
 ```
-
 
 ## Miscellaneous
 

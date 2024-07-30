@@ -26,7 +26,7 @@ relevant quantities.  Neither of these requires any adjustment by users of this 
 """
 @pn_expression function up_down_instability(pnsystem)
     T = eltype(pnsystem)
-    Ωₘₐₓ = PostNewtonian.Ω(v=one(T), M=M)
+    Ωₘₐₓ = PostNewtonian.Ω(; v=one(T), M=M)
 
     # Note that, as mentioned in the docstring, Gerosa et al. use q<1
     if M₂ > M₁  # Just swap the relevant variables
@@ -38,16 +38,15 @@ relevant quantities.  Neither of these requires any adjustment by users of this 
     if χ₁ₗ > 0 && χ₂ₗ < 0
         # Note that `r₊ ≥ r₋`, but we keep corresponding subscripts,
         # which means that `Ω₊ ≤ Ω₋`!
-        r₊ = M * (√abs(χ₁ₗ) + √abs(q*χ₂ₗ))^4 / (1-q)^2
-        r₋ = M * (√abs(χ₁ₗ) - √abs(q*χ₂ₗ))^4 / (1-q)^2
-        Ω₊ = √(M/r₊)^3
-        Ω₋ = √(M/r₋)^3
+        r₊ = M * (√abs(χ₁ₗ) + √abs(q * χ₂ₗ))^4 / (1 - q)^2
+        r₋ = M * (√abs(χ₁ₗ) - √abs(q * χ₂ₗ))^4 / (1 - q)^2
+        Ω₊ = √(M / r₊)^3
+        Ω₋ = √(M / r₋)^3
         (clamp(Ω₊, zero(T), Ωₘₐₓ), clamp(Ω₋, zero(T), Ωₘₐₓ))
     else
         (Ωₘₐₓ, Ωₘₐₓ)
     end
 end
-
 
 @doc raw"""
     function up_down_instability_warn(pnsystem, v₁, vₑ, vₗᵢₘᵢₜ=1//2)
@@ -65,17 +64,18 @@ See [`up_down_instability`](@ref) for details of the calculation of the unstable
 @pn_expression function up_down_instability_warn(pnsystem, v₁, vₑ, vₗᵢₘᵢₜ=1//2)
     if χₚₑᵣₚ ≤ 1e-2 && !iszero(χₚₑᵣₚ)
         (Ω₊, Ω₋) = up_down_instability(pnsystem)
-        v₊, v₋ = PostNewtonian.v(Ω=Ω₊, M=M), PostNewtonian.v(Ω=Ω₋, M=M)
+        v₊, v₋ = PostNewtonian.v(; Ω=Ω₊, M=M), PostNewtonian.v(; Ω=Ω₋, M=M)
         if v₁ < min(v₋, vₗᵢₘᵢₜ) && min(vₑ, vₗᵢₘᵢₜ) > v₊
-            @warn ("\n"
-                * "This system is likely to encounter the up-down instability in the frequency\n"
-                * "range (Ω₊, Ω₋)=$((Ω₊, Ω₋)), which corresponds to\n"
-                * "PN velocity parameters (v₊, v₋)=$((v₊, v₋)).\n"
-                * "This is a true physical instability, not just a numerical issue.  Despite the\n"
-                * "fact that the initial conditions contain very small precession, the system will\n"
-                * "likely evolve to have very large precession.  See `up_down_instability` docs\n"
-                * "for details."
-                * "\n\nParameters:"
+            @warn (
+                "\n" *
+                "This system is likely to encounter the up-down instability in the frequency\n" *
+                "range (Ω₊, Ω₋)=$((Ω₊, Ω₋)), which corresponds to\n" *
+                "PN velocity parameters (v₊, v₋)=$((v₊, v₋)).\n" *
+                "This is a true physical instability, not just a numerical issue.  Despite the\n" *
+                "fact that the initial conditions contain very small precession, the system will\n" *
+                "likely evolve to have very large precession.  See `up_down_instability` docs\n" *
+                "for details." *
+                "\n\nParameters:"
             ) M₁ M₂ χ⃗₁ χ⃗₂ R v v₁ vₑ
         end
     end

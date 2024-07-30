@@ -5,7 +5,6 @@ Return `x` or the value wrapped by the `Dual` number `x`
 """
 value(x) = hasproperty(x, :value) ? getproperty(x, :value) : x
 
-
 """
     find_symbols_of_type(mod, T)
 
@@ -14,9 +13,8 @@ inside that module that are instances of the given type `T`.  The returned quant
 vector of `Symbol`s.
 """
 function find_symbols_of_type(mod, T)
-    filter(n->getproperty(mod, n) isa T, names(mod))
+    return filter(n -> getproperty(mod, n) isa T, names(mod))
 end
-
 
 """
     iscall(x, symbols)
@@ -25,14 +23,12 @@ Return `true` if the `Expr` `x` is a call to any element of `symbols`.
 """
 iscall(x, symbols) = MacroTools.isexpr(x, :call) && x.args[1] ∈ symbols
 
-
 """
     isadd(x)
 
 Return `true` if the `Expr` `x` is a call to `(+)` or `:+`.
 """
 isadd(x) = iscall(x, ((+), :+))
-
 
 """
     ismul(x)
@@ -41,26 +37,24 @@ Return `true` if the `Expr` `x` is a call to `(*)` or `:*`.
 """
 ismul(x) = iscall(x, ((*), :*))
 
-
 """
     flatten_binary!(expr, symbols)
 
 Flatten nested binary operations — that is, apply associativity repeatedly.
 """
 function flatten_binary!(expr, symbols)
-    while iscall(expr, symbols) && any(x->iscall(x, symbols), expr.args[2:end])
+    while iscall(expr, symbols) && any(x -> iscall(x, symbols), expr.args[2:end])
         args = expr.args[2:end]
-        i₊ = findfirst(x->iscall(x, symbols), args)
-        args′ = [first(symbols); args[1:i₊-1]; args[i₊].args[2:end]; args[i₊+1:end]]
+        i₊ = findfirst(x -> iscall(x, symbols), args)
+        args′ = [first(symbols); args[1:(i₊ - 1)]; args[i₊].args[2:end]; args[(i₊ + 1):end]]
         expr.args[:] = args′[1:length(expr.args)]
-        append!(expr.args, args′[1+length(expr.args):end])
+        append!(expr.args, args′[(1 + length(expr.args)):end])
     end
-    expr
+    return expr
 end
 
 flatten_add!(expr) = flatten_binary!(expr, ((+), :+))
 flatten_mul!(expr) = flatten_binary!(expr, ((*), :*))
-
 
 """
     apply_to_first_add!(expr, func)

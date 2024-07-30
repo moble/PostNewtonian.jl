@@ -14,12 +14,12 @@ function termination_forwards(vₑ, quiet=false)
     # Triggers the `continuous_terminator!` whenever one of these conditions crosses 0.
     # More precisely, the integrator performs a root find to finish precisely
     # when one of these conditions crosses 0.
-    function conditions(out,state,t,integrator)
+    function conditions(out, state, t, integrator)
         out[1] = state[M₁index]  # Terminate if M₁ ≤ 0
         out[2] = state[M₂index]  # Terminate if M₂ ≤ 0
-        out[3] = 1 - sum(x->x^2, @view state[χ⃗₁indices])  # Terminate if χ₁ > 1
-        out[4] = 1 - sum(x->x^2, @view state[χ⃗₂indices])  # Terminate if χ₂ > 1
-        out[5] = vₑ - state[vindex]  # Terminate at v = vₑ
+        out[3] = 1 - sum(x -> x^2, @view state[χ⃗₁indices])  # Terminate if χ₁ > 1
+        out[4] = 1 - sum(x -> x^2, @view state[χ⃗₂indices])  # Terminate if χ₂ > 1
+        return out[5] = vₑ - state[vindex]  # Terminate at v = vₑ
     end
     function terminator!(integrator, event_index)
         if event_index == 1
@@ -32,20 +32,19 @@ function termination_forwards(vₑ, quiet=false)
             @warn "Terminating forwards evolution because χ₂>1.  Suggests early breakdown of PN."
         elseif event_index == 5
             quiet || @info (
-                "Terminating forwards evolution because the PN parameter 𝑣 "
-                * "has reached 𝑣ₑ=$(value(vₑ)).  This is ideal."
+                "Terminating forwards evolution because the PN parameter 𝑣 " *
+                "has reached 𝑣ₑ=$(value(vₑ)).  This is ideal."
             )
         end
-        terminate!(integrator)
+        return terminate!(integrator)
     end
-    VectorContinuousCallback(
+    return VectorContinuousCallback(
         conditions,
         terminator!,
         5;  # We have 5 criteria above
-        save_positions=(false,false)  # Only save before the termination, not after
+        save_positions=(false, false),  # Only save before the termination, not after
     )
 end
-
 
 """
     termination_backwards(v₁, [quiet])
@@ -60,12 +59,12 @@ value of `v₁` if set to `true`, but warnings will still be issued when termina
 reasons.
 """
 function termination_backwards(v₁, quiet=false)
-    function terminators_backwards(out,state,t,integrator)
+    function terminators_backwards(out, state, t, integrator)
         out[1] = state[M₁index]  # Terminate if M₁≤0
         out[2] = state[M₂index]  # Terminate if M₂≤0
-        out[3] = 1 - sum(x->x^2, @view state[χ⃗₁indices])  # Terminate if χ₁>1
-        out[4] = 1 - sum(x->x^2, @view state[χ⃗₂indices])  # Terminate if χ₂>1
-        out[5] = v₁ - state[vindex]  # Terminate at v = v₁
+        out[3] = 1 - sum(x -> x^2, @view state[χ⃗₁indices])  # Terminate if χ₁>1
+        out[4] = 1 - sum(x -> x^2, @view state[χ⃗₂indices])  # Terminate if χ₂>1
+        return out[5] = v₁ - state[vindex]  # Terminate at v = v₁
     end
     function terminator_backwards!(integrator, event_index)
         if event_index == 1
@@ -78,20 +77,19 @@ function termination_backwards(v₁, quiet=false)
             @warn "Terminating backwards evolution because χ₂>1.  Suggests problem with PN."
         elseif event_index == 5
             quiet || @info (
-                "Terminating backwards evolution because the PN parameter 𝑣 "
-                * "has reached 𝑣₁=$(value(v₁)).  This is ideal."
+                "Terminating backwards evolution because the PN parameter 𝑣 " *
+                "has reached 𝑣₁=$(value(v₁)).  This is ideal."
             )
         end
-        terminate!(integrator)
+        return terminate!(integrator)
     end
-    VectorContinuousCallback(
+    return VectorContinuousCallback(
         terminators_backwards,
         terminator_backwards!,
         5;  # We have 5 criteria above
-        save_positions=(false,false)  # Only save before the termination, not after
+        save_positions=(false, false),  # Only save before the termination, not after
     )
 end
-
 
 """
     dtmin_terminator(T, [quiet])
@@ -108,27 +106,25 @@ issued; otherwise an `info` message will be issued only if the `quiet` flag is s
 """
 function dtmin_terminator(T, quiet=false)
     sqrtϵ::T = √eps(T)  # Tricks for faster closures
-    discrete_condition = let sqrtϵ=sqrtϵ
-        (state,t,integrator) -> abs(integrator.dt) < sqrtϵ
+    discrete_condition = let sqrtϵ = sqrtϵ
+        (state, t, integrator) -> abs(integrator.dt) < sqrtϵ
     end
     function discrete_terminator!(integrator)
         v = integrator.u[vindex]
         message = (
-            "Terminating evolution because the time-step size has become very small:\n"
-            * "|dt=$(integrator.dt)| < √ϵ=$(sqrtϵ)\n"
-            * "This is only unexpected for 𝑣 ≲ 0.35; the current value is 𝑣=$v."
+            "Terminating evolution because the time-step size has become very small:\n" *
+            "|dt=$(integrator.dt)| < √ϵ=$(sqrtϵ)\n" *
+            "This is only unexpected for 𝑣 ≲ 0.35; the current value is 𝑣=$v."
         )
         if v < 7//20
             @warn message
         elseif !quiet
             @info message
         end
-        terminate!(integrator)
+        return terminate!(integrator)
     end
-    DiscreteCallback(
-        discrete_condition,
-        discrete_terminator!;
-        save_positions=(false,false)
+    return DiscreteCallback(
+        discrete_condition, discrete_terminator!; save_positions=(false, false)
     )
 end
 
@@ -147,31 +143,28 @@ issued; otherwise an `info` message will be issued only if the `quiet` flag is s
 `false`.
 """
 function decreasing_v_terminator(quiet=false)
-    function discrete_condition(state,t,integrator)
-        get_du(integrator)[vindex] < 0  # This translates to v̇<0
+    function discrete_condition(state, t, integrator)
+        return get_du(integrator)[vindex] < 0  # This translates to v̇<0
     end
     function discrete_terminator!(integrator)
         v = integrator.u[vindex]
         ∂ₜv = get_du(integrator)[vindex]
         message = (
-            "Terminating forwards evolution because 𝑣 is decreasing:\n"
-            * "This is only unusual if 𝑣 ≲ 0.35; the current value is 𝑣=$v\n"
-            * "∂ₜ𝑣=$∂ₜv."
+            "Terminating forwards evolution because 𝑣 is decreasing:\n" *
+            "This is only unusual if 𝑣 ≲ 0.35; the current value is 𝑣=$v\n" *
+            "∂ₜ𝑣=$∂ₜv."
         )
         if v < 7//20
             @warn message
         elseif !quiet
             @info message
         end
-        terminate!(integrator)
+        return terminate!(integrator)
     end
-    DiscreteCallback(
-        discrete_condition,
-        discrete_terminator!;
-        save_positions=(false,false)
+    return DiscreteCallback(
+        discrete_condition, discrete_terminator!; save_positions=(false, false)
     )
 end
-
 
 """
     nonfinite_terminator()
@@ -182,16 +175,14 @@ after an integration step.
 If this terminator is triggered, a warning will always be issued.
 """
 function nonfinite_terminator()
-    function discrete_condition(state,t,integrator)
-        !(all(isfinite, state) && isfinite(t) && isfinite(integrator.dt))
+    function discrete_condition(state, t, integrator)
+        return !(all(isfinite, state) && isfinite(t) && isfinite(integrator.dt))
     end
     function discrete_terminator!(integrator)
         @warn "Terminating forwards evolution because a non-finite number was found"
-        terminate!(integrator)
+        return terminate!(integrator)
     end
-    DiscreteCallback(
-        discrete_condition,
-        discrete_terminator!;
-        save_positions=(false,false)
+    return DiscreteCallback(
+        discrete_condition, discrete_terminator!; save_positions=(false, false)
     )
 end

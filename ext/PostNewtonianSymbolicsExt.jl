@@ -4,27 +4,59 @@ module PostNewtonianSymbolicsExt
 # only exist here, but will be needed elsewhere.  The documentation evidently needs to
 # occur there as well.
 
-import MacroTools
-import SymbolicUtils
-isdefined(Base, :get_extension) ? (import Symbolics) : (import ..Symbolics)
+using MacroTools: MacroTools
+using SymbolicUtils: SymbolicUtils
+isdefined(Base, :get_extension) ? (using Symbolics: Symbolics) : (import ..Symbolics)
 
 using PostNewtonian
-import PostNewtonian: hold, unhold, SymbolicPNSystem,
-    type_converter, fundamental_quaternionic_variables, derived_variables,
-    causes_domain_error!, prepare_pn_order, order_index,
-    𝓔′, apply_to_first_add!, flatten_add!, flatten_mul!,
-    pn_expression, pn_expansion, @pn_expansion,
-    M₁, M₂, χ⃗₁, χ⃗₂, v, Φ, Λ₁, Λ₂,
-    R, M, μ, ν, δ, q, ℳ, X₁, X₂,
-    ln, ln2, ln3, ln5, ζ3, γₑ,
+import PostNewtonian:
+    hold,
+    unhold,
+    SymbolicPNSystem,
+    type_converter,
+    fundamental_quaternionic_variables,
+    derived_variables,
+    causes_domain_error!,
+    prepare_pn_order,
+    order_index,
+    𝓔′,
+    apply_to_first_add!,
+    flatten_add!,
+    flatten_mul!,
+    pn_expression,
+    pn_expansion,
+    @pn_expansion,
+    M₁,
+    M₂,
+    χ⃗₁,
+    χ⃗₂,
+    v,
+    Φ,
+    Λ₁,
+    Λ₂,
+    R,
+    M,
+    μ,
+    ν,
+    δ,
+    q,
+    ℳ,
+    X₁,
+    X₂,
+    ln,
+    ln2,
+    ln3,
+    ln5,
+    ζ3,
+    γₑ,
     _efficient_vector
-    #apply_to_first_add!, flatten_add!, pn_expression,
+#apply_to_first_add!, flatten_add!, pn_expression,
 using RuntimeGeneratedFunctions: init, @RuntimeGeneratedFunction
 
 init(@__MODULE__)
 
 function _efficient_vector(N, ::Type{Symbolics.Num})
-    Symbolics.variables(string(gensym()), 1:N)
+    return Symbolics.variables(string(gensym()), 1:N)
 end
 
 ### Moved from src/utilities/macros.jl
@@ -36,26 +68,26 @@ Symbolics.derivative(::typeof(hold), args::NTuple{1,Any}, ::Val{1}) = 1
 function unhold(expr)
     MacroTools.postwalk(expr) do x
         m = MacroTools.trymatch(:(f_(i_)), x)
-        m === nothing || m[:f]!==hold ? x : Symbol(m[:i])
+        m === nothing || m[:f] !== hold ? x : Symbol(m[:i])
     end
 end
 
 function type_converter(::PNSystem{T}, x) where {T<:Vector{Symbolics.Num}}
-    Symbolics.Num(SymbolicUtils.Term(hold, [x]))
+    return Symbolics.Num(SymbolicUtils.Term(hold, [x]))
 end
 function type_converter(::PNSystem{T}, x::Symbolics.Num) where {T<:Vector{Symbolics.Num}}
-    x
+    return x
 end
 
 # Add symbolic capabilities to all derived variables (fundamental variables already work)
-for method ∈ [fundamental_quaternionic_variables; derived_variables]
+for method in [fundamental_quaternionic_variables; derived_variables]
     name = method.name
     @eval begin
         function PostNewtonian.$name(v::PNSystem{T}) where {T<:Vector{Symbolics.Num}}
-            Symbolics.Num(SymbolicUtils.Sym{Real}(Symbol($name)))
+            return Symbolics.Num(SymbolicUtils.Sym{Real}(Symbol($name)))
         end
         function PostNewtonian.$name(v::Vector{T}) where {T<:Symbolics.Num}
-            Symbolics.Num(SymbolicUtils.Sym{Real}(Symbol($name)))
+            return Symbolics.Num(SymbolicUtils.Sym{Real}(Symbol($name)))
         end
     end
 end
@@ -71,7 +103,7 @@ function extract_var_factor(term, var)
     if MacroTools.isexpr(term, :call) && term.args[1] ∈ ((/), :/)
         k₂, term₂ = extract_var_factor(term.args[2], var)
         k₃, term₃ = extract_var_factor(term.args[3], var)
-        return k₂-k₃, Expr(:call, term.args[1], term₂, term₃)
+        return k₂ - k₃, Expr(:call, term.args[1], term₂, term₃)
         #return k₂-k₃, :($(term.args[1]), $term₂, $term₃)
     end
     if !MacroTools.isexpr(term, :call) || term.args[1] ∉ ((*), :*)
@@ -88,8 +120,8 @@ function extract_var_factor(term, var)
     term = flatten_mul!(deepcopy(term))
     k = 0
     indices = Int[]
-    for (i,factor) ∈ enumerate(term.args)
-        if i==1
+    for (i, factor) in enumerate(term.args)
+        if i == 1
             continue  # Skip the :*
         end
         if MacroTools.isexpr(factor, :call)
@@ -126,7 +158,6 @@ function extract_var_factor(term, var)
     end
 end
 
-
 """
     var_collect(expr, var)
 
@@ -155,9 +186,9 @@ function var_collect(expr, var)
         k, term = extract_var_factor(expr, var)
         terms[k] = term
     else
-        for (i,term) ∈ enumerate(expr.args[2:end])
+        for (i, term) in enumerate(expr.args[2:end])
             k, term = extract_var_factor(term, var)
-            if expr.args[1] ∈ ((-), :-) && i==2
+            if expr.args[1] ∈ ((-), :-) && i == 2
                 if k ∈ keys(terms)
                     terms[k] = :($(terms[k]) - $(term))
                 else
@@ -173,39 +204,37 @@ function var_collect(expr, var)
         end
     end
     max_k = maximum(keys(terms))
-    term_exprs = [get(terms, k, 0) for k ∈ 0:max_k]
-    max_k, :(($(term_exprs...),))
+    term_exprs = [get(terms, k, 0) for k in 0:max_k]
+    return max_k, :(($(term_exprs...),))
 end
-
 
 function var_collect(expr::Symbolics.Num, var; max_power=100, max_gap=4)
     expr = SymbolicUtils.expand(expr)
-    dict = Dict(var^j => 0 for j=1:max_power)
-    c = SymbolicUtils.substitute(expr, dict, fold=false)
+    dict = Dict(var^j => 0 for j in 1:max_power)
+    c = SymbolicUtils.substitute(expr, dict; fold=false)
     expr = expr - c
     coefficients = [c]
     gap = 0
     for i in 1:max_power
         dict[var^i] = 1
         if i > 1
-            dict[var^(i-1)] = 0
+            dict[var^(i - 1)] = 0
         end
-        push!(coefficients, Symbolics.substitute(expr, dict, fold=false))
+        push!(coefficients, Symbolics.substitute(expr, dict; fold=false))
         if iszero(coefficients[end])
             gap += 1
             if gap ≥ max_gap
-                return coefficients[1:end-gap]
+                return coefficients[1:(end - gap)]
             end
         else
             gap = 0
         end
     end
-    coefficients
+    return coefficients
 end
 
-
 macro pn_expansion(offset, pnsystem, expr)
-    esc(pn_expansion(offset, pnsystem, expr))
+    return esc(pn_expansion(offset, pnsystem, expr))
 end
 
 function pn_expansion(offset, pnsystem, expr)
@@ -214,42 +243,29 @@ function pn_expansion(offset, pnsystem, expr)
     if offset != 0
         max_index_var = gensym("max_index")
         quote
-            $max_index_var = min($max_index, order_index($pnsystem)-$offset)
+            $max_index_var = min($max_index, order_index($pnsystem) - $offset)
             if $max_index_var < 1
                 zero(v)
             else
-                evalpoly(
-                    v,
-                    $coefficients[1:$max_index_var]
-                )
+                evalpoly(v, $coefficients[1:($max_index_var)])
             end
         end
     else
-        :(evalpoly(
-            v,
-            $coefficients[1:min($max_index, order_index($pnsystem))]
-        ))
+        :(evalpoly(v, $coefficients[1:min($max_index, order_index($pnsystem))]))
     end
 end
-
-
-
-
 
 ## Moved from src/pn_systems.jl
 
 causes_domain_error!(u̇, ::PNSystem{VT}) where {VT<:Vector{Symbolics.Num}} = false
 
-
 function SymbolicPNSystem(PNOrder=typemax(Int))
     Symbolics.@variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
     ET = typeof(M₁)
-    SymbolicPNSystem{Vector{ET}, prepare_pn_order(PNOrder), ET}(
-        [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
-        Λ₁, Λ₂
+    return SymbolicPNSystem{Vector{ET},prepare_pn_order(PNOrder),ET}(
+        [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ], Λ₁, Λ₂
     )
 end
-
 
 """
     symbolic_pnsystem
@@ -277,46 +293,40 @@ julia> χ⃗₂(symbolic_pnsystem)
 """
 const symbolic_pnsystem = SymbolicPNSystem()
 
-
 ## Moved from src/fundamental_variables.jl
 Λ₁(pn::SymbolicPNSystem) = pn.Λ₁
 Λ₂(pn::SymbolicPNSystem) = pn.Λ₂
 
-
 ## Moved from src/pn_expressions/binding_energy.jl with a little padding to distinguish it
 ## from the new FastDifferentiation-based version
-const 𝓔′Symbolics = let 𝓔=𝓔(symbolic_pnsystem), v=v(symbolic_pnsystem)
+const 𝓔′Symbolics = let 𝓔 = 𝓔(symbolic_pnsystem), v = v(symbolic_pnsystem)
     ∂ᵥ = Symbolics.Differential(v)
     # Evaluate derivative symbolically
-    𝓔′ = SymbolicUtils.simplify(Symbolics.expand_derivatives(∂ᵥ(𝓔)), expand=true)#, simplify_fractions=false)
+    𝓔′ = SymbolicUtils.simplify(Symbolics.expand_derivatives(∂ᵥ(𝓔)); expand=true)#, simplify_fractions=false)
     # Turn it into (an Expr of) a function taking one argument: `pnsystem`
-    𝓔′ = Symbolics.build_function(𝓔′, :pnsystem, nanmath=false)
+    𝓔′ = Symbolics.build_function(𝓔′, :pnsystem; nanmath=false)
     # Remove `hold` (which we needed for Symbolics.jl to not collapse to Float64)
     𝓔′ = unhold(𝓔′)
     # "Flatten" the main sum, because Symbolics nests sums for some reason
     𝓔′ = apply_to_first_add!(𝓔′, flatten_add!)
     # Apply `@pn_expansion` to the main sum
     splitfunc = MacroTools.splitdef(𝓔′)
-    splitfunc[:body] = apply_to_first_add!(
-        splitfunc[:body],
-        x->:(@pn_expansion(-1, $x))
-    )
+    splitfunc[:body] = apply_to_first_add!(splitfunc[:body], x -> :(@pn_expansion(-1, $x)))
     𝓔′ = MacroTools.combinedef(splitfunc)
     # Finally, apply the "macro" to it and get a full function out
     @RuntimeGeneratedFunction(pn_expression(1, 𝓔′))
 end
 
 function 𝓔′(
-    pnsystem::PNSystem{ST, PNOrder},
+    pnsystem::PNSystem{ST,PNOrder},
     ::Val{:Symbolics};
-    pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum)
-) where {ST, PNOrder, PNExpansionReducer}
+    pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum),
+) where {ST,PNOrder,PNExpansionReducer}
     if PNExpansionReducer != sum
         error("Symbolic 𝓔′ is not implemented for PNExpansionReducer other than `sum`")
     else
         𝓔′Symbolics(pnsystem)
     end
 end
-
 
 end #module

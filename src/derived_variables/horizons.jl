@@ -7,7 +7,7 @@ As defined on page 2, line 4, of [Alvi
 (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See the documentation section
 on ["Horizons"](@ref Horizons) for more details.
 """
-rₕ₁(s::VecOrPNSystem) = M₁(s) * (1 + √(1-min(χ₁²(s),1)))
+rₕ₁(s::VecOrPNSystem) = M₁(s) * (1 + √(1 - min(χ₁²(s), 1)))
 
 """
     rₕ₂(s)
@@ -18,8 +18,7 @@ As defined on page 2, line 4, of [Alvi
 (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See the documentation section
 on ["Horizons"](@ref Horizons) for more details.
 """
-rₕ₂(s::VecOrPNSystem) = M₂(s) * (1 + √(1-min(χ₂²(s),1)))
-
+rₕ₂(s::VecOrPNSystem) = M₂(s) * (1 + √(1 - min(χ₂²(s), 1)))
 
 """
     Ωₕ₁(s)
@@ -43,7 +42,6 @@ on ["Horizons"](@ref Horizons) for more details.
 """
 Ωₕ₂(s::VecOrPNSystem) = χ₂(s) / 2rₕ₂(s)
 
-
 """
     sin²θ₁(s)
 
@@ -53,8 +51,8 @@ Compare to Eq. (18) of [Alvi (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64
 See the documentation section on ["Horizons"](@ref Horizons) for more details.
 """
 function sin²θ₁(s::VecOrPNSystem)
-    let χ₁²=χ₁²(s)
-        ifelse(iszero(χ₁²), one(χ₁²), abs2vec(n̂(s)×χ⃗₁(s))/χ₁²)
+    let χ₁² = χ₁²(s)
+        ifelse(iszero(χ₁²), one(χ₁²), abs2vec(n̂(s) × χ⃗₁(s)) / χ₁²)
     end
 end
 
@@ -67,11 +65,10 @@ Compare to Eq. (18) of [Alvi (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64
 See the documentation section on ["Horizons"](@ref Horizons) for more details.
 """
 function sin²θ₂(s::VecOrPNSystem)
-    let χ₂²=χ₂²(s)
-        ifelse(iszero(χ₂²), one(χ₂²), abs2vec(n̂(s)×χ⃗₂(s))/χ₂²)
+    let χ₂² = χ₂²(s)
+        ifelse(iszero(χ₂²), one(χ₂²), abs2vec(n̂(s) × χ⃗₂(s)) / χ₂²)
     end
 end
-
 
 @doc raw"""
     ϕ̇̂₁(s)
@@ -87,15 +84,11 @@ that depend on this.
 See the documentation section on ["Horizons"](@ref Horizons) for more details.
 """
 function ϕ̇̂₁(s::VecOrPNSystem)
-    let χ₁=χ₁(s), sin²θ₁=sin²θ₁(s), M=M(s)
+    let χ₁ = χ₁(s), sin²θ₁ = sin²θ₁(s), M = M(s)
         ifelse(
             iszero(χ₁),
             inv(M),
-            ifelse(
-                iszero(sin²θ₁),
-                zero(χ₁),
-                ℓ̂(s) ⋅ χ⃗₁(s) / (M*χ₁*sin²θ₁)
-            )
+            ifelse(iszero(sin²θ₁), zero(χ₁), ℓ̂(s) ⋅ χ⃗₁(s) / (M * χ₁ * sin²θ₁)),
         )
     end
 end
@@ -114,19 +107,14 @@ that depend on this.
 See the documentation section on ["Horizons"](@ref Horizons) for more details.
 """
 function ϕ̇̂₂(s::VecOrPNSystem)
-    let χ₂=χ₂(s), sin²θ₂=sin²θ₂(s), M=M(s)
+    let χ₂ = χ₂(s), sin²θ₂ = sin²θ₂(s), M = M(s)
         ifelse(
             iszero(χ₂),
             inv(M),
-            ifelse(
-                iszero(sin²θ₂),
-                zero(χ₂),
-                ℓ̂(s) ⋅ χ⃗₂(s) / (M*χ₂*sin²θ₂)
-            )
+            ifelse(iszero(sin²θ₂), zero(χ₂), ℓ̂(s) ⋅ χ⃗₂(s) / (M * χ₂ * sin²θ₂)),
         )
     end
 end
-
 
 @doc raw"""
     Î₀₁(s)
@@ -138,10 +126,8 @@ This is the moment divided by ``ν^2 v^{12}``, as given by Eq. (10) of [Alvi
 on ["Horizons"](@ref Horizons) for more details.
 """
 function Î₀₁(s::VecOrPNSystem)
-    let χ₁²=χ₁²(s), sin²θ₁=sin²θ₁(s)
-        (16rₕ₁(s) / 5M(s)^2) * M₁(s)^3 * sin²θ₁ * (
-            1 - 3//4 * χ₁² + 15//4 * χ₁² * sin²θ₁
-        )
+    let χ₁² = χ₁²(s), sin²θ₁ = sin²θ₁(s)
+        (16rₕ₁(s) / 5M(s)^2) * M₁(s)^3 * sin²θ₁ * (1 - 3//4 * χ₁² + 15//4 * χ₁² * sin²θ₁)
     end
 end
 
@@ -155,10 +141,8 @@ This is the moment divided by ``ν^2 v^{12}``, as given by Eq. (10) of [Alvi
 on ["Horizons"](@ref Horizons) for more details.
 """
 function Î₀₂(s::VecOrPNSystem)
-    let χ₂²=χ₂²(s), sin²θ₂=sin²θ₂(s)
-        (16rₕ₂(s) / 5M(s)^2) * M₂(s)^3 * sin²θ₂ * (
-            1 - 3//4 * χ₂² + 15//4 * χ₂² * sin²θ₂
-        )
+    let χ₂² = χ₂²(s), sin²θ₂ = sin²θ₂(s)
+        (16rₕ₂(s) / 5M(s)^2) * M₂(s)^3 * sin²θ₂ * (1 - 3//4 * χ₂² + 15//4 * χ₂² * sin²θ₂)
     end
 end
 
@@ -190,7 +174,7 @@ See also [`λ₁`](@ref).
     information are welcome.
 """
 function κ₁(s::VecOrPNSystem)
-    one(eltype(s))
+    return one(eltype(s))
 end
 
 """
@@ -200,7 +184,7 @@ The "quadrupolar polarisability" of object 2 used by [Bohé et al.
 (2015)](https://arxiv.org/abs/1501.01529).  See [`κ₁`](@ref) for more details.
 """
 function κ₂(s::VecOrPNSystem)
-    one(eltype(s))
+    return one(eltype(s))
 end
 
 """
@@ -210,7 +194,7 @@ Equal to [`κ₁`](@ref)` + `[`κ₂`](@ref); defined below Eq. (3.28) of [Bohé
 (2015)](https://arxiv.org/abs/1501.01529).
 """
 function κ₊(s::VecOrPNSystem)
-    κ₁(s) + κ₂(s)
+    return κ₁(s) + κ₂(s)
 end
 
 """
@@ -220,9 +204,8 @@ Equal to [`κ₁`](@ref)` - `[`κ₂`](@ref); defined below Eq. (3.28) of [Bohé
 (2015)](https://arxiv.org/abs/1501.01529).
 """
 function κ₋(s::VecOrPNSystem)
-    κ₁(s) - κ₂(s)
+    return κ₁(s) - κ₂(s)
 end
-
 
 @doc raw"""
     λ₁(s)
@@ -244,7 +227,7 @@ See also [`κ₁`](@ref).
     information are welcome.
 """
 function λ₁(s::VecOrPNSystem)
-    one(eltype(s))
+    return one(eltype(s))
 end
 
 """
@@ -254,7 +237,7 @@ The "quadrupolar polarisability" of object 2 used by [Bohé et al.
 (2015)](https://arxiv.org/abs/1501.01529).  See [`λ₁`](@ref) for more details.
 """
 function λ₂(s::VecOrPNSystem)
-    one(eltype(s))
+    return one(eltype(s))
 end
 
 """
@@ -264,7 +247,7 @@ Equal to [`λ₁`](@ref)` + `[`λ₂`](@ref); defined below Eq. (3.28) of [Bohé
 (2015)](https://arxiv.org/abs/1501.01529).
 """
 function λ₊(s::VecOrPNSystem)
-    λ₁(s) + λ₂(s)
+    return λ₁(s) + λ₂(s)
 end
 
 """
@@ -274,5 +257,5 @@ Equal to [`λ₁`](@ref)` - `[`λ₂`](@ref); defined below Eq. (3.28) of [Bohé
 (2015)](https://arxiv.org/abs/1501.01529).
 """
 function λ₋(s::VecOrPNSystem)
-    λ₁(s) - λ₂(s)
+    return λ₁(s) - λ₂(s)
 end

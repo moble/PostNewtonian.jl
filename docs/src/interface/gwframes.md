@@ -17,6 +17,7 @@ This interface can be used directly from Julia, but is more likely to
 be wanted by python users.  To borrow from the example in [the
 standard python interface documentation](@ref
 Testing-the-installation):
+
 ```julia
 # Any python imports you need go here
 import numpy as np
@@ -37,6 +38,7 @@ w = GWFrames.PNWaveform("TaylorT1", delta, chi1, chi2, Omega_i)
 # Plot the magnitudes of all the modes as functions of time
 plt.semilogy(w.t, np.abs(w.data))
 ```
+
 This should produce precisely the same plot as the python example, but
 using the `GWFrames` interface.  Note that the parameters given here
 are required, but optional parameters are the same as in the original
@@ -59,7 +61,6 @@ relevant to post-Newtonian waveforms:
 - `v` (array): The orbital velocity as a function of time.
 - `orbital_phase` (array): The orbital phase as a function of
     time.
-
 
 ```@autodocs
 Modules = [PostNewtonian.GWFrames]

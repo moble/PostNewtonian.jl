@@ -3,7 +3,6 @@
 _pnsystem(inspiral::ODESolution) = inspiral.prob.p
 _pnsystem(inspiral::DiffEqArray) = inspiral.p
 
-
 """
     coorbital_waveform_computation_storage(inspiral; [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
     coorbital_waveform_computation_storage(inspiral; [ell_min=2], [ell_max=8], [PNOrder])
@@ -18,22 +17,20 @@ The meaning of the arguments is the same as in [`coorbital_waveform`](@ref).
 """
 function coorbital_waveform_computation_storage(
     inspiral;
-    ell_min=2, ell_max=8, ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max,
-    PNOrder=pn_order(_pnsystem(inspiral))
+    ell_min=2,
+    ell_max=8,
+    ℓₘᵢₙ=ell_min,
+    ℓₘₐₓ=ell_max,
+    PNOrder=pn_order(_pnsystem(inspiral)),
 )
     @assert 0 ≤ ℓₘᵢₙ ≤ 2
     @assert ℓₘᵢₙ ≤ ℓₘₐₓ
     p = _pnsystem(inspiral)
     PNSystemType = parameterless_type(p)
-    pnsystem = PNSystemType(
-        copy(inspiral.u[1]);
-        Λ₁=Λ₁(p),
-        Λ₂=Λ₂(p),
-        PNOrder
-    )
-    n_modes = (ℓₘₐₓ+1)^2 - ℓₘᵢₙ^2
+    pnsystem = PNSystemType(copy(inspiral.u[1]); Λ₁=Λ₁(p), Λ₂=Λ₂(p), PNOrder)
+    n_modes = (ℓₘₐₓ + 1)^2 - ℓₘᵢₙ^2
     h = Array{Complex{eltype(inspiral)}}(undef, n_modes, length(inspiral))
-    h, pnsystem
+    return h, pnsystem
 end
 
 """
@@ -48,19 +45,23 @@ The storage is assumed to be the object returned from
 [`coorbital_waveform`](@ref).
 """
 function coorbital_waveform!(
-    storage, inspiral;
-    ell_min=2, ell_max=8, ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max,
-    PNOrder=pn_order(storage[2])
+    storage,
+    inspiral;
+    ell_min=2,
+    ell_max=8,
+    ℓₘᵢₙ=ell_min,
+    ℓₘₐₓ=ell_max,
+    PNOrder=pn_order(storage[2]),
 )
     h, pnsystem = storage
     @assert length(pnsystem.state) == length(inspiral.u[1])
     @assert length(inspiral) == size(h, 2)
-    @assert (ℓₘₐₓ+1)^2 - ℓₘᵢₙ^2 == size(h, 1)
-    @inbounds @fastmath for iₜ ∈ eachindex(inspiral)
+    @assert (ℓₘₐₓ + 1)^2 - ℓₘᵢₙ^2 == size(h, 1)
+    @inbounds @fastmath for iₜ in eachindex(inspiral)
         pnsystem.state .= inspiral.u[iₜ]
         h!(@view(h[:, iₜ]), pnsystem; ℓₘᵢₙ, ℓₘₐₓ)
     end
-    h
+    return h
 end
 
 """
@@ -101,17 +102,15 @@ even this variation could be factored out.
 """
 function coorbital_waveform(
     inspiral;
-    ell_min=2, ell_max=8, ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max,
-    PNOrder=pn_order(_pnsystem(inspiral))
+    ell_min=2,
+    ell_max=8,
+    ℓₘᵢₙ=ell_min,
+    ℓₘₐₓ=ell_max,
+    PNOrder=pn_order(_pnsystem(inspiral)),
 )
-    storage = coorbital_waveform_computation_storage(
-        inspiral; ℓₘᵢₙ, ℓₘₐₓ, PNOrder
-    )
-    coorbital_waveform!(
-        storage, inspiral; ℓₘᵢₙ, ℓₘₐₓ, PNOrder
-    )
+    storage = coorbital_waveform_computation_storage(inspiral; ℓₘᵢₙ, ℓₘₐₓ, PNOrder)
+    return coorbital_waveform!(storage, inspiral; ℓₘᵢₙ, ℓₘₐₓ, PNOrder)
 end
-
 
 """
     inertial_waveform_computation_storage(inspiral; [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
@@ -127,13 +126,16 @@ The meaning of the arguments is the same as in [`inertial_waveform`](@ref).
 """
 function inertial_waveform_computation_storage(
     inspiral;
-    ell_min=2, ell_max=8, ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max,
-    PNOrder=pn_order(_pnsystem(inspiral))
+    ell_min=2,
+    ell_max=8,
+    ℓₘᵢₙ=ell_min,
+    ℓₘₐₓ=ell_max,
+    PNOrder=pn_order(_pnsystem(inspiral)),
 )
     h, pnsystem = coorbital_waveform_computation_storage(inspiral; ℓₘᵢₙ, ℓₘₐₓ, PNOrder)
     (D, H_rec_coeffs, eⁱᵐᵅ, eⁱᵐᵞ) = Dprep(ℓₘₐₓ, eltype(inspiral))
-    hᵢ = similar(h[:,1])
-    h, pnsystem, D, H_rec_coeffs, eⁱᵐᵅ, eⁱᵐᵞ, hᵢ
+    hᵢ = similar(h[:, 1])
+    return h, pnsystem, D, H_rec_coeffs, eⁱᵐᵅ, eⁱᵐᵞ, hᵢ
 end
 
 """
@@ -148,15 +150,19 @@ The storage is assumed to be the object returned from
 [`inertial_waveform`](@ref).
 """
 function inertial_waveform!(
-    storage, inspiral;
-    ell_min=2, ell_max=8, ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max,
-    PNOrder=pn_order(storage[2])
+    storage,
+    inspiral;
+    ell_min=2,
+    ell_max=8,
+    ℓₘᵢₙ=ell_min,
+    ℓₘₐₓ=ell_max,
+    PNOrder=pn_order(storage[2]),
 )
     h, pnsystem, D, H_rec_coeffs, eⁱᵐᵅ, eⁱᵐᵞ, hᵢ = storage
     @assert length(pnsystem.state) == length(inspiral.u[1])
     @assert length(inspiral) == size(h, 2)
-    @assert (ℓₘₐₓ+1)^2 - ℓₘᵢₙ^2 == size(h, 1)
-    @inbounds @fastmath for iₜ ∈ eachindex(inspiral)
+    @assert (ℓₘₐₓ + 1)^2 - ℓₘᵢₙ^2 == size(h, 1)
+    @inbounds @fastmath for iₜ in eachindex(inspiral)
         pnsystem.state .= inspiral.u[iₜ]
         h!(@view(h[:, iₜ]), pnsystem; ℓₘᵢₙ, ℓₘₐₓ)
         D!(D, conj(R(pnsystem)), ℓₘₐₓ, H_rec_coeffs, eⁱᵐᵅ, eⁱᵐᵞ)
@@ -168,7 +174,7 @@ function inertial_waveform!(
         end
         h[:, iₜ] .= hᵢ
     end
-    h
+    return h
 end
 
 """
@@ -187,13 +193,12 @@ quantity.
 """
 function inertial_waveform(
     inspiral;
-    ell_min=2, ell_max=8, ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max,
-    PNOrder=pn_order(_pnsystem(inspiral))
+    ell_min=2,
+    ell_max=8,
+    ℓₘᵢₙ=ell_min,
+    ℓₘₐₓ=ell_max,
+    PNOrder=pn_order(_pnsystem(inspiral)),
 )
-    storage = inertial_waveform_computation_storage(
-        inspiral; ℓₘᵢₙ, ℓₘₐₓ, PNOrder
-    )
-    inertial_waveform!(
-        storage, inspiral; ℓₘᵢₙ, ℓₘₐₓ, PNOrder
-    )
+    storage = inertial_waveform_computation_storage(inspiral; ℓₘᵢₙ, ℓₘₐₓ, PNOrder)
+    return inertial_waveform!(storage, inspiral; ℓₘᵢₙ, ℓₘₐₓ, PNOrder)
 end

@@ -51,23 +51,23 @@ orientations.  Note that the `Λᵢ` are only used if the input `pnclass` is `BH
 If you would prefer a different range of parameters, the source code for this function is
 easily modified.
 """
-function Base.rand(pnclass::Type{P}; v::T=0.2, PNOrder=typemax(Int)) where {P<:PNSystem, T}
-    rand(default_rng(), pnclass; v, PNOrder)
+function Base.rand(pnclass::Type{P}; v::T=0.2, PNOrder=typemax(Int)) where {P<:PNSystem,T}
+    return rand(default_rng(), pnclass; v, PNOrder)
 end
 
 function Base.rand(
     rng::AbstractRNG, pnclass::Type{P}; v::T=0.2, PNOrder=typemax(Int)
-) where {P<:PNSystem, T}
+) where {P<:PNSystem,T}
     qₘᵢₙ = T(big"0.05")  # Note that we're using q≤1 here for consistency with LIGO
     χₘₐₓ = T(big"0.998")
     Λₘₐₓ = T(big"5000.0")
-    q = rand(rng, T) * (1-qₘᵢₙ) + qₘᵢₙ
-    M₁ = 1/(q+1)
-    M₂ = q/(q+1)
+    q = rand(rng, T) * (1 - qₘᵢₙ) + qₘᵢₙ
+    M₁ = 1 / (q + 1)
+    M₂ = q / (q + 1)
     χ⃗₁ = χₘₐₓ * rand(rng, T) * normalize(randn(rng, QuatVec{T}))
     χ⃗₂ = χₘₐₓ * rand(rng, T) * normalize(randn(rng, QuatVec{T}))
     R = randn(rng, Rotor{T})
     Λ₁ = Λₘₐₓ * rand(rng, T)
     Λ₂ = Λₘₐₓ * rand(rng, T)
-    pnclass(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₁, Λ₂, PNOrder)
+    return pnclass(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₁, Λ₂, PNOrder)
 end

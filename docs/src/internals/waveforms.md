@@ -11,9 +11,11 @@ The waveform returned by these functions is essentially the complex strain ``h
 \colonequals h_+ - i\,h_\times``.  However, this quantity decays as ``1/r``,
 where ``r`` is the radius at which the strain is measured.  Therefore, as is
 conventional, the returned quantity is actually
+
 ```math
 H \colonequals \lim_{r\to\infty} h\, \frac{r}{M}\, \frac{c^2}{G},
 ```
+
 where ``M`` is the total mass of the two objects in the binary.  Note that both
 ``h`` and ``H`` are dimensionless, but only ``H`` is scale invariant.
 
@@ -26,6 +28,7 @@ reinterpretation of ``M`` as the redshifted mass ``M_z \colonequals M(1+z)`` and
 would be measured (in the asymptotic approximation) by an actual observer in an
 asymptotically flat universe or in our universe, we just need to invert the
 previous equation:
+
 ```math
 h \approx H\, \frac{M}{r}\, \frac{G}{c^2}
 \qquad \mathrm{or} \qquad
@@ -44,17 +47,21 @@ present in the `inspiral` arguments to the functions below.  To handle the
 angular dependence, we provide the waveform decomposed as mode weights in a
 spin-weighted spherical-harmonic decomposition, so that the actual quantity
 returned will be
+
 ```math
 H_{\ell,m}(t_i)
 \colonequals
 \int H(t, \theta, \phi)\, {}_{-2}\bar{Y}_{\ell,m}(\theta, \phi)\,
 \sin\theta\, d\theta\, d\phi.
 ```
+
 The output array is a two-dimensional complex array.  The first dimension varies
 over ``(\ell,m)`` values, with ``m`` varying most rapidly — as in
+
 ```julia
 [(ℓ,m) for ℓ ∈ ℓₘᵢₙ:ℓₘₐₓ for m ∈ -ℓ:ℓ]
 ```
+
 The second dimension of the array indexes the time.
 
 See [Example 2 on the "Units" page](@ref Units-example-2) for a complete example

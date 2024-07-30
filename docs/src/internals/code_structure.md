@@ -21,8 +21,8 @@ post-Newtonian calculations *per se*, we have the following:
    Note that basically everything below will be written as a function
    of such an object, which we will denote `pnsystem`.
 
-2. **Fundamental variables** 
-   
+2. **Fundamental variables**
+
    This consists of the basic variables describing the instantaneous
    state of the system, including `M₁`, `M₂`, `χ⃗₁`, `χ⃗₂`, `R`, `v`.
    For systems with matter, this may also include tidal deformability
