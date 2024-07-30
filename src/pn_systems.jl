@@ -21,7 +21,7 @@ const pnsystem_symbols = (
     :M₁, :M₂, :χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ, :χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ, :Rʷ, :Rˣ, :Rʸ, :Rᶻ, :v, :Φ
 )
 
-for (i, s) in enumerate(pnsystem_symbols)
+for (i, s) ∈ enumerate(pnsystem_symbols)
     sindex = Symbol("$(s)index")
     @eval const $sindex = $i
 end

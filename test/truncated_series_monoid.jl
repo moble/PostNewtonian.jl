@@ -4,14 +4,14 @@
         truncated_series_inverse, truncated_series_product, truncated_series_ratio
     @variables a[1:10] b[1:10] v
 
-    @testset "$N" for N in 0:6
+    @testset "$N" for N ∈ 0:6
         cₐ = collect(a[1:(N + 1)])
         cᵦ = collect(b[1:(N + 1)])
-        A = sum(c * v^(i - 1) for (i, c) in enumerate(cₐ))
-        A⁻¹ = sum(c * v^(i - 1) for (i, c) in enumerate(truncated_series_inverse(cₐ)))
-        B = sum(c * v^(i - 1) for (i, c) in enumerate(cᵦ))
+        A = sum(c * v^(i - 1) for (i, c) ∈ enumerate(cₐ))
+        A⁻¹ = sum(c * v^(i - 1) for (i, c) ∈ enumerate(truncated_series_inverse(cₐ)))
+        B = sum(c * v^(i - 1) for (i, c) ∈ enumerate(cᵦ))
         function truncate_orders(expr)
-            return substitute(expr, Dict(v^n => 0 for n in (N + 1):(2length(a))))
+            return substitute(expr, Dict(v^n => 0 for n ∈ (N + 1):(2length(a))))
         end
 
         # Note that we have to engage in some chicanery with a[1] because Symbolics doesn't

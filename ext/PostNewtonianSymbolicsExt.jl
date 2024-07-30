@@ -80,7 +80,7 @@ function type_converter(::PNSystem{T}, x::Symbolics.Num) where {T<:Vector{Symbol
 end
 
 # Add symbolic capabilities to all derived variables (fundamental variables already work)
-for method in [fundamental_quaternionic_variables; derived_variables]
+for method ∈ [fundamental_quaternionic_variables; derived_variables]
     name = method.name
     @eval begin
         function PostNewtonian.$name(v::PNSystem{T}) where {T<:Vector{Symbolics.Num}}
@@ -120,7 +120,7 @@ function extract_var_factor(term, var)
     term = flatten_mul!(deepcopy(term))
     k = 0
     indices = Int[]
-    for (i, factor) in enumerate(term.args)
+    for (i, factor) ∈ enumerate(term.args)
         if i == 1
             continue  # Skip the :*
         end
@@ -186,7 +186,7 @@ function var_collect(expr, var)
         k, term = extract_var_factor(expr, var)
         terms[k] = term
     else
-        for (i, term) in enumerate(expr.args[2:end])
+        for (i, term) ∈ enumerate(expr.args[2:end])
             k, term = extract_var_factor(term, var)
             if expr.args[1] ∈ ((-), :-) && i == 2
                 if k ∈ keys(terms)
@@ -204,18 +204,18 @@ function var_collect(expr, var)
         end
     end
     max_k = maximum(keys(terms))
-    term_exprs = [get(terms, k, 0) for k in 0:max_k]
+    term_exprs = [get(terms, k, 0) for k ∈ 0:max_k]
     return max_k, :(($(term_exprs...),))
 end
 
 function var_collect(expr::Symbolics.Num, var; max_power=100, max_gap=4)
     expr = SymbolicUtils.expand(expr)
-    dict = Dict(var^j => 0 for j in 1:max_power)
+    dict = Dict(var^j => 0 for j ∈ 1:max_power)
     c = SymbolicUtils.substitute(expr, dict; fold=false)
     expr = expr - c
     coefficients = [c]
     gap = 0
-    for i in 1:max_power
+    for i ∈ 1:max_power
         dict[var^i] = 1
         if i > 1
             dict[var^(i - 1)] = 0

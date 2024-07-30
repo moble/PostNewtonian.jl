@@ -97,7 +97,7 @@
 
     # Make sure that `MinStepsPerOrbit` gives us what we want
     @testset verbose = true "MinStepsPerOrbit" begin
-        for MinStepsPerOrbit in [17, 31, 32, 33, 64]
+        for MinStepsPerOrbit ∈ [17, 31, 32, 33, 64]
             w = GWFrames.PNWaveform(
                 Approximant,
                 delta,
@@ -107,7 +107,7 @@
                 Omega_orb_0,
                 MinStepsPerOrbit,
             )
-            for Φᵢ in w.Phi[begin:(end - MinStepsPerOrbit)]
+            for Φᵢ ∈ w.Phi[begin:(end - MinStepsPerOrbit)]
                 NSteps = sum(@. Φᵢ ≤ w.Phi ≤ Φᵢ + 2π * (1 - 1 / 100MinStepsPerOrbit))
                 @test NSteps == MinStepsPerOrbit
             end
@@ -116,7 +116,7 @@
 
     # Make sure the `dt` gives us what we want
     @testset verbose = true "Uniform time steps" begin
-        for dt in T[1, 1//3, 1//10]
+        for dt ∈ T[1, 1//3, 1//10]
             w = GWFrames.PNWaveform(
                 Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0, dt
             )

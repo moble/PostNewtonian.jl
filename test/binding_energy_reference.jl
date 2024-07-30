@@ -138,10 +138,10 @@ function be(pnsystem, deriv)
             c *
             v *
             (
-                sum(v^(k) * coeff * (k + 2) for (k, coeff) in e if k ≤ 2pn_order; init=0) +
+                sum(v^(k) * coeff * (k + 2) for (k, coeff) ∈ e if k ≤ 2pn_order; init=0) +
                 sum(
                     v^(k) * coeff * 2 * ((k + 2) * log(v) + 1) for
-                    (k, coeff) in eˡⁿ if k ≤ 2pn_order;
+                    (k, coeff) ∈ eˡⁿ if k ≤ 2pn_order;
                     init=0,
                 )
             )
@@ -149,8 +149,8 @@ function be(pnsystem, deriv)
             c *
             v^2 *
             (
-                sum(v^(k) * coeff for (k, coeff) in e if k ≤ 2pn_order; init=0) +
-                sum(v^(k) * coeff * 2log(v) for (k, coeff) in eˡⁿ if k ≤ 2pn_order; init=0)
+                sum(v^(k) * coeff for (k, coeff) ∈ e if k ≤ 2pn_order; init=0) +
+                sum(v^(k) * coeff * 2log(v) for (k, coeff) ∈ eˡⁿ if k ≤ 2pn_order; init=0)
             )
         end
     end
