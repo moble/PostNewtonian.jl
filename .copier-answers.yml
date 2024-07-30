@@ -11,7 +11,7 @@ AnswerStrategy: ask
 AuthorEmail: michael.oliver.boyle@gmail.com
 AuthorName: Michael Boyle
 Indentation: 4
-JuliaMinVersion: '1.6'
+JuliaMinVersion: '1.10'
 License: MIT
 PackageName: PostNewtonian
 PackageOwner: moble
