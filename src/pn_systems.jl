@@ -13,15 +13,15 @@ the given type of system.  The parameter `T` is the type of the `state` vector �
 example, `Vector{Float64}`.  `PNOrder` is a `Rational` giving the order to which PN
 expansions should be carried.
 """
-abstract type PNSystem{ST, PNOrder} end
+abstract type PNSystem{ST,PNOrder} end
 
-const VecOrPNSystem = Union{AbstractVector, PNSystem}
+const VecOrPNSystem = Union{AbstractVector,PNSystem}
 
 const pnsystem_symbols = (
     :M₁, :M₂, :χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ, :χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ, :Rʷ, :Rˣ, :Rʸ, :Rᶻ, :v, :Φ
 )
 
-for (i, s) ∈ enumerate(pnsystem_symbols)
+for (i, s) in enumerate(pnsystem_symbols)
     sindex = Symbol("$(s)index")
     @eval const $sindex = $i
 end
@@ -30,11 +30,9 @@ const χ⃗₁indices = χ⃗₁ˣindex:χ⃗₁ᶻindex
 const χ⃗₂indices = χ⃗₂ˣindex:χ⃗₂ᶻindex
 const Rindices = Rʷindex:Rᶻindex
 
-
 Base.eltype(::PNSystem{ST}) where {ST} = eltype(ST)
-pn_order(::PNSystem{ST, PNOrder}) where {ST, PNOrder} = PNOrder
+pn_order(::PNSystem{ST,PNOrder}) where {ST,PNOrder} = PNOrder
 order_index(pn::PNSystem) = 1 + Int(2pn_order(pn))
-
 
 """
     causes_domain_error!(u̇, p)
@@ -57,25 +55,20 @@ function causes_domain_error!(u̇, p::PNSystem{VT}) where {VT}
     end
 end
 
-
-function prepare_system(;
-    M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0,
-    PNOrder=typemax(Int)
-)
+function prepare_system(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0, PNOrder=typemax(Int))
     state = [M₁; M₂; vec(QuatVec(χ⃗₁)); vec(QuatVec(χ⃗₂)); components(Rotor(R)); v; Φ]
     ST = typeof(state)
     PNOrder = prepare_pn_order(PNOrder)
-    (ST, PNOrder, state)
+    return (ST, PNOrder, state)
 end
 
 function prepare_pn_order(PNOrder)
-    if PNOrder!=typemax(Int)
-        round(Int, 2PNOrder) // 2
+    if PNOrder != typemax(Int)
+        round(Int, 2PNOrder)//2
     else
-        (typemax(Int)-2) // 2
+        (typemax(Int) - 2)//2
     end
 end
-
 
 """
     BBH{T, PNOrder}
@@ -90,25 +83,21 @@ Optionally, `Φ` may also be tracked as the 14th element of the `state` vector. 
 the integral of the orbital angular frequency `Ω`, and holds little interest for general
 systems beyond a convenient description of how "far" the system has evolved.
 """
-struct BBH{T, PNOrder} <: PNSystem{T, PNOrder}
+struct BBH{T,PNOrder} <: PNSystem{T,PNOrder}
     state::T
 
-    BBH{T, PNOrder}(state) where {T, PNOrder} = new{T, PNOrder}(state)
-    function BBH(;
-        M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0,
-        PNOrder=typemax(Int), kwargs...
-    )
-        (T, PNOrder, state) = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
-        new{T, PNOrder}(state)
+    BBH{T,PNOrder}(state) where {T,PNOrder} = new{T,PNOrder}(state)
+    function BBH(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0, PNOrder=typemax(Int), kwargs...)
+        (T, PNOrder, state) = prepare_system(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
+        return new{T,PNOrder}(state)
     end
     function BBH(state; Λ₁=0, Λ₂=0, PNOrder=typemax(Int))
         @assert length(state) == 14
-        @assert Λ₁==0
-        @assert Λ₂==0
-        new{typeof(state), prepare_pn_order(PNOrder)}(state)
+        @assert Λ₁ == 0
+        @assert Λ₂ == 0
+        return new{typeof(state),prepare_pn_order(PNOrder)}(state)
     end
 end
-
 
 """
     BHNS{T, PNOrder}
@@ -121,28 +110,24 @@ holding the (constant) tidal-coupling parameter of the neutron star.
 Note that the neutron star is *always* object 2 — meaning that `M₂`, `χ⃗₂`, and `Λ₂` always
 refer to it; `M₁` and `χ⃗₁` always refer to the black hole.  See also [`NSNS`](@ref).
 """
-struct BHNS{ST, PNOrder, ET} <: PNSystem{ST, PNOrder}
+struct BHNS{ST,PNOrder,ET} <: PNSystem{ST,PNOrder}
     state::ST
     Λ₂::ET
 
-    BHNS{T, PNOrder, ET}(state) where {T, PNOrder, ET} = new{T, PNOrder, ET}(state)
-    BHNS{T, PNOrder}(state) where {T, PNOrder} = new{T, PNOrder, eltype(T)}(state)
-    function BHNS(;
-        M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₂, Φ=0,
-        PNOrder=typemax(Int), kwargs...
-    )
-        ST, PNOrder, state = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
+    BHNS{T,PNOrder,ET}(state) where {T,PNOrder,ET} = new{T,PNOrder,ET}(state)
+    BHNS{T,PNOrder}(state) where {T,PNOrder} = new{T,PNOrder,eltype(T)}(state)
+    function BHNS(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₂, Φ=0, PNOrder=typemax(Int), kwargs...)
+        ST, PNOrder, state = prepare_system(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
         ET = eltype(ST)
-        new{ST, PNOrder, ET}(state, convert(ET, Λ₂))
+        return new{ST,PNOrder,ET}(state, convert(ET, Λ₂))
     end
     function BHNS(state; Λ₂, Λ₁=0, PNOrder=typemax(Int))
         @assert length(state) == 14
         ST, PNOrder = typeof(state), prepare_pn_order(PNOrder)
         ET = eltype(ST)
-        new{ST, PNOrder, ET}(state, convert(ET, Λ₂))
+        return new{ST,PNOrder,ET}(state, convert(ET, Λ₂))
     end
 end
-
 
 """
     NSNS{T, PNOrder}
@@ -153,29 +138,25 @@ The `state` vector is the same as for a [`BBH`](@ref).  There are two additional
 and `Λ₂` holding the (constant) tidal-coupling parameters of the neutron stars.  See also
 [`BHNS`](@ref).
 """
-struct NSNS{ST, PNOrder, ET} <: PNSystem{ST, PNOrder}
+struct NSNS{ST,PNOrder,ET} <: PNSystem{ST,PNOrder}
     state::ST
     Λ₁::ET
     Λ₂::ET
 
-    NSNS{T, PNOrder, ET}(state) where {T, PNOrder, ET} = new{T, PNOrder, ET}(state)
-    NSNS{T, PNOrder}(state) where {T, PNOrder} = new{T, PNOrder, eltype(T)}(state)
-    function NSNS(;
-        M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₁, Λ₂, Φ=0,
-        PNOrder=typemax(Int), kwargs...
-    )
-        ST, PNOrder, state = prepare_system(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
+    NSNS{T,PNOrder,ET}(state) where {T,PNOrder,ET} = new{T,PNOrder,ET}(state)
+    NSNS{T,PNOrder}(state) where {T,PNOrder} = new{T,PNOrder,eltype(T)}(state)
+    function NSNS(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₁, Λ₂, Φ=0, PNOrder=typemax(Int), kwargs...)
+        ST, PNOrder, state = prepare_system(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
         ET = eltype(ST)
-        new{ST, PNOrder, ET}(state, convert(ET, Λ₁), convert(ET, Λ₂))
+        return new{ST,PNOrder,ET}(state, convert(ET, Λ₁), convert(ET, Λ₂))
     end
     function NSNS(state; Λ₁, Λ₂, PNOrder=typemax(Int))
         @assert length(state) == 14
         ST, PNOrder = typeof(state), prepare_pn_order(PNOrder)
         ET = eltype(state)
-        new{ST, PNOrder, ET}(state, convert(ET, Λ₁), convert(ET, Λ₂))
+        return new{ST,PNOrder,ET}(state, convert(ET, Λ₁), convert(ET, Λ₂))
     end
 end
-
 
 """
     FDPNSystem{FT, PNOrder}(state, Λ₁, Λ₂)
@@ -188,21 +169,19 @@ also involves the type `FT`, which will be the float type of actual numbers that
 get fed into (and will be passed out from) functions that use this system.  The correct type
 of `FDPNSystem` is used in calculating `𝓔′`.
 """
-struct FDPNSystem{FT, PNOrder} <: PNSystem{Vector{FastDifferentiation.Node}, PNOrder}
+struct FDPNSystem{FT,PNOrder} <: PNSystem{Vector{FastDifferentiation.Node},PNOrder}
     state::Vector{FastDifferentiation.Node}
     Λ₁::FastDifferentiation.Node
     Λ₂::FastDifferentiation.Node
 
     function FDPNSystem(FT, PNOrder=typemax(Int))
         FastDifferentiation.@variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
-        new{FT, prepare_pn_order(PNOrder)}(
-            [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ],
-            Λ₁, Λ₂
+        return new{FT,prepare_pn_order(PNOrder)}(
+            [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ], Λ₁, Λ₂
         )
     end
 end
 Base.eltype(::FDPNSystem{FT}) where {FT} = FT
-
 
 """
     fd_pnsystem
@@ -233,9 +212,8 @@ julia> χ⃗₂(fd_pnsystem)
 """
 const fd_pnsystem = FDPNSystem(Float64)
 
-
 function SVector(pnsystem::PNSystem)
-    SVector{16, eltype(pnsystem)}(
+    return SVector{16,eltype(pnsystem)}(
         pnsystem.state[1],
         pnsystem.state[2],
         pnsystem.state[3],
@@ -251,11 +229,11 @@ function SVector(pnsystem::PNSystem)
         pnsystem.state[13],
         pnsystem.state[14],
         Λ₁(pnsystem),
-        Λ₂(pnsystem)
+        Λ₂(pnsystem),
     )
 end
 function SVector(pnsystem::FDPNSystem)
-    SVector{16, FastDifferentiation.Node}(
+    return SVector{16,FastDifferentiation.Node}(
         pnsystem.state[1],
         pnsystem.state[2],
         pnsystem.state[3],
@@ -271,31 +249,35 @@ function SVector(pnsystem::FDPNSystem)
         pnsystem.state[13],
         pnsystem.state[14],
         Λ₁(pnsystem),
-        Λ₂(pnsystem)
+        Λ₂(pnsystem),
     )
 end
-
-
 
 @testitem "PNSystem constructors" begin
     using Quaternionic
 
     R = randn(RotorF32)
-    pn1 = BBH(
-        M₁=1.0f0, M₂=2.0f0,
-        χ⃗₁=Float32[3.0, 4.0, 5.0], χ⃗₂=Float32[6.0, 7.0, 8.0],
-        R=R, v=0.23f0
+    pn1 = BBH(;
+        M₁=1.0f0,
+        M₂=2.0f0,
+        χ⃗₁=Float32[3.0, 4.0, 5.0],
+        χ⃗₂=Float32[6.0, 7.0, 8.0],
+        R=R,
+        v=0.23f0,
     )
-    @test pn1.state ≈ [1.; 2.; 3.; 4.; 5.; 6.; 7.; 8.; components(R)...; 0.23; 0.]
+    @test pn1.state ≈ [1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; components(R)...; 0.23; 0.0]
 
-    pn2 = BBH(
-        M₁=1.0f0, M₂=2.0f0,
-        χ⃗₁=Float32[3.0, 4.0, 5.0], χ⃗₂=Float32[6.0, 7.0, 8.0],
-        R=R, v=0.23f0, Φ=9.0f0
+    pn2 = BBH(;
+        M₁=1.0f0,
+        M₂=2.0f0,
+        χ⃗₁=Float32[3.0, 4.0, 5.0],
+        χ⃗₂=Float32[6.0, 7.0, 8.0],
+        R=R,
+        v=0.23f0,
+        Φ=9.0f0,
     )
-    @test pn2.state ≈ [1.; 2.; 3.; 4.; 5.; 6.; 7.; 8.; components(R)...; 0.23; 9.]
+    @test pn2.state ≈ [1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; components(R)...; 0.23; 9.0]
 
     pn1.state[end] = 9.0f0
     @test pn1.state == pn2.state
-
 end

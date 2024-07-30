@@ -1,28 +1,30 @@
 function v̇_numerator(pnsystem; pn_expansion_reducer=Val(sum))
     (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂) = tidal_heating(pnsystem; pn_expansion_reducer)
-    - (𝓕(pnsystem; pn_expansion_reducer) + Ṁ₁ + Ṁ₂)
+    return -(𝓕(pnsystem; pn_expansion_reducer) + Ṁ₁ + Ṁ₂)
 end
 
 function v̇_denominator(pnsystem; pn_expansion_reducer=Val(sum))
-    𝓔′(pnsystem; pn_expansion_reducer)
+    return 𝓔′(pnsystem; pn_expansion_reducer)
 end
 
 function v̇_numerator_coeffs(pnsystem)
-    v̇_numerator(pnsystem; pn_expansion_reducer=Val(identity)).coeffs
+    return v̇_numerator(pnsystem; pn_expansion_reducer=Val(identity)).coeffs
 end
 
 function v̇_denominator_coeffs(pnsystem)
-    v̇_denominator(pnsystem; pn_expansion_reducer=Val(identity)).coeffs
+    return v̇_denominator(pnsystem; pn_expansion_reducer=Val(identity)).coeffs
 end
 
 TaylorT1_v̇(p) = v̇_numerator(p) / v̇_denominator(p)
 TaylorT4_v̇(p) = truncated_series_ratio(v̇_numerator_coeffs(p), v̇_denominator_coeffs(p))
-TaylorT5_v̇(p) = inv(truncated_series_ratio(v̇_denominator_coeffs(p), v̇_numerator_coeffs(p)))
+function TaylorT5_v̇(p)
+    return inv(truncated_series_ratio(v̇_denominator_coeffs(p), v̇_numerator_coeffs(p)))
+end
 
-@pn_expression function TaylorTn!(pnsystem, u̇, TaylorTn_v̇::V̇) where V̇
+@pn_expression function TaylorTn!(pnsystem, u̇, TaylorTn_v̇::V̇) where {V̇}
     # If these parameters result in v≤0, fill u̇ with NaNs so that `solve` will
     # know that this was a bad step and try again.
-    causes_domain_error!(u̇, pnsystem) && return
+    causes_domain_error!(u̇, pnsystem) && return nothing
 
     v̇ = TaylorTn_v̇(pnsystem)
 
@@ -47,12 +49,10 @@ TaylorT5_v̇(p) = inv(truncated_series_ratio(v̇_denominator_coeffs(p), v̇_nume
     u̇[Rᶻindex] = Ṙ.z
     u̇[vindex] = v̇
     u̇[Φindex] = Ω
-    nothing
+    return nothing
 end
 
-
 sys = SymbolCache(collect(pnsystem_symbols), nothing, :t)
-
 
 @doc raw"""
     TaylorT1!(u̇, pnsystem)
@@ -72,7 +72,7 @@ Here, `u̇` is the time-derivative of the state vector, which is stored in the
 [`PNSystem`](@ref) object `p`.
 """
 TaylorT1!(u̇, pnsystem) = TaylorTn!(pnsystem, u̇, TaylorT1_v̇)
-TaylorT1!(u̇,u,p,t) = (p.state.=u; TaylorT1!(u̇,p))
+TaylorT1!(u̇, u, p, t) = (p.state .= u; TaylorT1!(u̇, p))
 
 """
     TaylorT1RHS!
@@ -80,8 +80,7 @@ TaylorT1!(u̇,u,p,t) = (p.state.=u; TaylorT1!(u̇,p))
 A `SciMLBase.ODEFunction` wrapper for [`TaylorT1!`](@ref), suitable for passing into
 `OrdinaryDiffEq.solve`.
 """
-const TaylorT1RHS! = ODEFunction{true, FullSpecialize}(TaylorT1!; sys)
-
+const TaylorT1RHS! = ODEFunction{true,FullSpecialize}(TaylorT1!; sys)
 
 @doc raw"""
     TaylorT4!(u̇, pnsystem)
@@ -112,7 +111,7 @@ always be unused in this package, but is part of the `DifferentialEquations` API
     `TaylorT1` as `PNOrder` approaches `typemax(Int)`.
 """
 TaylorT4!(u̇, pnsystem) = TaylorTn!(pnsystem, u̇, TaylorT4_v̇)
-TaylorT4!(u̇,u,p,t) = (p.state.=u; TaylorT4!(u̇,p))
+TaylorT4!(u̇, u, p, t) = (p.state .= u; TaylorT4!(u̇, p))
 
 """
     TaylorT4RHS!
@@ -120,8 +119,7 @@ TaylorT4!(u̇,u,p,t) = (p.state.=u; TaylorT4!(u̇,p))
 A `SciMLBase.ODEFunction` wrapper for [`TaylorT4!`](@ref), suitable for passing into
 `OrdinaryDiffEq.solve`.
 """
-const TaylorT4RHS! = ODEFunction{true, FullSpecialize}(TaylorT4!; sys)
-
+const TaylorT4RHS! = ODEFunction{true,FullSpecialize}(TaylorT4!; sys)
 
 @doc raw"""
     TaylorT5!(u̇, pnsystem)
@@ -144,7 +142,7 @@ the [`PNSystem`](@ref) object `p`.  The parameter `t` represents the time, and w
 always be unused in this package, but is part of the `DifferentialEquations` API.
 """
 TaylorT5!(u̇, pnsystem) = TaylorTn!(pnsystem, u̇, TaylorT5_v̇)
-TaylorT5!(u̇,u,p,t) = (p.state.=u; TaylorT5!(u̇,p))
+TaylorT5!(u̇, u, p, t) = (p.state .= u; TaylorT5!(u̇, p))
 
 """
     TaylorT5RHS!
@@ -152,4 +150,4 @@ TaylorT5!(u̇,u,p,t) = (p.state.=u; TaylorT5!(u̇,p))
 A `SciMLBase.ODEFunction` wrapper for [`TaylorT5!`](@ref), suitable for passing into
 `OrdinaryDiffEq.solve`.
 """
-const TaylorT5RHS! = ODEFunction{true, FullSpecialize}(TaylorT5!; sys)
+const TaylorT5RHS! = ODEFunction{true,FullSpecialize}(TaylorT5!; sys)

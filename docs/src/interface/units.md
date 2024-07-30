@@ -15,13 +15,14 @@
 
     You may want to skip to [Example 2](@ref Units-example-2) for a complete
     example using astrophysical units.
-    
 
 The units of measurement used in this package are implicitly established by the
 input.  Specifically, the arguments `M₁`, `M₂`, and `Ωᵢ` in the call
+
 ```julia
 inspiral = orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ)
 ```
+
 are inherently dimensionful, and the units are effectively determined by the
 values entered.  For example, if we enter `0.4` as `M₁`, we have established the
 units as — quite simply — those units in which `M₁` has the value `0.4`.  The
@@ -40,12 +41,15 @@ mass with ``G`` and ``c``.
 
 The complete set of (required or optional) dimensionful arguments to
 `orbital_evolution` is
+
 ```julia
 M₁, M₂, Ωᵢ, Λ₁, Λ₂, Ω₁, Ωₑ, abstol, saveat
 ```
+
 If we scale the values by some `σ`, then to maintain the same physical meaning
 we should transform all the arguments as
-```
+
+```julia
 M₁ ↦ M₁ * σ
 M₂ ↦ M₂ * σ
 Ωᵢ ↦ Ωᵢ / σ
@@ -56,27 +60,33 @@ M₂ ↦ M₂ * σ
 abstol ↦ [abstol[1:2] * σ; abstol[3:end]]
 saveat ↦ saveat * σ
 ```
+
 Note that the scaling happens automatically for default values of the
 parameters; you would only need to rescale them if you were actually setting
 them.
 
 When the scaled arguments are provided to `orbital_evolution`, the resulting
 `inspiral` is affected as
+
 ```julia
 inspiral.t ↦ inspiral.t * σ
 inspiral[:M₁] ↦ inspiral[:M₁] * σ
 inspiral[:M₂] ↦ inspiral[:M₂] * σ
 ```
+
 All other evolved variables are dimensionless, and so are unaffected by the
 scaling.  In particular, if the initial conditions are entered with values of
 `M₁` and `M₂` in their desired final units, no change needs to be made.  On the
 other hand, if the values are entered so that `M₁+M₂=1`, we can rescale any BBH
 system to any desired total mass `Mₜₒₜ` using
+
 ```julia
 inspiral.t ↦ inspiral.t * Mₜₒₜ * G / c^3
 ```
+
 Furthermore, if `M₁` and `M₂` represent the *source-frame* mass, and we need to
 apply a cosmological redshift `z`, we simply apply
+
 ```julia
 inspiral.t ↦ inspiral.t * (1+z)
 ```
@@ -84,11 +94,13 @@ inspiral.t ↦ inspiral.t * (1+z)
 The waveform ``H`` returned by either [`coorbital_waveform`](@ref) or
 [`inertial_waveform`](@ref) is the rescaled asymptotic limit of the strain.  The
 observable strain is
+
 ```math
 h \approx H\, \frac{M}{r}\, \frac{G}{c^2}
 \qquad \mathrm{or} \qquad
 h \approx H\, \frac{M_z}{d_\mathrm{L}}\, \frac{G}{c^2}.
 ```
+
 (The equality is only approximate because we assume that terms in ``1/r^2`` can
 be ignored, which is almost certainly true of any detection in the foreseeable
 future.)  Here, ``r`` is the radius of the observer in asymptotically Minkowski
@@ -96,7 +108,6 @@ coordinates centered on the source and ``M`` is the total mass of the binary;
 alternatively, ``M_z=M(1+z)`` is the redshifted mass and ``d_\mathrm{L}`` is the
 luminosity distance between the source and observer.  For more complete
 description, see [here](@ref Computing-the-waveform).
-
 
 ## Example 1: Scale dependence
 
@@ -130,6 +141,7 @@ savefig("units1.html"); nothing  # hide
 # the second to *exactly* the same times as the first)
 inspiral1[:v] ≈ inspiral2(inspiral1.t*σ, idxs=:v)
 ```
+
 ```@raw html
 <!-- NOTE: ../ in src works on github, but not locally -->
 <iframe src="../units1.html" style="height:500px;width:100%;"></iframe>
@@ -157,6 +169,7 @@ waveform by ``M_z/d_\mathrm{L}`` to get the observed strain.
 The frequency ``f_i`` is the observed initial frequency of the ``(2,2)`` mode.
 We will need the corresponding angular orbital frequency in the frame.  Recall
 that, by definition of redshift ``z``, we have
+
 ```math
 \frac{f_{\mathrm{source}}} {f_{\mathrm{observer}}} = 1+z
 \qquad
@@ -164,12 +177,14 @@ that, by definition of redshift ``z``, we have
 \qquad
 \frac{\Delta t_{\mathrm{observer}}}{\Delta t_{\mathrm{source}}} = 1+z.
 ```
+
 Thus, the initial *source-frame orbital angular frequency* ``\Omega_i`` is
 related to the *observer-frame $(2,2)$ temporal frequency* ``f_i`` by[^1]
+
 ```math
 %\Omega_i = 2\pi f_{\mathrm{source}}^{(2,2)} / 2 \qquad f_i = f_{\mathrm{observer}}^{(2,2)}
 %\qquad
-%\frac{f_{\mathrm{source}}^{(2,2)}} {f_{\mathrm{observer}}^{(2,2)}} = 
+%\frac{f_{\mathrm{source}}^{(2,2)}} {f_{\mathrm{observer}}^{(2,2)}} =
 %\frac{\Omega_i/\pi} {f_i} = 1+z
 %\qquad
 \Omega_i = \pi\, f_i\, (1+z).
@@ -186,7 +201,6 @@ related to the *observer-frame $(2,2)$ temporal frequency* ``f_i`` by[^1]
     This means that the frequency of ``H_{\ell,m}`` is not precisely ``m\,
     \Omega`` — though this is a reasonable approximation for systems with
     reasonably low frequency.
-
 
 ```@example units2
 using Quaternionic
@@ -238,6 +252,7 @@ plot!(xlabel="Time (seconds)", ylabel="Strain (dimensionless)", ylim=(-1.5e-21,1
 plot!(title="Observer-frame waveform", legend=(0.205, 0.9))
 savefig("units2.html"); nothing  # hide
 ```
+
 ```@raw html
 <!-- NOTE: ../ in src works on github, but not locally -->
 <iframe src="../units2.html" style="height:500px;width:100%;"></iframe>

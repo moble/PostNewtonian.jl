@@ -6,7 +6,7 @@
 # will monitor the docs for any changes, then rebuild them and refresh the browser
 # until this script is stopped.
 
-import Dates
+using Dates: Dates
 println("Building docs starting at ", Dates.format(Dates.now(), "HH:MM:SS"), ".")
 
 using Pkg
@@ -15,4 +15,4 @@ cd((@__DIR__) * "/..")
 Pkg.activate("docs")
 
 using LiveServer
-servedocs(launch_browser=true)
+servedocs(; launch_browser=true)

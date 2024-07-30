@@ -18,6 +18,7 @@ produces a `PNSystem` with all the fundamental variables stored as
 [`Symbolics.jl`](https://symbolics.juliasymbolics.org/) variables — as
 long as the `Symbolics` package is also loaded.  We can extract the
 symbols as usual:
+
 ```julia
 julia> using PostNewtonian, Symbolics
 
@@ -27,14 +28,18 @@ PostNewtonian.SymbolicPNSystem{Vector{Num}, 9223372036854775805//2, Num}(Num[M�
 julia> v = PostNewtonian.v(symbolic_pnsystem)
 v
 ```
+
 More generally, we can obtain a symbolic expression for the [binding
 energy](@ref PostNewtonian.𝓔) as
+
 ```julia
 julia> 𝓔(symbolic_pnsystem)
 (-1//2)*(1 + (v^2)*(-(3//4) - (1//12)*ν) + (v^3)*((14//3)*sₗ + 2δ*σₗ) + [...]
 ```
+
 In fact, this is how the [derivative-of-binding-energy function
 `𝓔′`](@ref PostNewtonian.𝓔′) used to be constructed, essentially as
+
 ```julia
 julia> ∂ᵥ = Differential(v);
 
@@ -55,7 +60,6 @@ away easily, so you don't need to do anything more.  However, you
 in
 [`Expr`](https://docs.julialang.org/en/v1/manual/metaprogramming/#Program-representation)
 form.
-
 
 ```@docs
 PostNewtonian.hold

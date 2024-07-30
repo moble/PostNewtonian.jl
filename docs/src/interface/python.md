@@ -7,7 +7,6 @@ Julia itself and any dependencies *within* Julia that you may need
 (both of which are much easier than similar tasks in Python).
 
 !!! warning "Be careful of using unicode in Python!"
-
     Every effort is made to ensure that *users* of this package can always use
     plain ASCII — even though this package uses Unicode *internally* and in many
     of the examples found in this documentation.  For example, if keyword
@@ -34,14 +33,12 @@ Julia itself and any dependencies *within* Julia that you may need
     but Python never even sees the variable names as different strings; it
     interprets these expressions as setting, resetting, and resetting again
     the value of `Ma`.
-    
+
     If you find an example where ASCII substitutions are not possible,
     please file a [bug
     report](https://github.com/moble/PostNewtonian.jl/issues/new).
 
-
 ## Installation
- 
 
 ### 0. Optionally pre-install Julia
 
@@ -57,16 +54,18 @@ automatically install the PostNewtonian package and its dependencies
 (and even Julia, if necessary).
 
 If you use `conda`, just run something like[^1]
+
 ```bash
 conda install -c conda-forge sxs numba::numba numba::llvmlite
 ```
+
 If you prefer `pip`, use
+
 ```bash
 python -m pip install sxs
 ```
 
 !!! danger "Avoid segfaults on macOS"
-
     If using conda/mamba on macOS, you *must* install the correct
     versions of `numba` and `llvmlite`, or [you will get
     segfaults.](https://github.com/numba/numba/issues/7857#issuecomment-1082246028)
@@ -92,11 +91,9 @@ packages.
 python -c 'from sxs import julia'
 ```
 
-
 ## Testing the installation
 
 !!! danger "Import this package first"
-
     When using this package from Python with any other non-standard
     libraries — like `scri` or `lal` — you should always import
     `sxs.julia` or one of its components *first* in your Python session.
@@ -108,8 +105,8 @@ python -c 'from sxs import julia'
     that newer versions of the libraries are loaded, which will typically
     be backwards compatible.
 
-
 Start up a python session and run something like this:
+
 ```python
 # Any python imports you need go here
 import numpy as np
@@ -131,6 +128,7 @@ w = PNWaveform(M1, M2, chi1, chi2, Omega_i)
 # Plot the magnitudes of all the modes as functions of time
 plt.semilogy(w.t, np.abs(w.data))
 ```
+
 The [`sxs.julia.PNWaveform`
 function](https://github.com/sxs-collaboration/sxs/blob/e6aa63695fdb1a2f97cfb54e04dbbd5453142cd3/sxs/julia/__init__.py#L17-L86)
 is a simple wrapper that calls [`orbital_evolution`](@ref) and
@@ -159,14 +157,15 @@ coorbital frame (`False`), and the keyword arguments `ell_min`,
 [`inertial_waveform`](@ref) or [`coorbital_waveform`](@ref)
 correspondingly.
 
-
 ## Full Julia interface from Python
 
 In general, you can now call any function from the Julia
 `PostNewtonian` package by running
+
 ```python
 from sxs.julia import PostNewtonian
 ```
+
 and then calling the function just as you would if you had run `import
 PostNewtonian` in Julia.  That is, any of the functions given in the
 rest of this documentation should be available in Python, just as they
@@ -177,6 +176,7 @@ You can also evaluate *arbitrary Julia code* by prefixing
 `PostNewtonian.` to the command, or as a fallback write Julia code as
 a string and pass it to `PostNewtonian.seval("<Julia code goes
 here>")`.  Simple examples include
+
 ```python
 >>> PostNewtonian.println("Hello from Julia!")
 Hello from Julia!
@@ -184,6 +184,7 @@ Hello from Julia!
 >>> x
 3
 ```
+
 See the [documentation for `juliacall`
 here](https://github.com/cjdoris/PythonCall.jl#readme) for more
 details.
@@ -199,7 +200,6 @@ Python functions.  If you really need a `numpy` array, you can use the
 Of course, it is *much* simpler to call Python code from Julia, so if
 you find yourself using a lot of Julia code, you may want to consider
 flipping your approach.
-
 
 [^1]: As general advice, you should run `conda install -y mamba -n
       base -c conda-forge`, and then just use the command `mamba`

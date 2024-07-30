@@ -29,10 +29,10 @@ computation of horizon quantities used in this function.
     # References to pages and equation numbers are from Alvi (2001)
 
     # Un-normalize these quantities (they could now be defined this way...)
-    ϕ̇₁ = (v/c)^3 * ϕ̇̂₁
-    ϕ̇₂ = (v/c)^3 * ϕ̇̂₂
-    I₀₁ = ν^2 * (v/c)^12 * Î₀₁
-    I₀₂ = ν^2 * (v/c)^12 * Î₀₂
+    ϕ̇₁ = (v / c)^3 * ϕ̇̂₁
+    ϕ̇₂ = (v / c)^3 * ϕ̇̂₂
+    I₀₁ = ν^2 * (v / c)^12 * Î₀₁
+    I₀₂ = ν^2 * (v / c)^12 * Î₀₂
 
     # Eq. (21)
     # Note that the Ṁ₁ and Ṁ₂ terms start at 2.5pN order relative to the flux (because
@@ -49,5 +49,5 @@ computation of horizon quantities used in this function.
     # Ṡ₂ = ν^2 * Î₀₂ * v^12 * @pn_expansion (v^3 * ϕ̇̂₂ - Ωₕ₂)
     # Ṁ₂ = ν^2 * Î₀₂ * v^12 * v^3 * ϕ̇̂₂ * @pn_expansion 5 (v^3 * ϕ̇̂₂ - Ωₕ₂)  # ϕ̇₂ * Ṡ₂
 
-    (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂)
+    return (Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂)
 end

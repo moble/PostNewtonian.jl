@@ -17,20 +17,17 @@ So this test does all that a little more manually and compares the results at ea
 
     rng = Xoshiro(1234)
 
-    for PNOrder ∈ 0//2 : 1//2 : 13//2
-
-        for T ∈ [Float32, Float64, Double64]
+    for PNOrder in (0//2):(1//2):(13//2)
+        for T in [Float32, Float64, Double64]
             v = T(1//10)
-            for _ ∈ 1:100
+            for _ in 1:100
                 numpn = rand(rng, NSNS; v, PNOrder)
                 ϵ = 2eps(PostNewtonian.μ(numpn) * v^2)
-                @test 𝓔(numpn) ≈ be(numpn, false) atol=ϵ rtol=3eps(T)
-                @test 𝓔′(numpn) ≈ be(numpn, true) atol=ϵ rtol=3eps(T)
+                @test 𝓔(numpn) ≈ be(numpn, false) atol = ϵ rtol = 3eps(T)
+                @test 𝓔′(numpn) ≈ be(numpn, true) atol = ϵ rtol = 3eps(T)
             end
         end
-
     end
-
 end
 
 @testitem "binding_energy_symbolics" begin
@@ -42,17 +39,14 @@ end
 
     rng = Xoshiro(1234)
 
-    for PNOrder ∈ [0//2 : 1//2 : 13//2; 1_000//2]
-
-        for T ∈ [Float32, Float64, Double64]
+    for PNOrder in [(0//2):(1//2):(13//2); 1_000//2]
+        for T in [Float32, Float64, Double64]
             v = T(1//10)
-            for _ ∈ 1:100
+            for _ in 1:100
                 numpn = rand(rng, NSNS; v, PNOrder)
                 ϵ = 2eps(PostNewtonian.μ(numpn) * v^2)
-                @test 𝓔′(numpn, Val(:Symbolics)) ≈ 𝓔′(numpn) atol=ϵ rtol=3eps(T)
+                @test 𝓔′(numpn, Val(:Symbolics)) ≈ 𝓔′(numpn) atol = ϵ rtol = 3eps(T)
             end
         end
-
     end
-
 end

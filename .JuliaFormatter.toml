@@ -1,3 +1,5 @@
+ignore = ["src/pn_expressions/mode_weights.jl"]
 indent = 4
 margin = 92
 normalize_line_endings = "unix"
+style = "blue"

@@ -1,4 +1,4 @@
-import Dates
+using Dates: Dates
 println("Running tests starting at ", Dates.format(Dates.now(), "HH:MM:SS"), ".")
 
 using Pkg

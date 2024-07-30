@@ -24,9 +24,11 @@ These compute the right-hand sides for the ODE integration of PN
 orbital evolutions.  They only differ in how they compute the time
 dependence of the fundamental PN variable ``v``.  Fundamentally, we
 have
+
 ```math
 \frac{dv}{dt} = -\frac{\mathcal{F} + \dot{M}_1 + \dot{M}_2} {\mathcal{E}'}
 ```
+
 as the essential expression.  The various approximants differ simply
 in how they expand this expression.  Details are explained in the
 following docstrings, but in principle the differences should be at
@@ -71,8 +73,11 @@ Order   = [:module, :type, :constant, :function, :macro]
     `PNOrder` approaches `typemax(Int)`.  This design decision was
     made to ensure feasibility of the calculations.
 
-Note that, internally, the `TaylorT*` functions call `causes_domain_error!`.  This is a fairly simplistic detection of when evolved parameters will lead to bad values.  It may be
-desirable to extend this detection to be more sophisticated.
+Note that, internally, the `TaylorT*` functions call
+`causes_domain_error!`.  This is a fairly simplistic detection of when
+evolved parameters will lead to bad values.  It may be desirable to
+extend this detection to be more sophisticated.
+
 ```@docs
 PostNewtonian.causes_domain_error!
 ```

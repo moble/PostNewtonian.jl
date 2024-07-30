@@ -3,7 +3,6 @@ module GWFrames
 using ..PostNewtonian
 using Quaternionic: Quaternionic, QuatVec, Rotor
 
-
 """
     PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i; kwargs...)
 
@@ -112,34 +111,70 @@ Because this is a NamedTuple, the fields can be accessed much like the fields of
 where `w` is the object returned by this function.
 """
 function PNWaveform(
-    Approximant::String, delta, chi1_i, chi2_i, Omega_orb_i,
-    Omega_orb_0, R_frame_i=[1.0], MinStepsPerOrbit=32,
-    PNWaveformModeOrder=4.0, PNOrbitalEvolutionOrder=4.0,
-    inertial=false, dt=0.0, quiet=true,
-    ell_min=2, ell_max=8, Lambda1=0, Lambda2=0,
-    kwargs...
+    Approximant::String,
+    delta,
+    chi1_i,
+    chi2_i,
+    Omega_orb_i,
+    Omega_orb_0,
+    R_frame_i=[1.0],
+    MinStepsPerOrbit=32,
+    PNWaveformModeOrder=4.0,
+    PNOrbitalEvolutionOrder=4.0,
+    inertial=false,
+    dt=0.0,
+    quiet=true,
+    ell_min=2,
+    ell_max=8,
+    Lambda1=0,
+    Lambda2=0,
+    kwargs...,
 )
     # Note that this method's signature is missing the `Omega_orb_0` default
     # value; if it is not given, Julia selects the other (keyword-based)
     # method, which does have a default method for it.
 
-    PNWaveform(
-        Approximant, delta, chi1_i, chi2_i, Omega_orb_i;
-        Omega_orb_0, R_frame_i, MinStepsPerOrbit,
-        PNWaveformModeOrder, PNOrbitalEvolutionOrder,
-        inertial, dt, quiet,
-        ell_min, ell_max, Lambda1, Lambda2,
-        kwargs...
+    return PNWaveform(
+        Approximant,
+        delta,
+        chi1_i,
+        chi2_i,
+        Omega_orb_i;
+        Omega_orb_0,
+        R_frame_i,
+        MinStepsPerOrbit,
+        PNWaveformModeOrder,
+        PNOrbitalEvolutionOrder,
+        inertial,
+        dt,
+        quiet,
+        ell_min,
+        ell_max,
+        Lambda1,
+        Lambda2,
+        kwargs...,
     )
 end
 
 function PNWaveform(
-    Approximant, delta, chi1_i, chi2_i, Omega_orb_i;
-    Omega_orb_0=Omega_orb_i, R_frame_i=[1.0], MinStepsPerOrbit=32,
-    PNWaveformModeOrder=4.0, PNOrbitalEvolutionOrder=4.0,
-    inertial=false, dt=0.0, quiet=true,
-    ell_min=2, ell_max=8, Lambda1=0, Lambda2=0,
-    kwargs...
+    Approximant,
+    delta,
+    chi1_i,
+    chi2_i,
+    Omega_orb_i;
+    Omega_orb_0=Omega_orb_i,
+    R_frame_i=[1.0],
+    MinStepsPerOrbit=32,
+    PNWaveformModeOrder=4.0,
+    PNOrbitalEvolutionOrder=4.0,
+    inertial=false,
+    dt=0.0,
+    quiet=true,
+    ell_min=2,
+    ell_max=8,
+    Lambda1=0,
+    Lambda2=0,
+    kwargs...,
 )
     M₁ = (1 + delta) / 2
     M₂ = (1 - delta) / 2
@@ -163,10 +198,20 @@ function PNWaveform(
 
     # Inspiral
     solution = orbital_evolution(
-        M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; Λ₁=Lambda1, Λ₂=Lambda2,
-        Ω₁=Ω₁, Rᵢ=Rᵢ,
-        approximant=Approximant, PNOrder=PNOrbitalEvolutionOrder,
-        quiet=quiet, saveat, kwargs...
+        M₁,
+        M₂,
+        χ⃗₁,
+        χ⃗₂,
+        Ωᵢ;
+        Λ₁=Lambda1,
+        Λ₂=Lambda2,
+        Ω₁=Ω₁,
+        Rᵢ=Rᵢ,
+        approximant=Approximant,
+        PNOrder=PNOrbitalEvolutionOrder,
+        quiet=quiet,
+        saveat,
+        kwargs...,
     )
     if saveat == []
         solution = uniform_in_phase(solution, MinStepsPerOrbit)
@@ -174,17 +219,13 @@ function PNWaveform(
 
     # Waveform
     h = if inertial
-        inertial_waveform(
-            solution; ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max, PNOrder=PNWaveformModeOrder
-        )
+        inertial_waveform(solution; ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max, PNOrder=PNWaveformModeOrder)
     else
-        coorbital_waveform(
-            solution; ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max, PNOrder=PNWaveformModeOrder
-        )
+        coorbital_waveform(solution; ℓₘᵢₙ=ell_min, ℓₘₐₓ=ell_max, PNOrder=PNWaveformModeOrder)
     end
 
     # Return
-    (
+    return (
         t=solution.t,
         data=transpose(h),
         frame=transpose(stack(solution[[:Rʷ, :Rˣ, :Rʸ, :Rᶻ]])),
@@ -196,6 +237,5 @@ function PNWaveform(
         Phi=solution[:Φ],
     )
 end
-
 
 end  # module GWFrames

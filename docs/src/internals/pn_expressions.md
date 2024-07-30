@@ -35,7 +35,6 @@ Pages   = ["pn_expressions/precession.jl"]
 Order   = [:module, :type, :constant, :function, :macro]
 ```
 
-
 ## Mode weights
 
 ```@autodocs

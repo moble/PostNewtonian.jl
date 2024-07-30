@@ -24,7 +24,6 @@ Remove occurrences of [`hold`](@ref) from an `Expr`.
 """
 function unhold end
 
-
 """
     SymbolicPNSystem{ST, PNOrder, ET}(state, Λ₁, Λ₂)
 
@@ -50,7 +49,7 @@ julia> χ⃗₂(symbolic_pnsystem)
 χ⃗₂
 ```
 """
-struct SymbolicPNSystem{ST, PNOrder, ET} <: PNSystem{ST, PNOrder}
+struct SymbolicPNSystem{ST,PNOrder,ET} <: PNSystem{ST,PNOrder}
     state::ST
     Λ₁::ET
     Λ₂::ET

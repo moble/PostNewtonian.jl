@@ -27,15 +27,17 @@ probably also want to use a Julia ["project
 environment"](https://pkgdocs.julialang.org/v1/environments/) specifically for
 using this package.  An easy way to do this is to create a directory, `cd` into
 that directory, and then run julia as
-```
+
+```bash
 julia --project=.
 ```
+
 Then, installation of this package involves the usual commands:
+
 ```julia
 using Pkg
 Pkg.add("PostNewtonian")
 ```
-
 
 ## Quick start
 
@@ -74,7 +76,9 @@ inspiral = inspiral(t′)
 h = inertial_waveform(inspiral)
 nothing  # hide
 ```
+
 We can plot the result like this:
+
 ```@example 1
 using Plots  # Requires also installing `Plots` in your project
 plotlyjs()  # hide
@@ -89,9 +93,11 @@ plot!(xlabel=raw"$\text{Time }(M)$", ylabel="Mode weights", ylim=(-0.45,0.45))
 
 savefig("quickstart_waveform.html"); nothing  # hide
 ```
+
 ```@raw html
 <iframe src="quickstart_waveform.html" style="height:500px;width:100%;"></iframe>
 ```
+
 We see various features to be expected of a precessing system like this,
 including slow modulations of the modes on the precession timescale, as well as
 faster oscillations in the amplitudes and asymmetry between the ``m=\pm 2``

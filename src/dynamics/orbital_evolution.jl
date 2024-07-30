@@ -11,13 +11,12 @@ can be a very poor approximation, especially close to merger, and doubly so if t
 eccentricity are significant.
 """
 function estimated_time_to_merger(M, ν, v)
-    5M/(256ν * v^8)
+    return 5M / (256ν * v^8)
 end
 
 function estimated_time_to_merger(pnsystem)
-    estimated_time_to_merger(M(pnsystem), ν(pnsystem), v(pnsystem))
+    return estimated_time_to_merger(M(pnsystem), ν(pnsystem), v(pnsystem))
 end
-
 
 """
     fISCO(q, M)
@@ -32,13 +31,13 @@ a very crude estimate of a frequency of interest.
 function fISCO(q, M)
     let π = oftype(q, π)
         if q > 1
-            q = 1/q
+            q = 1 / q
         end
-        (10 + q*(28 + q*(-26 + q*8))) / (10π * (6M)^(3//2))
+        (10 + q * (28 + q * (-26 + q * 8))) / (10π * (6M)^(3//2))
     end
 end
 function fISCO(pnsystem)
-    fISCO(q(pnsystem), M(pnsystem))
+    return fISCO(q(pnsystem), M(pnsystem))
 end
 
 """
@@ -47,13 +46,12 @@ end
 
 2π times [`fISCO`](@ref).
 """
-function ΩISCO(q,M)
-    2oftype(q,π) * fISCO(q, M)
+function ΩISCO(q, M)
+    return 2oftype(q, π) * fISCO(q, M)
 end
 function ΩISCO(pnsystem)
-    2eltype(pnsystem)(π) * fISCO(pnsystem)
+    return 2eltype(pnsystem)(π) * fISCO(pnsystem)
 end
-
 
 @doc raw"""
     uniform_in_phase(solution, saves_per_orbit)
@@ -72,11 +70,11 @@ See also the `saves_per_orbit` and `saveat` arguments to [`orbital_evolution`](@
 well as interpolation-in-time capabilities of the result of that function.
 """
 function uniform_in_phase(solution, saves_per_orbit)
-    let π=eltype(solution)(π)
+    let π = eltype(solution)(π)
         t = solution.t
         Φ = solution[:Φ]
         δΦ = 2π / saves_per_orbit
-        Φrange = range(extrema(Φ)..., step=δΦ)
+        Φrange = range(extrema(Φ)...; step=δΦ)
         t_Φ = CubicSpline(t, Φ)(Φrange)
         # Ensure that t=0 is interpolated back
         # to *exactly* t=0 instead of, e.g., -1e-24:
@@ -85,40 +83,35 @@ function uniform_in_phase(solution, saves_per_orbit)
     end
 end
 
-
 function default_termination_criteria_forwards(pnsystem, vₑ, quiet)
-    CallbackSet(
+    return CallbackSet(
         termination_forwards(vₑ, quiet),
         dtmin_terminator(eltype(pnsystem), quiet),
         decreasing_v_terminator(quiet),
-        nonfinite_terminator()
+        nonfinite_terminator(),
     )
 end
-
 
 function default_termination_criteria_backwards(pnsystem, v₁, quiet)
-    CallbackSet(
+    return CallbackSet(
         termination_backwards(v₁, quiet),
         dtmin_terminator(eltype(pnsystem), quiet),
-        nonfinite_terminator()
+        nonfinite_terminator(),
     )
 end
-
 
 function default_reltol(pnsystem)
     T = eltype(pnsystem)
-    eps(T)^(11//16)
+    return eps(T)^(11//16)
 end
-
 
 function default_abstol(pnsystem)
     T = eltype(pnsystem)
-    T[
-        T[eps(T(M₁(pnsystem)+M₂(pnsystem)))^(11//16) for _ ∈ 1:2];
-        T[eps(T)^(11//16) for _ ∈ 3:length(pnsystem.state)]
+    return T[
+        T[eps(T(M₁(pnsystem) + M₂(pnsystem)))^(11//16) for _ in 1:2]
+        T[eps(T)^(11//16) for _ in 3:length(pnsystem.state)]
     ]
 end
-
 
 """
     orbital_evolution(pnsystem; kwargs...)
@@ -374,16 +367,33 @@ the [callback documentation](https://diffeq.sciml.ai/stable/features/callback_fu
 for details.
 """
 Base.@constprop :aggressive function orbital_evolution(
-    M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ;
-    Lambda1=0, Lambda2=0, Omega_1=0, Omega_e=Ω(v=1,M=M₁+M₂), R_i=Rotor(true),
-    Λ₁=Lambda1, Λ₂=Lambda2, Ω₁=Omega_1, Ωₑ=Omega_e, Rᵢ=R_i,
-    approximant="TaylorT1", PNOrder=typemax(Int),
-    check_up_down_instability=true, time_stepper=Vern9(),
-    reltol=nothing, abstol=nothing,
+    M₁,
+    M₂,
+    χ⃗₁,
+    χ⃗₂,
+    Ωᵢ;
+    Lambda1=0,
+    Lambda2=0,
+    Omega_1=0,
+    Omega_e=Ω(; v=1, M=M₁ + M₂),
+    R_i=Rotor(true),
+    Λ₁=Lambda1,
+    Λ₂=Lambda2,
+    Ω₁=Omega_1,
+    Ωₑ=Omega_e,
+    Rᵢ=R_i,
+    approximant="TaylorT1",
+    PNOrder=typemax(Int),
+    check_up_down_instability=true,
+    time_stepper=Vern9(),
+    reltol=nothing,
+    abstol=nothing,
     termination_criteria_forwards=nothing,
     termination_criteria_backwards=nothing,
-    quiet=true, force_dtmin=true, saves_per_orbit=false,
-    solve_kwargs...
+    quiet=true,
+    force_dtmin=true,
+    saves_per_orbit=false,
+    solve_kwargs...,
 )
     # Sanity checks for the inputs
 
@@ -404,64 +414,64 @@ Base.@constprop :aggressive function orbital_evolution(
     χ⃗₁, χ⃗₂ = QuatVec(χ⃗₁), QuatVec(χ⃗₂)
     if abs2vec(χ⃗₁) > 1 || abs2vec(χ⃗₂) > 1
         error(
-            "Unphysical spins: |χ⃗₁|=$(abs2vec(χ⃗₁)), |χ⃗₂|=$(abs2vec(χ⃗₂)).\n"
-            * "These are dimensionless spins, which should be less than 1.\n"
-            * "Perhaps you forgot to divide by M₁² or M₂², respectively."
+            "Unphysical spins: |χ⃗₁|=$(abs2vec(χ⃗₁)), |χ⃗₂|=$(abs2vec(χ⃗₂)).\n" *
+            "These are dimensionless spins, which should be less than 1.\n" *
+            "Perhaps you forgot to divide by M₁² or M₂², respectively.",
         )
     end
 
     Rᵢ = Rotor(Rᵢ)
 
-    vᵢ = v(Ω=Ωᵢ, M=M₁+M₂)
+    vᵢ = v(; Ω=Ωᵢ, M=M₁ + M₂)
     if vᵢ ≥ 1
         error(
-            "The input Ωᵢ=$Ωᵢ is too large; with these masses, it corresponds to\n"
-            * "vᵢ=$vᵢ, which is beyond the reach of post-Newtonian methods."
+            "The input Ωᵢ=$Ωᵢ is too large; with these masses, it corresponds to\n" *
+            "vᵢ=$vᵢ, which is beyond the reach of post-Newtonian methods.",
         )
     end
 
     if !iszero(Λ₁) && iszero(Λ₂)
         error(
-            "By convention, the NS in a BHNS binary must be the second body,\n"
-            *"meaning that Λ₁ should be zero, and only Λ₂ should be nonzero.\n"
-            *"You may want to swap the masses, spins, and Λ parameters.\n"
-            *"Alternatively, both can be nonzero, resulting in an NSNS binary."
+            "By convention, the NS in a BHNS binary must be the second body,\n" *
+            "meaning that Λ₁ should be zero, and only Λ₂ should be nonzero.\n" *
+            "You may want to swap the masses, spins, and Λ parameters.\n" *
+            "Alternatively, both can be nonzero, resulting in an NSNS binary.",
         )
     end
 
     if Ω₁ > Ωᵢ
         error(
-            "Initial frequency Ωᵢ=$Ωᵢ should be greater than "
-            * "or equal to first frequency Ω₁=$Ω₁."
+            "Initial frequency Ωᵢ=$Ωᵢ should be greater than " *
+            "or equal to first frequency Ω₁=$Ω₁.",
         )
     end
 
     if Ωᵢ > Ωₑ
         error(
-            "Initial frequency Ωᵢ=$Ωᵢ should be less than "
-            * "or equal to ending frequency Ωₑ=$Ωₑ."
+            "Initial frequency Ωᵢ=$Ωᵢ should be less than " *
+            "or equal to ending frequency Ωₑ=$Ωₑ.",
         )
     end
 
     if saves_per_orbit != false && "saveat" ∈ keys(solve_kwargs)
         error(
-            "It doesn't make sense to pass the `saves_per_orbit` argument *and* the "
-            * "`saveat` argument; only one may be passed."
+            "It doesn't make sense to pass the `saves_per_orbit` argument *and* the " *
+            "`saveat` argument; only one may be passed.",
         )
     end
 
-    v₁ = v(Ω=Ω₁, M=M₁+M₂)
-    vₑ = min(v(Ω=Ωₑ, M=M₁+M₂), 1)
+    v₁ = v(; Ω=Ω₁, M=M₁ + M₂)
+    vₑ = min(v(; Ω=Ωₑ, M=M₁ + M₂), 1)
     Φ = 0
 
     # Initial conditions for the ODE integration
-    pnsystem = let R=Rᵢ, v=vᵢ
+    pnsystem = let R = Rᵢ, v = vᵢ
         if !iszero(Λ₁) && !iszero(Λ₂)
-            NSNS(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₁, Λ₂, Φ, PNOrder)
+            NSNS(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₁, Λ₂, Φ, PNOrder)
         elseif !iszero(Λ₂)
-            BHNS(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₂, Φ, PNOrder)
+            BHNS(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₂, Φ, PNOrder)
         else
-            BBH(;M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
+            BBH(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
         end
     end
 
@@ -488,23 +498,43 @@ Base.@constprop :aggressive function orbital_evolution(
         abstol = default_abstol(pnsystem)
     end
 
-    orbital_evolution(
-        pnsystem; RHS!, v₁, vₑ,
-        check_up_down_instability, quiet,
+    return orbital_evolution(
+        pnsystem;
+        RHS!,
+        v₁,
+        vₑ,
+        check_up_down_instability,
+        quiet,
         termination_criteria_forwards,
         termination_criteria_backwards,
-        time_stepper, reltol, abstol,
-        force_dtmin, saves_per_orbit, solve_kwargs...
+        time_stepper,
+        reltol,
+        abstol,
+        force_dtmin,
+        saves_per_orbit,
+        solve_kwargs...,
     )
 end
 
 Base.@constprop :aggressive function orbital_evolution(
-    pnsystemᵢ; RHS! = TaylorT1RHS!, v₁=zero(eltype(pnsystemᵢ)), vₑ=one(eltype(pnsystemᵢ)),
-    check_up_down_instability=true, quiet=true,
-    termination_criteria_forwards=default_termination_criteria_forwards(pnsystemᵢ, vₑ, quiet),
-    termination_criteria_backwards=default_termination_criteria_backwards(pnsystemᵢ, v₁, quiet),
-    time_stepper=Vern9(), reltol=default_reltol(pnsystemᵢ), abstol=default_abstol(pnsystemᵢ),
-    force_dtmin=true, saves_per_orbit=zero(eltype(pnsystemᵢ)), solve_kwargs...
+    pnsystemᵢ;
+    (RHS!)=TaylorT1RHS!,
+    v₁=zero(eltype(pnsystemᵢ)),
+    vₑ=one(eltype(pnsystemᵢ)),
+    check_up_down_instability=true,
+    quiet=true,
+    termination_criteria_forwards=default_termination_criteria_forwards(
+        pnsystemᵢ, vₑ, quiet
+    ),
+    termination_criteria_backwards=default_termination_criteria_backwards(
+        pnsystemᵢ, v₁, quiet
+    ),
+    time_stepper=Vern9(),
+    reltol=default_reltol(pnsystemᵢ),
+    abstol=default_abstol(pnsystemᵢ),
+    force_dtmin=true,
+    saves_per_orbit=zero(eltype(pnsystemᵢ)),
+    solve_kwargs...,
 )
     pnsystem = deepcopy(pnsystemᵢ)
 
@@ -518,7 +548,7 @@ Base.@constprop :aggressive function orbital_evolution(
         u̇ = similar(uᵢ)
         tᵢ = zero(eltype(pnsystem))
         RHS!(u̇, uᵢ, pnsystem, tᵢ)
-        if any(isnan, u̇) ||  any(isnan, uᵢ)
+        if any(isnan, u̇) || any(isnan, uᵢ)
             # COV_EXCL_START
             @error "Found a NaN with initial parameters:" value.(uᵢ) value.(u̇) pnsystem
             error("Found NaN")
@@ -533,14 +563,15 @@ Base.@constprop :aggressive function orbital_evolution(
     τ = estimated_time_to_merger(pnsystem)
 
     problem_forwards = ODEProblem(
-        RHS!, pnsystem.state, (zero(τ), 4τ), pnsystem,
-        callback=termination_criteria_forwards
+        RHS!,
+        pnsystem.state,
+        (zero(τ), 4τ),
+        pnsystem;
+        callback=termination_criteria_forwards,
     )
 
     solution_forwards = solve(
-        problem_forwards, time_stepper;
-        reltol, abstol, force_dtmin,
-        solve_kwargs...
+        problem_forwards, time_stepper; reltol, abstol, force_dtmin, solve_kwargs...
     )
 
     solution = if v₁ > 0
@@ -554,14 +585,18 @@ Base.@constprop :aggressive function orbital_evolution(
         τ = estimated_time_to_merger(M(pnsystem), ν(pnsystem), v₁) - τ
 
         problem_backwards = remake(
-            problem_forwards; tspan=(zero(τ), -4τ),
-            callback=termination_criteria_backwards
+            problem_forwards;
+            tspan=(zero(τ), -4τ),
+            callback=termination_criteria_backwards,
         )
 
         solution_backwards = solve(
-            problem_backwards, time_stepper;
-            reltol, abstol, force_dtmin,
-            solve_kwargs...
+            problem_backwards,
+            time_stepper;
+            reltol,
+            abstol,
+            force_dtmin,
+            solve_kwargs...,
         )
 
         combine_solutions(solution_backwards, solution_forwards)
@@ -573,5 +608,5 @@ Base.@constprop :aggressive function orbital_evolution(
         solution = uniform_in_phase(solution, saves_per_orbit)
     end
 
-    solution
+    return solution
 end

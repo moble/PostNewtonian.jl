@@ -8,14 +8,15 @@ In each case, the returned object is a `PNSystem`, which can be used as input to
 most functions in this package — most notably the `orbital_evolution` function.
 For example, to integrate the inspiral of a binary black-hole system in
 ["superkick"](@ref superkick) configuration, we could write
+
 ```julia
 inspiral = orbital_evolution(superkick())
 ```
+
 This implicitly provides the `M₁`, `M₂`, `χ⃗₁`, `χ⃗₂`, `Ωᵢ`, `Rᵢ`, and `PNOrder`
 arguments (along with `Λ₁` and/or `Λ₂` for `BHNS` or `NSNS` systems) to
 [`orbital_evolution`](@ref); other keyword arguments to that function can be
 provided after `superkick()`.
-
 
 ```@autodocs
 Modules = [PostNewtonian]

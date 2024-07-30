@@ -38,91 +38,117 @@ terms again with ``1 ↔ 2``.  Finally, note the normalization difference, where
 overall factor is used, leading to a sign difference.
 """
 @pn_expression function 𝓔(pnsystem)
-    -μ * c^2 * (v/c)^2 / 2 * @pn_expansion(
+    return -μ * c^2 * (v / c)^2 / 2 * @pn_expansion(
         # Non-spinning terms; Eq. (233) of Blanchet (2014)
-        1
-        + (v/c)^2 * (-ν/12 - 3//4)
-        + (v/c)^4 * (-ν^2/24 + 19ν/8 - 27//8)
-        + (v/c)^6 * (-35ν^3/5184 - 155ν^2/96 + (34445//576 - 205π^2/96)ν - 675//64)
+        1 +
+            (v / c)^2 * (-ν / 12 - 3//4) +
+            (v / c)^4 * (-ν^2 / 24 + 19ν / 8 - 27//8) +
+            (v / c)^6 *
+            (-35ν^3 / 5184 - 155ν^2 / 96 + (34445//576 - 205π^2 / 96)ν - 675//64)
 
-        # Eq. (5.2d) of Jaranowski and Schäfer
-        + (v/c)^8 * (
-            -3969//128 + 77ν^4/31104 + 301ν^3/1728 + (-498449//3456 + 3157π^2/576)ν^2
-            + (-123671//5760 + 1792ln2/15 + 9037π^2/1536 + 896γₑ/15)ν
-            + 2ln(v) * (448ν/15)
-        )
-
-        # Below are the incomplete terms from Eq. (74) of https://arxiv.org/abs/1312.2503v2
-        + (v/c)^10 * (
-            -45927//512 + ν^5/512 + 55ν^4/512 + (-1353π^2/256 + 69423//512)ν^3
-            + (-21337π^2/1024 + 3a₆ᶜ¹ - 896ln2/5 - 448γₑ/5 + 893429//2880)ν^2
-            + (-228916843//115200 - 9976γₑ/35 + 729ln3/7 - 23672ln2/35 + 126779π^2/512)ν
-            + 2ln(v) * (-4988ν/35 - 656ν^2/5)
-        )
-        + (v/c)^11 * (10ν/3 * (13696π/525 + ν*a₆₅ᶜ¹))
-        + (v/c)^12 * (
-            -264627//1024
-            + 2717ν^6/6718464
-            + 5159ν^5/248832
-            + (272855π^2/124416 - 20543435//373248)ν^4
-            + (
-                1232γₑ/27 + 6634243π^2/110592
-                - 11a₆ᶜ¹/2 - 71700787//51840  + 2464ln2/27
-            )ν^3
-            + (
-                113176680983//14515200 + 18491π^4/2304
-                + 246004ln2/105 + 112772γₑ/105 + a₆ᶜ¹*11//2 + a₇ˡⁿ¹*2//3
-                + a₇ᶜ¹*11//3 - 86017789π^2/110592 - 2673ln3/14
-            )ν^2
-            + (
-                -389727504721//43545600 + 74888ln2/243 - 7128ln3/7
-                - 30809603π^4/786432 - 3934568γₑ/8505 + 9118627045π^2/5308416
-            )ν
-            + 2ln(v) * (
-                - 1967284ν/8505
-                + 24464ν^3/135
-                + (39754//105 + a₇ˡⁿ¹*11//3)ν^2
+            # Eq. (5.2d) of Jaranowski and Schäfer
+            +
+            (v / c)^8 * (
+                -3969//128 +
+                77ν^4 / 31104 +
+                301ν^3 / 1728 +
+                (-498449//3456 + 3157π^2 / 576)ν^2 +
+                (-123671//5760 + 1792ln2 / 15 + 9037π^2 / 1536 + 896γₑ / 15)ν +
+                2ln(v) * (448ν / 15)
             )
-        )
 
-        # Spin-orbit; Eq. (4.6) of Bohé et al. (2012)
-        + (v/c)^3 * (14sₗ/3 + 2δ * σₗ)
-        + (v/c)^5 * ((11-61ν/9) * sₗ + (3 - 10ν/3)δ * σₗ)
-        + (v/c)^7 * ((135//4 - 367ν/4 + 29ν^2/12) * sₗ + (27//4 - 39ν + 5ν^2/4)δ * σₗ)
+            # Below are the incomplete terms from Eq. (74) of https://arxiv.org/abs/1312.2503v2
+            +
+            (v / c)^10 * (
+                -45927//512 +
+                ν^5 / 512 +
+                55ν^4 / 512 +
+                (-1353π^2 / 256 + 69423//512)ν^3 +
+                (-21337π^2 / 1024 + 3a₆ᶜ¹ - 896ln2 / 5 - 448γₑ / 5 + 893429//2880)ν^2 +
+                (
+                    -228916843//115200 - 9976γₑ / 35 + 729ln3 / 7 - 23672ln2 / 35 +
+                    126779π^2 / 512
+                )ν +
+                2ln(v) * (-4988ν / 35 - 656ν^2 / 5)
+            ) +
+            (v / c)^11 * (10ν / 3 * (13696π / 525 + ν * a₆₅ᶜ¹)) +
+            (v / c)^12 * (
+                -264627//1024 +
+                2717ν^6 / 6718464 +
+                5159ν^5 / 248832 +
+                (272855π^2 / 124416 - 20543435//373248)ν^4 +
+                (
+                    1232γₑ / 27 + 6634243π^2 / 110592 - 11a₆ᶜ¹ / 2 - 71700787//51840 +
+                    2464ln2 / 27
+                )ν^3 +
+                (
+                    113176680983//14515200 +
+                    18491π^4 / 2304 +
+                    246004ln2 / 105 +
+                    112772γₑ / 105 +
+                    a₆ᶜ¹ * 11//2 +
+                    a₇ˡⁿ¹ * 2//3 +
+                    a₇ᶜ¹ * 11//3 - 86017789π^2 / 110592 - 2673ln3 / 14
+                )ν^2 +
+                (
+                    -389727504721//43545600 + 74888ln2 / 243 - 7128ln3 / 7 -
+                    30809603π^4 / 786432 - 3934568γₑ / 8505 + 9118627045π^2 / 5308416
+                )ν +
+                2ln(v) *
+                (-1967284ν / 8505 + 24464ν^3 / 135 + (39754//105 + a₇ˡⁿ¹ * 11//3)ν^2)
+            )
 
-        # Spin-squared; Eq. (3.33) of Bohé et al. (2015)
-        + (v/c)^4 * (
-            sₗ^2 * (-κ₊ - 2)
-            + sₗ * σₗ * (-δ*κ₊ - 2δ + κ₋)
-            + σₗ^2 * (δ*κ₋/2 - κ₊/2 + (κ₊ + 2)ν)
-        )
-        + (v/c)^6 * (
-            sₗ^2 * (-5δ*κ₋/3 - 25*κ₊/6 + 50//9 + (5κ₊/6 + 5//3)ν)
-            + sₗ * σₗ * (-5*δ*κ₊/2 + 25*δ/3 + 5κ₋/2 + (5δ*κ₊/6 + 5δ/3 + 35κ₋/6)ν)
-            + σₗ^2 * (5δ*κ₋/4 - 5κ₊/4 + 5 + (5δ*κ₋/4 + 5κ₊/4 - 10)ν + (-5κ₊/6 - 5//3)ν^2)
-        )
+            # Spin-orbit; Eq. (4.6) of Bohé et al. (2012)
+            +
+            (v / c)^3 * (14sₗ / 3 + 2δ * σₗ) +
+            (v / c)^5 * ((11 - 61ν / 9) * sₗ + (3 - 10ν / 3)δ * σₗ) +
+            (v / c)^7 *
+            ((135//4 - 367ν / 4 + 29ν^2 / 12) * sₗ + (27//4 - 39ν + 5ν^2 / 4)δ * σₗ)
 
-        # Spin-cubed; Eq. (6.17) of Marsat (2014)
-        + (v/c)^7 * (
-            sₗ^3 * (2κ₊ + 4λ₊ - 20)
-            + sₗ^2 * σₗ * (2δ*κ₊ + 6δ*λ₊ - 32δ + 4κ₋ - 6λ₋)
-            + sₗ * σₗ^2 * (5δ*κ₋ - 6δ*λ₋ - 5κ₊ + 6λ₊ - 12 + (-2κ₊ - 12λ₊ + 68)ν)
-            + σₗ^3 * (-3δ*κ₊ + 2δ*λ₊ + 3κ₋ - 2λ₋ + (-2δ*λ₊ + 12δ - 6κ₋ + 6λ₋)ν)
-        )
+            # Spin-squared; Eq. (3.33) of Bohé et al. (2015)
+            +
+            (v / c)^4 * (
+                sₗ^2 * (-κ₊ - 2) +
+                sₗ * σₗ * (-δ * κ₊ - 2δ + κ₋) +
+                σₗ^2 * (δ * κ₋ / 2 - κ₊ / 2 + (κ₊ + 2)ν)
+            ) +
+            (v / c)^6 * (
+                sₗ^2 * (-5δ * κ₋ / 3 - 25 * κ₊ / 6 + 50//9 + (5κ₊ / 6 + 5//3)ν) +
+                sₗ *
+                σₗ *
+                (
+                    -5 * δ * κ₊ / 2 +
+                    25 * δ / 3 +
+                    5κ₋ / 2 +
+                    (5δ * κ₊ / 6 + 5δ / 3 + 35κ₋ / 6)ν
+                ) +
+                σₗ^2 * (
+                    5δ * κ₋ / 4 - 5κ₊ / 4 +
+                    5 +
+                    (5δ * κ₋ / 4 + 5κ₊ / 4 - 10)ν +
+                    (-5κ₊ / 6 - 5//3)ν^2
+                )
+            )
 
-        # NS tidal coupling; Eq. (2.11) of Vines et al. (2011) with λ̂=v^10*Λ₂*(M₂/M)^5
-        + (v/c)^10 * (
-            - 9Λ₁ * ν * X₁^3
-            - 9Λ₂ * ν * X₂^3
-        )
-        + (v/c)^12 * (
-            - 11//2 * (3 + 2X₁ + 3X₁^2)Λ₁ * ν * X₁^3
-            - 11//2 * (3 + 2X₂ + 3X₂^2)Λ₂ * ν * X₂^3
-        )
+            # Spin-cubed; Eq. (6.17) of Marsat (2014)
+            +
+            (v / c)^7 * (
+                sₗ^3 * (2κ₊ + 4λ₊ - 20) +
+                sₗ^2 * σₗ * (2δ * κ₊ + 6δ * λ₊ - 32δ + 4κ₋ - 6λ₋) +
+                sₗ * σₗ^2 * (5δ * κ₋ - 6δ * λ₋ - 5κ₊ + 6λ₊ - 12 + (-2κ₊ - 12λ₊ + 68)ν) +
+                σₗ^3 * (-3δ * κ₊ + 2δ * λ₊ + 3κ₋ - 2λ₋ + (-2δ * λ₊ + 12δ - 6κ₋ + 6λ₋)ν)
+            )
+
+            # NS tidal coupling; Eq. (2.11) of Vines et al. (2011) with λ̂=v^10*Λ₂*(M₂/M)^5
+            +
+            (v / c)^10 * (-9Λ₁ * ν * X₁^3 - 9Λ₂ * ν * X₂^3) +
+            (v / c)^12 * (
+                -11//2 * (3 + 2X₁ + 3X₁^2)Λ₁ * ν * X₁^3 -
+                11//2 * (3 + 2X₂ + 3X₂^2)Λ₂ * ν * X₂^3
+            )
     )
 end
 const binding_energy = 𝓔
-
 
 """
     𝓔′(pnsystem)
@@ -134,9 +160,8 @@ This is computed automatically (via `FastDifferentiation`) from [`𝓔`](@ref); 
 function for details of the PN formulas.
 """
 @generated function 𝓔′(
-    pnsystem::PNSystem{ST, PNOrder};
-    pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum)
-) where {ST, PNOrder, PNExpansionReducer}
+    pnsystem::PNSystem{ST,PNOrder}; pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum)
+) where {ST,PNOrder,PNExpansionReducer}
     # Create a `PNSystem` with `FastDifferentiation` (henceforth FD) variables, using the
     # same PNOrder as the input `pnsystem`.
     fdpnsystem = FDPNSystem(eltype(ST), PNOrder)
@@ -163,49 +188,53 @@ function for details of the PN formulas.
 
     # # At this point, the function is just a long series of statements inside an `@inbounds`
     # # block, which we will want later, but first we need to extract them.
-    MacroTools.@capture(𝓔′body, @inbounds begin 𝓔′statements__ end) ||
-        throw(ArgumentError(
+    MacroTools.@capture(𝓔′body, @inbounds begin
+        𝓔′statements__
+    end) || throw(
+        ArgumentError(
             "\nNo @inbounds block found in 𝓔′ expression." *
             "\nSomething may have changed in FastDifferentiation." *
             "\nOpen an issue citing this Julia call:" *
             "\n```julia" *
             "\nusing PostNewtonian" *
             "\n𝓔′($pnsystem)" *
-            "\n```"
-        ))
+            "\n```",
+        ),
+    )
 
     # The 𝓔′statements are mostly what we want, except that the last line is a return
     # statement.  We want that result, but we don't to return it yet; we want to wrap that
     # result, so we just get that returned quantity here.
-    MacroTools.@capture(𝓔′statements[end], return 𝓔′return_) ||
-        throw(ArgumentError(
+    MacroTools.@capture(𝓔′statements[end], return 𝓔′return_) || throw(
+        ArgumentError(
             "\nNo return statement found in 𝓔′ expression." *
             "\nSomething may have changed in FastDifferentiation." *
             "\nOpen an issue citing this Julia call:" *
             "\n```julia" *
             "\nusing PostNewtonian" *
             "\n𝓔′($pnsystem)" *
-            "\n```"
-        ))
+            "\n```",
+        ),
+    )
     𝓔′statements[end] = 𝓔′return
 
     if PNExpansionReducer === identity
         # When `pn_expansion_reducer=Val(identity)` is passed, we return a PNExpansion
-        NMax = Int(2PNOrder+1)
+        NMax = Int(2PNOrder + 1)
         return quote
             input_variables = SVector(pnsystem)
-            result = MVector{$(length(𝓔′)), $(eltype(ST))}(undef)
+            result = MVector{$(length(𝓔′)),$(eltype(ST))}(undef)
             result .= 0
             @fastmath @inbounds begin
                 $(𝓔′statements...)
             end
-            return PNExpansion{$(length(𝓔′)), $(eltype(ST)), $NMax}(Tuple(result))
+            return PNExpansion{$(length(𝓔′)),$(eltype(ST)),$NMax}(Tuple(result))
         end
     else
         # Otherwise, FD produces a 1-tuple, so we just extract the value from that.
         return quote
             input_variables = SVector(pnsystem)
-            result = MVector{1, $(eltype(ST))}(undef)
+            result = MVector{1,$(eltype(ST))}(undef)
             result .= 0
             @fastmath @inbounds begin
                 $(𝓔′statements...)
@@ -214,4 +243,4 @@ function for details of the PN formulas.
         end
     end
 end
-const binding_energy_deriv=𝓔′
+const binding_energy_deriv = 𝓔′

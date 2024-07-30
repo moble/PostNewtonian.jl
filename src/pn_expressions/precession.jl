@@ -14,7 +14,6 @@ See also [`R`](@ref PostNewtonian.R).
 Ω⃗ₚ(pnsystem) = 𝛡(pnsystem)
 const Omega_p = Ω⃗ₚ
 
-
 """
     𝛡(pnsystem)
 
@@ -35,9 +34,8 @@ energy are known to 3pN order, and given in [Eq. (3.32) of Bohé et al.
 See also [`R`](@ref PostNewtonian.R).
 """
 @pn_expression function 𝛡(pnsystem)
-    (γₚₙ(pnsystem) * aₗ(pnsystem) / (v/c)^3) * n̂
+    return (γₚₙ(pnsystem) * aₗ(pnsystem) / (v / c)^3) * n̂
 end
-
 
 @doc raw"""
     γₚₙ(pnsystem)
@@ -54,32 +52,33 @@ Note that there is a 3PN gauge term of ``-22ν\\ln(r/r₀′)/3`` that is simply
 it should cancel out of any physical quantity.
 """
 @pn_expression function γₚₙ(pnsystem)
-    (v/c)^2 * @pn_expansion(
+    return (v / c)^2 * @pn_expansion(
         # Non-spinning terms; Eq. (4.3) of Bohé et al. (2013)
-        1
-        + (v/c)^2 * (1 - ν / 3)
-        + (v/c)^4 * (1 - 65ν / 12)
-        + (v/c)^6 * (1 + (-2203//2520 - 41π^2 / 192)ν + 229ν^2 / 36 + ν^3 / 81)
+        1 +
+            (v / c)^2 * (1 - ν / 3) +
+            (v / c)^4 * (1 - 65ν / 12) +
+            (v / c)^6 * (1 + (-2203//2520 - 41π^2 / 192)ν + 229ν^2 / 36 + ν^3 / 81)
 
-        # Spin-orbit terms; Eq. (4.3) of Bohé et al. (2013)
-        + (v/c)^3 * (5//3 * sₗ + δ * σₗ)
-        + (v/c)^5 * ((10//3 + 8ν/9) * sₗ + 2δ * σₗ)
-        + (v/c)^7 * ((5 - 127ν/12 - 6ν^2) * sₗ + δ * (3 - 61ν/6 - 8ν^2/3) * σₗ)
+            # Spin-orbit terms; Eq. (4.3) of Bohé et al. (2013)
+            +
+            (v / c)^3 * (5//3 * sₗ + δ * σₗ) +
+            (v / c)^5 * ((10//3 + 8ν / 9) * sₗ + 2δ * σₗ) +
+            (v / c)^7 * ((5 - 127ν / 12 - 6ν^2) * sₗ + δ * (3 - 61ν / 6 - 8ν^2 / 3) * σₗ)
 
-        # Spin-squared terms; Eq. (3.32) of Bohé et al. (2015)
-        + (v/c)^4 * (
-            sₗ^2 * (-κ₊/2 - 1)
-            + sₗ * σₗ * (-δ*κ₊/2 - δ + κ₋/2)
-            + σₗ^2 * (δ*κ₋/4 - κ₊/4 + (κ₊/2 + 1)ν)
-        )
-        + (v/c)^6 * (
-            sₗ^2 * (-11δ*κ₋/12 - 11κ₊/12 + 14//9 + (-κ₊/6 - 1//3)ν)
-            + sₗ * σₗ * (5δ/3 + (-δ*κ₊/6 - δ/3 + 23κ₋/6)ν)
-            + σₗ^2 * (1 + (δ*κ₋ - κ₊ - 2)ν + (κ₊/6 + 1//3)ν^2)
-        )
+            # Spin-squared terms; Eq. (3.32) of Bohé et al. (2015)
+            +
+            (v / c)^4 * (
+                sₗ^2 * (-κ₊ / 2 - 1) +
+                sₗ * σₗ * (-δ * κ₊ / 2 - δ + κ₋ / 2) +
+                σₗ^2 * (δ * κ₋ / 4 - κ₊ / 4 + (κ₊ / 2 + 1)ν)
+            ) +
+            (v / c)^6 * (
+                sₗ^2 * (-11δ * κ₋ / 12 - 11κ₊ / 12 + 14//9 + (-κ₊ / 6 - 1//3)ν) +
+                sₗ * σₗ * (5δ / 3 + (-δ * κ₊ / 6 - δ / 3 + 23κ₋ / 6)ν) +
+                σₗ^2 * (1 + (δ * κ₋ - κ₊ - 2)ν + (κ₊ / 6 + 1//3)ν^2)
+            )
     )
 end
-
 
 """
     aₗ(pnsystem)
@@ -88,16 +87,13 @@ Eq. (4.4) of [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520).  This term 
 to [`𝛡`](@ref).
 """
 @pn_expression function aₗ(pnsystem)
-    (v/c)^7/M^3 * @pn_expansion(
-        (7Sₙ + 3δ*Σₙ)
-        + (v/c)^2 * ((-10 - 29ν/3) * Sₙ + δ*(-6 - 9ν/2) * Σₙ)
-        + (v/c)^4 * (
-            (3//2 + 59ν/4 + 52ν^2/9) * Sₙ
-            + δ*(3//2 + 73ν/8 + 17ν^2/6) * Σₙ
-        )
+    return (v / c)^7 / M^3 * @pn_expansion(
+        (7Sₙ + 3δ * Σₙ) +
+            (v / c)^2 * ((-10 - 29ν / 3) * Sₙ + δ * (-6 - 9ν / 2) * Σₙ) +
+            (v / c)^4 *
+            ((3//2 + 59ν / 4 + 52ν^2 / 9) * Sₙ + δ * (3//2 + 73ν / 8 + 17ν^2 / 6) * Σₙ)
     )
 end
-
 
 """
     Ω⃗ᵪ₁(pnsystem)
@@ -112,10 +108,9 @@ Note that this function simply calls [`Ω⃗ᵪ`](@ref) with the appropriate par
 @pn_expression function Ω⃗ᵪ₁(pnsystem)
     # Note that `PNExpansionReducer` appears magically via the `@pn_expression` macro, along
     # with other magic variables, as usual.
-    QuatVec(Ω⃗ᵪ(M₁, M₂, χ⃗₁, χ⃗₂, v, R, pnsystem, PNExpansionReducer))
+    return QuatVec(Ω⃗ᵪ(M₁, M₂, χ⃗₁, χ⃗₂, v, R, pnsystem, PNExpansionReducer))
 end
 const Omega_chi1 = Ω⃗ᵪ₁
-
 
 """
     Ω⃗ᵪ₂(pnsystem)
@@ -130,10 +125,9 @@ Note that this function simply calls [`Ω⃗ᵪ`](@ref) with the appropriate par
 @pn_expression function Ω⃗ᵪ₂(pnsystem)
     # Note that `PNExpansionReducer` appears magically via the `@pn_expression` macro, along
     # with other magic variables, as usual.
-    QuatVec(Ω⃗ᵪ(M₂, M₁, χ⃗₂, χ⃗₁, v, R, pnsystem, PNExpansionReducer))
+    return QuatVec(Ω⃗ᵪ(M₂, M₁, χ⃗₂, χ⃗₁, v, R, pnsystem, PNExpansionReducer))
 end
 const Omega_chi2 = Ω⃗ᵪ₂
-
 
 """
     Ω⃗ᵪ(Mⱼ, Mₖ, χ⃗ⱼ, χ⃗ₖ, R)
@@ -155,23 +149,34 @@ function Ω⃗ᵪ(Mⱼ, Mₖ, χ⃗ⱼ, χ⃗ₖ, v, R, pnsystem, PNExpansionRed
     # Note that we don't use the `@pn_expression` macro here, because we're swapping
     # the order of certain arguments above, so we do it manually here, and don't just
     # call things like `δ(pnsystem)` because that would fail to swap.
-    let M=M(Mⱼ, Mₖ), ν=ν(Mⱼ, Mₖ), δ=δ(Mⱼ, Mₖ), n̂=n̂(R), ℓ̂=ℓ̂(R), c = one(eltype(pnsystem))
+    let M = M(Mⱼ, Mₖ),
+        ν = ν(Mⱼ, Mₖ),
+        δ = δ(Mⱼ, Mₖ),
+        n̂ = n̂(R),
+        ℓ̂ = ℓ̂(R),
+        c = one(eltype(pnsystem))
+
         χⱼₙ = χ⃗ⱼ ⋅ n̂
         χₖₙ = χ⃗ₖ ⋅ n̂
 
-        (v/c)^5/M * @pn_expansion pnsystem (
+        (v / c)^5 / M * @pn_expansion pnsystem (
             # Spin-spin term from Eq. (2.4) of Kidder
-            v/c * (Mₖ^2 / M^2) * (-χ⃗ₖ + 3χₖₙ * n̂)
+            v / c * (Mₖ^2 / M^2) * (-χ⃗ₖ + 3χₖₙ * n̂)
 
             # Spin-orbit terms from Eq. (4.5) of Bohé et al.
-            + (
-                (3//4 + ν/2 - 3δ/4)
-                + (v/c)^2 * (9//16 + 5ν/4 - ν^2/24 + δ*(-9//16 + 5ν/8))
-                + (v/c)^4 * (27//32 + 3ν/16 - 105ν^2/32 - ν^3/48 + δ*(-27//32 + 39ν/8 - 5ν^2/32))
+            +
+            (
+                (3//4 + ν / 2 - 3δ / 4) +
+                (v / c)^2 * (9//16 + 5ν / 4 - ν^2 / 24 + δ * (-9//16 + 5ν / 8)) +
+                (v / c)^4 * (
+                    27//32 + 3ν / 16 - 105ν^2 / 32 - ν^3 / 48 +
+                    δ * (-27//32 + 39ν / 8 - 5ν^2 / 32)
+                )
             ) * ℓ̂
 
             # Quadrupole-monopole term from Eq. (2.7) of Racine
-            + v/c * (3ν * χⱼₙ * n̂)
+            +
+            v / c * (3ν * χⱼₙ * n̂)
         )
     end
 end
