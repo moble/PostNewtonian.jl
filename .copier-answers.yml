@@ -1,7 +1,7 @@
 # Changes here will be overwritten by Copier
 AddAllcontributors: false
 AddCodeOfConduct: false
-AddContributionDocs: false
+AddContributionDocs: true
 AddCopierCI: true
 AddGitHubTemplates: true
 AddMacToCI: true
