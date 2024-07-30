@@ -2,7 +2,7 @@
     using DoubleFloats
     using PostNewtonian: PNExpansion
 
-    for T in [Float64, Float16, Double64]
+    for T ∈ [Float64, Float16, Double64]
         pn = rand(BBH; v=T(1) / 5, PNOrder=9//2)
         c = PNExpansionParameter(pn)
         z = zero(T)
@@ -12,7 +12,7 @@
         v = T(27) / 13
 
         # Test behavior of `c` as the basic PNTerm
-        for (term, c⁻¹exponent, coeff) in (
+        for (term, c⁻¹exponent, coeff) ∈ (
             (c, -1, 1),
             (c^2, -2, 1),
             (x * c^2, -2, x),
@@ -33,7 +33,7 @@
 
         # Test PNExpressions
         @test_throws ArgumentError PNExpansion((), 0)
-        for (expr, expected) in (
+        for (expr, expected) ∈ (
             (w - (x - y / c), (w - x, y)),
             (w - (x / c - y), (w + y, -x)),
             (x - y / c, (x, -y)),
@@ -85,11 +85,11 @@ end
     using Symbolics
     using PostNewtonian: PNExpansion
 
-    for N1 in 1:9
-        for N2 in 1:9
-            for NMax in max(N1, N2):(N1 + N2 + 3)
+    for N1 ∈ 1:9
+        for N2 ∈ 1:9
+            for NMax ∈ max(N1, N2):(N1 + N2 + 3)
                 @variables c⁻¹ x[1:N1] y[1:N2] z
-                poly(e::PNExpansion) = sum(e[i] * c⁻¹^(i - 1) for i in 1:length(e))
+                poly(e::PNExpansion) = sum(e[i] * c⁻¹^(i - 1) for i ∈ 1:length(e))
                 eˣ = PNExpansion(tuple(x...), NMax)
                 eʸ = PNExpansion(tuple(y...), NMax)
 
@@ -106,7 +106,7 @@ end
                 prodpoly = simplify(
                     substitute(
                         simplify(poly(eˣ) * poly(eʸ); expand=true),
-                        Dict([c⁻¹^n => 0 for n in NMax:(2NMax + 3)]),
+                        Dict([c⁻¹^n => 0 for n ∈ NMax:(2NMax + 3)]),
                     );
                     expand=true,
                 )

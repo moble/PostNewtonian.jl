@@ -20,8 +20,7 @@ end
 
 fundamental_variables = methodswith(PNSystem, FundamentalVariables)
 fundamental_quaternionic_variables = [
-    m for
-    m in methodswith(AbstractVector, FundamentalVariables) if m.name ∈ [:χ⃗₁, :χ⃗₂, :R]
+    m for m ∈ methodswith(AbstractVector, FundamentalVariables) if m.name ∈ [:χ⃗₁, :χ⃗₂, :R]
 ]
 derived_variables = methodswith(VecOrPNSystem, DerivedVariables)
 pnvariables = map(v -> v.name, [fundamental_variables; derived_variables])
@@ -40,15 +39,15 @@ function pn_expression(pnsystem::Symbol, body)
     # Look for variables in `body` that we need to treat specially, and write exprs to do
     # so.  These three are described as bullet points in the docstring of `@pn_expression`.
     pnvariables_exprs = [
-        :($v = $v($pnsystem)) for v in filter(v -> MacroTools.inexpr(body, v), pnvariables)
+        :($v = $v($pnsystem)) for v ∈ filter(v -> MacroTools.inexpr(body, v), pnvariables)
     ]
     irrationals_exprs = [
         :($v = type_converter($pnsystem, $v)) for
-        v in filter(v -> MacroTools.inexpr(body, v), irrationals)
+        v ∈ filter(v -> MacroTools.inexpr(body, v), irrationals)
     ]
     unary_funcs_exprs = [
         :($v = (x -> $v(type_converter($pnsystem, x)))) for
-        v in filter(v -> MacroTools.inexpr(body, v), unary_funcs)
+        v ∈ filter(v -> MacroTools.inexpr(body, v), unary_funcs)
     ]
 
     exprs = [

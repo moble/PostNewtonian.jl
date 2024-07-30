@@ -8,7 +8,7 @@
 
     function approx(reference, actual; atol=1e-8, rtol=1e-8)
         return_value = true
-        for (k, v1) in reference
+        for (k, v1) ∈ reference
             if haskey(actual, k)
                 v2 = actual[k]
                 if size(v1) ≠ size(v2) || !isapprox(v1, v2; atol=atol, rtol=rtol)
@@ -25,7 +25,7 @@
                 return_value = false
             end
         end
-        for (k, v2) in actual
+        for (k, v2) ∈ actual
             if !haskey(reference, k)
                 @warn """Key "$k" found in "actual" file but not in "reference"."""
                 return_value = false
@@ -37,7 +37,7 @@
     function compare_v̇(file_name, args...; kwargs...)
         file_name = joinpath("reference_values", file_name)
         rng = Random.Xoshiro(1234)
-        pnsystems = [rand(rng, BBH) for _ in 1:1_000]
+        pnsystems = [rand(rng, BBH) for _ ∈ 1:1_000]
         # TaylorT1 is just the ratio of v̇_numerator to v̇_denominator, but we'll store
         # those separately in case it helps with debugging, so we won't store TaylorT1
         # itself.  We will store TaylorT4 and TaylorT5, though.

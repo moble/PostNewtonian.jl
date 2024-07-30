@@ -6,7 +6,7 @@
         return v * π√10
     end
 
-    for T in [Float32, Float64, BigFloat]
+    for T ∈ [Float32, Float64, BigFloat]
         M₁, M₂, χ⃗₁, χ⃗₂, R, v = T(1),
         T(1), QuatVec(T(0)), QuatVec(T(0)), Rotor(T(1)),
         T(1//17)

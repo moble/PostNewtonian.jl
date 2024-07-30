@@ -108,8 +108,8 @@ end
 function default_abstol(pnsystem)
     T = eltype(pnsystem)
     return T[
-        T[eps(T(M₁(pnsystem) + M₂(pnsystem)))^(11//16) for _ in 1:2]
-        T[eps(T)^(11//16) for _ in 3:length(pnsystem.state)]
+        T[eps(T(M₁(pnsystem) + M₂(pnsystem)))^(11//16) for _ ∈ 1:2]
+        T[eps(T)^(11//16) for _ ∈ 3:length(pnsystem.state)]
     ]
 end
 

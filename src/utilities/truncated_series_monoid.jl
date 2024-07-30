@@ -59,10 +59,10 @@ function truncated_series_inverse!(b, a)
     @inbounds @fastmath if n > 0
         b[0 + 1] = inv(a[0 + 1])
     end
-    @inbounds @fastmath for i in 0:(n - 2)
+    @inbounds @fastmath for i ∈ 0:(n - 2)
         b[i + 1 + 1] =
             -b[0 + 1] *
-            sum((a[j + 1] * b[i + 1 - j + 1] for j in 1:(i + 1)); init=zero(eltype(a)))
+            sum((a[j + 1] * b[i + 1 - j + 1] for j ∈ 1:(i + 1)); init=zero(eltype(a)))
     end
     return b
 end
@@ -94,7 +94,7 @@ function truncated_series_product(a, b, v)
         return zero(v)
     end
     ex = b[N + 1] * a[1]
-    for n in (N - 1):-1:0
+    for n ∈ (N - 1):-1:0
         ex = muladd(v, ex, b[n + 1] * evalpoly(v, @view a[1:((N - n) + 1)]))
     end
     return ex
@@ -106,7 +106,7 @@ function truncated_series_product(a::NTuple{N,T}, b, v) where {N,T}
         return zero(v)
     end
     ex = b[N] * a[1]
-    for n in (N - 2):-1:0
+    for n ∈ (N - 2):-1:0
         ex = muladd(v, ex, b[n + 1] * evalpoly(v, a[1:((N - n - 1) + 1)]))
     end
     return ex
@@ -154,20 +154,20 @@ function truncated_series_ratio(a::NTuple{N1,T1}, b::NTuple{N2,T2}) where {N1,N2
 
     @inbounds @fastmath begin
         b⁻¹[0 + 1] = inv(b[0 + 1])
-        for i in 0:(N2 - 2)
+        for i ∈ 0:(N2 - 2)
             b⁻¹[i + 1 + 1] =
                 -b⁻¹[0 + 1] *
-                sum((b[j + 1] * b⁻¹[i + 1 - j + 1] for j in 1:(i + 1)); init=zero(T))
+                sum((b[j + 1] * b⁻¹[i + 1 - j + 1] for j ∈ 1:(i + 1)); init=zero(T))
         end
-        for i in (N2 - 1):(N - 2)
+        for i ∈ (N2 - 1):(N - 2)
             b⁻¹[i + 1 + 1] =
                 -b⁻¹[0 + 1] *
-                sum((b[j + 1] * b⁻¹[i + 1 - j + 1] for j in 1:(N2 - 1)); init=zero(T))
+                sum((b[j + 1] * b⁻¹[i + 1 - j + 1] for j ∈ 1:(N2 - 1)); init=zero(T))
         end
 
         a╱b = zero(T)
-        for i1 in 1:N1
-            a╱b += a[i1] * sum((b⁻¹[i2] for i2 in 1:(N - i1 + 1)); init=zero(T))
+        for i1 ∈ 1:N1
+            a╱b += a[i1] * sum((b⁻¹[i2] for i2 ∈ 1:(N - i1 + 1)); init=zero(T))
         end
         a╱b
     end
@@ -178,14 +178,14 @@ end
     using DoubleFloats
     import PostNewtonian: truncated_series_inverse, truncated_series_ratio
     Random.seed!(123)
-    for T in [Float32, Float64, Double64]
-        for N in 1:20
+    for T ∈ [Float32, Float64, Double64]
+        for N ∈ 1:20
             A = rand(T, N)
             A[1] = one(T) + rand(T) / 100
             a = Tuple(A)
             x = rand(T)
             ϵ = sum(a) * N * eps(T)
-            for N1 in 1:N
+            for N1 ∈ 1:N
                 expected = sum(truncated_series_inverse(a))
                 unit = zeros(T, N1)
                 unit[1] = one(T)

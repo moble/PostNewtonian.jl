@@ -1,3 +1,5 @@
+always_for_in = true
+for_in_replacement = "∈"
 ignore = ["src/pn_expressions/mode_weights.jl"]
 indent = 4
 margin = 92

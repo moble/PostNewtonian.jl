@@ -57,7 +57,7 @@ function coorbital_waveform!(
     @assert length(pnsystem.state) == length(inspiral.u[1])
     @assert length(inspiral) == size(h, 2)
     @assert (ℓₘₐₓ + 1)^2 - ℓₘᵢₙ^2 == size(h, 1)
-    @inbounds @fastmath for iₜ in eachindex(inspiral)
+    @inbounds @fastmath for iₜ ∈ eachindex(inspiral)
         pnsystem.state .= inspiral.u[iₜ]
         h!(@view(h[:, iₜ]), pnsystem; ℓₘᵢₙ, ℓₘₐₓ)
     end
@@ -162,14 +162,14 @@ function inertial_waveform!(
     @assert length(pnsystem.state) == length(inspiral.u[1])
     @assert length(inspiral) == size(h, 2)
     @assert (ℓₘₐₓ + 1)^2 - ℓₘᵢₙ^2 == size(h, 1)
-    @inbounds @fastmath for iₜ in eachindex(inspiral)
+    @inbounds @fastmath for iₜ ∈ eachindex(inspiral)
         pnsystem.state .= inspiral.u[iₜ]
         h!(@view(h[:, iₜ]), pnsystem; ℓₘᵢₙ, ℓₘₐₓ)
         D!(D, conj(R(pnsystem)), ℓₘₐₓ, H_rec_coeffs, eⁱᵐᵅ, eⁱᵐᵞ)
         f′ = Yiterator(hᵢ, ℓₘₐₓ, ℓₘᵢₙ, 1)
         f = Yiterator(h[:, iₜ], ℓₘₐₓ, ℓₘᵢₙ, 1)
         𝔇 = Diterator(D, ℓₘₐₓ, ℓₘᵢₙ)
-        for (f′ˡ, fˡ, 𝔇ˡ) in zip(f′, f, 𝔇)
+        for (f′ˡ, fˡ, 𝔇ˡ) ∈ zip(f′, f, 𝔇)
             mul!(f′ˡ, 𝔇ˡ, fˡ)
         end
         h[:, iₜ] .= hᵢ

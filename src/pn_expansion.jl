@@ -69,7 +69,7 @@ Base.length(pn::PNExpansion) = length(pn.coeffs)
 Base.eltype(pn::PNExpansion) = eltype(pn.coeffs)
 
 function Base.sum(pn_expansion::PNExpansion{N,T,NMax}) where {N,T,NMax}
-    return sum(pn_expansion[i] for i in 1:N, init in zero(T))
+    return sum(pn_expansion[i] for i ∈ 1:N, init ∈ zero(T))
 end
 
 function Base.:+(pn::PNExpansion{N,T1,NMax}, x::T2) where {N,T1,NMax,T2<:Number}
@@ -147,8 +147,8 @@ function product_term(
 ) where {N1,N2,T1,T2,NMax}
     T3 = promote_type(T1, T2)
     return sum(
-        pn1.coeffs[j] * pn2.coeffs[i - j + 1] for j in max(1, i - N2 + 1):min(i, N1),
-        init in zero(T3)
+        pn1.coeffs[j] * pn2.coeffs[i - j + 1] for j ∈ max(1, i - N2 + 1):min(i, N1),
+        init ∈ zero(T3)
     )
 end
 
@@ -355,7 +355,7 @@ function Base.:+(
     @inbounds if N1 ≤ N
         coeffs[N1] += term.coeff
     end
-    @inbounds for i in 1:N
+    @inbounds for i ∈ 1:N
         if i ≤ N2
             coeffs[i] += expansion[i]
         end
@@ -380,7 +380,7 @@ function Base.:*(
     N = min(max(N1, N1 + ΔN), NMax)
 
     # Check that no terms from expansion will be lost to negative PN orders
-    @inbounds for i in 1:min(max(0, -ΔN), N1)
+    @inbounds for i ∈ 1:min(max(0, -ΔN), N1)
         if !iszero(expansion[i])
             throw(
                 ArgumentError(
@@ -395,7 +395,7 @@ function Base.:*(
     T = promote_type(T1, T2)
     coeffs = _efficient_vector(Val(N), Val(T))
     coeffs .= zero(T)
-    @inbounds for i in max(1, 1 - ΔN):min(N1, N - ΔN)
+    @inbounds for i ∈ max(1, 1 - ΔN):min(N1, N - ΔN)
         coeffs[i + ΔN] = expansion[i] * term.coeff
     end
     return PNExpansion{N,T,NMax}(Tuple(coeffs))

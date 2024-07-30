@@ -28,9 +28,9 @@ function (interp::CombinedInterpolationData)(
     val = if idxs isa Integer
         Vector{eltype(interp.sol₊)}(undef, length(tvals))
     elseif isnothing(idxs)
-        [Vector{eltype(interp.sol₊)}(undef, size(interp.sol₊, 1)) for _ in eachindex(tvals)]
+        [Vector{eltype(interp.sol₊)}(undef, size(interp.sol₊, 1)) for _ ∈ eachindex(tvals)]
     else
-        [Vector{eltype(interp.sol₊)}(undef, length(idxs)) for _ in eachindex(tvals)]
+        [Vector{eltype(interp.sol₊)}(undef, length(idxs)) for _ ∈ eachindex(tvals)]
     end
     return interp(val, tvals, idxs, deriv, p, continuity)
 end
@@ -40,7 +40,7 @@ function (interp::CombinedInterpolationData)(
     i₊ = tvals .≥ interp.tᵢ
     i₋ = tvals .< interp.tᵢ
     if idxs isa Integer
-        for i in eachindex(tvals)
+        for i ∈ eachindex(tvals)
             if tvals[i] ≥ interp.tᵢ
                 val[i] = interp.sol₊.interp(tvals[i], idxs, deriv, p, continuity)
             else
@@ -48,7 +48,7 @@ function (interp::CombinedInterpolationData)(
             end
         end
     else
-        for i in eachindex(tvals)
+        for i ∈ eachindex(tvals)
             if tvals[i] ≥ interp.tᵢ
                 val[i] .= interp.sol₊.interp(tvals[i], idxs, deriv, p, continuity)
             else
