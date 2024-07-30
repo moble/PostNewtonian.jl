@@ -1,0 +1,13 @@
+# Link checker: https://github.com/lycheeverse/lychee?tab=readme-ov-file
+
+exclude = [
+  "@ref",
+  "^https://github.com/.*/releases/tag/v.*$",
+  "^https://doi.org/10.5281/zenodo.6847321$",
+  "^https://moble.github.io/PostNewtonian.jl/stable$",
+  "zenodo.org/badge/DOI/10.5281/zenodo.6847321$"
+]
+
+exclude_path = [
+  "docs/build"
+]
