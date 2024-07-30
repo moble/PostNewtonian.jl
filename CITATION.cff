@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+title: PostNewtonian.jl
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Michael
+    family-names: Boyle
+    email: michael.oliver.boyle@gmail.com
+    affiliation: Cornell University
+    orcid: 'https://orcid.org/0000-0002-5075-5116'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.6847321
+    description: The concept DOI of the work.
+repository-code: 'https://github.com/moble/PostNewtonian.jl'
+commit: 44d23438ac2caa37a975afbcd9b13e0ccdca3f56
+version: 0.9.1
+date-released: '2024-07-27'
