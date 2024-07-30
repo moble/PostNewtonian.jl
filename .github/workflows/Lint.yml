@@ -53,4 +53,6 @@ jobs:
               uses: lycheeverse/lychee-action@v1
               with:
                   fail: true
-                  args: --config '.lychee.toml'
+                  args:
+                      --base . --verbose --no-progress './**/*.md' './**/*.html' \
+                      './**/*.rst' --config '.lychee.toml'
