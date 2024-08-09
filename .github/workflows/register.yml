@@ -5,6 +5,7 @@ on:
             version:
                 description: Version to register or component to bump (major, minor, or patch)
                 required: true
+                default: "patch"
 jobs:
     register:
         runs-on: ubuntu-latest
