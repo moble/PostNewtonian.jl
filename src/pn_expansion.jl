@@ -187,6 +187,12 @@ e = 1 + (v/c)^2 * (-ν/12 - 3//4) + (v/c)^4 * (-ν^2/24 + 19ν/8 - 27//8)
 ```
 Any exponent higher than the desired `PNOrder` will be automatically set to zero.
 
+Useful facts:
+  - `v` has order `1/c`
+  - `x` has order `1/c^2`
+  - `γ` has order `1/c^2`
+  - `1/r` has order `1/c^2`
+
 """
 struct PNTerm{T,PNOrder,c⁻¹Exponent}
     coeff::T
