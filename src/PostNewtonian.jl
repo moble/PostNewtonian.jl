@@ -153,7 +153,11 @@ export gw_energy_flux,
     Ω⃗ᵪ₁,
     Omega_chi2,
     Ω⃗ᵪ₂,
-    #𝛡, γₚₙ, aₗ, Ω⃗ᵪ  # Too obscure to bother with
+    #𝛡, aₗ, Ω⃗ᵪ  # Too obscure to bother with
+    γₚₙ,
+    inverse_radius,
+    γₚₙ′,
+    inverse_radius_deriv,
     mode_weights!,
     h!
 
