@@ -2,8 +2,23 @@
     truncated_series_inverse(a)
     truncated_series_inverse!(b, a)
 
-Given the coefficients `a` of a series, find the coefficients `b` of the multiplicative
-inverse of that series, up to the order of the original series.
+Given the coefficients `a` of a series, find the coefficients `b` of the *multiplicative*
+inverse of that series, up to the order of the original series.  That is, if
+```math
+A \colonequals \sum_{i=0}^n a_{i-1} v^i,
+```
+then we return the coefficients `b` of the series
+```math
+B \colonequals \sum_{i=0}^n b_{i-1} v^i
+```
+such that
+```math
+A\, B = 1 + \mathcal{O}(v^{n+1}).
+```
+
+See [`lagrange_inversion`](@ref) for the *compositional* inverse (a.k.a. reversion), which
+returns the coefficients of ``f^{-1}`` such that ``f^{-1}(f(v)) = v +
+\mathcal{O}(v^{n+1})``.
 
 Note that this function returns the *coefficients* of the inverse, rather than its value.
 This is relevant for use in [`truncated_series_product`](@ref) and
