@@ -34,6 +34,8 @@ end
             :order_index,
             :γₑ,
             :ζ3,
+            :PNExpansionParameter,
+            :type_converter,
         ),
     ) === nothing
     @test ExplicitImports.check_all_qualified_accesses_via_owners(PostNewtonian) === nothing

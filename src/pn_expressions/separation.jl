@@ -187,7 +187,20 @@ consistent with those from SpEC.
 """
 module Kidder1995
 
-using PostNewtonian: @pn_expansion, @pn_expression, M, M₁, M₂, ν, δ, χ₁ₗ, χ₂ₗ, χ₁₂, Ω
+using PostNewtonian:
+    @pn_expansion,
+    @pn_expression,
+    M,
+    M₁,
+    M₂,
+    ν,
+    δ,
+    χ₁ₗ,
+    χ₂ₗ,
+    χ₁₂,
+    Ω,
+    type_converter,
+    PNExpansionParameter
 
 """
     r(pnsystem)
