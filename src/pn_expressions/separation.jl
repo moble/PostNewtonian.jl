@@ -174,8 +174,18 @@ const separation_prime = r′
 end
 const separation_dot = ṙ
 
+"""
+This module contains a few expressions from [Kidder
+(1995)](https://arxiv.org/abs/gr-qc/9506022).
+
+This is mostly here for testing, because these expressions are not directly used in this
+package: they are somewhat outdated and describe quantities that are not actually used in
+this formulation.  However, they were used in the SpEC code as an initial guess for
+eccentricity reduction, so we want to make sure that results from this package are
+consistent with those from SpEC.
+
+"""
 module Kidder1995
-# https://arxiv.org/abs/gr-qc/9506022
 
 using PostNewtonian:
     @pn_expansion,
@@ -188,9 +198,30 @@ using PostNewtonian:
     χ₁ₗ,
     χ₂ₗ,
     χ₁₂,
-    r,
+    Ω,
     type_converter,
     PNExpansionParameter
+
+"""
+    r(pnsystem)
+
+Eq. (4.13).
+"""
+@pn_expression function r(pnsystem)
+    let m = M, m₁ = M₁, m₂ = M₂, η = ν, δm = δ * M, χ₁L̂ₙŝ₁ = χ₁ₗ, χ₂L̂ₙŝ₂ = χ₂ₗ, ω = Ω
+        m *
+        (m * ω)^(-2//3) *
+        @pn_expansion(
+            1 - 1//3 * (3 - η) * (m * ω)^(2//3) / c^2 -
+            (
+                1//3 *
+                ((χ₁L̂ₙŝ₁ * (2 * m₁^2 / m^2 + 3η)) + (χ₂L̂ₙŝ₂ * (2 * m₂^2 / m^2 + 3η)))
+            ) * (m * ω) / c^3 +
+                (η * (19//4 + η / 9) - 1//2 * η * (χ₁₂ - 3χ₁L̂ₙŝ₁ * χ₂L̂ₙŝ₂)) *
+            (m * ω)^(4//3) / c^4
+        )
+    end
+end
 
 """
     drdt(pnsystem)
@@ -217,7 +248,7 @@ Eq. (4.12), computed as ṙ = (dE/dt) / (dE/dr), re-expanded and truncated.
     end
 end
 
-end
+end  # module Kidder1995
 
 @testitem "separation" begin
     using Random
