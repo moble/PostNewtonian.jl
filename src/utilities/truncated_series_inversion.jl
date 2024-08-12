@@ -96,7 +96,7 @@ end
 end
 
 @doc raw"""
-    hⁱ_mod_xⁿ⁻¹(h, i)
+    hⁱ✖h_mod_xⁿ⁻¹(h, i)
 
 Compute the truncated power series expansion of ``h^i`` mod ``x^{n-1}``, where ``h`` is the
 power series expansion of a function ``h(x)``

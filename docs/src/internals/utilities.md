@@ -142,7 +142,7 @@ PostNewtonian.truncated_series_product
 PostNewtonian.truncated_series_ratio
 PostNewtonian.lagrange_inversion
 PostNewtonian.x╱f_mod_xⁿ⁻¹
-PostNewtonian.hⁱ_mod_xⁿ⁻¹
+PostNewtonian.hⁱ✖h_mod_xⁿ⁻¹
 ```
 
 ## Miscellaneous
