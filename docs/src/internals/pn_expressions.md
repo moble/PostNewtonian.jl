@@ -27,6 +27,22 @@ Pages   = ["pn_expressions/tidal_heating.jl"]
 Order   = [:module, :type, :constant, :function, :macro]
 ```
 
+## Separation
+
+```@autodocs
+Modules = [PostNewtonian]
+Pages   = ["pn_expressions/separation.jl"]
+Order   = [:module, :type, :constant, :function, :macro]
+```
+
+### Kidder (1995)
+
+```@autodocs
+Modules = [PostNewtonian.Kidder1995]
+Pages   = ["pn_expressions/separation.jl"]
+Order   = [:module, :type, :constant, :function, :macro]
+```
+
 ## Precession
 
 ```@autodocs
