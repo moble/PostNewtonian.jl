@@ -155,9 +155,9 @@ export gw_energy_flux,
     Ω⃗ᵪ₂,
     #𝛡, aₗ, Ω⃗ᵪ  # Too obscure to bother with
     γₚₙ,
-    inverse_radius,
+    inverse_separation,
     γₚₙ′,
-    inverse_radius_deriv,
+    inverse_separation_deriv,
     mode_weights!,
     h!
 
