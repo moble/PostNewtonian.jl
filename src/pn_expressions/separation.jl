@@ -10,7 +10,7 @@ where ``r`` is the magnitude of the orbital separation.  This quantity has PN or
 is given by Eq. (4.3) of [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520) and Eq.
 (3.32) of [Bohé et al.  (2015)](https://arxiv.org/abs/1501.01529).
 
-Note that there is a 3PN gauge term of ``-22ν\\ln(r/r₀′)/3`` that is simply ignored here, as
+Note that there is a 3PN gauge term of ``-22ν\ln(r/r₀')/3`` that is simply ignored here, as
 it should cancel out of any physical quantity.
 """
 @pn_expression function γₚₙ(pnsystem)
@@ -156,7 +156,7 @@ const separation = r
 
 """
     r′(pnsystem)
-    separation_prime(pnsystem)
+    separation_deriv(pnsystem)
 
 Compute the derivative of the separation between the two black holes with respect to `v`.
 """
@@ -165,7 +165,7 @@ Compute the derivative of the separation between the two black holes with respec
         -γₚₙ′ * G * M / (γₚₙ^2 * c^2)
     end
 end
-const separation_prime = r′
+const separation_deriv = r′
 
 @pn_expression function ṙ(pnsystem)
     let γₚₙ = γₚₙ(pnsystem), γₚₙ′ = γₚₙ′(pnsystem), 𝓕 = 𝓕(pnsystem), 𝓔′ = 𝓔′(pnsystem)
@@ -173,6 +173,96 @@ const separation_prime = r′
     end
 end
 const separation_dot = ṙ
+
+"""
+    γₚₙ⁻¹(γ, pnsystem)
+    inverse_separation_inverse(γ, pnsystem)
+
+Return `v` such that `γₚₙ(pnsystem) = γ` when `pnsystem` is evaluated at `v`.
+
+Note that the value of `v` in the input `pnsystem` is ignored; you may use any value.  It
+may also be convenient to know that you can set the value of `v` in `pnsystem` to the
+returned value using `PostNewtonian.vindex` as in
+```julia
+pnsystem.state[PostNewtonian.vindex] = γₚₙ⁻¹(γ, pnsystem)
+```
+See also [`r⁻¹`](@ref).
+"""
+function γₚₙ⁻¹(γ, pnsystem)
+    if 2γ ≥ 1
+        @info "Error with" pnsystem
+        throw(ArgumentError("γ=$γ ≥ 1/2 describes a binary that has already merged"))
+    elseif γ ≤ 0
+        @info "Error with" pnsystem
+        throw(ArgumentError("γ=$γ ≤ 0 is unphysical"))
+    end
+
+    # We evaluate at v=1 just to get all the terms out separately, without actually multiplying
+    # by the powers of v.
+    pn = deepcopy(pnsystem)
+    pn.state[PostNewtonian.vindex] = one(eltype(pn))
+
+    # Now we can get the actual terms.  Note that there is a pre-factor of (v/c)^2.
+    γₚₙ_expansion = PostNewtonian.γₚₙ(pn; pn_expansion_reducer=Val(identity))
+
+    # Include the pre-factor of (v/c)^2, then compute coefficients of the first and second
+    # derivatives with respect to v.
+    coeffs = (0.0, 0.0, γₚₙ_expansion.coeffs...)
+    coeffs′ = Tuple(i * c for (i, c) ∈ enumerate(coeffs[2:end]))
+    coeffs′′ = Tuple(i * c for (i, c) ∈ enumerate(coeffs′[2:end]))
+
+    # Defining the cost function as Ξ(v) = (evalpoly(v, coeffs) - γ)^2, the Newton step is
+    # -Ξ′(v) / Ξ′′(v), which is easy to compute from the coefficients:
+    function newton_step(v)
+        return -(
+            (evalpoly(v, coeffs) - γ) * evalpoly(v, coeffs′) /
+            ((evalpoly(v, coeffs) - γ) * evalpoly(v, coeffs′′) + (evalpoly(v, coeffs′))^2)
+        )
+    end
+
+    # Now we just do a few Newton steps to get the value of v.
+    vᵢ = let ν = PostNewtonian.ν(pnsystem)
+        try
+            √((3 - √(-12ν * γ + 36γ + 9)) / (2ν - 6))
+        catch
+            return zero(γ)
+            # @info γ pnsystem
+            # rethrow
+        end
+    end
+    for i ∈ 1:10  # Limit the possible number of steps, just in case
+        δvᵢ = newton_step(vᵢ)
+        vᵢ += δvᵢ
+        if abs(δvᵢ) < 10eps(vᵢ)
+            break
+        end
+    end
+
+    return vᵢ
+end
+const inverse_separation_inverse = γₚₙ⁻¹
+
+"""
+    r⁻¹(r, pnsystem)
+    separation_inverse(r, pnsystem)
+
+Return `v` such that `r = r(v)` when `pnsystem` is evaluated at `v`.
+
+Note that the value of `v` in the input `pnsystem` is ignored; you may use any value.  It
+may also be convenient to know that you can set the value of `v` in `pnsystem` to the
+returned value using `PostNewtonian.vindex` as in
+```julia
+pnsystem.state[PostNewtonian.vindex] = r⁻¹(r, pnsystem)
+```
+See also [`γₚₙ⁻¹`](@ref).
+"""
+function r⁻¹(r, pnsystem)
+    let G = 1, M = PostNewtonian.M(pnsystem)
+        γ = G * M / r
+        v = γₚₙ⁻¹(γ, pnsystem)
+    end
+end
+const separation_inverse = r⁻¹
 
 """
 This module contains a few expressions from [Kidder
@@ -261,5 +351,33 @@ end  # module Kidder1995
         # include newer PN terms, so this tolerance may need to be adjusted.  This is more
         # of a sanity check.
         @test drdt(pnsystem) ≈ separation_dot(pnsystem) rtol = 0.03
+    end
+end
+
+@testitem "separation_inverse" begin
+    using Random
+    using PostNewtonian: PostNewtonian
+
+    rng = Random.Xoshiro(1234)
+    for _ ∈ 1:100_000
+        # First, create a random system.  Make it NSNS to ensure that as many code paths as
+        # possible are tested.  Ensure that v≤1/2 to avoid cases where the system has
+        # already merged.
+        pnsystem = rand(rng, NSNS; v=rand(rng) / 2)
+
+        # Test γ
+        γ = PostNewtonian.γₚₙ(pnsystem)
+        v = PostNewtonian.γₚₙ⁻¹(γ, pnsystem)
+        @test abs(1 - v / PostNewtonian.v(pnsystem)) < 3eps(typeof(v))
+
+        # Now perturb the masses just enough to ensure that the total mass is significantly
+        # different from 1, but not so different as to mess with the tolerance.
+        pnsystem.state[PostNewtonian.M₁index] *= 1.03
+        pnsystem.state[PostNewtonian.M₂index] *= 1.09
+
+        # And re-test with `r` instead of `γ`.
+        r = PostNewtonian.r(pnsystem)
+        v = PostNewtonian.r⁻¹(r, pnsystem)
+        @test abs(1 - v / PostNewtonian.v(pnsystem)) < 3eps(typeof(v))
     end
 end
