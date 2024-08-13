@@ -200,10 +200,10 @@ function γₚₙ⁻¹(γ, pnsystem)
     # We evaluate at v=1 just to get all the terms out separately, without actually multiplying
     # by the powers of v.
     pn = deepcopy(pnsystem)
-    pn.state[PostNewtonian.vindex] = one(eltype(pn))
+    pn.state[vindex] = one(eltype(pn))
 
     # Now we can get the actual terms.  Note that there is a pre-factor of (v/c)^2.
-    γₚₙ_expansion = PostNewtonian.γₚₙ(pn; pn_expansion_reducer=Val(identity))
+    γₚₙ_expansion = γₚₙ(pn; pn_expansion_reducer=Val(identity))
 
     # Include the pre-factor of (v/c)^2, then compute coefficients of the first and second
     # derivatives with respect to v.
@@ -221,7 +221,7 @@ function γₚₙ⁻¹(γ, pnsystem)
     end
 
     # Now we just do a few Newton steps to get the value of v.
-    vᵢ = let ν = PostNewtonian.ν(pnsystem)
+    vᵢ = let ν = ν(pnsystem)
         try
             √((3 - √(-12ν * γ + 36γ + 9)) / (2ν - 6))
         catch
@@ -257,7 +257,7 @@ pnsystem.state[PostNewtonian.vindex] = r⁻¹(r, pnsystem)
 See also [`γₚₙ⁻¹`](@ref).
 """
 function r⁻¹(r, pnsystem)
-    let G = 1, M = PostNewtonian.M(pnsystem)
+    let G = 1, M = M(pnsystem)
         γ = G * M / r
         v = γₚₙ⁻¹(γ, pnsystem)
     end
@@ -356,7 +356,7 @@ end
 
 @testitem "separation_inverse" begin
     using Random
-    using PostNewtonian: PostNewtonian
+    using PostNewtonian: PostNewtonian, γₚₙ, γₚₙ⁻¹, M₁index, M₂index, v, r, r⁻¹
 
     rng = Random.Xoshiro(1234)
     for _ ∈ 1:100_000
@@ -366,18 +366,16 @@ end
         pnsystem = rand(rng, NSNS; v=rand(rng) / 2)
 
         # Test γ
-        γ = PostNewtonian.γₚₙ(pnsystem)
-        v = PostNewtonian.γₚₙ⁻¹(γ, pnsystem)
-        @test abs(1 - v / PostNewtonian.v(pnsystem)) < 3eps(typeof(v))
+        vᵧ = γₚₙ⁻¹(γₚₙ(pnsystem), pnsystem)
+        @test abs(1 - vᵧ / v(pnsystem)) < 3eps(typeof(vᵧ))
 
         # Now perturb the masses just enough to ensure that the total mass is significantly
         # different from 1, but not so different as to mess with the tolerance.
-        pnsystem.state[PostNewtonian.M₁index] *= 1.03
-        pnsystem.state[PostNewtonian.M₂index] *= 1.09
+        pnsystem.state[M₁index] *= 1.03
+        pnsystem.state[M₂index] *= 1.09
 
         # And re-test with `r` instead of `γ`.
-        r = PostNewtonian.r(pnsystem)
-        v = PostNewtonian.r⁻¹(r, pnsystem)
-        @test abs(1 - v / PostNewtonian.v(pnsystem)) < 3eps(typeof(v))
+        vᵣ = r⁻¹(r(pnsystem), pnsystem)
+        @test abs(1 - vᵣ / v(pnsystem)) < 3eps(typeof(vᵣ))
     end
 end
