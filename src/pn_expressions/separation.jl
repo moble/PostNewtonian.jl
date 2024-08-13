@@ -149,7 +149,7 @@ factor of `1/c^2` in the expansion.
 """
 @pn_expression function r(pnsystem)
     let γₚₙ = γₚₙ(pnsystem)
-        return G * M / (γₚₙ)
+        return G * M / (γₚₙ * c^2)
     end
 end
 const separation = r
@@ -257,8 +257,8 @@ pnsystem.state[PostNewtonian.vindex] = r⁻¹(r, pnsystem)
 See also [`γₚₙ⁻¹`](@ref).
 """
 function r⁻¹(r, pnsystem)
-    let G = 1, M = M(pnsystem)
-        γ = G * M / r
+    let c = 1, G = 1, M = M(pnsystem)
+        γ = G * M / (r * c^2)
         v = γₚₙ⁻¹(γ, pnsystem)
     end
 end
@@ -312,13 +312,14 @@ Eq. (4.13).
         )
     end
 end
+const separation = r
 
 """
-    drdt(pnsystem)
+    ṙ(pnsystem)
 
 Eq. (4.12), computed as ṙ = (dE/dt) / (dE/dr), re-expanded and truncated.
 """
-@pn_expression function drdt(pnsystem)
+@pn_expression function ṙ(pnsystem)
     let r = r(pnsystem)
         let m = M, m₁ = M₁, m₂ = M₂, η = ν, δm = δ * M, χ₁L̂ₙŝ₁ = χ₁ₗ, χ₂L̂ₙŝ₂ = χ₂ₗ
             -64//5 *
@@ -343,14 +344,14 @@ end  # module Kidder1995
 @testitem "separation" begin
     using Random
     using PostNewtonian: @pn_expansion, @pn_expression, separation_dot
-    using PostNewtonian.Kidder1995: drdt
+    using PostNewtonian.Kidder1995: ṙ
 
     rng = Random.Xoshiro(1234)
     for pnsystem ∈ (rand(rng, BBH) for _ ∈ 1:1_000)
         # We know that Larry's expression is old and inaccurate.  It may get more so as we
         # include newer PN terms, so this tolerance may need to be adjusted.  This is more
         # of a sanity check.
-        @test drdt(pnsystem) ≈ separation_dot(pnsystem) rtol = 0.03
+        @test ṙ(pnsystem) ≈ separation_dot(pnsystem) rtol = 0.03
     end
 end
 
