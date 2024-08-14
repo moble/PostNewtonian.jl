@@ -87,7 +87,7 @@ struct BBH{T,PNOrder} <: PNSystem{T,PNOrder}
     state::T
 
     BBH{T,PNOrder}(state) where {T,PNOrder} = new{T,PNOrder}(state)
-    function BBH(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0, PNOrder=typemax(Int), kwargs...)
+    function BBH(; M₁, M₂, χ⃗₁, χ⃗₂, v, R=Rotor(1), Φ=0, PNOrder=typemax(Int), kwargs...)
         (T, PNOrder, state) = prepare_system(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
         return new{T,PNOrder}(state)
     end
@@ -116,7 +116,9 @@ struct BHNS{ST,PNOrder,ET} <: PNSystem{ST,PNOrder}
 
     BHNS{T,PNOrder,ET}(state) where {T,PNOrder,ET} = new{T,PNOrder,ET}(state)
     BHNS{T,PNOrder}(state) where {T,PNOrder} = new{T,PNOrder,eltype(T)}(state)
-    function BHNS(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₂, Φ=0, PNOrder=typemax(Int), kwargs...)
+    function BHNS(;
+        M₁, M₂, χ⃗₁, χ⃗₂, v, R=Rotor(1), Λ₂, Φ=0, PNOrder=typemax(Int), kwargs...
+    )
         ST, PNOrder, state = prepare_system(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
         ET = eltype(ST)
         return new{ST,PNOrder,ET}(state, convert(ET, Λ₂))
@@ -145,7 +147,9 @@ struct NSNS{ST,PNOrder,ET} <: PNSystem{ST,PNOrder}
 
     NSNS{T,PNOrder,ET}(state) where {T,PNOrder,ET} = new{T,PNOrder,ET}(state)
     NSNS{T,PNOrder}(state) where {T,PNOrder} = new{T,PNOrder,eltype(T)}(state)
-    function NSNS(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₁, Λ₂, Φ=0, PNOrder=typemax(Int), kwargs...)
+    function NSNS(;
+        M₁, M₂, χ⃗₁, χ⃗₂, v, R=Rotor(1), Λ₁, Λ₂, Φ=0, PNOrder=typemax(Int), kwargs...
+    )
         ST, PNOrder, state = prepare_system(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
         ET = eltype(ST)
         return new{ST,PNOrder,ET}(state, convert(ET, Λ₁), convert(ET, Λ₂))
@@ -255,6 +259,23 @@ end
 
 @testitem "PNSystem constructors" begin
     using Quaternionic
+
+    pnA = BBH(;
+        M₁=1.0f0, M₂=2.0f0, χ⃗₁=Float32[3.0, 4.0, 5.0], χ⃗₂=Float32[6.0, 7.0, 8.0], v=0.23f0
+    )
+    @test pnA.state ==
+        Float32[1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 1.0; 0.0; 0.0; 0.0; 0.23; 0.0]
+
+    pnA = BBH(;
+        M₁=1.0f0,
+        M₂=2.0f0,
+        χ⃗₁=Float32[3.0, 4.0, 5.0],
+        χ⃗₂=Float32[6.0, 7.0, 8.0],
+        v=0.23f0,
+        Φ=9.0f0,
+    )
+    @test pnA.state ==
+        Float32[1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 1.0; 0.0; 0.0; 0.0; 0.23; 9.0]
 
     R = randn(RotorF32)
     pn1 = BBH(;
