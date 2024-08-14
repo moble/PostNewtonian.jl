@@ -49,7 +49,7 @@ export termination_forwards,
 using .MathConstants
 
 include("pn_systems.jl")
-export PNSystem, pn_order, BBH, BHNS, NSNS, FDPNSystem, fd_pnsystem
+export PNSystem, pn_order, BBH, BHBH, BHNS, NSNS, BNS, FDPNSystem, fd_pnsystem
 
 include("pn_expansion.jl")
 export PNExpansion, PNTerm, PNExpansionParameter
