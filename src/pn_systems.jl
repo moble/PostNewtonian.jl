@@ -98,6 +98,7 @@ struct BBH{T,PNOrder} <: PNSystem{T,PNOrder}
         return new{typeof(state),prepare_pn_order(PNOrder)}(state)
     end
 end
+const BHBH = BBH
 
 """
     BHNS{T, PNOrder}
@@ -161,6 +162,7 @@ struct NSNS{ST,PNOrder,ET} <: PNSystem{ST,PNOrder}
         return new{ST,PNOrder,ET}(state, convert(ET, Λ₁), convert(ET, Λ₂))
     end
 end
+const BNS = NSNS
 
 """
     FDPNSystem{FT, PNOrder}(state, Λ₁, Λ₂)
