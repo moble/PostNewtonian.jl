@@ -343,15 +343,14 @@ end  # module Kidder1995
 
 @testitem "separation" begin
     using Random
-    using PostNewtonian: @pn_expansion, @pn_expression, separation_dot
-    using PostNewtonian.Kidder1995: ṙ
+    using PostNewtonian: @pn_expansion, @pn_expression, ṙ, Kidder1995
 
     rng = Random.Xoshiro(1234)
     for pnsystem ∈ (rand(rng, BBH) for _ ∈ 1:1_000)
-        # We know that Larry's expression is old and inaccurate.  It may get more so as we
-        # include newer PN terms, so this tolerance may need to be adjusted.  This is more
-        # of a sanity check.
-        @test ṙ(pnsystem) ≈ separation_dot(pnsystem) rtol = 0.03
+        # We know that Larry's expression is outdated.  It may get more so as we include
+        # newer PN terms, so this tolerance may need to be adjusted.  This is more of a
+        # sanity check.
+        @test Kidder1995.ṙ(pnsystem) ≈ ṙ(pnsystem) rtol = 0.03
     end
 end
 
