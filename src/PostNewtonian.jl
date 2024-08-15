@@ -158,6 +158,12 @@ export gw_energy_flux,
     inverse_separation,
     γₚₙ′,
     inverse_separation_deriv,
+    γₚₙ⁻¹,
+    inverse_separation_inverse,
+    separation,  # r,
+    separation_deriv,  # r′,
+    separation_dot,  # ṙ,
+    separation_inverse,  # r⁻¹,
     mode_weights!,
     h!
 
