@@ -560,14 +560,14 @@ Base.@constprop :aggressive function orbital_evolution(
     # especially close to merger.  An underestimate would lead to an inspiral ending too
     # soon, but an overestimate can lead to integration continuing very slowly in a regime
     # where PN has broken down.
-    τ = estimated_time_to_merger(pnsystem)
+    tₑ = 4estimated_time_to_merger(pnsystem)
+    tᵢ = zero(tₑ)
+    if "saveat" ∈ keys(solve_kwargs) && solve_kwargs["saveat"] isa AbstractVector
+        tₑ = max(tᵢ, min(tₑ, solve_kwargs["saveat"][end]))
+    end
 
     problem_forwards = ODEProblem(
-        RHS!,
-        pnsystem.state,
-        (zero(τ), 4τ),
-        pnsystem;
-        callback=termination_criteria_forwards,
+        RHS!, pnsystem.state, (tᵢ, tₑ), pnsystem; callback=termination_criteria_forwards
     )
 
     solution_forwards = solve(
@@ -575,19 +575,23 @@ Base.@constprop :aggressive function orbital_evolution(
     )
 
     solution = if v₁ > 0
-        # Reset state to initial conditions
-        pnsystem.state[:] .= pnsystemᵢ.state
-
         # Note: Here again, we don't want to overestimate the time span by too much, but we
         # also don't want to underestimate and get a shortened waveform.  This should be a
         # better estimate, though, because it's dealing with lower speeds, at which PN
         # approximation should be more accurate.
-        τ = estimated_time_to_merger(M(pnsystem), ν(pnsystem), v₁) - τ
+        pnsystem.state[:] .= pnsystemᵢ.state
+        pnsystem.state[vindex] = v₁
+        t₁ =
+            -4 * (estimated_time_to_merger(pnsystem) - estimated_time_to_merger(pnsystemᵢ))
+        if "saveat" ∈ keys(solve_kwargs) && solve_kwargs["saveat"] isa AbstractVector
+            t₁ = min(tᵢ, max(t₁, solve_kwargs["saveat"][begin]))
+        end
+
+        # Reset state to initial conditions
+        pnsystem.state[:] .= pnsystemᵢ.state
 
         problem_backwards = remake(
-            problem_forwards;
-            tspan=(zero(τ), -4τ),
-            callback=termination_criteria_backwards,
+            problem_forwards; tspan=(tᵢ, t₁), callback=termination_criteria_backwards
         )
 
         solution_backwards = solve(
