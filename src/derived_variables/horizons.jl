@@ -4,7 +4,7 @@
 Horizon radius of black hole 1.
 
 As defined on page 2, line 4, of [Alvi
-(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See the documentation section
+(2001)](https://doi.org/10.1103/PhysRevD.64.104020).  See the documentation section
 on ["Horizons"](@ref Horizons) for more details.
 """
 rₕ₁(s::VecOrPNSystem) = M₁(s) * (1 + √(1 - min(χ₁²(s), 1)))
@@ -15,7 +15,7 @@ rₕ₁(s::VecOrPNSystem) = M₁(s) * (1 + √(1 - min(χ₁²(s), 1)))
 Horizon radius of black hole 2.
 
 As defined on page 2, line 4, of [Alvi
-(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See the documentation section
+(2001)](https://doi.org/10.1103/PhysRevD.64.104020).  See the documentation section
 on ["Horizons"](@ref Horizons) for more details.
 """
 rₕ₂(s::VecOrPNSystem) = M₂(s) * (1 + √(1 - min(χ₂²(s), 1)))
@@ -26,7 +26,7 @@ rₕ₂(s::VecOrPNSystem) = M₂(s) * (1 + √(1 - min(χ₂²(s), 1)))
 Horizon angular velocity of black hole 1.
 
 As defined on page 2, line 5, of [Alvi
-(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See the documentation section
+(2001)](https://doi.org/10.1103/PhysRevD.64.104020).  See the documentation section
 on ["Horizons"](@ref Horizons) for more details.
 """
 Ωₕ₁(s::VecOrPNSystem) = χ₁(s) / 2rₕ₁(s)
@@ -37,7 +37,7 @@ on ["Horizons"](@ref Horizons) for more details.
 Horizon angular velocity of black hole 2.
 
 As defined on page 2, line 5, of [Alvi
-(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See the documentation section
+(2001)](https://doi.org/10.1103/PhysRevD.64.104020).  See the documentation section
 on ["Horizons"](@ref Horizons) for more details.
 """
 Ωₕ₂(s::VecOrPNSystem) = χ₂(s) / 2rₕ₂(s)
@@ -47,7 +47,7 @@ on ["Horizons"](@ref Horizons) for more details.
 
 Sine-squared of angle between spin of black hole 1 and vector to black hole 2.
 
-Compare to Eq. (18) of [Alvi (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).
+Compare to Eq. (18) of [Alvi (2001)](https://doi.org/10.1103/PhysRevD.64.104020).
 See the documentation section on ["Horizons"](@ref Horizons) for more details.
 """
 function sin²θ₁(s::VecOrPNSystem)
@@ -61,7 +61,7 @@ end
 
 Sine-squared of angle between spin of black hole 2 and vector to black hole 1.
 
-Compare to Eq. (18) of [Alvi (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).
+Compare to Eq. (18) of [Alvi (2001)](https://doi.org/10.1103/PhysRevD.64.104020).
 See the documentation section on ["Horizons"](@ref Horizons) for more details.
 """
 function sin²θ₂(s::VecOrPNSystem)
@@ -77,7 +77,7 @@ Rate of rotation of black hole 2 about the spin of black hole 1, relative to orb
 rotation rate.
 
 This is the rotation rate ϕ̇ as defined in Eq. (19) of [Alvi
-(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020), divided by ``v^3  = M\,
+(2001)](https://doi.org/10.1103/PhysRevD.64.104020), divided by ``v^3  = M\,
 \Omega``.  This division is done to make sure we can track the relative PN order of terms
 that depend on this.
 
@@ -100,7 +100,7 @@ Rate of rotation of black hole 1 about the spin of black hole 2, relative to orb
 rotation rate.
 
 This is the rotation rate ϕ̇ as defined in Eq. (19) of [Alvi
-(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020), divided by ``v^3  = M\,
+(2001)](https://doi.org/10.1103/PhysRevD.64.104020), divided by ``v^3  = M\,
 \Omega``.  This division is done to make sure we can track the relative PN order of terms
 that depend on this.
 
@@ -122,7 +122,7 @@ end
 Horizon moment of inertia of black hole 1.
 
 This is the moment divided by ``ν^2 v^{12}``, as given by Eq. (10) of [Alvi
-(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See the documentation section
+(2001)](https://doi.org/10.1103/PhysRevD.64.104020).  See the documentation section
 on ["Horizons"](@ref Horizons) for more details.
 """
 function Î₀₁(s::VecOrPNSystem)
@@ -137,7 +137,7 @@ end
 Horizon moment of inertia of black hole 2.
 
 This is the moment divided by ``ν^2 v^{12}``, as given by Eq. (10) of [Alvi
-(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  See the documentation section
+(2001)](https://doi.org/10.1103/PhysRevD.64.104020).  See the documentation section
 on ["Horizons"](@ref Horizons) for more details.
 """
 function Î₀₂(s::VecOrPNSystem)
