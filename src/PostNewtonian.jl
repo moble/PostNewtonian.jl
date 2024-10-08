@@ -10,8 +10,11 @@ using RuntimeGeneratedFunctions: RuntimeGeneratedFunctions
 using DataInterpolations: CubicSpline
 using InteractiveUtils: methodswith
 using LinearAlgebra: mul!
-using OrdinaryDiffEq:
-    Vern9, #AutoVern9, Rodas5P,
+using Random: AbstractRNG, default_rng
+using Quaternionic: QuatVec, Rotor, abs2vec, components, normalize, (⋅), (×)
+using SphericalFunctions: D!, Diterator, Dprep, Yiterator
+using OrdinaryDiffEqVerner: Vern9
+using SciMLBase:
     ODEFunction,
     ODEProblem,
     solve,
@@ -19,11 +22,7 @@ using OrdinaryDiffEq:
     terminate!,
     CallbackSet,
     DiscreteCallback,
-    VectorContinuousCallback
-using Quaternionic: QuatVec, Rotor, abs2vec, components, normalize, (⋅), (×)
-using Random: AbstractRNG, default_rng
-using RecursiveArrayTools: DiffEqArray
-using SciMLBase:
+    VectorContinuousCallback,
     ODESolution,
     parameterless_type,
     FullSpecialize,
@@ -31,9 +30,9 @@ using SciMLBase:
     build_solution,
     get_du
 using SciMLBase.ReturnCode: ReturnCode
-using SphericalFunctions: D!, Diterator, Dprep, Yiterator
-using StaticArrays: SVector, MVector
 using SymbolicIndexingInterface: SymbolCache
+using RecursiveArrayTools: DiffEqArray
+using StaticArrays: SVector, MVector
 using TestItems: @testitem
 
 # See the "Code structure" section of the documentation for a description of the simple
