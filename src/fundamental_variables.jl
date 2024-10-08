@@ -127,9 +127,12 @@ black holes, it is precisely zero; for neutron stars it may range up to 1; more 
 objects may have significantly larger values.
 
 Note that — as of this writing — only `NSNS` systems can have a nonzero value for this
-quantity.  All other types return `0`, which Julia can use to eliminate code that would then
-be 0.  Thus, it is safe and efficient to use this quantity in any PN expression that
-specializes on the type of `pnsystem`.
+quantity.  (`BHNS` systems can only have a nonzero value for ``\Lambda_2``.)  All other
+types return `0`, which Julia can use to eliminate code that would then be 0.  Thus, it is
+safe and efficient to use this quantity in any PN expression that specializes on the type of
+`pnsystem`.
+
+See also [`Λ₂`](@ref) and [`Λ̃`](@ref).
 """
 Λ₁(pn::PNSystem) = zero(eltype(pn))
 Λ₁(pn::NSNS) = pn.Λ₁
@@ -148,6 +151,8 @@ Note that — as of this writing — only `BHNS` and `NSNS` systems can have a n
 this quantity.  All other types return `0`, which Julia can use to eliminate code that would
 then be 0.  Thus, it is safe and efficient to use this quantity in any PN expression that
 specializes on the type of `pnsystem`.
+
+See also [`Λ₁`](@ref) and [`Λ̃`](@ref).
 """
 Λ₂(pn::PNSystem) = zero(eltype(pn))
 Λ₂(pn::BHNS) = pn.Λ₂

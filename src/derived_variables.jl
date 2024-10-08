@@ -75,4 +75,7 @@ include("derived_variables/horizons.jl")
 export rₕ₁,
     rₕ₂, Ωₕ₁, Ωₕ₂, sin²θ₁, sin²θ₂, ϕ̇̂₁, ϕ̇̂₂, Î₀₁, Î₀₂, κ₁, κ₂, κ₊, κ₋, λ₁, λ₂, λ₊, λ₋
 
+include("derived_variables/tidal_coupling.jl")
+export Λ̃, Lambda_tilde
+
 end

@@ -136,7 +136,9 @@ export total_mass,  # M,  # Avoid clashes: don't export nicer names for importan
     λ₁,
     λ₂,
     λ₊,
-    λ₋
+    λ₋,
+    Λ̃,
+    Lambda_tilde
 
 include("pn_expressions.jl")
 export gw_energy_flux,
