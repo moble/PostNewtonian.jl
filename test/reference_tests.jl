@@ -6,6 +6,9 @@
     using FileIO
     using Random
 
+    # # Temporarily uncomment the following line to update the reference test values.
+    # ENV["JULIA_REFERENCETESTS_UPDATE"] = "true"
+
     function approx(reference, actual; atol=1e-8, rtol=1e-8)
         return_value = true
         for (k, v1) ∈ reference
