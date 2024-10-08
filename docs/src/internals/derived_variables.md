@@ -184,3 +184,9 @@ PostNewtonian.λ₂
 PostNewtonian.λ₊
 PostNewtonian.λ₋
 ```
+
+## Tidal coupling
+
+```@docs
+PostNewtonian.Λ̃
+```
