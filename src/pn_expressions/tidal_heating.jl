@@ -6,7 +6,7 @@ Compute the rate of energy and angular-momentum absorption into each black hole 
 The returned quantity is a tuple `(Ṡ₁, Ṁ₁, Ṡ₂, Ṁ₂)`, representing the corresponding
 rates of change of spin (magnitude) and mass on black hole 1 and black hole 2.  These apply
 to general — possibly precessing — non-eccentric binaries.  This collection of terms comes
-from [Alvi (2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020).  It probably
+from [Alvi (2001)](https://doi.org/10.1103/PhysRevD.64.104020).  It probably
 wouldn't be too hard to extend Alvi's analysis to eccentric systems.
 
 Note that the validity of the result depends not only on the PN parameter ``v``, but also on
