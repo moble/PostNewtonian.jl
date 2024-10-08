@@ -4,6 +4,7 @@ exclude = [
   "@ref",
   "^https://github.com/.*/releases/tag/v.*$",
   "^https://doi.org/10.5281/zenodo.6847321$",
+  "^https://doi.org/10.1103/PhysRevD.64.104020$",
   "^https://moble.github.io/PostNewtonian.jl/stable$",
   "zenodo.org/badge/DOI/10.5281/zenodo.6847321$"
 ]
