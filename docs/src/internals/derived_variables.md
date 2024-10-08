@@ -49,7 +49,7 @@ PostNewtonian.@pn_expression) macro.
 ## Horizons
 
 We can also compute some variables defined by [Alvi
-(2001)](http://link.aps.org/doi/10.1103/PhysRevD.64.104020) related to the
+(2001)](https://doi.org/10.1103/PhysRevD.64.104020) related to the
 horizons.  The hardest parts to compute here involve the relative angles between
 the spins and the black-hole separation vectors.  Alvi constructs a spherical
 coordinate system centered on each black hole where the ``z`` axis is given by
