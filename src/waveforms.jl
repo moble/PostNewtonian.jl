@@ -168,7 +168,7 @@ function inertial_waveform!(
         D!(D, conj(R(pnsystem)), ℓₘₐₓ, H_rec_coeffs, eⁱᵐᵅ, eⁱᵐᵞ)
         f′ = Yiterator(hᵢ, ℓₘₐₓ, ℓₘᵢₙ, 1)
         f = Yiterator(h[:, iₜ], ℓₘₐₓ, ℓₘᵢₙ, 1)
-        𝔇 = Diterator(D, ℓₘₐₓ, ℓₘᵢₙ)
+        𝔇 = Diterator(D, ℓₘₐₓ, ℓₘᵢₙ; warn=false)
         for (f′ˡ, fˡ, 𝔇ˡ) ∈ zip(f′, f, 𝔇)
             mul!(f′ˡ, 𝔇ˡ, fˡ)
         end
