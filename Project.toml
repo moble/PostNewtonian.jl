@@ -30,7 +30,7 @@ PostNewtonianSymbolicsExt = ["Symbolics", "SymbolicUtils"]
 
 [compat]
 Aqua = "0.8"
-DataInterpolations = "5.1, 6, 7"
+DataInterpolations = "5.1, 6, 7, 8"
 DoubleFloats = "1.4"
 ExplicitImports = "1.8"
 FastDifferentiation = "0.3.15"
