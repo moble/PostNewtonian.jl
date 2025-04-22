@@ -77,15 +77,17 @@ function pn_expression(pnsystem::Symbol, body)
 
     # Finally, just wrap `new_body` in a `let` block, where we include exprs created above.
     # Also include the definitions `c=G=1` (to be overwritten inside any `@pn_expansion`).
-    return full_body = MacroTools.unblock(
+    full_body = MacroTools.unblock(
         quote
-            c = one(eltype($pnsystem))
-            G = one(eltype($pnsystem))
-            @fastmath let $(exprs...)
-                $(new_body)
+            let c=G=1
+                #@fastmath
+                let $(exprs...)
+                    $(new_body)
+                end
             end
         end,
     )
+    return full_body
 end
 
 function pn_expression(arg_index::Integer, func)

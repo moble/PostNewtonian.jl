@@ -174,7 +174,7 @@ See also [`λ₁`](@ref).
     information are welcome.
 """
 function κ₁(s::VecOrPNSystem)
-    return one(eltype(s))
+    return 1
 end
 
 """
@@ -184,7 +184,7 @@ The "quadrupolar polarisability" of object 2 used by [Bohé et al.
 (2015)](https://arxiv.org/abs/1501.01529).  See [`κ₁`](@ref) for more details.
 """
 function κ₂(s::VecOrPNSystem)
-    return one(eltype(s))
+    return 1
 end
 
 """
@@ -227,7 +227,7 @@ See also [`κ₁`](@ref).
     information are welcome.
 """
 function λ₁(s::VecOrPNSystem)
-    return one(eltype(s))
+    return 1
 end
 
 """
@@ -237,7 +237,7 @@ The "quadrupolar polarisability" of object 2 used by [Bohé et al.
 (2015)](https://arxiv.org/abs/1501.01529).  See [`λ₁`](@ref) for more details.
 """
 function λ₂(s::VecOrPNSystem)
-    return one(eltype(s))
+    return 1
 end
 
 """

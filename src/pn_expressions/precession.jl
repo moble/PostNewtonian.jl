@@ -111,7 +111,7 @@ function Ω⃗ᵪ(Mⱼ, Mₖ, χ⃗ⱼ, χ⃗ₖ, v, R, pnsystem, PNExpansionRed
         δ = δ(Mⱼ, Mₖ),
         n̂ = n̂(R),
         ℓ̂ = ℓ̂(R),
-        c = one(eltype(pnsystem))
+        c = 1
 
         χⱼₙ = χ⃗ⱼ ⋅ n̂
         χₖₙ = χ⃗ₖ ⋅ n̂
