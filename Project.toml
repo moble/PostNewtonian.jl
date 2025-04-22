@@ -22,10 +22,12 @@ SymbolicIndexingInterface = "2efcf032-c050-4f8e-a9bb-153293bab1f5"
 TestItems = "1c621080-faea-4a02-84b6-bbd5e436b8fe"
 
 [weakdeps]
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [extensions]
+PostNewtonianForwardDiffExt = ["ForwardDiff"]
 PostNewtonianSymbolicsExt = ["Symbolics", "SymbolicUtils"]
 
 [compat]
@@ -35,13 +37,14 @@ DoubleFloats = "1.4"
 ExplicitImports = "1.8"
 FastDifferentiation = "0.3.15"
 FileIO = "1.16.3"
+ForwardDiff = "0.10.38"
 HDF5 = "0.17.2"
 InteractiveUtils = "1"
 LinearAlgebra = "1"
 Logging = "1"
 MacroTools = "0.5.10"
 OrdinaryDiffEqVerner = "1.1"
-Quaternionic = "1.5.2, 2"
+Quaternionic = "2,3"
 Random = "1"
 RecursiveArrayTools = "3"
 ReferenceTests = "0.10.4"
@@ -63,6 +66,7 @@ DoubleFloats = "497a8b3b-efae-58df-a0af-a86822472b78"
 ExplicitImports = "7d51a73a-1435-4ff3-83d9-f097790105c7"
 FastDifferentiation = "eb9bf01b-bf85-4b60-bf87-ee5de06c00be"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 HDF5 = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
 OrdinaryDiffEqVerner = "79d7bb75-1356-48c1-b8c0-6832512096c2"
@@ -76,4 +80,4 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestItemRunner = "f8b46487-2199-4994-9208-9a1283c18c0a"
 
 [targets]
-test = ["Aqua", "DoubleFloats", "ExplicitImports", "FastDifferentiation", "FileIO", "HDF5", "Logging", "OrdinaryDiffEqVerner", "Quaternionic", "Random", "ReferenceTests", "SciMLBase", "SymbolicUtils", "Symbolics", "Test", "TestItemRunner"]
+test = ["Aqua", "DoubleFloats", "ExplicitImports", "FastDifferentiation", "FileIO", "ForwardDiff", "HDF5", "Logging", "OrdinaryDiffEqVerner", "Quaternionic", "Random", "ReferenceTests", "SciMLBase", "SymbolicUtils", "Symbolics", "Test", "TestItemRunner"]

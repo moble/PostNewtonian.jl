@@ -203,6 +203,9 @@ end
         @require Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7" include(
             "../ext/PostNewtonianSymbolicsExt.jl"
         )
+        @require ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210" include(
+            "../ext/PostNewtonianForwardDiffExt.jl"
+        )
     end
 
     # COV_EXCL_STOP
