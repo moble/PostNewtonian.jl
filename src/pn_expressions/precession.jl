@@ -106,13 +106,7 @@ function Ω⃗ᵪ(Mⱼ, Mₖ, χ⃗ⱼ, χ⃗ₖ, v, R, pnsystem, PNExpansionRed
     # Note that we don't use the `@pn_expression` macro here, because we're swapping
     # the order of certain arguments above, so we do it manually here, and don't just
     # call things like `δ(pnsystem)` because that would fail to swap.
-    let M = M(Mⱼ, Mₖ),
-        ν = ν(Mⱼ, Mₖ),
-        δ = δ(Mⱼ, Mₖ),
-        n̂ = n̂(R),
-        ℓ̂ = ℓ̂(R),
-        c = 1
-
+    let M = M(Mⱼ, Mₖ), ν = ν(Mⱼ, Mₖ), δ = δ(Mⱼ, Mₖ), n̂ = n̂(R), ℓ̂ = ℓ̂(R), c = 1
         χⱼₙ = χ⃗ⱼ ⋅ n̂
         χₖₙ = χ⃗ₖ ⋅ n̂
 
