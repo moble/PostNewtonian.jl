@@ -16,6 +16,10 @@ end
     @test ExplicitImports.check_no_stale_explicit_imports(
         PostNewtonian;
         ignore=(
+            # The following generally need to be ignored because they are imported for use
+            # in code that is created by a macro; as such, these are not explicitly used in
+            # the code until after the macro runs (which comes after ExplicitImports looks
+            # at the code).
             :M,
             :R,
             :X₁,
@@ -36,6 +40,9 @@ end
             :ζ3,
             :PNExpansionParameter,
             :type_converter,
+            :MVector,
+            :SVector,
+            :Node,
         ),
     ) === nothing
     @test ExplicitImports.check_all_qualified_accesses_via_owners(PostNewtonian) === nothing
