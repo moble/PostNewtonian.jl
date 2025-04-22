@@ -150,9 +150,9 @@ overall factor is used, leading to a sign difference.
 end
 const binding_energy = 𝓔
 
-# NOTE: This is a helper function for the `@generate`d function `𝓔′`; this function
+# NOTE: This is a helper function for the `@generated` function `𝓔′`; this function
 # actually computes the code Expr to be generated.  This has been factored out to make it
-# easier to `@generate` different methods.  Specifically, we need to generate different code
+# easier to generate different methods.  Specifically, we need to generate different code
 # for `ForwardDiff.Dual`` numbers, which are only used in an extension to the core package.
 # As such, the code relies on methods that cannot be defined yet, but generated functions
 # "are only permitted to call functions that were defined *before* the definition of the
