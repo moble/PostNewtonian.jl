@@ -12,13 +12,13 @@
         i for i ∈ eachindex(PostNewtonian.pnsystem_symbols) if i ∉ nonzero_indices
     ]
     pn = rand(PostNewtonian.BBH, PNOrder=2//2)
-    function c(u)
+    function c1(u)
         pnsystem = PostNewtonian.BBH(u; PNOrder=PostNewtonian.pn_order(pn))
         return PostNewtonian.𝓔′(pnsystem)
     end
-    ∇c = ForwardDiff.gradient(c, pn.state)
-    Hc = ForwardDiff.hessian(c, pn.state)
-    @test c(pn.state) == PostNewtonian.𝓔′(pn)
+    ∇c = ForwardDiff.gradient(c1, pn.state)
+    Hc = ForwardDiff.hessian(c1, pn.state)
+    @test c1(pn.state) == PostNewtonian.𝓔′(pn)
     @test all(y->y≠0, ∇c[nonzero_indices])
     @test all(y->y==0, ∇c[zero_indices])
     @test all(ij->Hc[ij...]≠0, Iterators.product(nonzero_indices, nonzero_indices))
@@ -36,13 +36,13 @@
         i for i ∈ eachindex(PostNewtonian.pnsystem_symbols) if i ∉ zero_indices
     ]
     pn = rand(PostNewtonian.BBH, PNOrder=3//2)
-    function c(u)
+    function c2(u)
         pnsystem = PostNewtonian.BBH(u; PNOrder=PostNewtonian.pn_order(pn))
         return PostNewtonian.𝓔′(pnsystem)
     end
-    ∇c = ForwardDiff.gradient(c, pn.state)
-    Hc = ForwardDiff.hessian(c, pn.state)
-    @test c(pn.state) == PostNewtonian.𝓔′(pn)
+    ∇c = ForwardDiff.gradient(c2, pn.state)
+    Hc = ForwardDiff.hessian(c2, pn.state)
+    @test c2(pn.state) == PostNewtonian.𝓔′(pn)
     @test all(y->y≠0, ∇c[1:(end - 1)])
     @test all(ij->Hc[ij...]≠0, Iterators.product(nonzero_indices, nonzero_indices))
     @test all(ij->Hc[ij...]==0, Iterators.product(zero_indices, zero_indices))
@@ -51,13 +51,13 @@
     # except for the very last component, which is the phase, which shouldn't affect
     # anything
     pn = rand(PostNewtonian.BBH, PNOrder=4//2)
-    function c(u)
+    function c3(u)
         pnsystem = PostNewtonian.BBH(u; PNOrder=PostNewtonian.pn_order(pn))
         return PostNewtonian.𝓔′(pnsystem)
     end
-    ∇c = ForwardDiff.gradient(c, pn.state)
-    Hc = ForwardDiff.hessian(c, pn.state)
-    @test c(pn.state) == PostNewtonian.𝓔′(pn)
+    ∇c = ForwardDiff.gradient(c3, pn.state)
+    Hc = ForwardDiff.hessian(c3, pn.state)
+    @test c3(pn.state) == PostNewtonian.𝓔′(pn)
     @test all(y->y≠0, ∇c[1:(end - 1)])
     @test ∇c[end] == 0
     @test all(y->y≠0, Hc[1:(end - 1), 1:(end - 1)])
@@ -66,27 +66,27 @@
 
     # Finally, check that the full-order energy and waveforms are also differentiable
     pn = rand(PostNewtonian.BBH; v=0.5)
-    function c(u)
+    function c4(u)
         pnsystem = PostNewtonian.BBH(u; PNOrder=PostNewtonian.pn_order(pn))
         return PostNewtonian.𝓔′(pnsystem)
     end
-    ∇c = ForwardDiff.gradient(c, pn.state)
-    Hc = ForwardDiff.hessian(c, pn.state)
-    @test c(pn.state) == PostNewtonian.𝓔′(pn)
+    ∇c = ForwardDiff.gradient(c4, pn.state)
+    Hc = ForwardDiff.hessian(c4, pn.state)
+    @test c4(pn.state) == PostNewtonian.𝓔′(pn)
     @test all(y->y≠0, ∇c[1:(end - 1)])
     @test ∇c[end] == 0
     @test all(y->y≠0, Hc[1:(end - 1), 1:(end - 1)])
     @test all(y->y==0, Hc[1:end, end])
     @test all(y->y==0, Hc[end, 1:end])
-    function c(u)
+    function c5(u)
         pnsystem = PostNewtonian.BBH(u; PNOrder=PostNewtonian.pn_order(pn))
         inspiral = PostNewtonian.orbital_evolution(pnsystem; vₑ=0.6)
         h = PostNewtonian.inertial_waveform(inspiral)
         return sum(abs2, h)
     end
-    ∇c = ForwardDiff.gradient(c, pn.state)
-    Hc = ForwardDiff.hessian(c, pn.state)
-    @test c(pn.state) > 0
+    ∇c = ForwardDiff.gradient(c5, pn.state)
+    Hc = ForwardDiff.hessian(c5, pn.state)
+    @test c5(pn.state) > 0
     @test all(y->y≠0, ∇c[1:(end - 1)])
     @test ∇c[end] == 0
     @test all(y->y≠0, Hc[1:(end - 1), 1:(end - 1)])
