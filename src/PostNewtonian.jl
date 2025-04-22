@@ -11,7 +11,7 @@ using DataInterpolations: CubicSpline
 using InteractiveUtils: methodswith
 using LinearAlgebra: mul!
 using Random: AbstractRNG, default_rng
-using Quaternionic: QuatVec, Rotor, abs2vec, components, normalize, (⋅), (×)
+using Quaternionic: QuatVec, Rotor, abs2vec, components, normalize, ⋅, ×
 using SphericalFunctions: D!, Diterator, Dprep, Yiterator
 using OrdinaryDiffEqVerner: Vern9
 using SciMLBase:

@@ -8,12 +8,12 @@
     T = Float64
     M₁ = T(5//8)
     M₂ = T(3//8)
-    χ⃗₁ = normalize(randn(QuatVec{T})) * rand(T(0):T(1//1_000_000):T(1))
-    χ⃗₂ = normalize(randn(QuatVec{T})) * rand(T(0):T(1//1_000_000):T(1))
+    χ⃗₁ = normalize(randn(QuatVec{T})) * rand(T(0):T(1 // 1_000_000):T(1))
+    χ⃗₂ = normalize(randn(QuatVec{T})) * rand(T(0):T(1 // 1_000_000):T(1))
     Ωᵢ = T(1//64)
     Ω₁ = Ωᵢ / 2
     Ωₑ = 1
-    Rᵢ = exp(normalize(randn(QuatVec{T})) * rand(T(0):T(1//1_000_000):T(1//1_000)))
+    Rᵢ = exp(normalize(randn(QuatVec{T})) * rand(T(0):T(1 // 1_000_000):T(1 // 1_000)))
 
     Mₜₒₜ = M₁ + M₂
     q = M₁ / M₂

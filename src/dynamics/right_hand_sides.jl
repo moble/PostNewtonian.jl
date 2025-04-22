@@ -72,7 +72,7 @@ Here, `u̇` is the time-derivative of the state vector, which is stored in the
 [`PNSystem`](@ref) object `p`.
 """
 TaylorT1!(u̇, pnsystem) = TaylorTn!(pnsystem, u̇, TaylorT1_v̇)
-TaylorT1!(u̇, u, p, t) = (p.state .= u; TaylorT1!(u̇, p))
+TaylorT1!(u̇, u, p, t) = (p.state.=u; TaylorT1!(u̇, p))
 
 """
     TaylorT1RHS!
@@ -111,7 +111,7 @@ always be unused in this package, but is part of the `DifferentialEquations` API
     `TaylorT1` as `PNOrder` approaches `typemax(Int)`.
 """
 TaylorT4!(u̇, pnsystem) = TaylorTn!(pnsystem, u̇, TaylorT4_v̇)
-TaylorT4!(u̇, u, p, t) = (p.state .= u; TaylorT4!(u̇, p))
+TaylorT4!(u̇, u, p, t) = (p.state.=u; TaylorT4!(u̇, p))
 
 """
     TaylorT4RHS!
@@ -142,7 +142,7 @@ the [`PNSystem`](@ref) object `p`.  The parameter `t` represents the time, and w
 always be unused in this package, but is part of the `DifferentialEquations` API.
 """
 TaylorT5!(u̇, pnsystem) = TaylorTn!(pnsystem, u̇, TaylorT5_v̇)
-TaylorT5!(u̇, u, p, t) = (p.state .= u; TaylorT5!(u̇, p))
+TaylorT5!(u̇, u, p, t) = (p.state.=u; TaylorT5!(u̇, p))
 
 """
     TaylorT5RHS!

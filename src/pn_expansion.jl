@@ -147,8 +147,8 @@ function product_term(
 ) where {N1,N2,T1,T2,NMax}
     T3 = promote_type(T1, T2)
     return sum(
-        pn1.coeffs[j] * pn2.coeffs[i - j + 1] for j ∈ max(1, i - N2 + 1):min(i, N1),
-        init ∈ zero(T3)
+        pn1.coeffs[j] * pn2.coeffs[i - j + 1] for
+        j ∈ max(1, i - N2 + 1):min(i, N1), init ∈ zero(T3)
     )
 end
 
