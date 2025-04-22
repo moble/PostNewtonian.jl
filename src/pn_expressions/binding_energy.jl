@@ -150,7 +150,6 @@ overall factor is used, leading to a sign difference.
 end
 const binding_energy = 𝓔
 
-
 # NOTE: This is a helper function for the `@generate`d function `𝓔′`; this function
 # actually computes the code Expr to be generated.  This has been factored out to make it
 # easier to `@generate` different methods.  Specifically, we need to generate different code
@@ -160,11 +159,8 @@ const binding_energy = 𝓔
 # generated function."  So we have to generate another method at a later time.  Therefore,
 # we factor out this code to minimize duplication.
 function 𝓔′code(
-    ::Type{PN},
-    ::Type{Val{PNExpansionReducer}},
-    ::Type{ScalarType},
-    ::Type{FloatType},
-) where {ST, PNOrder, PN<:PNSystem{ST,PNOrder}, PNExpansionReducer, ScalarType, FloatType}
+    ::Type{PN}, ::Type{Val{PNExpansionReducer}}, ::Type{ScalarType}, ::Type{FloatType}
+) where {ST,PNOrder,PN<:PNSystem{ST,PNOrder},PNExpansionReducer,ScalarType,FloatType}
     # Create a `PNSystem` with `FastDifferentiation` (henceforth FD) variables, using the
     # same PNOrder as the input `pnsystem`.
     fdpnsystem = FDPNSystem(FloatType, PNOrder)
@@ -247,7 +243,6 @@ function 𝓔′code(
     end
 end
 
-
 """
     𝓔′(pnsystem)
     binding_energy_deriv(pnsystem)
@@ -259,7 +254,7 @@ function for details of the PN formulas.
 """
 @generated function 𝓔′(
     pnsystem::PNSystem{ST,PNOrder}; pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum)
-) where {ST, PNOrder, PNExpansionReducer}
+) where {ST,PNOrder,PNExpansionReducer}
     𝓔′code(pnsystem, pn_expansion_reducer, eltype(ST), eltype(ST))
 end
 
