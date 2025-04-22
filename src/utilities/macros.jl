@@ -12,10 +12,16 @@ function type_converter(pnsystem, x)
     return convert(eltype(pnsystem), x)
 end
 function type_converter(::FDPNSystem{FT}, x) where {FT}
+    return x
+end
+function type_converter(::FDPNSystem{FT}, x::Integer) where {FT}
     return convert(FT, x)
 end
-function type_converter(::FDPNSystem, x::FastDifferentiation.Node)
-    return x
+function type_converter(::FDPNSystem{FT}, x::Rational) where {FT}
+    return convert(FT, x)
+end
+function type_converter(::FDPNSystem{FT}, x::AbstractIrrational) where {FT}
+    return convert(FT, x)
 end
 
 fundamental_variables = methodswith(PNSystem, FundamentalVariables)
@@ -34,6 +40,24 @@ irrationals = unique(
 
 # This should include all the unary functions that we want to use in any PN expression.
 unary_funcs = [:√, :sqrt, :log, :ln, :sin, :cos]
+# unary_funcs = Dict(
+#     :√ => :(Base.sqrt),
+#     :sqrt => :(Base.sqrt),
+#     :log => :(Base.log),
+#     :ln => :(Base.log),
+# )
+
+# for (expr, f) ∈ pairs(unary_funcs)
+#     if expr ∈ (:sqrt, :ln)  # These are just aliases, so avoid redefinitions
+#         continue
+#     end
+#     @eval begin
+#         $f(::Type{T}, x) where T = $f(x)
+#         $f(::Type{T}, x::Int) where T = $f(T(x))
+#         $f(::Type{T}, x::Rational) where T = $f(T(x))
+#         $f(::Type{T}, x::Irrational) where T = $f(T(x))
+#     end
+# end
 
 function pn_expression(pnsystem::Symbol, body)
     # Look for variables in `body` that we need to treat specially, and write exprs to do
@@ -77,16 +101,14 @@ function pn_expression(pnsystem::Symbol, body)
 
     # Finally, just wrap `new_body` in a `let` block, where we include exprs created above.
     # Also include the definitions `c=G=1` (to be overwritten inside any `@pn_expansion`).
-    full_body = MacroTools.unblock(
-        quote
-            let c=G=1
-                #@fastmath
-                let $(exprs...)
-                    $(new_body)
-                end
+    full_body = MacroTools.unblock(quote
+        let c=G=1
+            #@fastmath
+            let $(exprs...)
+                $(new_body)
             end
-        end,
-    )
+        end
+    end)
     return full_body
 end
 

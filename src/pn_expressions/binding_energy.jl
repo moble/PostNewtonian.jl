@@ -150,21 +150,24 @@ overall factor is used, leading to a sign difference.
 end
 const binding_energy = 𝓔
 
-"""
-    𝓔′(pnsystem)
-    binding_energy_deriv(pnsystem)
 
-Compute the derivative with respect to ``v`` of the binding energy of a compact binary.
-
-This is computed automatically (via `FastDifferentiation`) from [`𝓔`](@ref); see that
-function for details of the PN formulas.
-"""
-@generated function 𝓔′(
-    pnsystem::PNSystem{ST,PNOrder}; pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum)
-) where {ST,PNOrder,PNExpansionReducer}
+# NOTE: This is a helper function for the `@generate`d function `𝓔′`; this function
+# actually computes the code Expr to be generated.  This has been factored out to make it
+# easier to `@generate` different methods.  Specifically, we need to generate different code
+# for `ForwardDiff.Dual`` numbers, which are only used in an extension to the core package.
+# As such, the code relies on methods that cannot be defined yet, but generated functions
+# "are only permitted to call functions that were defined *before* the definition of the
+# generated function."  So we have to generate another method at a later time.  Therefore,
+# we factor out this code to minimize duplication.
+function 𝓔′code(
+    ::Type{PN},
+    ::Type{Val{PNExpansionReducer}},
+    ::Type{ScalarType},
+    ::Type{FloatType},
+) where {ST, PNOrder, PN<:PNSystem{ST,PNOrder}, PNExpansionReducer, ScalarType, FloatType}
     # Create a `PNSystem` with `FastDifferentiation` (henceforth FD) variables, using the
     # same PNOrder as the input `pnsystem`.
-    fdpnsystem = FDPNSystem(eltype(ST), PNOrder)
+    fdpnsystem = FDPNSystem(FloatType, PNOrder)
 
     # FD expects a single vector of variables, so we concatenate the state vector with the
     # two tidal-coupling parameters
@@ -186,8 +189,8 @@ function for details of the PN formulas.
     # Now, we use `MacroTools` to get the body of the function.
     𝓔′body = MacroTools.unblock(MacroTools.splitdef(𝓔′expr)[:body])
 
-    # # At this point, the function is just a long series of statements inside an `@inbounds`
-    # # block, which we will want later, but first we need to extract them.
+    # At this point, the function is just a long series of statements inside an `@inbounds`
+    # block, which we will want later, but first we need to extract them.
     MacroTools.@capture(𝓔′body, @inbounds begin
         𝓔′statements__
     end) || throw(
@@ -223,18 +226,18 @@ function for details of the PN formulas.
         NMax = Int(2PNOrder + 1)
         return quote
             input_variables = SVector(pnsystem)
-            result = MVector{$(length(𝓔′)),$(eltype(ST))}(undef)
+            result = MVector{$(length(𝓔′)),$(ScalarType)}(undef)
             result .= 0
             @fastmath @inbounds begin
                 $(𝓔′statements...)
             end
-            return PNExpansion{$(length(𝓔′)),$(eltype(ST)),$NMax}(Tuple(result))
+            return PNExpansion{$(length(𝓔′)),$(ScalarType),$NMax}(Tuple(result))
         end
     else
         # Otherwise, FD produces a 1-tuple, so we just extract the value from that.
         return quote
             input_variables = SVector(pnsystem)
-            result = MVector{1,$(eltype(ST))}(undef)
+            result = MVector{1,$(ScalarType)}(undef)
             result .= 0
             @fastmath @inbounds begin
                 $(𝓔′statements...)
@@ -243,4 +246,21 @@ function for details of the PN formulas.
         end
     end
 end
+
+
+"""
+    𝓔′(pnsystem)
+    binding_energy_deriv(pnsystem)
+
+Compute the derivative with respect to ``v`` of the binding energy of a compact binary.
+
+This is computed automatically (via `FastDifferentiation`) from [`𝓔`](@ref); see that
+function for details of the PN formulas.
+"""
+@generated function 𝓔′(
+    pnsystem::PNSystem{ST,PNOrder}; pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum)
+) where {ST, PNOrder, PNExpansionReducer}
+    𝓔′code(pnsystem, pn_expansion_reducer, eltype(ST), eltype(ST))
+end
+
 const binding_energy_deriv = 𝓔′
