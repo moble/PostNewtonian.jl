@@ -24,4 +24,6 @@ code you don't want to measure:
 using TestItemRunner
 
 @run_package_tests verbose = true
+
+# ENV["JULIA_REFERENCETESTS_UPDATE"] = "true"
 #@run_package_tests verbose = true filter=ti->(endswith(ti.filename, "reference_tests.jl") )
