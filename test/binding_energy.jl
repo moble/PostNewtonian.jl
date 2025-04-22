@@ -17,7 +17,7 @@ So this test does all that a little more manually and compares the results at ea
 
     rng = Xoshiro(1234)
 
-    for PNOrder ∈ (0//2):(1//2):(13//2)
+    for PNOrder ∈ (0 // 2):(1 // 2):(13 // 2)
         for T ∈ [Float32, Float64, Double64]
             v = T(1//10)
             for _ ∈ 1:100
@@ -39,7 +39,7 @@ end
 
     rng = Xoshiro(1234)
 
-    for PNOrder ∈ [(0//2):(1//2):(13//2); 1_000//2]
+    for PNOrder ∈ [(0 // 2):(1 // 2):(13 // 2); 1_000//2]
         for T ∈ [Float32, Float64, Double64]
             v = T(1//10)
             for _ ∈ 1:100

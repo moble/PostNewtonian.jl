@@ -216,9 +216,9 @@ function var_collect(expr::Symbolics.Num, var; max_power=100, max_gap=4)
     coefficients = [c]
     gap = 0
     for i ∈ 1:max_power
-        dict[var^i] = 1
+        dict[var ^ i] = 1
         if i > 1
-            dict[var^(i - 1)] = 0
+            dict[var ^ (i - 1)] = 0
         end
         push!(coefficients, Symbolics.substitute(expr, dict; fold=false))
         if iszero(coefficients[end])

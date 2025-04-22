@@ -27,7 +27,11 @@
     # Next, test that the Hessian of ℰ′ has zeros whenever a spin or Φ component is involved
     # and the PN order is 3//2.  This is the order at which linear-in-spin terms appear, but
     # no quadratic-in-spin terms.
-    zero_indices = [PostNewtonian.χ⃗₁indices; PostNewtonian.χ⃗₂indices; PostNewtonian.Φindex]
+    zero_indices = [
+        PostNewtonian.χ⃗₁indices;
+        PostNewtonian.χ⃗₂indices;
+        PostNewtonian.Φindex
+    ]
     nonzero_indices = [
         i for i ∈ eachindex(PostNewtonian.pnsystem_symbols) if i ∉ zero_indices
     ]
@@ -39,7 +43,7 @@
     ∇c = ForwardDiff.gradient(c, pn.state)
     Hc = ForwardDiff.hessian(c, pn.state)
     @test c(pn.state) == PostNewtonian.𝓔′(pn)
-    @test all(y->y≠0, ∇c[1:end-1])
+    @test all(y->y≠0, ∇c[1:(end - 1)])
     @test all(ij->Hc[ij...]≠0, Iterators.product(nonzero_indices, nonzero_indices))
     @test all(ij->Hc[ij...]==0, Iterators.product(zero_indices, zero_indices))
 
@@ -54,9 +58,9 @@
     ∇c = ForwardDiff.gradient(c, pn.state)
     Hc = ForwardDiff.hessian(c, pn.state)
     @test c(pn.state) == PostNewtonian.𝓔′(pn)
-    @test all(y->y≠0, ∇c[1:end-1])
+    @test all(y->y≠0, ∇c[1:(end - 1)])
     @test ∇c[end] == 0
-    @test all(y->y≠0, Hc[1:end-1, 1:end-1])
+    @test all(y->y≠0, Hc[1:(end - 1), 1:(end - 1)])
     @test all(y->y==0, Hc[1:end, end])
     @test all(y->y==0, Hc[end, 1:end])
 
@@ -69,9 +73,9 @@
     ∇c = ForwardDiff.gradient(c, pn.state)
     Hc = ForwardDiff.hessian(c, pn.state)
     @test c(pn.state) == PostNewtonian.𝓔′(pn)
-    @test all(y->y≠0, ∇c[1:end-1])
+    @test all(y->y≠0, ∇c[1:(end - 1)])
     @test ∇c[end] == 0
-    @test all(y->y≠0, Hc[1:end-1, 1:end-1])
+    @test all(y->y≠0, Hc[1:(end - 1), 1:(end - 1)])
     @test all(y->y==0, Hc[1:end, end])
     @test all(y->y==0, Hc[end, 1:end])
     function c(u)
@@ -83,10 +87,9 @@
     ∇c = ForwardDiff.gradient(c, pn.state)
     Hc = ForwardDiff.hessian(c, pn.state)
     @test c(pn.state) > 0
-    @test all(y->y≠0, ∇c[1:end-1])
+    @test all(y->y≠0, ∇c[1:(end - 1)])
     @test ∇c[end] == 0
-    @test all(y->y≠0, Hc[1:end-1, 1:end-1])
+    @test all(y->y≠0, Hc[1:(end - 1), 1:(end - 1)])
     @test all(y->y==0, Hc[1:end, end])
     @test all(y->y==0, Hc[end, 1:end])
-
 end

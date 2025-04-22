@@ -7,12 +7,12 @@
     T = Float64
     M₁ = T(5//8)
     M₂ = T(3//8)
-    χ⃗₁ = normalize(randn(QuatVec{T})) * rand(T(0):T(1//1_000_000):T(1))
-    χ⃗₂ = normalize(randn(QuatVec{T})) * rand(T(0):T(1//1_000_000):T(1))
+    χ⃗₁ = normalize(randn(QuatVec{T})) * rand(T(0):T(1 // 1_000_000):T(1))
+    χ⃗₂ = normalize(randn(QuatVec{T})) * rand(T(0):T(1 // 1_000_000):T(1))
     Ωᵢ = T(1//64)
     Ω₁ = Ωᵢ / 2
     Ωₑ = 1
-    Rᵢ = exp(normalize(randn(QuatVec{T})) * rand(T(0):T(1//1_000_000):T(1//1_000)))
+    Rᵢ = exp(normalize(randn(QuatVec{T})) * rand(T(0):T(1 // 1_000_000):T(1 // 1_000)))
 
     Mₜₒₜ = M₁ + M₂
     q = M₁ / M₂
@@ -116,7 +116,7 @@
 
     # Make sure the `dt` gives us what we want
     @testset verbose = true "Uniform time steps" begin
-        for dt ∈ T[1, 1//3, 1//10]
+        for dt ∈ T[1, 1 // 3, 1 // 10]
             w = GWFrames.PNWaveform(
                 Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0, dt
             )
