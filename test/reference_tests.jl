@@ -5,6 +5,7 @@
     using HDF5
     using FileIO
     using Random
+    Random.seed!(1234)
 
     # # Temporarily uncomment the following line to update the reference test values.
     # ENV["JULIA_REFERENCETESTS_UPDATE"] = "true"
