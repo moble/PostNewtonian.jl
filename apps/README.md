@@ -1,18 +1,11 @@
-From thee directory containing this file, run the following commands
-to create a simple Julia application, compile it into a standalone
+From the directory containing this file, run the following commands to
+create a simple Julia application, compile it into a standalone
 executable using PackageCompiler.jl, and run it:
 
 ```bash
-> julia -q --project=.
+> julia make.jl
 
-julia> using PackageCompiler
+[lots of output...]
 
-julia> create_app("ZeroEccParamsFromPN", "ZeroEccParamsFromPNApp")
-PackageCompiler: bundled libraries:
-...
-✔ [00m:35s] PackageCompiler: compiling nonincremental system image
-
-julia> exit()
-
-> ZeroEccParamsFromPNApp/bin/ZeroEccParamsFromPN
+> ZeroEccParamsFromPNApp/bin/ZeroEccParamsFromPN --q=4.3 --chiA=0.1,0.2,0.3 --chiB=0.3,0.2,0.1 --Omega0=0.015
 ```
