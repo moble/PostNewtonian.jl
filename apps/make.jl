@@ -5,6 +5,6 @@ using PackageCompiler
 create_app(
     "ZeroEccParamsFromPN",
     "ZeroEccParamsFromPNApp";
-    force=true,
+    force=true,  # Overwrite existing app
     precompile_execution_file="precompilation_statements.jl",
 )
