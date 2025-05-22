@@ -14,6 +14,9 @@ The spin-squared terms (by which we mean both spin-spin and spin-orbit squared t
 flux are known to 3pN order, and given most conveniently in Eq. (4.14) of [Bohé et al.
 (2015)](https://arxiv.org/abs/1501.01529).
 
+The spin-cubed terms are known to 3.5pN order, and come from Eq. (6.19) of [Marsat
+(2014)](https://arxiv.org/abs/1411.4118).
+
 Beyond 4.5pN, terms are only known in the extreme-mass-ratio limit.  These terms are given
 in Appendix A of [Fujita (2012)](https://arxiv.org/abs/1211.5535v1).  He computed them up to
 22pN.  That seems like overkill, so we'll just go up to 6pN.

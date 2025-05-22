@@ -49,6 +49,21 @@ the result for any physical quantity.
                 sₗ * σₗ * (5δ / 3 + (-δ * κ₊ / 6 - δ / 3 + 23κ₋ / 6)ν) +
                 σₗ^2 * (1 + (δ * κ₋ - κ₊ - 2)ν + (κ₊ / 6 + 1//3)ν^2)
             )
+
+            # Spin-cubed terms; Eq. (6.15) of Marsat (2015)
+            +
+            (v / c)^7 * (
+                sₗ^3 * (-3κ₊ / 2 + λ₊ - 9) +
+                sₗ^2 * σₗ * (-5δ * κ₊ / 2 + 3δ * λ₊ / 2 - 14δ + 3κ₋ - 3λ₋ / 2) +
+                sₗ * σₗ^2 * (
+                    13δ * κ₋ / 4 - 3δ * λ₋ / 2 - 13κ₊ / 4 + 3λ₊ / 2 - 5
+                    + (11κ₊ / 2 - 3λ₊ + 29)ν
+                ) +
+                σₗ^3 * (
+                    -5δ * κ₊ / 4 + δ * λ₊ / 2 + 5κ₋ / 4 - λ₋ / 2
+                    + (δ * κ₊ - δ * λ₊ / 2 + 5δ - 7κ₋ / 2 + 3λ₋ / 2)ν
+                )
+            )
     )
 end
 
@@ -62,8 +77,10 @@ Compute the post-Newtonian parameter
 \gamma_{\mathrm{PN}} \equiv \frac{G\, M}{r\, c^2},
 ```
 where ``r`` is the magnitude of the orbital separation.  This quantity has PN order 1, and
-is given by Eq. (4.3) of [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520) and Eq.
-(3.32) of [Bohé et al.  (2015)](https://arxiv.org/abs/1501.01529).
+is given by Eq. (4.3) of [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520), with
+spin-squared terms from Eq.  (3.32) of [Bohé et al.
+(2015)](https://arxiv.org/abs/1501.01529) and spin-cubed terms from [Marsat
+(2014)](https://arxiv.org/abs/1411.4118).
 
 Note that there is a 3PN gauge term of ``-22ν\ln(r/r₀')/3``.  While this value should cancel
 out of any physical quantity, it is included here for completeness.  Computing it requires a
@@ -124,7 +141,7 @@ of `v`, though it is multiplied by `M`, which is not independent of `v`.  This d
 however, should be at a much higher PN order than is currently available in any case, so we
 ignore it for simplicity.
 
-This computation uses [`γₚₙ₀`](@ref) along with the following derivation.
+This computation uses [`γₚₙ₀`](@ref) along with the following derivation:
 ```math
 \begin{align*}
 γₚₙ &= γₚₙ₀ + (v/c)^8 (22 \ln(γₚₙ)/3)ν \\
