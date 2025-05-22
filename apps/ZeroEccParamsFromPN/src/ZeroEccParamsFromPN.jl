@@ -1,8 +1,9 @@
 module ZeroEccParamsFromPN
 
-using PostNewtonian: PostNewtonian
+import PostNewtonian: PostNewtonian
 import Quaternionic: QuatVecF64
-using ArgParse: ArgParse
+import ArgParse: ArgParse
+import Roots: find_zero
 
 function ArgParse.parse_item(::Type{QuatVecF64}, x::AbstractString)
     components = split(x, ",")
@@ -94,16 +95,24 @@ const QuatVecF64OrNothing = Union{QuatVecF64,Nothing}
 
 """
 * If Dᵣ and Ωᵣ are not given
-  - If d₀ is given, figure out the corresponding Ω₀ and proceed as below
-  - If tₘ is given, search for the value of Ω₀ that gives the right time
-    and compute the corresponding d₀, ȧ₀, and Nₒ
-  - If Nₒ is given, search for the value of Ω₀ that gives the right number
-    of orbits and compute the corresponding d₀, ȧ₀, and tₘ
-  - If Ω₀ is given, compute the corresponding d₀, ȧ₀, tₘ, and Nₒ
+  - If r₀ is given, figure out the corresponding Ω₀ and proceed as below
+  - If tₘ is given, search for the value of Ω₀ that gives the right time and compute the
+    corresponding r₀, ȧ₀, and Nₒ
+  - If Nₒ is given, search for the value of Ω₀ that gives the right number of orbits and
+    compute the corresponding r₀, ȧ₀, and tₘ
+  - If Ω₀ is given, compute the corresponding r₀, ȧ₀, tₘ, and Nₒ
 * If Dᵣ is given, compute Ωᵣ and proceed as below
 * If Ωᵣ is given, evolve the given system forwards in time, then
-  - If d₀ is given, compute the corresponding Ω₀, ȧ₀, tₘ, and Nₒ
+  - If r₀ is given, compute the corresponding Ω₀, ȧ₀, tₘ, and Nₒ
 
+
+Test this using something like one of the following commands, run from the
+apps/ZeroEccParamsFromPN directory:
+```bash
+julia --project -e 'using ZeroEccParamsFromPN' -- --q=4.3 --chiA=0.1,0.2,0.3 --chiB=0.3,0.2,0.1 --Omega0=0.01
+julia --project -e 'using ZeroEccParamsFromPN' -- --q=4.3 --chiA=0.1,0.2,0.3 --chiB=0.3,0.2,0.1 --D0=20
+julia --project -e 'using ZeroEccParamsFromPN' -- --q=4.3 --chiA=0.1,0.2,0.3 --chiB=0.3,0.2,0.1 --tMerger=10000
+```
 """
 function julia_main(args=nothing)::Cint
     # @info "Args:" args
@@ -114,7 +123,7 @@ function julia_main(args=nothing)::Cint
         χ⃗₁::QuatVecF64OrNothing = parsed_args["chiA"]
         χ⃗₂::QuatVecF64OrNothing = parsed_args["chiB"]
         Ω₀::Float64OrNothing = parsed_args["Omega0"]
-        d₀::Float64OrNothing = parsed_args["D0"]
+        r₀::Float64OrNothing = parsed_args["D0"]
         tₘ::Float64OrNothing = parsed_args["tMerger"]
         Nₒ::Float64OrNothing = parsed_args["NOrbits"]
         Ωᵣ::Float64OrNothing = parsed_args["OmegaRef"]
@@ -125,7 +134,7 @@ function julia_main(args=nothing)::Cint
         M₁ = q/(1+q)
         M₂ = 1/(1+q)
 
-        zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, d₀, tₘ, Nₒ, Ωᵣ, Dᵣ)
+        zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, tₘ, Nₒ, Ωᵣ, Dᵣ)
     catch
         Base.invokelatest(Base.display_error, Base.catch_stack())
         return 1
@@ -133,11 +142,12 @@ function julia_main(args=nothing)::Cint
     return 0
 end
 
-function zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, d₀, tₘ, Nₒ, Ωᵣ, Dᵣ)
+function zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, tₘ, Nₒ, Ωᵣ, Dᵣ)
     # End every integration at Ω=0.1; this comes from the original script,
     # spec/Support/Python/ZeroEccParamsFromPN.py, and is kept here for consistency; there is
     # no "right" choice.
-    vₑ = PostNewtonian.v(; Ω=0.1) # ≈ 0.464
+    Ωₑ = 0.1
+    vₑ = PostNewtonian.v(; Ω=Ωₑ) # ≈ 0.464
 
     # If Ω₀ is not given, we just choose a sensible default that will be long enough that we
     # don't typically need to backtrack, but not so long that it will be slow to integrate.
@@ -154,63 +164,62 @@ function zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, d₀, t�
     # Note that this system may have the wrong v₀
     pnsystem = PostNewtonian.BBH(; M₁, M₂, χ⃗₁, χ⃗₂, v=v₀)
 
-    # Handle input D0 because this easily transforms to the problem with input Omega0
-    if !isnothing(d₀)
-        v₀ = PostNewtonian.separation_inverse(d₀, pnsystem)
-        pnsystem.state[PostNewtonian.vindex] = v₀
-        Ω₀ = PostNewtonian.Ω(pnsystem)
-    end
-
     # r′₀ is a gauge choice; try a few values and see what the difference is
     r′₀s = (1.0, 10.0)  # These are values from the old script
 
-    # TODO: Incorporate r′₀
-    r′₀ = r′₀s[1]
-
     if isnothing(Dᵣ) && isnothing(Ωᵣ)
-        if !isnothing(Ω₀)
-            r₀ = PostNewtonian.r(pnsystem)
-            ȧ₀ = PostNewtonian.ṙ(pnsystem) / r₀
-
-            pnevolution = PostNewtonian.orbital_evolution(pnsystem; vₑ)
-            Nₒ = pnevolution[:Φ, end] / 2π
-            tₘ = pnevolution.t[end]
-
-            println("###############################")
-            println("Results for rPrime0 = $(r′₀):")
-            println("Omega0 = $Ω₀")
-            println("D0 = $r₀")
-            println("adot0 = $ȧ₀")
-            println("Approximate nOrbits = $Nₒ")
-            println("Approximate tMerger = $tₘ")
-        elseif !isnothing(Nₒ)
+        if !isnothing(Nₒ)
             throw(ErrorException("Not implemented: Nₒ"))
-            # # First find an omega0 that gives the right number of orbits, then use that to
-            # # find d₀, adot0.
-            # function helperFunc(args)
-            #     omega0 = args[1]
-            #     println("nOrbits not implemented")
-            #     return abs(nOrbits(q, χ⃗₁, χ⃗₂, omega0) - Nₒ)
-            # end
-            # omega = fmin(helperFunc, 0.01)[1]
-            # # fromΩ₀(omega, r′₀s, q, χ⃗₁, χ⃗₂)
-            # println("fromΩ₀ not implemented")
         elseif !isnothing(tₘ)
-            throw(ErrorException("Not implemented: tₘ"))
-            # # First find an omega0 that gives the right time, then use that to find d₀,
-            # # adot0.
-            # function helperFunc(args)
-            #     omega0 = args[1]
-            #     println("totalTime not implemented")
-            #     return abs(totalTime(q, χ⃗₁, χ⃗₂, omega0) - tₘ)
-            # end
-            # omega = fmin(helperFunc, 0.01)[1]
-            # # fromΩ₀(omega, r′₀s, q, χ⃗₁, χ⃗₂)
-            # println("fromΩ₀ not implemented")
+            # Establish a rough first guess
+            v₀ = (5 / (256PostNewtonian.ν(M₁, M₂) * tₘ))^(1//8)
+            pnsystem.state[PostNewtonian.vindex] = v₀
+            Ω₀ = PostNewtonian.Ω(pnsystem)
+            # Now actively search for the value of Ω₀ that gives the right tₘ
+            Ω₀ = find_zero(
+                Ω₀ -> begin
+                    pnsystem.state[PostNewtonian.vindex] = PostNewtonian.v(; Ω=Ω₀)
+                    pnevolution = PostNewtonian.orbital_evolution(pnsystem; vₑ)
+                    tₘ - pnevolution.t[end]
+                end,
+                (Ω₀/2, 0.9Ωₑ),
+            )
+        end
+
+        if !isnothing(r₀)
+            for r′₀ ∈ r′₀s
+                v₀ = PostNewtonian.r⁻¹(r₀, pnsystem, r′₀)
+                pnsystem.state[PostNewtonian.vindex] = v₀
+                Ω₀ = PostNewtonian.Ω(pnsystem)
+                evolve_and_evaluate(Ω₀, pnsystem, r′₀, vₑ)
+            end
+        elseif !isnothing(Ω₀)
+            for r′₀ ∈ r′₀s
+                evolve_and_evaluate(Ω₀, pnsystem, r′₀, vₑ)
+            end
+        else
+            # This is an error.  I don't see how this could happen, but just in case...
+            throw(ErrorException("Ω₀ has not been given or calculated"))
         end
     else
         throw(ErrorException("Not implemented: Dᵣ / Ωᵣ"))
     end
+end
+
+function evolve_and_evaluate(Ω₀, pnsystem, r′₀, vₑ)
+    pnevolution = PostNewtonian.orbital_evolution(pnsystem; vₑ)
+    Nₒ = pnevolution[:Φ, end] / 2π
+    tₘ = pnevolution.t[end]
+    r₀ = PostNewtonian.r(pnsystem, r′₀)  # This is redundant if r₀ is given, but that's fine
+    ȧ₀ = PostNewtonian.ṙ(pnsystem, r′₀) / r₀
+
+    println("###############################")
+    println("Results for rPrime0 = $(r′₀):")
+    println("Omega0 = $Ω₀")
+    println("D0 = $r₀")
+    println("adot0 = $ȧ₀")
+    println("Approximate nOrbits = $Nₒ")
+    println("Approximate tMerger = $tₘ")
 end
 
 export main
