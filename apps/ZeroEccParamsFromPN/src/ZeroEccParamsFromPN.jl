@@ -146,7 +146,7 @@ function zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, d₀, t�
         # long time to merger (which would probably never be simulated in practice).
         long_time_to_merger = 200_000  # M
         ν = PostNewtonian.ν(M₁, M₂)
-        (5 / (256ν * long_time_to_merger))^(1//8)
+        (5 / (256ν * long_time_to_merger))^(1//8) # ≈ 0.16 — 0.20 for q ≲ 20
     else
         PostNewtonian.v(; Ω=Ω₀)
     end
