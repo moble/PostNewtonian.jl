@@ -10,16 +10,27 @@ where ``r`` is the magnitude of the orbital separation.  This quantity has PN or
 is given by Eq. (4.3) of [Bohé et al. (2013)](https://arxiv.org/abs/1212.5520) and Eq.
 (3.32) of [Bohé et al.  (2015)](https://arxiv.org/abs/1501.01529).
 
-Note that there is a 3PN gauge term of ``-22ν\ln(r/r₀')/3`` that is simply ignored here, as
-it should cancel out of any physical quantity.
+Note that there is a 3PN gauge term of ``-22ν\ln(r/r₀')/3``.  While this value should cancel
+out of any physical quantity, it is included here for completeness.  Computing it requires a
+few Newton steps to get the value of ``γ`` because the ``\ln(r)`` term depends on
+``\gamma``.
+
+The default value of ``r₀'`` is precisely whatever is required to make *its* logarithm
+vanish (not the logarithm of `r`).  If you pass the optional argument `lnr₀′c²╱GM`, *you*
+are responsible for ensuring that the appropriate values of `M`, `c`, and `G` are used.
 """
-@pn_expression function γₚₙ(pnsystem)
-    return (v / c)^2 * @pn_expansion(
+@pn_expression function γₚₙ(pnsystem, lnr₀′c²╱GM=0)
+    γ₀ = (v / c)^2 * @pn_expansion(
         # Non-spinning terms; Eq. (4.3) of Bohé et al. (2013)
         1 +
             (v / c)^2 * (1 - ν / 3) +
             (v / c)^4 * (1 - 65ν / 12) +
-            (v / c)^6 * (1 + (-2203//2520 - 41π^2 / 192)ν + 229ν^2 / 36 + ν^3 / 81)
+            (v / c)^6 * (
+                1
+                + (-2203//2520 - 41π^2 / 192 + 22lnr₀′c²╱GM / 3)ν
+                + 229ν^2 / 36
+                + ν^3 / 81
+            )
 
             # Spin-orbit terms; Eq. (4.3) of Bohé et al. (2013)
             +
@@ -40,6 +51,31 @@ it should cancel out of any physical quantity.
                 σₗ^2 * (1 + (δ * κ₋ - κ₊ - 2)ν + (κ₊ / 6 + 1//3)ν^2)
             )
     )
+
+    if pn_order(pnsystem) ≥ 3
+        if !isa(pn_expansion_reducer, Val{sum})
+            throw(ArgumentError(
+                "`PostNewtonian.γₚₙ` not implemented for `pn_expansion_reducer` types other"
+                *" than `Val{sum}`.  (That is, you can't get individual terms out of this.)"
+            ))
+        end
+
+        # Account for the 3PN gauge term.  Note that the coefficient of the logarithm is
+        # too small for the Lambert W function to give us a useful result, so we just
+        # do a few Newton steps to get the value of γ = γ₀ + (v/c)^8 * (22ln(γ) / 3)ν
+        a = (v / c)^8 * (22ν / 3)
+        γᵢ = γ₀
+        for i ∈ 1:10  # Limit the possible number of steps, just in case
+            δγ = - (γᵢ + a*ln(γᵢ) - γ₀) / (1 + a / γᵢ)
+            γᵢ += δγ
+            # if abs(δγ) < 10eps(γᵢ)
+            #     break
+            # end
+        end
+        return γᵢ
+    else
+        return γ₀
+    end
 end
 const inverse_separation = γₚₙ
 
@@ -140,8 +176,8 @@ const inverse_separation_deriv = γₚₙ′
     r(pnsystem)
     separation(pnsystem)
 
-Compute the separation between the two black holes.  This is essentially the inverse of
-[`γₚₙ`](@ref), with some factors of `G` and `M` thrown in.
+Compute the separation between the two black holes.  This is essentially the multiplicative
+inverse of [`γₚₙ`](@ref), with some factors of `G` and `M` thrown in.
 
 Note that there should be a factor of `1/c^2` in this expression; we reserve it to use
 explicitly in PN expansions.  That is, for every factor of `1/r`, we explicitly include a
