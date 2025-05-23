@@ -84,6 +84,14 @@ function parse_commandline(args=nothing)
         required = false
     end
 
+    # Add a single optional argument --quiet with default value false
+    ArgParse.add_arg_group!(s, "optional behavior argument"; required=false)
+    ArgParse.@add_arg_table! s begin
+        "--skip_check_up_down_instability"
+        help = "Don't check for the up-down instability."
+        action = :store_true
+    end
+
     if isnothing(args)
         return ArgParse.parse_args(s)
     else
@@ -92,7 +100,7 @@ function parse_commandline(args=nothing)
 end
 
 const Float64OrNothing = Union{Float64,Nothing}
-const QuatVecF64OrNothing = Union{QuatVecF64,Nothing}
+const BoolOrNothing = Union{Bool,Nothing}
 
 """
 * If Dᵣ and Ωᵣ are not given
@@ -129,10 +137,11 @@ function julia_main(args=nothing)::Cint
         Nₒ::Float64OrNothing = parsed_args["NOrbits"]
         Ωᵣ::Float64OrNothing = parsed_args["OmegaRef"]
         Dᵣ::Float64OrNothing = parsed_args["DRef"]
+        skipud::BoolOrNothing = parsed_args["skip_check_up_down_instability"]
         M₁ = q/(1+q)
         M₂ = 1/(1+q)
 
-        zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, tₘ, Nₒ, Ωᵣ, Dᵣ)
+        zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, tₘ, Nₒ, Ωᵣ, Dᵣ, skipud)
     catch
         Base.invokelatest(Base.display_error, Base.catch_stack())
         return 1
@@ -140,7 +149,9 @@ function julia_main(args=nothing)::Cint
     return 0
 end
 
-function zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, tₘ, Nₒ, Ωᵣ, Dᵣ)
+function zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, tₘ, Nₒ, Ωᵣ, Dᵣ, skipud)
+    check_up_down_instability = !skipud
+
     # End every integration at Ω=0.1; this comes from the original script,
     # spec/Support/Python/ZeroEccParamsFromPN.py, and is kept here for consistency; there is
     # no "right" choice.
@@ -173,11 +184,15 @@ function zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, t�
             # number of orbits.
 
             # Evolve naive system
-            pnevolution = PostNewtonian.orbital_evolution(pnsystem; vₑ)
+            pnevolution = PostNewtonian.orbital_evolution(
+                pnsystem; vₑ, check_up_down_instability
+            )
             while pnevolution[:Φ, end] / 2π < Nₒ
                 v₀ *= 0.9
                 pnsystem.state[PostNewtonian.vindex] = v₀
-                pnevolution = PostNewtonian.orbital_evolution(pnsystem; vₑ)
+                pnevolution = PostNewtonian.orbital_evolution(
+                    pnsystem; vₑ, check_up_down_instability
+                )
             end
             Nₑ = pnevolution[:Φ, end] / 2π
             spline = CubicSpline(pnevolution[:v], pnevolution[:Φ] / 2π)
@@ -189,7 +204,9 @@ function zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, t�
             Ω₀ = find_zero(
                 Ω₀ -> begin
                     pnsystem.state[PostNewtonian.vindex] = PostNewtonian.v(; Ω=Ω₀)
-                    pnevolution = PostNewtonian.orbital_evolution(pnsystem; vₑ)
+                    pnevolution = PostNewtonian.orbital_evolution(
+                        pnsystem; vₑ, check_up_down_instability
+                    )
                     Nₑ = pnevolution[:Φ, end] / 2π
                     Nₒ - Nₑ
                 end,
@@ -211,7 +228,9 @@ function zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, t�
             Ω₀ = find_zero(
                 Ω₀ -> begin
                     pnsystem.state[PostNewtonian.vindex] = PostNewtonian.v(; Ω=Ω₀)
-                    pnevolution = PostNewtonian.orbital_evolution(pnsystem; vₑ)
+                    pnevolution = PostNewtonian.orbital_evolution(
+                        pnsystem; vₑ, check_up_down_instability
+                    )
                     tₘ - pnevolution.t[end]
                 end,
                 (Ω₀/2, 0.9Ωₑ),
@@ -223,11 +242,11 @@ function zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, t�
                 v₀ = PostNewtonian.r⁻¹(r₀, pnsystem, r′₀)
                 pnsystem.state[PostNewtonian.vindex] = v₀
                 Ω₀ = PostNewtonian.Ω(pnsystem)
-                evolve_and_evaluate(Ω₀, pnsystem, r′₀, vₑ)
+                evolve_and_evaluate(Ω₀, pnsystem, r′₀, vₑ, check_up_down_instability)
             end
         elseif !isnothing(Ω₀)
             for r′₀ ∈ r′₀s
-                evolve_and_evaluate(Ω₀, pnsystem, r′₀, vₑ)
+                evolve_and_evaluate(Ω₀, pnsystem, r′₀, vₑ, check_up_down_instability)
             end
         else
             # This is an error.  I don't see how this could happen, but just in case...
@@ -238,8 +257,8 @@ function zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, t�
     end
 end
 
-function evolve_and_evaluate(Ω₀, pnsystem, r′₀, vₑ)
-    pnevolution = PostNewtonian.orbital_evolution(pnsystem; vₑ)
+function evolve_and_evaluate(Ω₀, pnsystem, r′₀, vₑ, check_up_down_instability)
+    pnevolution = PostNewtonian.orbital_evolution(pnsystem; vₑ, check_up_down_instability)
     Nₒ = pnevolution[:Φ, end] / 2π
     tₘ = pnevolution.t[end]
     r₀ = PostNewtonian.r(pnsystem, r′₀)  # This is redundant if r₀ is given, but that's fine
