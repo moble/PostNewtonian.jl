@@ -29,6 +29,9 @@ The spin-squared terms (by which we mean both spin-spin and spin-orbit squared t
 energy are known to 3pN order, and given in Eq. (3.33) of [Bohé et al.
 (2015)](https://arxiv.org/abs/1501.01529).
 
+The spin-cubed terms are known to 3.5pN order, and come from Eq. (6.17) of [Marsat
+(2014)](https://arxiv.org/abs/1411.4118).
+
 The tidal-coupling terms come in to the binding energy at relative 5pN order, and are known
 to 6pN order.  These terms come from Eq. (2.11) of [Vines et al.
 (2011)](https://prd.aps.org/abstract/PRD/v83/i8/e084051).  Note their unusual convention for
