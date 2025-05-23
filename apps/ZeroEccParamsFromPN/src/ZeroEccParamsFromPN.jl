@@ -4,6 +4,7 @@ import PostNewtonian: PostNewtonian
 import Quaternionic: QuatVecF64
 import ArgParse: ArgParse
 import Roots: find_zero
+import DataInterpolations: CubicSpline
 
 function ArgParse.parse_item(::Type{QuatVecF64}, x::AbstractString)
     components = split(x, ",")
@@ -112,25 +113,22 @@ apps/ZeroEccParamsFromPN directory:
 julia --project -e 'using ZeroEccParamsFromPN' -- --q=4.3 --chiA=0.1,0.2,0.3 --chiB=0.3,0.2,0.1 --Omega0=0.01
 julia --project -e 'using ZeroEccParamsFromPN' -- --q=4.3 --chiA=0.1,0.2,0.3 --chiB=0.3,0.2,0.1 --D0=20
 julia --project -e 'using ZeroEccParamsFromPN' -- --q=4.3 --chiA=0.1,0.2,0.3 --chiB=0.3,0.2,0.1 --tMerger=10000
+julia --project -e 'using ZeroEccParamsFromPN' -- --q=4.3 --chiA=0.1,0.2,0.3 --chiB=0.3,0.2,0.1 --NOrbits=22
 ```
 """
 function julia_main(args=nothing)::Cint
-    # @info "Args:" args
     try
         # Parse command line arguments; arguments not provided are set to `nothing`
         parsed_args = parse_commandline(args)
-        q::Float64OrNothing = parsed_args["q"]
-        χ⃗₁::QuatVecF64OrNothing = parsed_args["chiA"]
-        χ⃗₂::QuatVecF64OrNothing = parsed_args["chiB"]
+        q::Float64 = parsed_args["q"]
+        χ⃗₁::QuatVecF64 = parsed_args["chiA"]
+        χ⃗₂::QuatVecF64 = parsed_args["chiB"]
         Ω₀::Float64OrNothing = parsed_args["Omega0"]
         r₀::Float64OrNothing = parsed_args["D0"]
         tₘ::Float64OrNothing = parsed_args["tMerger"]
         Nₒ::Float64OrNothing = parsed_args["NOrbits"]
         Ωᵣ::Float64OrNothing = parsed_args["OmegaRef"]
         Dᵣ::Float64OrNothing = parsed_args["DRef"]
-
-        # @info "Parsed:" parsed_args
-
         M₁ = q/(1+q)
         M₂ = 1/(1+q)
 
@@ -169,13 +167,47 @@ function zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, t�
 
     if isnothing(Dᵣ) && isnothing(Ωᵣ)
         if !isnothing(Nₒ)
-            throw(ErrorException("Not implemented: Nₒ"))
+            # One way to get a first guess is to just evolve with the naive value of `Ω₀`,
+            # then find the `t` corresponding to the `Φ` that gives the right number of
+            # orbits.  Then run `find_zero` to find the value of `Ω₀` that gives the right
+            # number of orbits.
+
+            # Evolve naive system
+            pnevolution = PostNewtonian.orbital_evolution(pnsystem; vₑ)
+            while pnevolution[:Φ, end] / 2π < Nₒ
+                v₀ *= 0.9
+                pnsystem.state[PostNewtonian.vindex] = v₀
+                pnevolution = PostNewtonian.orbital_evolution(pnsystem; vₑ)
+            end
+            Nₑ = pnevolution[:Φ, end] / 2π
+            spline = CubicSpline(pnevolution[:v], pnevolution[:Φ] / 2π)
+            v₀ = spline(Nₑ - Nₒ)
+            pnsystem.state[PostNewtonian.vindex] = v₀
+            Ω₀ = PostNewtonian.Ω(pnsystem)
+
+            # Now actively search for the value of Ω₀ that gives the right Nₒ.
+            Ω₀ = find_zero(
+                Ω₀ -> begin
+                    pnsystem.state[PostNewtonian.vindex] = PostNewtonian.v(; Ω=Ω₀)
+                    pnevolution = PostNewtonian.orbital_evolution(pnsystem; vₑ)
+                    Nₑ = pnevolution[:Φ, end] / 2π
+                    Nₒ - Nₑ
+                end,
+                (Ω₀/2, 0.9Ωₑ),
+            )
+
         elseif !isnothing(tₘ)
             # Establish a rough first guess
             v₀ = (5 / (256PostNewtonian.ν(M₁, M₂) * tₘ))^(1//8)
             pnsystem.state[PostNewtonian.vindex] = v₀
             Ω₀ = PostNewtonian.Ω(pnsystem)
-            # Now actively search for the value of Ω₀ that gives the right tₘ
+            # Now actively search for the value of Ω₀ that gives the right tₘ.
+            #
+            # TODO: We have to use a bracketed search because it is too easy for the
+            # algorithm to choose a value of Ω₀ larger than Ωₑ, which means that the
+            # terminator never triggers.  The bracketing algorithm is typically not as fast
+            # as the unbracketed one, so if the latter gets fixed, we could try to switch
+            # algorithms.
             Ω₀ = find_zero(
                 Ω₀ -> begin
                     pnsystem.state[PostNewtonian.vindex] = PostNewtonian.v(; Ω=Ω₀)
