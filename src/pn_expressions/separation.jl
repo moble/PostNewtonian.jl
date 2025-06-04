@@ -267,6 +267,21 @@ end
 
 
 """
+    γ̇ₚₙ(pnsystem)
+    inverse_separation_dot(pnsystem)
+
+Compute the derivative of the inverse separation between the two black holes with respect to
+time.
+"""
+@pn_expression function γ̇ₚₙ(pnsystem)
+    let γₚₙ′ = γₚₙ′(pnsystem), 𝓕 = 𝓕(pnsystem), 𝓔′ = 𝓔′(pnsystem)
+        γₚₙ′ * -𝓕 / 𝓔′
+    end
+end
+const inverse_separation_dot = γ̇ₚₙ
+
+
+"""
     r(pnsystem, [r₀′])
     separation(pnsystem, [r₀′])
 
