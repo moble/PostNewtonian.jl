@@ -75,11 +75,11 @@ function parse_commandline(args=nothing)
     )
     ArgParse.@add_arg_table! s begin
         "--OmegaRef"
-        help = "Orbital angular frequency at which q, chiA, chiB have the given values."
+        help = "[Not yet implemented] Orbital angular frequency at which q, chiA, chiB have the given values."
         arg_type = Float64
         required = false
         "--DRef"
-        help = "Separation distance at which q, chiA, chiB have the given values."
+        help = "[Not yet implemented] Separation distance at which q, chiA, chiB have the given values."
         arg_type = Float64
         required = false
     end
@@ -89,6 +89,9 @@ function parse_commandline(args=nothing)
     ArgParse.@add_arg_table! s begin
         "--skip_check_up_down_instability"
         help = "Don't check for the up-down instability."
+        action = :store_true
+        "--experimental_D0_hack"
+        help = "Add experimental fit for PN-NR offset to D0 (subject to change): `v₀^5*χₑ + (1/8*ν*χₑ + 10/3)*v₀^3 + 3/7*v₀*ν - 1/33`"
         action = :store_true
     end
 
@@ -103,26 +106,7 @@ const Float64OrNothing = Union{Float64,Nothing}
 const BoolOrNothing = Union{Bool,Nothing}
 
 """
-* If Dᵣ and Ωᵣ are not given
-  - If r₀ is given, figure out the corresponding Ω₀ and proceed as below
-  - If tₘ is given, search for the value of Ω₀ that gives the right time and compute the
-    corresponding r₀, ȧ₀, and Nₒ
-  - If Nₒ is given, search for the value of Ω₀ that gives the right number of orbits and
-    compute the corresponding r₀, ȧ₀, and tₘ
-  - If Ω₀ is given, compute the corresponding r₀, ȧ₀, tₘ, and Nₒ
-* If Dᵣ is given, compute Ωᵣ and proceed as below
-* If Ωᵣ is given, evolve the given system forwards in time, then
-  - If r₀ is given, compute the corresponding Ω₀, ȧ₀, tₘ, and Nₒ
-
-
-Test this using something like one of the following commands, run from the
-apps/ZeroEccParamsFromPN directory:
-```bash
-julia --project -e 'using ZeroEccParamsFromPN' -- --q=4.3 --chiA=0.1,0.2,0.3 --chiB=0.3,0.2,0.1 --Omega0=0.01
-julia --project -e 'using ZeroEccParamsFromPN' -- --q=4.3 --chiA=0.1,0.2,0.3 --chiB=0.3,0.2,0.1 --D0=20
-julia --project -e 'using ZeroEccParamsFromPN' -- --q=4.3 --chiA=0.1,0.2,0.3 --chiB=0.3,0.2,0.1 --tMerger=10000
-julia --project -e 'using ZeroEccParamsFromPN' -- --q=4.3 --chiA=0.1,0.2,0.3 --chiB=0.3,0.2,0.1 --NOrbits=22
-```
+This is the main function that will be called when the script is run.
 """
 function julia_main(args=nothing)::Cint
     try
@@ -138,10 +122,13 @@ function julia_main(args=nothing)::Cint
         Ωᵣ::Float64OrNothing = parsed_args["OmegaRef"]
         Dᵣ::Float64OrNothing = parsed_args["DRef"]
         skipud::BoolOrNothing = parsed_args["skip_check_up_down_instability"]
+        D0_hack::BoolOrNothing = parsed_args["experimental_D0_hack"]
         M₁ = q/(1+q)
         M₂ = 1/(1+q)
 
-        zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, tₘ, Nₒ, Ωᵣ, Dᵣ, skipud)
+        zero_ecc_params_from_pn(
+            M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, tₘ, Nₒ, Ωᵣ, Dᵣ, skipud, D0_hack
+        )
     catch
         Base.invokelatest(Base.display_error, Base.catch_stack())
         return 1
@@ -149,7 +136,14 @@ function julia_main(args=nothing)::Cint
     return 0
 end
 
-function zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, tₘ, Nₒ, Ωᵣ, Dᵣ, skipud)
+
+function zero_ecc_params_from_pn(
+    M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, tₘ, Nₒ, Ωᵣ, Dᵣ, skipud, D0_hack, quiet=false
+)
+    if all(isnothing, (Ω₀, r₀, tₘ, Nₒ))
+        throw(ArgumentError("At least one of Ω₀, r₀, tₘ, or Nₒ must be given"))
+    end
+
     check_up_down_instability = !skipud
 
     # End every integration at Ω=0.1; this comes from the original script,
@@ -223,7 +217,7 @@ function zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, t�
             # TODO: We have to use a bracketed search because it is too easy for the
             # algorithm to choose a value of Ω₀ larger than Ωₑ, which means that the
             # terminator never triggers.  The bracketing algorithm is typically not as fast
-            # as the unbracketed one, so if the latter gets fixed, we could try to switch
+            # as the unbracketed one, so if issue #87 gets fixed, we could try to switch
             # algorithms.
             Ω₀ = find_zero(
                 Ω₀ -> begin
@@ -238,16 +232,19 @@ function zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, t�
         end
 
         if !isnothing(r₀)
-            for r′₀ ∈ r′₀s
-                v₀ = PostNewtonian.r⁻¹(r₀, pnsystem, r′₀)
-                pnsystem.state[PostNewtonian.vindex] = v₀
-                Ω₀ = PostNewtonian.Ω(pnsystem)
-                evolve_and_evaluate(Ω₀, pnsystem, r′₀, vₑ, check_up_down_instability)
-            end
+            return [
+                convert_evolve_and_evaluate(
+                    r₀, pnsystem, r′₀, vₑ, check_up_down_instability, D0_hack, quiet
+                )
+                for r′₀ ∈ r′₀s
+            ]
         elseif !isnothing(Ω₀)
-            for r′₀ ∈ r′₀s
-                evolve_and_evaluate(Ω₀, pnsystem, r′₀, vₑ, check_up_down_instability)
-            end
+            return [
+                evolve_and_evaluate(
+                    Ω₀, pnsystem, r′₀, vₑ, check_up_down_instability, D0_hack, quiet
+                )
+                for r′₀ ∈ r′₀s
+            ]
         else
             # This is an error.  I don't see how this could happen, but just in case...
             throw(ErrorException("Ω₀ has not been given or calculated"))
@@ -257,20 +254,102 @@ function zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, t�
     end
 end
 
-function evolve_and_evaluate(Ω₀, pnsystem, r′₀, vₑ, check_up_down_instability)
+
+function convert_evolve_and_evaluate(
+    r₀, pnsystem, r′₀, vₑ, check_up_down_instability, D0_hack, quiet
+)
+    v₀ = if D0_hack
+        # The input r₀ is really r₀ᴺᴿ, but we want to find r₀ᴾᴺ according to
+        #
+        #    γ₀ᴾᴺ ≈ γ₀ᴺᴿ + δγ
+        #
+        # and thence the value of Ω₀ᴾᴺ with which to evolve the system.  By construction,
+        # v₀ᴾᴺ=v₀ᴺᴿ, but we don't know how to calculate v from γ₀ᴺᴿ; we need γ₀ᴾᴺ to
+        # calculate it.  But we need v to calculate γ₀ᴾᴺ, so we have to use fixed-point
+        # iteration.
+        M = PostNewtonian.M(pnsystem)
+        ν = PostNewtonian.ν(pnsystem)
+        χₑ = PostNewtonian.χₑ(pnsystem)
+        γ₀ᴺᴿ = M / r₀
+        γ₀ᴾᴺ = γ₀ᴺᴿ  # Initial guess for γ₀ᴾᴺ
+        for i ∈ 1:100  # Had-code limit for number of iterations to avoid infinite loops
+            v = PostNewtonian.γₚₙ⁻¹(γ₀ᴾᴺ, pnsystem, r′₀)
+            δγ = v^2 * (v^5 * χₑ + (1/8 * ν * χₑ + 10/3) * v^3 + 3/7 * v * ν - 1/33)
+            γ₀ᴾᴺ′ = γ₀ᴺᴿ + δγ
+            if abs(γ₀ᴾᴺ′ - γ₀ᴾᴺ) < 10 * eps(γ₀ᴾᴺ)
+                #@info "Breaking at iteration $i with" γ₀ᴾᴺ γ₀ᴺᴿ δγ
+                break  # Convergence criterion
+            end
+            γ₀ᴾᴺ = γ₀ᴾᴺ′
+            #@info "Iteration $i" γ₀ᴾᴺ γ₀ᴺᴿ δγ
+        end
+        PostNewtonian.γₚₙ⁻¹(γ₀ᴾᴺ, pnsystem, r′₀)
+    else
+        PostNewtonian.r⁻¹(r₀, pnsystem, r′₀)
+    end
+    pnsystem.state[PostNewtonian.vindex] = v₀
+
+    # let # Debug correction
+    #     v = PostNewtonian.v(pnsystem)
+    #     M = PostNewtonian.M(pnsystem)
+    #     ν = PostNewtonian.ν(pnsystem)
+    #     χₑ = PostNewtonian.χₑ(pnsystem)
+    #     δγ = v^2 * (v^5 * χₑ + (1/8 * ν * χₑ + 10/3) * v^3 + 3/7 * v * ν - 1/33)
+    #     γᴾᴺ = PostNewtonian.γₚₙ(pnsystem, r′₀)
+    #     γᴺᴿ = γᴾᴺ - δγ
+    #     @info "Debugging correction" r₀ M/γᴺᴿ PostNewtonian.r(pnsystem, r′₀)
+    # end
+
+    Ω₀ = PostNewtonian.Ω(pnsystem)
+    evolve_and_evaluate(
+        Ω₀, pnsystem, r′₀, vₑ, check_up_down_instability, D0_hack, quiet
+    )
+end
+
+
+function evolve_and_evaluate(
+    Ω₀, pnsystem, r′₀, vₑ, check_up_down_instability, D0_hack, quiet
+)
     pnevolution = PostNewtonian.orbital_evolution(pnsystem; vₑ, check_up_down_instability)
     Nₒ = pnevolution[:Φ, end] / 2π
     tₘ = pnevolution.t[end]
-    r₀ = PostNewtonian.r(pnsystem, r′₀)  # This is redundant if r₀ is given, but that's fine
-    ȧ₀ = PostNewtonian.ṙ(pnsystem, r′₀) / r₀
 
-    println("###############################")
-    println("Results for rPrime0 = $(r′₀):")
-    println("Omega0 = $Ω₀")
-    println("D0 = $r₀")
-    println("adot0 = $ȧ₀")
-    println("Approximate nOrbits = $Nₒ")
-    println("Approximate tMerger = $tₘ")
+    r₀, ȧ₀ = if D0_hack
+        # We want the output D0 to correspond to the NR value, but we have calculated the
+        # PN value.  We have a correction term such that
+        #     γ₀ᴺᴿ ≈ γ₀ᴾᴺ - v₀^2 * (v₀^5 * χₑ + (1/8 * ν * χₑ + 10/3) * v₀^3 + 3/7 * v₀ * ν - 1/33)
+        # where γ=M/r is the inverse of the separation distance.
+        ν = PostNewtonian.ν(pnsystem)
+        M = PostNewtonian.M(pnsystem)
+        χₑ = PostNewtonian.χₑ(pnsystem)
+        γ₀ᴾᴺ = PostNewtonian.γₚₙ(pnsystem, r′₀)
+        v₀ = PostNewtonian.v(; Ω=Ω₀)
+        v̇ = -PostNewtonian.𝓕(pnsystem) / PostNewtonian.𝓔′(pnsystem)
+        γ₀ᴺᴿ = γ₀ᴾᴺ - v₀^2 * (v₀^5 * χₑ + (1/8 * ν * χₑ + 10/3) * v₀^3 + 3/7 * v₀ * ν - 1/33)
+        r₀ᴺᴿ = M / γ₀ᴺᴿ
+        # γ = M/r, so γ̇ = -M ṙ₀ / r₀² = -ṙ₀ γ₀² / M, and ṙ = -M γ̇ / γ₀².
+        # We can write ȧ = ṙ γ / M = -γ̇/γ.
+        γ̇₀ᴾᴺ = PostNewtonian.γ̇ₚₙ(pnsystem)
+        γ̇₀ᴺᴿ = γ̇₀ᴾᴺ - v̇ * v₀ * (7 * v₀^5 * χₑ + (1/8 * ν * χₑ + 10/3) * 5 * v₀^3 + 9/7 * v₀ * ν - 2/33)
+        ȧ₀ᴺᴿ = -γ̇₀ᴺᴿ / γ₀ᴺᴿ
+        r₀ᴺᴿ, ȧ₀ᴺᴿ
+    else
+        r₀ = PostNewtonian.r(pnsystem, r′₀)  # This is redundant if r₀ is given, but that's fine
+        ȧ₀ = PostNewtonian.ṙ(pnsystem, r′₀) / r₀
+        r₀, ȧ₀
+    end
+
+    if !quiet
+        println("###############################")
+        println("Results for rPrime0 = $(r′₀):")
+        println("Omega0 = $Ω₀")
+        println("D0 = $r₀")
+        println("adot0 = $ȧ₀")
+        println("Approximate nOrbits = $Nₒ")
+        println("Approximate tMerger = $tₘ")
+    end
+
+    return (r′₀, Ω₀, r₀, ȧ₀, Nₒ, tₘ)
 end
 
 export main
