@@ -43,6 +43,7 @@ makedocs(;
             "internals/utilities.md",
         ],
         "Adding terms" => "adding_terms.md",
+        "apps_and_scripts.md",
     ],
 )
 

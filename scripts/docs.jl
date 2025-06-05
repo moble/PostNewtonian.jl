@@ -1,3 +1,5 @@
+#!/usr/bin/env julia
+
 # Run this script from any directory as
 #
 #   julia -t 4 scripts/docs.jl
@@ -13,6 +15,7 @@ using Pkg
 #using Revise # Doesn't enable updates of docstrings in the output.
 cd((@__DIR__) * "/..")
 Pkg.activate("docs")
+Pkg.instantiate()
 
 using LiveServer
 servedocs(; launch_browser=true)

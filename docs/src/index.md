@@ -15,18 +15,14 @@ for eccentric systems is still upcoming.
 If you intend to use this package via Python, see [this page](@ref
 Using-this-package-from-Python) for installation instructions.
 
-It is recommended to use this package with Julia version 1.9 or greater, because
-of that version's improved pre-compilation caching.  If you find it very slow
-the first time you use functions from this package in a new Julia session, that
-is most likely because Julia has to compile a lot of code.  Version 1.9 does a
-better job of caching that compiled code, which speeds up your first-time usage.
+Julia 1.10 or greater is required to use this package.  If you haven't
+installed Julia yet, you probably want to use
+[`juliaup`](https://github.com/JuliaLang/juliaup#readme) to do so.
 
-If you haven't installed Julia yet, you probably want to use
-[`juliaup`](https://github.com/JuliaLang/juliaup#readme) to do so.  You'll
-probably also want to use a Julia ["project
-environment"](https://pkgdocs.julialang.org/v1/environments/) specifically for
-using this package.  An easy way to do this is to create a directory, `cd` into
-that directory, and then run julia as
+You'll probably also want to use a Julia ["project
+environment"](https://pkgdocs.julialang.org/v1/environments/)
+specifically for using this package.  An easy way to do this is to
+create a directory, `cd` into that directory, and then run julia as
 
 ```bash
 julia --project=.

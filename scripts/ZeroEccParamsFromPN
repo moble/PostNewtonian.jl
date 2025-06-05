@@ -1,0 +1,21 @@
+#!/usr/bin/env julia
+
+# This script basically just calls the main function of the
+# ZeroEccParamsFromPN app, using the args passed into this script.  So
+# essentially, it should be the same as the app, but it assumes that
+# you are running with your own version of `julia`, and are happy to
+# install and compile packages (and see a little more of how the
+# sausage is made when doing so).
+
+PostNewtonianDirectory = dirname(@__DIR__)
+
+# We'll just make sure that the ZeroEccParamsFromPN project is
+# installed correctly.
+using Pkg
+Pkg.activate(joinpath(PostNewtonianDirectory, "apps", "ZeroEccParamsFromPN"))
+Pkg.develop(; path=PostNewtonianDirectory)
+Pkg.instantiate()
+
+import ZeroEccParamsFromPN
+
+ZeroEccParamsFromPN.julia_main(ARGS)

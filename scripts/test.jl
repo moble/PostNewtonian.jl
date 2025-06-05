@@ -1,9 +1,12 @@
+#!/usr/bin/env julia
+
 using Dates: Dates
 println("Running tests starting at ", Dates.format(Dates.now(), "HH:MM:SS"), ".")
 
 using Pkg
 cd((@__DIR__) * "/..")
 Pkg.activate(".")
+Pkg.instantiate()
 
 try
     Δt = @elapsed Pkg.test("PostNewtonian"; coverage=true, test_args=ARGS)
