@@ -1,7 +1,6 @@
-always_for_in = true
+# Use Blue style by default, but set some customizations
 for_in_replacement = "∈"
 ignore = ["src/pn_expressions/mode_weights.jl"]
-indent = 4
-margin = 92
+import_to_using = false
 normalize_line_endings = "unix"
 style = "blue"

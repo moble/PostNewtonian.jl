@@ -19,54 +19,56 @@ the result for any physical quantity.
     else
         ln(r₀′ * c^2 / (G * M))
     end
-    γ₀ = (v / c)^2 * @pn_expansion(
-        # Non-spinning terms; Eq. (4.3) of Bohé et al. (2013)
-        1 +
-            (v / c)^2 * (1 - ν / 3) +
-            (v / c)^4 * (1 - 65ν / 12) +
-            (v / c)^6 * (
-                1
-                + (-2203//2520 - 41π^2 / 192 + 22lnr₀′c²╱GM / 3)ν
-                + 229ν^2 / 36
-                + ν^3 / 81
-            )
-
-            # Spin-orbit terms; Eq. (4.3) of Bohé et al. (2013)
-            +
-            (v / c)^3 * (5//3 * sₗ + δ * σₗ) +
-            (v / c)^5 * ((10//3 + 8ν / 9) * sₗ + 2δ * σₗ) +
-            (v / c)^7 * ((5 - 127ν / 12 - 6ν^2) * sₗ + δ * (3 - 61ν / 6 - 8ν^2 / 3) * σₗ)
-
-            # Spin-squared terms; Eq. (3.32) of Bohé et al. (2015)
-            +
-            (v / c)^4 * (
-                sₗ^2 * (-κ₊ / 2 - 1) +
-                sₗ * σₗ * (-δ * κ₊ / 2 - δ + κ₋ / 2) +
-                σₗ^2 * (δ * κ₋ / 4 - κ₊ / 4 + (κ₊ / 2 + 1)ν)
-            ) +
-            (v / c)^6 * (
-                sₗ^2 * (-11δ * κ₋ / 12 - 11κ₊ / 12 + 14//9 + (-κ₊ / 6 - 1//3)ν) +
-                sₗ * σₗ * (5δ / 3 + (-δ * κ₊ / 6 - δ / 3 + 23κ₋ / 6)ν) +
-                σₗ^2 * (1 + (δ * κ₋ - κ₊ - 2)ν + (κ₊ / 6 + 1//3)ν^2)
-            )
-
-            # Spin-cubed terms; Eq. (6.15) of Marsat (2015)
-            +
-            (v / c)^7 * (
-                sₗ^3 * (-3κ₊ / 2 + λ₊ - 9) +
-                sₗ^2 * σₗ * (-5δ * κ₊ / 2 + 3δ * λ₊ / 2 - 14δ + 3κ₋ - 3λ₋ / 2) +
-                sₗ * σₗ^2 * (
-                    13δ * κ₋ / 4 - 3δ * λ₋ / 2 - 13κ₊ / 4 + 3λ₊ / 2 - 5
-                    + (11κ₊ / 2 - 3λ₊ + 29)ν
-                ) +
-                σₗ^3 * (
-                    -5δ * κ₊ / 4 + δ * λ₊ / 2 + 5κ₋ / 4 - λ₋ / 2
-                    + (δ * κ₊ - δ * λ₊ / 2 + 5δ - 7κ₋ / 2 + 3λ₋ / 2)ν
+    γ₀ =
+        (v / c)^2 * @pn_expansion(
+            # Non-spinning terms; Eq. (4.3) of Bohé et al. (2013)
+            1 +
+                (v / c)^2 * (1 - ν / 3) +
+                (v / c)^4 * (1 - 65ν / 12) +
+                (v / c)^6 * (
+                    1 +
+                    (-2203//2520 - 41π^2 / 192 + 22lnr₀′c²╱GM / 3)ν +
+                    229ν^2 / 36 +
+                    ν^3 / 81
                 )
-            )
-    )
-end
 
+                # Spin-orbit terms; Eq. (4.3) of Bohé et al. (2013)
+                +
+                (v / c)^3 * (5//3 * sₗ + δ * σₗ) +
+                (v / c)^5 * ((10//3 + 8ν / 9) * sₗ + 2δ * σₗ) +
+                (v / c)^7 * ((5 - 127ν / 12 - 6ν^2)sₗ + δ * (3 - 61ν / 6 - 8ν^2 / 3)σₗ)
+
+                # Spin-squared terms; Eq. (3.32) of Bohé et al. (2015)
+                +
+                (v / c)^4 * (
+                    sₗ^2 * (-κ₊ / 2 - 1) +
+                    sₗ * σₗ * (-δ * κ₊ / 2 - δ + κ₋ / 2) +
+                    σₗ^2 * (δ * κ₋ / 4 - κ₊ / 4 + (κ₊ / 2 + 1)ν)
+                ) +
+                (v / c)^6 * (
+                    sₗ^2 * (-11δ * κ₋ / 12 - 11κ₊ / 12 + 14//9 + (-κ₊ / 6 - 1//3)ν) +
+                    sₗ * σₗ * (5δ / 3 + (-δ * κ₊ / 6 - δ / 3 + 23κ₋ / 6)ν) +
+                    σₗ^2 * (1 + (δ * κ₋ - κ₊ - 2)ν + (κ₊ / 6 + 1//3)ν^2)
+                )
+
+                # Spin-cubed terms; Eq. (6.15) of Marsat (2015)
+                +
+                (v / c)^7 * (
+                    sₗ^3 * (-3κ₊ / 2 + λ₊ - 9) +
+                    sₗ^2 * σₗ * (-5δ * κ₊ / 2 + 3δ * λ₊ / 2 - 14δ + 3κ₋ - 3λ₋ / 2) +
+                    sₗ *
+                    σₗ^2 *
+                    (
+                        13δ * κ₋ / 4 - 3δ * λ₋ / 2 - 13κ₊ / 4 + 3λ₊ / 2 - 5 +
+                        (11κ₊ / 2 - 3λ₊ + 29)ν
+                    ) +
+                    σₗ^3 * (
+                        -5δ * κ₊ / 4 + δ * λ₊ / 2 + 5κ₋ / 4 - λ₋ / 2 +
+                        (δ * κ₊ - δ * λ₊ / 2 + 5δ - 7κ₋ / 2 + 3λ₋ / 2)ν
+                    )
+                )
+        )
+end
 
 @doc raw"""
     γₚₙ(pnsystem, [r₀′])
@@ -117,10 +119,7 @@ The default value of `r₀'` is `G*M/c^2`, which makes its contribution vanish.
             return γ₀ + Δγ
         else
             # γ₀ will be a `PNExpansion`, and we need to add the `Δγ` to term 7
-            coeffs = Tuple(
-                i==7 ? c + Δγ : c
-                for (i,c) ∈ enumerate(γ₀.coeffs)
-            )
+            coeffs = Tuple(i==7 ? c + Δγ : c for (i, c) ∈ enumerate(γ₀.coeffs))
             return typeof(γ₀)(coeffs)
         end
     else
@@ -128,7 +127,6 @@ The default value of `r₀'` is `G*M/c^2`, which makes its contribution vanish.
     end
 end
 const inverse_separation = γₚₙ
-
 
 @doc raw"""
     γₚₙ′(pnsystem)
@@ -153,10 +151,12 @@ This computation uses [`γₚₙ₀`](@ref) along with the following derivation:
 """
 @pn_expression function γₚₙ′(pnsystem)
     if !isa(pn_expansion_reducer, Val{sum})
-        throw(ArgumentError(
-            "`PostNewtonian.γₚₙ′` not implemented for `pn_expansion_reducer` types other"
-            *" than `Val{sum}`.  (That is, you can't get individual terms out of this.)"
-        ))
+        throw(
+            ArgumentError(
+                "`PostNewtonian.γₚₙ′` not implemented for `pn_expansion_reducer` types other" *
+                " than `Val{sum}`.  (That is, you can't get individual terms out of this.)",
+            ),
+        )
     end
 
     γ₀′ = γₚₙ₀′(pnsystem)
@@ -170,7 +170,6 @@ This computation uses [`γₚₙ₀`](@ref) along with the following derivation:
     end
 end
 const inverse_separation_deriv = γₚₙ′
-
 
 @doc raw"""
     γₚₙ₀′(pnsystem)
@@ -265,7 +264,6 @@ from the Newton iterations in [`γₚₙ′`](@ref).
     end
 end
 
-
 """
     γ̇ₚₙ(pnsystem)
     inverse_separation_dot(pnsystem)
@@ -280,7 +278,6 @@ time.
 end
 const inverse_separation_dot = γ̇ₚₙ
 
-
 """
     r(pnsystem, [r₀′])
     separation(pnsystem, [r₀′])
@@ -294,7 +291,6 @@ inverse of [`γₚₙ`](@ref), with some factors of `G` and `M` thrown in.
     end
 end
 const separation = r
-
 
 """
     r′(pnsystem, [r₀′])
@@ -312,7 +308,6 @@ Note that we ignore a derivative of `M` that appears in the `r₀′` term, as e
 end
 const separation_deriv = r′
 
-
 """
     ṙ(pnsystem, [r₀′])
     separation_dot(pnsystem, [r₀′])
@@ -325,7 +320,6 @@ Compute the derivative of the separation between the two black holes with respec
     end
 end
 const separation_dot = ṙ
-
 
 """
     γₚₙ⁻¹(γ, pnsystem, [r₀′])
@@ -362,7 +356,7 @@ function γₚₙ⁻¹(γ, pnsystem, r₀′=0)
         pnsystemᵥ.state[vindex] = v
         γᵥ = γₚₙ(pnsystemᵥ, r₀′)
         γᵥ′ = γₚₙ′(pnsystemᵥ)
-        return -( (γᵥ - γ) / γᵥ′ )
+        return -((γᵥ - γ) / γᵥ′)
     end
 
     # We can get an initial guess by solving the leading-order equation
@@ -392,7 +386,6 @@ function γₚₙ⁻¹(γ, pnsystem, r₀′=0)
 end
 const inverse_separation_inverse = γₚₙ⁻¹
 
-
 """
     r⁻¹(r, pnsystem, [r₀′])
     separation_inverse(r, pnsystem, [r₀′])
@@ -414,7 +407,6 @@ function r⁻¹(r, pnsystem, r₀′=0)
     end
 end
 const separation_inverse = r⁻¹
-
 
 """
 This module contains a few expressions from [Kidder

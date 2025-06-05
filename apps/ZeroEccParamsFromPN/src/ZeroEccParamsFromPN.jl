@@ -75,11 +75,17 @@ function parse_commandline(args=nothing)
     )
     ArgParse.@add_arg_table! s begin
         "--OmegaRef"
-        help = "[Not yet implemented] Orbital angular frequency at which q, chiA, chiB have the given values."
+        help = (
+            "[Not yet implemented] Orbital angular frequency at which q, chiA, chiB have " *
+            "the given values."
+        )
         arg_type = Float64
         required = false
         "--DRef"
-        help = "[Not yet implemented] Separation distance at which q, chiA, chiB have the given values."
+        help = (
+            "[Not yet implemented] Separation distance at which q, chiA, chiB have the " *
+            "given values."
+        )
         arg_type = Float64
         required = false
     end
@@ -91,7 +97,10 @@ function parse_commandline(args=nothing)
         help = "Don't check for the up-down instability."
         action = :store_true
         "--experimental_D0_hack"
-        help = "Add experimental fit for PN-NR offset to D0 (subject to change): `v₀^5*χₑ + (1/8*ν*χₑ + 10/3)*v₀^3 + 3/7*v₀*ν - 1/33`"
+        help = (
+            "Add experimental fit for PN-NR offset to D0 (subject to change): `v₀^5*χₑ + " *
+            "(1/8*ν*χₑ + 10/3)*v₀^3 + 3/7*v₀*ν - 1/33`"
+        )
         action = :store_true
     end
 
@@ -126,16 +135,13 @@ function julia_main(args=nothing)::Cint
         M₁ = q/(1+q)
         M₂ = 1/(1+q)
 
-        zero_ecc_params_from_pn(
-            M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, tₘ, Nₒ, Ωᵣ, Dᵣ, skipud, D0_hack
-        )
+        zero_ecc_params_from_pn(M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, tₘ, Nₒ, Ωᵣ, Dᵣ, skipud, D0_hack)
     catch
         Base.invokelatest(Base.display_error, Base.catch_stack())
         return 1
     end
     return 0
 end
-
 
 function zero_ecc_params_from_pn(
     M₁, M₂, χ⃗₁, χ⃗₂, Ω₀, r₀, tₘ, Nₒ, Ωᵣ, Dᵣ, skipud, D0_hack, quiet=false
@@ -235,15 +241,13 @@ function zero_ecc_params_from_pn(
             return [
                 convert_evolve_and_evaluate(
                     r₀, pnsystem, r′₀, vₑ, check_up_down_instability, D0_hack, quiet
-                )
-                for r′₀ ∈ r′₀s
+                ) for r′₀ ∈ r′₀s
             ]
         elseif !isnothing(Ω₀)
             return [
                 evolve_and_evaluate(
                     Ω₀, pnsystem, r′₀, vₑ, check_up_down_instability, D0_hack, quiet
-                )
-                for r′₀ ∈ r′₀s
+                ) for r′₀ ∈ r′₀s
             ]
         else
             # This is an error.  I don't see how this could happen, but just in case...
@@ -253,7 +257,6 @@ function zero_ecc_params_from_pn(
         throw(ErrorException("Not implemented: Dᵣ / Ωᵣ"))
     end
 end
-
 
 function convert_evolve_and_evaluate(
     r₀, pnsystem, r′₀, vₑ, check_up_down_instability, D0_hack, quiet
@@ -301,11 +304,8 @@ function convert_evolve_and_evaluate(
     # end
 
     Ω₀ = PostNewtonian.Ω(pnsystem)
-    evolve_and_evaluate(
-        Ω₀, pnsystem, r′₀, vₑ, check_up_down_instability, D0_hack, quiet
-    )
+    evolve_and_evaluate(Ω₀, pnsystem, r′₀, vₑ, check_up_down_instability, D0_hack, quiet)
 end
-
 
 function evolve_and_evaluate(
     Ω₀, pnsystem, r′₀, vₑ, check_up_down_instability, D0_hack, quiet
@@ -317,7 +317,7 @@ function evolve_and_evaluate(
     r₀, ȧ₀ = if D0_hack
         # We want the output D0 to correspond to the NR value, but we have calculated the
         # PN value.  We have a correction term such that
-        #     γ₀ᴺᴿ ≈ γ₀ᴾᴺ - v₀^2 * (v₀^5 * χₑ + (1/8 * ν * χₑ + 10/3) * v₀^3 + 3/7 * v₀ * ν - 1/33)
+        #     γ₀ᴺᴿ ≈ γ₀ᴾᴺ - v₀^2 * (...)
         # where γ=M/r is the inverse of the separation distance.
         ν = PostNewtonian.ν(pnsystem)
         M = PostNewtonian.M(pnsystem)
@@ -325,16 +325,21 @@ function evolve_and_evaluate(
         γ₀ᴾᴺ = PostNewtonian.γₚₙ(pnsystem, r′₀)
         v₀ = PostNewtonian.v(; Ω=Ω₀)
         v̇ = -PostNewtonian.𝓕(pnsystem) / PostNewtonian.𝓔′(pnsystem)
-        γ₀ᴺᴿ = γ₀ᴾᴺ - v₀^2 * (v₀^5 * χₑ + (1/8 * ν * χₑ + 10/3) * v₀^3 + 3/7 * v₀ * ν - 1/33)
+        γ₀ᴺᴿ =
+            γ₀ᴾᴺ - v₀^2 * (v₀^5 * χₑ + (1/8 * ν * χₑ + 10/3) * v₀^3 + 3/7 * v₀ * ν - 1/33)
         r₀ᴺᴿ = M / γ₀ᴺᴿ
         # γ = M/r, so γ̇ = -M ṙ₀ / r₀² = -ṙ₀ γ₀² / M, and ṙ = -M γ̇ / γ₀².
         # We can write ȧ = ṙ γ / M = -γ̇/γ.
         γ̇₀ᴾᴺ = PostNewtonian.γ̇ₚₙ(pnsystem)
-        γ̇₀ᴺᴿ = γ̇₀ᴾᴺ - v̇ * v₀ * (7 * v₀^5 * χₑ + (1/8 * ν * χₑ + 10/3) * 5 * v₀^3 + 9/7 * v₀ * ν - 2/33)
+        γ̇₀ᴺᴿ =
+            γ̇₀ᴾᴺ -
+            v̇ *
+            v₀ *
+            (7 * v₀^5 * χₑ + (1/8 * ν * χₑ + 10/3) * 5 * v₀^3 + 9/7 * v₀ * ν - 2/33)
         ȧ₀ᴺᴿ = -γ̇₀ᴺᴿ / γ₀ᴺᴿ
         r₀ᴺᴿ, ȧ₀ᴺᴿ
     else
-        r₀ = PostNewtonian.r(pnsystem, r′₀)  # This is redundant if r₀ is given, but that's fine
+        r₀ = PostNewtonian.r(pnsystem, r′₀)  # This is redundant if r₀ is given; that's fine
         ȧ₀ = PostNewtonian.ṙ(pnsystem, r′₀) / r₀
         r₀, ȧ₀
     end
