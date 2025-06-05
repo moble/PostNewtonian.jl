@@ -1,19 +1,8 @@
 """
-OLD DIRECTIONS:
 
-Run this script (from this directory) as
 
-    time julia --code-coverage=tracefile-%p.info --code-coverage=user --project=. ./runtests.jl
-
-Then, if you have `lcov` installed, you should also have `genhtml`, and you can run this
-
-    genhtml tracefile-<your_PID>.info --output-directory coverage/ && open coverage/index.html
-
-to view the coverage locally as HTML.  I find that this sometimes requires
-removing files that aren't really there from the .info file.
-
-It's a well-hidden fact that you can turn coverage on and off by adding certain comments around the
-code you don't want to measure:
+A note about coverage: It's a well-hidden fact that you can turn coverage on and off by
+adding certain comments around the code you don't want to measure:
 
     # COV_EXCL_START
     untested_code_that_wont_show_up_in_coverage()
@@ -23,7 +12,16 @@ code you don't want to measure:
 
 using TestItemRunner
 
-@run_package_tests verbose = true
+function filter_files(filenames)
+    # Check if the filename is in the list of filenames to allow
+    return ti->any(endswith(ti.filename, f) for f ∈ filenames)
+end
 
-# ENV["JULIA_REFERENCETESTS_UPDATE"] = "true"
-# @run_package_tests verbose = true filter=ti->(endswith(ti.filename, "reference_tests.jl") )
+if length(ARGS) ≥ 1 && ARGS[1] == "update"
+    ENV["JULIA_REFERENCETESTS_UPDATE"] = "true"
+    @run_package_tests verbose = true filter=filter_files(["reference_tests.jl"])
+elseif length(ARGS) > 0
+    @run_package_tests verbose = true filter=filter_files(ARGS)
+else
+    @run_package_tests verbose = true
+end
