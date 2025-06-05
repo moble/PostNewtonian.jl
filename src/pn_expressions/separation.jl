@@ -85,20 +85,20 @@ spin-squared terms from Eq.  (3.32) of [Bohé et al.
 (2014)](https://arxiv.org/abs/1411.4118).
 
 Note that there is a 3PN gauge term of ``-22ν\ln(r/r₀')/3``.  While this value should cancel
-out of any physical quantity, it is included here for completeness.  Computing it requires a
-few Newton steps to get the value of ``γ`` because the ``\ln(r)`` term depends on
+out of any physical quantity, it is optionally included here for completeness.  Computing it
+requires a few Newton steps to get the value of ``γ`` because the ``\ln(r)`` term depends on
 ``\gamma``.
 
 Specifically, we use the helper function [`γₚₙ₀`](@ref) to write `γₚₙ = γₚₙ₀ + (v/c)^8 *
 (22ln(γₚₙ)/3)ν`; given the value of `γₚₙ₀`, the purpose of this function is to determine
 `γₚₙ`.
 
-The default value of `r₀'` is `G*M/c^2`, which makes its contribution vanish.
+The default value of `r₀′` is `0`, in which case that entire term is ignored.
 """
 @pn_expression function γₚₙ(pnsystem, r₀′=0)
     γ₀ = γₚₙ₀(pnsystem, r₀′; pn_expansion_reducer)
 
-    if pn_order(pnsystem) ≥ 3
+    if pn_order(pnsystem) ≥ 3 && !iszero(r₀′)
         # Account for the 3PN gauge term.  Note that the coefficient of the logarithm is
         # too small for the Lambert W function to give us a useful result, so we just
         # do a few Newton steps to get the value of γ = γ₀ + (v/c)^8 * (22ln(γ) / 3)ν
@@ -134,22 +134,22 @@ const inverse_separation = γₚₙ
 
 Compute the derivative of [`γₚₙ`](@ref) with respect to `v`.
 
-Note that we ignore the `r₀′` term in this function; that constant is obviously independent
-of `v`, though it is multiplied by `M`, which is not independent of `v`.  This dependence,
-however, should be at a much higher PN order than is currently available in any case, so we
-ignore it for simplicity.
+Note that we ignore the time-dependence of the `r₀′` term in this function; that constant is
+obviously independent of `v`, though it is multiplied by `M`, which is not independent of
+`v`.  This dependence, however, should be at a much higher PN order than is currently
+available in any case, so we ignore it for simplicity.
 
 This computation uses [`γₚₙ₀`](@ref) along with the following derivation:
 ```math
 \begin{align*}
-γₚₙ &= γₚₙ₀ + (v/c)^8 (22 \ln(γₚₙ)/3)ν \\
-γₚₙ' &= γₚₙ₀' + 8(v/c)^7 (22 \ln(γₚₙ)/3)ν + (v/c)^8 (22 γₚₙ'/3γₚₙ)ν \\
-γₚₙ' &= \frac{γₚₙ₀' + 8(v/c)^7 (22 \ln(γₚₙ)/3)ν} {1 - (v/c)^8 (22/3γₚₙ)ν}
+γₚₙ &= γₚₙ₀ + (v/c)^8 (22 \ln(γₚₙ/γ₀′)/3)ν \\
+γₚₙ' &= γₚₙ₀' + 8(v/c)^7 (22 \ln(γₚₙ/γ₀′)/3)ν + (v/c)^8 (22 γₚₙ'/3γₚₙ)ν \\
+γₚₙ' &= \frac{γₚₙ₀' + 8(v/c)^7 (22 \ln(γₚₙ/γ₀')/3)ν} {1 - (v/c)^8 (22/3γₚₙ)ν}
 \end{align*}
 ```
 
 """
-@pn_expression function γₚₙ′(pnsystem)
+@pn_expression function γₚₙ′(pnsystem, r₀′=0)
     if !isa(pn_expansion_reducer, Val{sum})
         throw(
             ArgumentError(
@@ -159,14 +159,15 @@ This computation uses [`γₚₙ₀`](@ref) along with the following derivation:
         )
     end
 
-    γ₀′ = γₚₙ₀′(pnsystem)
-
-    if pn_order(pnsystem) ≥ 3
-        let γₚₙ = γₚₙ(pnsystem)
-            (γ₀′ + 8(v / c)^7 * (22ln(γₚₙ) / 3)ν) / (1 - (v / c)^8 * (22 / 3γₚₙ) * ν)
+    let γₚₙ₀′ = γₚₙ₀′(pnsystem)
+        if pn_order(pnsystem) ≥ 3 && !iszero(r₀′)
+            γ₀′ = G * M / (r₀′ * c^2)
+            let γₚₙ = γₚₙ(pnsystem, r₀′)
+                (γₚₙ₀′ + 8(v / c)^7 * (22ln(γₚₙ/γ₀′) / 3)ν) / (1 - (v / c)^8 * (22 / 3γₚₙ)ν)
+            end
+        else
+            γₚₙ₀′
         end
-    else
-        γ₀′
     end
 end
 const inverse_separation_deriv = γₚₙ′
