@@ -30,7 +30,13 @@ const χ⃗₁indices = χ⃗₁ˣindex:χ⃗₁ᶻindex
 const χ⃗₂indices = χ⃗₂ˣindex:χ⃗₂ᶻindex
 const Rindices = Rʷindex:Rᶻindex
 
-Base.eltype(::PNSystem{ST}) where {ST} = eltype(ST)
+Base.eltype(::Type{PNT}) where {ST,PNT<:PNSystem{ST}} = eltype(ST)
+Base.one(x::T) where {T<:PNSystem} = one(T)
+Base.zero(x::T) where {T<:PNSystem} = zero(T)
+Base.float(x::T) where {T<:PNSystem} = float(T)
+Base.one(::Type{PNT}) where {PNT<:PNSystem} = one(eltype(PNT))
+Base.zero(::Type{PNT}) where {PNT<:PNSystem} = zero(eltype(PNT))
+Base.float(::Type{PNT}) where {PNT<:PNSystem} = float(eltype(PNT))
 pn_order(::PNSystem{ST,PNOrder}) where {ST,PNOrder} = PNOrder
 order_index(pn::PNSystem) = 1 + Int(2pn_order(pn))
 

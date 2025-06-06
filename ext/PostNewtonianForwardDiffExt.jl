@@ -1,11 +1,15 @@
 module PostNewtonianForwardDiffExt
 isdefined(Base, :get_extension) ? (using ForwardDiff: ForwardDiff) : (import ..ForwardDiff)
 
-import ForwardDiff: Dual
+import ForwardDiff: Dual, valtype
 import PostNewtonian: type_converter, FDPNSystem, PNSystem, 𝓔′, 𝓔′code
 import FastDifferentiation: FastDifferentiation, Node
 import StaticArrays: SVector, MVector
 using MacroTools: MacroTools
+
+Base.one(::Type{PNT}) where {PNT<:PNSystem{<:Dual}} = one(valtype(eltype(PNT)))
+Base.zero(::Type{PNT}) where {PNT<:PNSystem{<:Dual}} = zero(valtype(eltype(PNT)))
+Base.float(::Type{PNT}) where {PNT<:PNSystem{<:Dual}} = float(valtype(eltype(PNT)))
 
 # These three definitions allow us to call 𝓔′ with ForwardDiff.Dual numbers
 function type_converter(::FDPNSystem{Dual{T,V,N}}, x) where {T,V,N}

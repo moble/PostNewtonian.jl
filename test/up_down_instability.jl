@@ -11,9 +11,10 @@
     R = Rotor(1.0)
     Ωᵢ = 2e-3
     v = PostNewtonian.v(; Ω=Ωᵢ, M=M₁ + M₂)
-    state = [M₁, M₂, vec(χ⃗₁)..., vec(χ⃗₂)..., components(R)..., v]
+    state = [M₁, M₂, vec(χ⃗₁)..., vec(χ⃗₂)..., components(R)..., v, 0]
+    pnsystem = PostNewtonian.BBH(state)
 
-    Ω₊, Ω₋ = up_down_instability(state)
+    Ω₊, Ω₋ = up_down_instability(pnsystem)
 
     # Test this general property, which should be true of *every* value returned for *any*
     # inputs to this function:

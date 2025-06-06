@@ -25,8 +25,7 @@ They also assume that ``M_1 \geq M_2``, which we deal with by automatically swap
 relevant quantities.  Neither of these requires any adjustment by users of this function.
 """
 @pn_expression function up_down_instability(pnsystem)
-    T = eltype(pnsystem)
-    Ωₘₐₓ = PostNewtonian.Ω(; v=one(T), M=M)
+    Ωₘₐₓ = PostNewtonian.Ω(; v=c, M=M)
 
     # Note that, as mentioned in the docstring, Gerosa et al. use q<1
     if M₂ > M₁  # Just swap the relevant variables
@@ -42,7 +41,7 @@ relevant quantities.  Neither of these requires any adjustment by users of this 
         r₋ = M * (√abs(χ₁ₗ) - √abs(q * χ₂ₗ))^4 / (1 - q)^2
         Ω₊ = √(M / r₊)^3
         Ω₋ = √(M / r₋)^3
-        (clamp(Ω₊, zero(T), Ωₘₐₓ), clamp(Ω₋, zero(T), Ωₘₐₓ))
+        (clamp(Ω₊, zero(Ωₘₐₓ), Ωₘₐₓ), clamp(Ω₋, zero(Ωₘₐₓ), Ωₘₐₓ))
     else
         (Ωₘₐₓ, Ωₘₐₓ)
     end

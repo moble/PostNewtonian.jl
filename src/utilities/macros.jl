@@ -102,7 +102,7 @@ function pn_expression(pnsystem::Symbol, body)
     # Finally, just wrap `new_body` in a `let` block, where we include exprs created above.
     # Also include the definitions `c=G=1` (to be overwritten inside any `@pn_expansion`).
     full_body = MacroTools.unblock(quote
-        let c=G=1
+        let c=G=one(pnsystem)
             #@fastmath
             let $(exprs...)
                 $(new_body)

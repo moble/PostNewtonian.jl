@@ -2,7 +2,7 @@
     using Quaternionic
     using Symbolics
 
-    @eval PostNewtonian PostNewtonian.@pn_expression function macro_test(pnstate)
+    @eval PostNewtonian PostNewtonian.@pn_expression function macro_test(pnsystem)
         return v * π√10
     end
 
