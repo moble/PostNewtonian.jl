@@ -1,5 +1,5 @@
 """
-
+See the file `PostNewtonian.jl/scripts/test.jl` for an easy way to run these tests.
 
 A note about coverage: It's a well-hidden fact that you can turn coverage on and off by
 adding certain comments around the code you don't want to measure:

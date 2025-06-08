@@ -1,22 +1,13 @@
 # Changes here will be overwritten by Copier
-AddAllcontributors: false
-AddCodeOfConduct: false
-AddContributionDocs: true
-AddCopierCI: true
-AddGitHubTemplates: true
-AddMacToCI: true
-AddPrecommit: true
-AddWinToCI: true
-AnswerStrategy: ask
-AuthorEmail: michael.oliver.boyle@gmail.com
-AuthorName: Michael Boyle
-Indentation: 4
+Authors: Michael Boyle <michael.oliver.boyle@gmail.com>
 JuliaMinVersion: '1.10'
 License: MIT
+LicenseCopyrightHolders: Michael Boyle
 PackageName: PostNewtonian
 PackageOwner: moble
 PackageUUID: 377afc40-5642-4616-8613-b7ebca523866
-RunJuliaNightlyOnCI: false
-UseCirrusCI: false
-_commit: v0.9.1
+StrategyConfirmIncluded: false
+StrategyLevel: 2
+StrategyReviewExcluded: false
+_commit: v0.16.2
 _src_path: https://github.com/JuliaBesties/BestieTemplate.jl

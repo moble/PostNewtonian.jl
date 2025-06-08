@@ -72,11 +72,11 @@ python -m pip install sxs
     Specifically, you *must* include the `numba::` prefix to
     select the correct anaconda channel, as shown in the
     command given above.  A more permanent solution is to run the
-    following commands:
-    ```
-    conda config --set channel_priority strict
-    conda config --add channels conda-forge --prepend channels numba
-    ```
+    commands:
+
+        conda config --set channel_priority strict
+        conda config --add channels conda-forge --prepend channels numba
+
     This will automatically choose the correct versions of numba and
     llvmlite for your system, without the need to explicitly use the
     `numba::` prefix ever again.

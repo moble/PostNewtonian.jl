@@ -1,15 +1,15 @@
 name: Register Package
 on:
-    workflow_dispatch:
-        inputs:
-            version:
-                description: Version to register or component to bump (major, minor, or patch)
-                required: true
-                default: "patch"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to register or component to bump (major, minor, or patch)
+        required: true
+        default: "patch"
 jobs:
-    register:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: julia-actions/RegisterAction@latest
-              with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
+  register:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: julia-actions/RegisterAction@latest
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
