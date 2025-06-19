@@ -43,6 +43,7 @@ end
             :MVector,
             :SVector,
             :Node,
+            :PNExpansion,
         ),
     ) === nothing
     @test ExplicitImports.check_all_qualified_accesses_via_owners(PostNewtonian) === nothing
