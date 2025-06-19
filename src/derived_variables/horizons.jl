@@ -155,7 +155,7 @@ The "quadrupolar polarisability" of object 1 used by [Bohé et al.
 Note that Bohé et al. refer to the closely related (and co-authored) [Marsat
 (2014)](https://arxiv.org/abs/1411.4118), who notes above Eq. (4.7) that this is denoted
 ``C_{\mathrm{ES}^2}`` in [Levi and Steinhoff (2014)](https://arxiv.org/abs/1410.2601), who
-in turn notes that "we can set ... the Wilson coefficients ``C_{\mathrm{ES}^2} =
+in turn note that "we can set ... the Wilson coefficients ``C_{\mathrm{ES}^2} =
 C_{\mathrm{BS}^3} = 1`` for the black hole case."
 
 However, a very similar constant ``\kappa_A`` is used in Eq. (2.1) of [Buonanno et al.
@@ -212,8 +212,8 @@ end
 
 The "quadrupolar polarisability" of object 1 used by [Marsat
 (2014)](https://arxiv.org/abs/1411.4118), who notes above Eq. (4.11) that this is denoted
-``C_{\mathrm{BS}^2}`` in [Levi and Steinhoff (2014)](https://arxiv.org/abs/1410.2601), who
-in turn notes that "we can set ... the Wilson coefficients ``C_{\mathrm{ES}^2} =
+``C_{\mathrm{BS}^3}`` in [Levi and Steinhoff (2014)](https://arxiv.org/abs/1410.2601), who
+in turn note that "we can set ... the Wilson coefficients ``C_{\mathrm{ES}^2} =
 C_{\mathrm{BS}^3} = 1`` for the black hole case."
 
 See also [`κ₁`](@ref).
