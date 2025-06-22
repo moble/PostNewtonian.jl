@@ -1,0 +1,10 @@
+[project]
+name = "parse-literature"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "ipython>=9.3.0",
+    "mathics-omnibus>=8.0.0",
+]
