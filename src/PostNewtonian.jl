@@ -4,6 +4,7 @@ module PostNewtonian
 # which come from these packages:
 using MacroTools: MacroTools
 using FastDifferentiation: FastDifferentiation
+using FastDifferentiation: Node as FDNode
 using RuntimeGeneratedFunctions: RuntimeGeneratedFunctions
 
 # Otherwise, we just explicitly import specific functions:
