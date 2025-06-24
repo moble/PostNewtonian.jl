@@ -116,48 +116,44 @@ function ascii_symbols(::Type{T}) where {T<:PNSystem}
     error("`ascii_symbols` is not yet defined for PNSystem subtype `$T`.")
 end
 
-# By marking this function with `@generated`, we compute the index at compile time.  This is
-# possible because the `symbols` for type `T` are known at compile time.  The function that
-# calls this must put the `Symbol` `s` into a `Val` so that the *value* of `s` is also known
-# at compile time — at least on this side a function barrier, which the compiler will
-# usually be smart enough to use as if everything was already known at compile time.
-@generated function symbol_index(::Type{T}, ::Val{S}) where {T<:PNSystem,S}
+"""
+    symbol_index(::Type{T}, s::Symbol) where {T<:PNSystem}
+    symbol_index(::Type{T}, ::Val{s}) where {T<:PNSystem}
+
+Return the index of the symbol `s` in the state vector of the given `PNSystem` type `T`.
+
+Note that the default implementation is slow; `symbol_index(::Type{T}, ::Val{s})` should be
+overridden for every symbol (and ASCII equivalent, if desired) for concrete `PNSystem`
+types.
+"""
+function symbol_index(::Type{T}, ::Val{S}) where {T<:PNSystem,S}
     index = findfirst(y -> y == S, symbols(T))
-    if index === nothing
-        error("Type `$(T)` has no symbol `$(S)`")
+    if isnothing(index)
+        index = findfirst(y -> y == S, ascii_symbols(T))
+    end
+    if isnothing(index)
+        error(
+            "Type `$(T)` has no symbol `:$(S)`.\n" *
+            "Its symbols are `$(symbols(T))`.\n" *
+            "The ASCII equivalents are `$(ascii_symbols(T))`.\n",
+        )
     else
+        @warn "Please define `PostNewtonian.symbol_index(::Type{$T}, ::Val{$S})`"
         index
     end
 end
 
-# Base.getindex(pnsystem::PNSystem, s::Symbol) = getindex(pnsystem, Val(s))
-
-function Base.getindex(pnsystem::T, s::Symbol) where {T<:PNSystem}
-    # @show hasmethod(Base.getindex, (T, Val{s}))
-    # if !hasmethod(Base.getindex, (T, Val{s}))
-    #     error("Type `$(T)` has no symbol `$(s)`")
-    # end
-    try
-        Base.getindex(pnsystem, Val(s))
-    catch err
-        if isa(err, MethodError)
-            error("Type `$(T)` has no symbol `$(s)`")
-        else
-            rethrow(err)
-        end
-    end
-end
-
+Base.getindex(pnsystem::PNSystem, s::Symbol) = getindex(pnsystem, Val(s))
 function Base.getindex(pnsystem::T, ::Val{S}) where {T<:PNSystem,S}
-    # If `S` is not actually a symbol in `pnsystem`, this will not have compiled, so we
-    # know that the `index` is inbounds.
-    index = symbol_index(T, S)
+    # If `S` is not actually a symbol in `pnsystem`, `symbol_index` will error, so we know
+    # that the `index` is inbounds if it returns.
+    index = symbol_index(T, Val(S))
     @inbounds state(pnsystem)[index]
 end
 
 Base.setindex!(pnsystem::PNSystem, v, s::Symbol) = setindex!(pnsystem, v, Val(s))
 function Base.setindex!(pnsystem::T, v, ::Val{S}) where {NT,T<:PNSystem{NT},S}
-    index = symbol_index(T, S)
+    index = symbol_index(T, Val(S))
     @inbounds setindex!(state(pnsystem), v, index)
 end
 
