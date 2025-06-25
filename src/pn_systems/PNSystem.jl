@@ -117,47 +117,6 @@ function ascii_symbols(::Type{T}) where {T<:PNSystem}
 end
 
 """
-    symbol_index(::Type{T}, s::Symbol) where {T<:PNSystem}
-    symbol_index(::Type{T}, ::Val{s}) where {T<:PNSystem}
-
-Return the index of the symbol `s` in the state vector of the given `PNSystem` type `T`.
-
-Note that the default implementation is slow; `symbol_index(::Type{T}, ::Val{s})` should be
-overridden for every symbol (and ASCII equivalent, if desired) for concrete `PNSystem`
-types.
-"""
-function symbol_index(::Type{T}, ::Val{S}) where {T<:PNSystem,S}
-    index = findfirst(y -> y == S, symbols(T))
-    if isnothing(index)
-        index = findfirst(y -> y == S, ascii_symbols(T))
-    end
-    if isnothing(index)
-        error(
-            "Type `$(T)` has no symbol `:$(S)`.\n" *
-            "Its symbols are `$(symbols(T))`.\n" *
-            "The ASCII equivalents are `$(ascii_symbols(T))`.\n",
-        )
-    else
-        @warn "Please define `PostNewtonian.symbol_index(::Type{$T}, ::Val{$S})`"
-        index
-    end
-end
-
-Base.getindex(pnsystem::PNSystem, s::Symbol) = getindex(pnsystem, Val(s))
-function Base.getindex(pnsystem::T, ::Val{S}) where {T<:PNSystem,S}
-    # If `S` is not actually a symbol in `pnsystem`, `symbol_index` will error, so we know
-    # that the `index` is inbounds if it returns.
-    index = symbol_index(T, Val(S))
-    @inbounds state(pnsystem)[index]
-end
-
-Base.setindex!(pnsystem::PNSystem, v, s::Symbol) = setindex!(pnsystem, v, Val(s))
-function Base.setindex!(pnsystem::T, v, ::Val{S}) where {NT,T<:PNSystem{NT},S}
-    index = symbol_index(T, Val(S))
-    @inbounds setindex!(state(pnsystem), v, index)
-end
-
-"""
     pnsystem::PNSystem(; kwargs...)
 
 State-modifying copy constructor for `PNSystem` objects.
