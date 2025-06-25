@@ -173,14 +173,14 @@ julia> using PostNewtonian: BBH
 julia> pnsystem = BBH(ones(14)/2; PNOrder=7//2)
 BBH{Vector{Float64}, 7//2}([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
 
-julia> pnsystem2 = pnsystem(M₁=0.25, M₂=0.75, chi1x=0.1)
-BBH{Vector{Float64}, 7//2}([0.25, 0.75, 0.1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
+julia> pnsystem2 = pnsystem(M₁=0.2, M₂=0.8, chi1x=0.1)
+BBH{Vector{Float64}, 7//2}([0.2, 0.8, 0.1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
 ```
 """
-function (pnsystem::T)(; kwargs...) where {T<:PNSystem}
+function (pnsystem::PNSystem)(; kwargs...)
     all_symbols = Set(symbols(pnsystem)) ∪ Set(ascii_symbols(pnsystem))
     @assert keys(kwargs) ⊆ all_symbols (
-        "PNSystem of type $T does not have these symbols which were input:\n" *
+        "PNSystem of type $(typeof(pnsystem)) does not have these symbols which were input:\n" *
         "    $(setdiff(keys(kwargs), all_symbols))\n" *
         "Maybe you passed `String`s instead of `Symbol`s?\n" *
         "The available symbols for this type are\n" *

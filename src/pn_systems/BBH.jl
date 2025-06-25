@@ -70,7 +70,7 @@ end
 Λ₁(pnsystem::BBH) = zero(pnsystem)
 Λ₂(pnsystem::BBH) = zero(pnsystem)
 
-@testitem "PNSystem constructors" begin
+@testitem "BBH constructors" begin
     using Quaternionic
 
     pnA = BBH(;
