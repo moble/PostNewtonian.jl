@@ -1,6 +1,13 @@
-module DerivedVariables
+module CommonVariables
 
-using ..PostNewtonian: VecOrPNSystem
+# Import the fundamental variables, which are generally part of the `state` vector of a
+# PNSystem.
+import ..PostNewtonian:
+    M₁, M₂, χ⃗₁, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, R, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ, Λ₁, Λ₂
+
+# Now, we define all the common variables used throughout the literature as functions of
+# those fundamental variables.
+
 using ..PostNewtonian.FundamentalVariables
 using Quaternionic: 𝐢, 𝐣, 𝐤, QuatVec, ⋅, ×, abs2vec, absvec
 

@@ -1,7 +1,0 @@
-include("utilities/macros.jl")
-include("pn_expressions/flux.jl")
-include("pn_expressions/tidal_heating.jl")
-include("pn_expressions/binding_energy.jl")
-include("pn_expressions/separation.jl")
-include("pn_expressions/precession.jl")
-include("pn_expressions/mode_weights.jl")

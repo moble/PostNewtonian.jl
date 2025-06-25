@@ -30,9 +30,9 @@ an error.
 Similarly, we want the author to *have to* define every single variable to be used in the PN
 expression.  In most cases, the variable can just be imported from `common_variables` under
 its own name.  There may be cases, however, where the name needs to change, or a variable
-needs to be defined just in the given module.  In any case, this will make it easier for
-`@pn_expression` to look through the current module for symbols that appear in the
-expression that need to be replaced with a call to that function.
-
+needs to be defined just in the given module.  One prominent example is that some authors
+use `η` where we use `ν`.  In any case, this will make it easier for `@pn_expression` to
+look through the current module for symbols that appear in the expression that need to be
+replaced with a call to that function.
 
 """
