@@ -14,12 +14,9 @@ method to apply to a given `PNSystem`.
 """
 struct FDPNSystem{NT,PN<:PNSystem{NT},PNOrder} <: PNSystem{FDNode,Vector{FDNode},PNOrder}
     state::Vector{FDNode}
-    constants::Vector{FDNode}
 
     function FDPNSystem(::Type{PN}, PNOrder=typemax(Int)) where {NT,PN<:PNSystem{NT}}
-        return new{NT,prepare_pn_order(PNOrder)}(
-            [FDNode(s) for s ∈ state_symbols(PN)], [FDNode(s) for s ∈ constants_symbols(PN)]
-        )
+        return new{NT,prepare_pn_order(PNOrder)}([FDNode(s) for s ∈ symbols(PN)])
     end
 end
 
@@ -35,24 +32,3 @@ end
 ## relied upon in the functions where we take derivatives — 𝓔′code and γₚₙ₀′ — but even if
 ## so, maybe we could work around it with another function.
 #Base.eltype(::FDPNSystem{FT}) where {FT} = FT
-
-function characterize(pnsystem::FDPNSystem)
-    return SVector{16,FastDifferentiation.Node}(
-        pnsystem.state[1],
-        pnsystem.state[2],
-        pnsystem.state[3],
-        pnsystem.state[4],
-        pnsystem.state[5],
-        pnsystem.state[6],
-        pnsystem.state[7],
-        pnsystem.state[8],
-        pnsystem.state[9],
-        pnsystem.state[10],
-        pnsystem.state[11],
-        pnsystem.state[12],
-        pnsystem.state[13],
-        pnsystem.state[14],
-        Λ₁(pnsystem),
-        Λ₂(pnsystem),
-    )
-end
