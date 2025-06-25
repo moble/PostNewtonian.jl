@@ -55,20 +55,6 @@ M₂(fdpnsystem::FDPNSystem) = fdpnsystem[:M₂]
 const M2 = M₂
 
 """
-    χ⃗₁(pnsystem)
-    chi1(pnsystem)
-
-Dimensionless spin vector of object 1 in this system, as a `QuatVec`.
-
-See also [`χ⃗₁ˣ`](@ref), [`χ⃗₁ʸ`](@ref), and [`χ⃗₁ᶻ`](@ref) for the individual components.
-"""
-function χ⃗₁(::T) where {T<:PNSystem}
-    error("χ⃗₁ is not (yet) defined for PNSystem subtype `$T`.")
-end
-χ⃗₁(fdpnsystem::FDPNSystem) = fdpnsystem[:χ⃗₁]
-const chi1 = χ⃗₁
-
-"""
     χ⃗₁ˣ(pnsystem)
     chi1x(pnsystem)
 
@@ -111,20 +97,6 @@ end
 const chi1z = χ⃗₁ᶻ
 
 """
-    χ⃗₂(pnsystem)
-    chi2(pnsystem)
-
-Dimensionless spin vector of object 2 in this system, as a `QuatVec`.
-
-See also [`χ⃗₂ˣ`](@ref), [`χ⃗₂ʸ`](@ref), and [`χ⃗₂ᶻ`](@ref) for the individual components.
-"""
-function χ⃗₂(::T) where {T<:PNSystem}
-    error("χ⃗₂ is not (yet) defined for PNSystem subtype `$T`.")
-end
-χ⃗₂(fdpnsystem::FDPNSystem) = fdpnsystem[:χ⃗₂]
-const chi2 = χ⃗₂
-
-"""
     χ⃗₂ˣ(pnsystem)
     chi2x(pnsystem)
 
@@ -165,30 +137,6 @@ function χ⃗₂ᶻ(::T) where {T<:PNSystem}
 end
 χ⃗₂ᶻ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ⃗₂ᶻ]
 const chi2z = χ⃗₂ᶻ
-
-"""
-    R(pnsystem)
-
-Orientation of the binary, as a `Rotor`.
-
-At any instant, the binary is represented by the right-handed triad ``(n̂, λ̂, ℓ̂)``, where
-[``n̂``](@ref PostNewtonian.n̂) is the unit vector pointing from object 2 to object 1, and
-the instantaneous velocities of the binary's elements are in the ``n̂``-``λ̂`` plane.  This
-`Rotor` will rotate the ``x̂`` vector to be along ``n̂``,  the ``ŷ`` vector to be along
-``λ̂``, and  the ``ẑ`` vector to be along ``ℓ̂``.
-
-Note that the angular velocity associated to `R` is given by ``Ω⃗ = 2 Ṙ R̄ = Ω ℓ̂ + ϖ n̂``.
-(Any component of ``Ω⃗`` along ``λ̂`` would violate the condition that the velocities be in
-the ``n̂``-``λ̂`` plane.)  Here, the scalar quantity ``Ω`` is the orbital angular frequency,
-and ``ϖ`` is the precession angular frequency.
-
-See also [`n̂`](@ref PostNewtonian.n̂), [`λ̂`](@ref PostNewtonian.λ̂), [`ℓ̂`](@ref
-PostNewtonian.ℓ̂), [`Ω`](@ref PostNewtonian.Ω), and [`𝛡`](@ref PostNewtonian.𝛡)``=ϖ n̂``.
-"""
-function R(::T) where {T<:PNSystem}
-    error("R is not (yet) defined for PNSystem subtype `$T`.")
-end
-R(fdpnsystem::FDPNSystem) = fdpnsystem[:R]
 
 """
     Rʷ(pnsystem)
@@ -337,3 +285,58 @@ function Λ₂(::T) where {T<:PNSystem}
 end
 Λ₂(fdpnsystem::FDPNSystem) = fdpnsystem[:Λ₂]
 const Lambda2 = Λ₂
+
+#################################################################
+# Not actually state variables, but aggregates of state variables
+
+"""
+    χ⃗₁(pnsystem)
+    chi1(pnsystem)
+
+Dimensionless spin vector of object 1 in this system, as a `QuatVec`.
+
+See also [`χ⃗₁ˣ`](@ref), [`χ⃗₁ʸ`](@ref), and [`χ⃗₁ᶻ`](@ref) for the individual components.
+"""
+function χ⃗₁(::T) where {T<:PNSystem}
+    QuatVec(χ⃗₁ˣ(pnsystem), χ⃗₁ʸ(pnsystem), χ⃗₁ᶻ(pnsystem))
+end
+const chi1 = χ⃗₁
+
+"""
+    χ⃗₂(pnsystem)
+    chi2(pnsystem)
+
+Dimensionless spin vector of object 2 in this system, as a `QuatVec`.
+
+See also [`χ⃗₂ˣ`](@ref), [`χ⃗₂ʸ`](@ref), and [`χ⃗₂ᶻ`](@ref) for the individual components.
+"""
+function χ⃗₂(::T) where {T<:PNSystem}
+    QuatVec(χ⃗₂ˣ(pnsystem), χ⃗₂ʸ(pnsystem), χ⃗₂ᶻ(pnsystem))
+end
+const chi2 = χ⃗₂
+
+"""
+    R(pnsystem)
+
+Orientation of the binary, as a `Rotor`.
+
+At any instant, the binary is represented by the right-handed triad ``(n̂, λ̂, ℓ̂)``, where
+[``n̂``](@ref PostNewtonian.n̂) is the unit vector pointing from object 2 to object 1, and
+the instantaneous velocities of the binary's elements are in the ``n̂``-``λ̂`` plane.  This
+`Rotor` will rotate the ``x̂`` vector to be along ``n̂``,  the ``ŷ`` vector to be along
+``λ̂``, and  the ``ẑ`` vector to be along ``ℓ̂``.
+
+Note that the angular velocity associated to `R` is given by ``Ω⃗ = 2 Ṙ R̄ = Ω ℓ̂ + ϖ n̂``.
+(Any component of ``Ω⃗`` along ``λ̂`` would violate the condition that the velocities be in
+the ``n̂``-``λ̂`` plane.)  Here, the scalar quantity ``Ω`` is the orbital angular frequency,
+and ``ϖ`` is the precession angular frequency.
+
+See also [`n̂`](@ref PostNewtonian.n̂), [`λ̂`](@ref PostNewtonian.λ̂), [`ℓ̂`](@ref
+PostNewtonian.ℓ̂), [`Ω`](@ref PostNewtonian.Ω), and [`𝛡`](@ref PostNewtonian.𝛡)``=ϖ n̂``.
+"""
+function R(pnsystem::T) where {NT,T<:PNSystem{NT}}
+    # We use this explicit constructor (with type parameter) to avoid normalization
+    # that would probably just complicate derivatives.
+    Rotor{NT}(Rʷ(pnsystem), Rˣ(pnsystem), Rʸ(pnsystem), Rᶻ(pnsystem))
+end
+R(fdpnsystem::FDPNSystem) = fdpnsystem[:R]
