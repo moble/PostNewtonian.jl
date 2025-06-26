@@ -1,96 +1,35 @@
-# NOTE: This file is a modified version of the `InlineExports.jl` package, which is
-#       licensed under the MIT License. The original source can be found at:
-#       https://github.com/dalum/InlineExports.jl
+# NOTE: This file borrows from the `InlineExports.jl` package, which is licensed under the
+# MIT License. The original source can be found at https://github.com/dalum/InlineExports.jl
 
 module InlineExports
 
-import Base: @__doc__
+export @public, @export
 
-export @export, @public
-
+# Because of how `export` is handled, we can't define a macro with that name directly.
+# Here, we trick the parser to allow us to do so.
 eval(quote
-    """
-        @export
-
-    Return the expression with all bindings exported.
-
-    ```
-    julia> module M
-               using InlineExports
-               @export begin
-                   const a = 2
-                   abstract type S <: Number end
-                   struct T <: S
-                       val
-                   end
-               end
-               @export f(x::TT) where {TT<:S} = x.val^2
-           end
-    M
-
-    julia> using .M
-
-    julia> f(T(a))
-    4
-    ```
-    """
     macro $(Symbol("export"))(expr::Expr)
-        r = handle(expr)
-        if r isa Symbol
-            return quote
-                export $(esc(r))
-                @__doc__ $(esc(expr))
-            end
-        else
-            return quote
-                export $(map(esc, r)...)
-                @__doc__ $(esc(expr))
-            end
-        end
+        return handle(expr, :export)
     end
 end)
 
-eval(quote
-    """
-        @public
+# For some reason, `public` is handled differently, so we don't need to play any tricks.
+macro public(expr::Expr)
+    return esc(public_handler(expr, :public))
+end
 
-    Return the expression with all bindings marked as public.
-
-    ```
-    julia> module M
-               using InlineExports
-               @public begin
-                   const a = 2
-                   abstract type S <: Number end
-                   struct T <: S
-                       val
-                   end
-               end
-               @public f(x::TT) where {TT<:S} = x.val^2
-           end
-    M
-
-    julia> using .M
-
-    julia> f(T(a))
-    4
-    ```
-    """
-    macro $(Symbol("public"))(expr::Expr)
-        r = handle(expr)
-        if r isa Symbol
-            return quote
-                public $ (esc(r))
-                @__doc__ $(esc(expr))
-            end
-        else
-            return quote
-                public $ (map(esc, r)...)
-                @__doc__ $(esc(expr))
-            end
-        end
+function handle(expr::Expr, export_or_public::Symbol)
+    r = handle(expr)
+    ep = if r isa Symbol
+        Expr(export_or_public, r)
+    else
+        Expr(export_or_public, r...)
     end
-end)
+    return esc(quote
+        Base.@__doc__ $expr
+        $ep
+    end)
+end
 
 handle(::Any) = nothing
 handle(x::Symbol) = x
@@ -109,9 +48,19 @@ handle(::Union{Val{:abstract},Val{:primitive}}, expr) = handle(expr.args[1])
 handle(::Val{:<:}, expr) = handle(expr.args[1])
 handle(::Val{:curly}, expr) = handle(expr.args[1])
 handle(::Val{:call}, expr) = handle(expr.args[1])
-handle(::Val{:macrocall}, expr) = filter(x -> x !== nothing, map(handle, expr.args[3:end]))
+function handle(::Val{:macrocall}, expr)
+    if expr.args[1]==Symbol("@doc") ||
+        (expr.args[1] == Core.GlobalRef(Core, Symbol("@doc")))
+        if length(expr.args) != 4
+            error("@doc expression found with $(length(expr.args)) args:\n$expr")
+        end
+        handle(expr.args[4])
+    else
+        filter(x -> x !== nothing, map(handle, expr.args[3:end]))
+    end
+end
 
-end  # module InlineExports
+end # module InlineExports
 
 @testitem "InlineExports" begin
     module Bla
