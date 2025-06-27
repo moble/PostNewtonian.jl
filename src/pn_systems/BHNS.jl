@@ -10,23 +10,28 @@ Note that the neutron star is *always* object 2 — meaning that `M₂`, `χ⃗�
 refer to it; `M₁` and `χ⃗₁` always refer to the black hole.  (It's "BHNS", not "NSBH".)  See
 also [`NSNS`](@ref).
 """
-struct BHNS{NT,ST,PNOrder} <: PNSystem{NT,ST,PNOrder}
+@export struct BHNS{NT,PNOrder,ST} <: Quasispherical{NT,PNOrder,ST}
     state::ST
 
-    function BHNS{NT,ST,PNOrder}(state) where {NT,ST,PNOrder}
+    function BHNS{NT,PNOrder,ST}(state) where {NT,PNOrder,ST}
         if eachindex(state) != Base.OneTo(15)
             error(
                 "The `state` vector for `BHNS` must be indexed from 1 to 15; " *
                 "input is indexed `$(eachindex(state))`.",
             )
         end
-        new{NT,ST,PNOrder}(state)
+        new{NT,PNOrder,ST}(state)
     end
-    function BHNS(;
-        M₁, M₂, χ⃗₁, χ⃗₂, v, R=Rotor(1), Φ=0, Λ₂, PNOrder=typemax(Int), kwargs...
-    )
-        NT, ST, PNOrder, state = prepare_system(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, Λ₂, PNOrder)
-        return new{NT,ST,PNOrder}(state)
+    function BHNS(; M₁, M₂, χ⃗₁, χ⃗₂, v, R=Rotor(1), Φ=0, Λ₁=0, Λ₂, PNOrder=typemax(Int))
+        if Λ₁ != 0
+            error(
+                "`BHNS` does not support a tidal-coupling parameter `Λ₁` for object 1; " *
+                "use `NSNS` instead.",
+            )
+        end
+        (NT, PNOrder, state) = prepare_Quasispherical(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
+        state = vcat(state, Λ₂)
+        return new{eltype(state),PNOrder,typeof(state)}(state)
     end
     function BHNS(state; PNOrder=typemax(Int))
         if eachindex(state) != Base.OneTo(15)
@@ -35,8 +40,8 @@ struct BHNS{NT,ST,PNOrder} <: PNSystem{NT,ST,PNOrder}
                 "input is indexed `$(eachindex(state))`.",
             )
         end
-        NT, ST, PNOrder = eltype(state), typeof(state), prepare_pn_order(PNOrder)
-        return new{NT,ST,PNOrder}(state)
+        NT, PNOrder, ST = eltype(state), prepare_pn_order(PNOrder), typeof(state)
+        return new{NT,PNOrder,ST}(state)
     end
 end
 
@@ -44,26 +49,10 @@ end
 # `BHNS` systems.
 state(pnsystem::BHNS) = pnsystem.state
 function symbols(::Type{<:BHNS})
-    (:M₁, :M₂, :χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ, :χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ, :Rʷ, :Rˣ, :Rʸ, :Rᶻ, :v, :Φ, :Λ₂)
+    (symbols(Quasispherical)..., :Λ₂)
 end
 function ascii_symbols(::Type{<:BHNS})
-    (
-        :M1,
-        :M2,
-        :chi1x,
-        :chi1y,
-        :chi1z,
-        :chi2x,
-        :chi2y,
-        :chi2z,
-        :Rw,
-        :Rx,
-        :Ry,
-        :Rz,
-        :v,
-        :Phi,
-        :Lambda2,
-    )
+    (ascii_symbols(Quasispherical)..., :Lambda2)
 end
 for (i, symbol) ∈ enumerate(symbols(BHNS))
     # This will define, e.g., `M₁(pnsystem::BHNS) = pnsystem.state[1]`.  We
@@ -76,5 +65,99 @@ for (i, symbol) ∈ enumerate(symbols(BHNS))
     end
 end
 
+# Define any state-variable methods we may need for variables that are not actually in the
+# state vector.
 Λ₁(pnsystem::BHNS) = zero(pnsystem)
-Λ₂(pnsystem::BHNS) = @inbounds pnsystem.state[15]
+
+@testitem "BHNS constructors" begin
+    using PostNewtonian: state
+    using Quaternionic
+
+    # minimal constructor: default Φ=0, R=Rotor(1)
+    pnA = BHNS(
+        M₁=1.0f0,
+        M₂=2.0f0,
+        χ⃗₁=Float32[3.0, 4.0, 5.0],
+        χ⃗₂=Float32[6.0, 7.0, 8.0],
+        v=0.23f0,
+        Λ₂=4.0f0,
+    )
+    @test eltype(pnA) == Float32
+    @test state(pnA) == Float32[
+        1.0;
+        2.0;
+        3.0;
+        4.0;
+        5.0;
+        6.0;
+        7.0;
+        8.0;
+        1.0;
+        0.0;
+        0.0;
+        0.0;
+        0.23;
+        0.0;
+        4.0
+    ]
+
+    # explicit orbital phase
+    pnB = BHNS(
+        M₁=1.0f0,
+        M₂=2.0f0,
+        χ⃗₁=Float32[3.0, 4.0, 5.0],
+        χ⃗₂=Float32[6.0, 7.0, 8.0],
+        v=0.23f0,
+        Φ=9.0f0,
+        Λ₂=4.0f0,
+    )
+    @test state(pnB) == Float32[
+        1.0;
+        2.0;
+        3.0;
+        4.0;
+        5.0;
+        6.0;
+        7.0;
+        8.0;
+        1.0;
+        0.0;
+        0.0;
+        0.0;
+        0.23;
+        9.0;
+        4.0
+    ]
+
+    # custom rotor, default Φ
+    R = randn(RotorF32)
+    pn1 = BHNS(
+        M₁=1.0f0,
+        M₂=2.0f0,
+        χ⃗₁=Float32[3.0, 4.0, 5.0],
+        χ⃗₂=Float32[6.0, 7.0, 8.0],
+        R=R,
+        v=0.23f0,
+        Λ₂=4.0f0,
+    )
+    @test state(pn1) ≈
+        [1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; components(R)...; 0.23; 0.0; 4.0]
+
+    # custom rotor and Φ
+    pn2 = BHNS(
+        M₁=1.0f0,
+        M₂=2.0f0,
+        χ⃗₁=Float32[3.0, 4.0, 5.0],
+        χ⃗₂=Float32[6.0, 7.0, 8.0],
+        R=R,
+        v=0.23f0,
+        Φ=9.0f0,
+        Λ₂=4.0f0,
+    )
+    @test state(pn2) ≈
+        [1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; components(R)...; 0.23; 9.0; 4.0]
+
+    # mutating the second-to-last element (Φ) to match pn2
+    pn1[end - 1] = 9.0f0
+    @test state(pn1) == state(pn2)
+end

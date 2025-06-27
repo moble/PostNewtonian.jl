@@ -11,7 +11,7 @@ than just returning the integer `1`, because there may be expressions with facto
 `G/3` which will immediately convert to `Float64` if `G` is just `1`, so the result will not
 have the expected precision.
 """
-G(::PNSystem{NT}) where {NT} = one(NT)
+@public G(::PNSystem{NT}) where {NT} = one(NT)
 G(::FDPNSystem{NT,PN}) where {NT,PN} = one(PN)
 
 """
@@ -27,7 +27,7 @@ than just returning the integer `1`, because there may be expressions with facto
 `c/3` which will immediately convert to `Float64` if `c` is just `1`, so the result will not
 have the expected precision.
 """
-c(::PNSystem{NT}) where {NT} = one(NT)
+@public c(::PNSystem{NT}) where {NT} = one(NT)
 c(::FDPNSystem{NT,PN}) where {NT,PN} = one(PN)
 
 """
@@ -36,11 +36,11 @@ c(::FDPNSystem{NT,PN}) where {NT,PN} = one(PN)
 
 Mass of object 1 in this system.
 """
-function M₁(::T) where {T<:PNSystem}
+@public function M₁(::T) where {T<:PNSystem}
     error("M₁ is not (yet) defined for PNSystem subtype `$T`.")
 end
 M₁(fdpnsystem::FDPNSystem) = fdpnsystem[:M₁]
-const M1 = M₁
+@public const M1 = M₁
 
 """
     M₂(pnsystem)
@@ -48,11 +48,11 @@ const M1 = M₁
 
 Mass of object 2 in this system.
 """
-function M₂(::T) where {T<:PNSystem}
+@public function M₂(::T) where {T<:PNSystem}
     error("M₂ is not (yet) defined for PNSystem subtype `$T`.")
 end
 M₂(fdpnsystem::FDPNSystem) = fdpnsystem[:M₂]
-const M2 = M₂
+@public const M2 = M₂
 
 """
     χ⃗₁ˣ(pnsystem)
@@ -62,11 +62,11 @@ const M2 = M₂
 
 See [`χ⃗₁`](@ref) for details.
 """
-function χ⃗₁ˣ(::T) where {T<:PNSystem}
+@public function χ⃗₁ˣ(::T) where {T<:PNSystem}
     error("χ⃗₁ˣ is not (yet) defined for PNSystem subtype `$T`.")
 end
 χ⃗₁ˣ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ⃗₁ˣ]
-const chi1x = χ⃗₁ˣ
+@public const chi1x = χ⃗₁ˣ
 
 """
     χ⃗₁ʸ(pnsystem)
@@ -76,11 +76,11 @@ const chi1x = χ⃗₁ˣ
 
 See [`χ⃗₁`](@ref) for details.
 """
-function χ⃗₁ʸ(::T) where {T<:PNSystem}
+@public function χ⃗₁ʸ(::T) where {T<:PNSystem}
     error("χ⃗₁ʸ is not (yet) defined for PNSystem subtype `$T`.")
 end
 χ⃗₁ʸ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ⃗₁ʸ]
-const chi1y = χ⃗₁ʸ
+@public const chi1y = χ⃗₁ʸ
 
 """
     χ⃗₁ᶻ(pnsystem)
@@ -90,11 +90,11 @@ const chi1y = χ⃗₁ʸ
 
 See [`χ⃗₁`](@ref) for details.
 """
-function χ⃗₁ᶻ(::T) where {T<:PNSystem}
+@public function χ⃗₁ᶻ(::T) where {T<:PNSystem}
     error("χ⃗₁ᶻ is not (yet) defined for PNSystem subtype `$T`.")
 end
 χ⃗₁ᶻ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ⃗₁ᶻ]
-const chi1z = χ⃗₁ᶻ
+@public const chi1z = χ⃗₁ᶻ
 
 """
     χ⃗₂ˣ(pnsystem)
@@ -104,11 +104,11 @@ const chi1z = χ⃗₁ᶻ
 
 See [`χ⃗₂`](@ref) for details.
 """
-function χ⃗₂ˣ(::T) where {T<:PNSystem}
+@public function χ⃗₂ˣ(::T) where {T<:PNSystem}
     error("χ⃗₂ˣ is not (yet) defined for PNSystem subtype `$T`.")
 end
 χ⃗₂ˣ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ⃗₂ˣ]
-const chi2x = χ⃗₂ˣ
+@public const chi2x = χ⃗₂ˣ
 
 """
     χ⃗₂ʸ(pnsystem)
@@ -118,11 +118,11 @@ const chi2x = χ⃗₂ˣ
 
 See [`χ⃗₂`](@ref) for details.
 """
-function χ⃗₂ʸ(::T) where {T<:PNSystem}
+@public function χ⃗₂ʸ(::T) where {T<:PNSystem}
     error("χ⃗₂ʸ is not (yet) defined for PNSystem subtype `$T`.")
 end
 χ⃗₂ʸ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ⃗₂ʸ]
-const chi2y = χ⃗₂ʸ
+@public const chi2y = χ⃗₂ʸ
 
 """
     χ⃗₂ᶻ(pnsystem)
@@ -132,11 +132,11 @@ const chi2y = χ⃗₂ʸ
 
 See [`χ⃗₂`](@ref) for details.
 """
-function χ⃗₂ᶻ(::T) where {T<:PNSystem}
+@public function χ⃗₂ᶻ(::T) where {T<:PNSystem}
     error("χ⃗₂ᶻ is not (yet) defined for PNSystem subtype `$T`.")
 end
 χ⃗₂ᶻ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ⃗₂ᶻ]
-const chi2z = χ⃗₂ᶻ
+@public const chi2z = χ⃗₂ᶻ
 
 """
     Rʷ(pnsystem)
@@ -146,11 +146,11 @@ Scalar component of the orientation `Rotor` of the binary.
 
 See [`R`](@ref) for details.
 """
-function Rʷ(::T) where {T<:PNSystem}
+@public function Rʷ(::T) where {T<:PNSystem}
     error("Rʷ is not (yet) defined for PNSystem subtype `$T`.")
 end
 Rʷ(fdpnsystem::FDPNSystem) = fdpnsystem[:Rʷ]
-const Rw = Rʷ
+@public const Rw = Rʷ
 
 """
     Rˣ(pnsystem)
@@ -160,11 +160,11 @@ const Rw = Rʷ
 
 See [`R`](@ref) for details.
 """
-function Rˣ(::T) where {T<:PNSystem}
+@public function Rˣ(::T) where {T<:PNSystem}
     error("Rˣ is not (yet) defined for PNSystem subtype `$T`.")
 end
 Rˣ(fdpnsystem::FDPNSystem) = fdpnsystem[:Rˣ]
-const Rx = Rˣ
+@public const Rx = Rˣ
 
 """
     Rʸ(pnsystem)
@@ -174,11 +174,11 @@ const Rx = Rˣ
 
 See [`R`](@ref) for details.
 """
-function Rʸ(::T) where {T<:PNSystem}
+@public function Rʸ(::T) where {T<:PNSystem}
     error("Rʸ is not (yet) defined for PNSystem subtype `$T`.")
 end
 Rʸ(fdpnsystem::FDPNSystem) = fdpnsystem[:Rʸ]
-const Ry = Rʸ
+@public const Ry = Rʸ
 
 """
     Rᶻ(pnsystem)
@@ -188,11 +188,11 @@ const Ry = Rʸ
 
 See [`R`](@ref) for details.
 """
-function Rᶻ(::T) where {T<:PNSystem}
+@public function Rᶻ(::T) where {T<:PNSystem}
     error("Rᶻ is not (yet) defined for PNSystem subtype `$T`.")
 end
 Rᶻ(fdpnsystem::FDPNSystem) = fdpnsystem[:Rᶻ]
-const Rz = Rᶻ
+@public const Rz = Rᶻ
 
 @doc raw"""
     v(pnsystem)
@@ -210,7 +210,7 @@ as a keyword argument — as in `v(Ω=0.1)`.
 
 See also [`Ω`](@ref).
 """
-function v(::T) where {T<:PNSystem}
+@public function v(::T) where {T<:PNSystem}
     error("v is not (yet) defined for PNSystem subtype `$T`.")
 end
 v(fdpnsystem::FDPNSystem) = fdpnsystem[:v]
@@ -222,11 +222,11 @@ v(; Ω, M=1) = ∛(M * Ω)
 
 Integrated orbital phase of the system.  It is computed as the integral of [`Ω`](@ref).
 """
-function Φ(::T) where {T<:PNSystem}
+@public function Φ(::T) where {T<:PNSystem}
     error("Φ is not (yet) defined for PNSystem subtype `$T`.")
 end
 Φ(fdpnsystem::FDPNSystem) = fdpnsystem[:Φ]
-const Phi = Φ
+@public const Phi = Φ
 
 @doc raw"""
     Λ₁(pnsystem)
@@ -259,11 +259,11 @@ safe and efficient to use this quantity in any PN expression that specializes on
 
 See also [`Λ₂`](@ref) and [`Λ̃`](@ref).
 """
-function Λ₁(::T) where {T<:PNSystem}
+@public function Λ₁(::T) where {T<:PNSystem}
     error("Λ₁ is not (yet) defined for PNSystem subtype `$T`.")
 end
 Λ₁(fdpnsystem::FDPNSystem) = fdpnsystem[:Λ₁]
-const Lambda1 = Λ₁
+@public const Lambda1 = Λ₁
 
 @doc raw"""
     Λ₂(pnsystem)
@@ -280,11 +280,11 @@ specializes on the type of `pnsystem`.
 
 See also [`Λ₁`](@ref) and [`Λ̃`](@ref).
 """
-function Λ₂(::T) where {T<:PNSystem}
+@public function Λ₂(::T) where {T<:PNSystem}
     error("Λ₂ is not (yet) defined for PNSystem subtype `$T`.")
 end
 Λ₂(fdpnsystem::FDPNSystem) = fdpnsystem[:Λ₂]
-const Lambda2 = Λ₂
+@public const Lambda2 = Λ₂
 
 #################################################################
 # Not actually state variables, but aggregates of state variables
@@ -297,10 +297,10 @@ Dimensionless spin vector of object 1 in this system, as a `QuatVec`.
 
 See also [`χ⃗₁ˣ`](@ref), [`χ⃗₁ʸ`](@ref), and [`χ⃗₁ᶻ`](@ref) for the individual components.
 """
-function χ⃗₁(::T) where {T<:PNSystem}
+@public function χ⃗₁(::T) where {T<:PNSystem}
     QuatVec(χ⃗₁ˣ(pnsystem), χ⃗₁ʸ(pnsystem), χ⃗₁ᶻ(pnsystem))
 end
-const chi1 = χ⃗₁
+@public const chi1 = χ⃗₁
 
 """
     χ⃗₂(pnsystem)
@@ -310,10 +310,10 @@ Dimensionless spin vector of object 2 in this system, as a `QuatVec`.
 
 See also [`χ⃗₂ˣ`](@ref), [`χ⃗₂ʸ`](@ref), and [`χ⃗₂ᶻ`](@ref) for the individual components.
 """
-function χ⃗₂(::T) where {T<:PNSystem}
+@public function χ⃗₂(::T) where {T<:PNSystem}
     QuatVec(χ⃗₂ˣ(pnsystem), χ⃗₂ʸ(pnsystem), χ⃗₂ᶻ(pnsystem))
 end
-const chi2 = χ⃗₂
+@public const chi2 = χ⃗₂
 
 """
     R(pnsystem)
@@ -334,7 +334,7 @@ and ``ϖ`` is the precession angular frequency.
 See also [`n̂`](@ref PostNewtonian.n̂), [`λ̂`](@ref PostNewtonian.λ̂), [`ℓ̂`](@ref
 PostNewtonian.ℓ̂), [`Ω`](@ref PostNewtonian.Ω), and [`𝛡`](@ref PostNewtonian.𝛡)``=ϖ n̂``.
 """
-function R(pnsystem::T) where {NT,T<:PNSystem{NT}}
+@public function R(pnsystem::T) where {NT,T<:PNSystem{NT}}
     # We use this explicit constructor (with type parameter) to avoid normalization
     # that would probably just complicate derivatives.
     Rotor{NT}(Rʷ(pnsystem), Rˣ(pnsystem), Rʸ(pnsystem), Rᶻ(pnsystem))

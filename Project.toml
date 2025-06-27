@@ -6,6 +6,7 @@ version = "0.10.6"
 [deps]
 DataInterpolations = "82cc6244-b520-54b8-b5a6-8a565e85f1d0"
 FastDifferentiation = "eb9bf01b-bf85-4b60-bf87-ee5de06c00be"
+InlineExports = "809d7502-0c9d-5bc2-962a-5201dc498f73"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
@@ -26,9 +27,9 @@ ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
-[extensions]
-PostNewtonianForwardDiffExt = ["ForwardDiff"]
-PostNewtonianSymbolicsExt = ["Symbolics", "SymbolicUtils"]
+# [extensions]
+# PostNewtonianForwardDiffExt = ["ForwardDiff"]
+# PostNewtonianSymbolicsExt = ["Symbolics", "SymbolicUtils"]
 
 [compat]
 Aqua = "0.8"
@@ -39,6 +40,7 @@ FastDifferentiation = "0.3.15, 0.4"
 FileIO = "1.16.3"
 ForwardDiff = "0.10.38, 1"
 HDF5 = "0.17.2"
+InlineExports = "0.1.2"
 InteractiveUtils = "1"
 LinearAlgebra = "1"
 Logging = "1"

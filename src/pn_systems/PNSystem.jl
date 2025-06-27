@@ -9,13 +9,14 @@ and [derived variables](@ref Derived-variables), as well as [PN expressions](@re
 [dynamics](@ref Dynamics) functions.
 
 The parameter `NT` is the number type of the system, such as `Float64` or `Dual{SomeTag,
-Float64, 7}`.  The parameter `ST <: DenseVector{NT}` is the type returned by the `state`
+Float64, 7}`.  The parameter `ST <: AbstractVector{NT}` is the type returned by the `state`
 function, which probably just returns the `state` vector stored in the concrete subtype.  As
 such, this will probably be `MVector{N, NT}` or `SVector{N, NT}`, where `N` is the number of
 elements in the state.  `PNOrder` is a `Rational` giving the order to which PN expansions
 should be carried out when using the given object.
 """
-abstract type PNSystem{NT,PNOrder,ST<:DenseVector{NT}} <: DenseVector{NT} end
+@export abstract type PNSystem{NT<:Number,PNOrder,ST<:AbstractVector{NT}} <:
+                      AbstractVector{NT} end
 
 """
     state(pnsystem::PNSystem)
@@ -26,8 +27,10 @@ given PN system.
 Note that the built-in `PNSystem` subtypes have a `state` field that is a vector, so this
 function will just return that vector.  However, that may not always be true for
 user-defined subtypes.
+
+This function should have a specialized method for each concrete subtype of `PNSystem`.
 """
-function state(::T) where {T<:PNSystem}
+@public function state(::T) where {T<:PNSystem}
     error("`state` is not yet defined for PNSystem subtype `$T`.")
 end
 Base.vec(pnsystem::PNSystem) = state(pnsystem)
@@ -52,6 +55,8 @@ in which they are stored in the `state` vector.
 The `ascii_symbols` function returns those symbols in ASCII form, enabling interaction with
 external systems (e.g., Python) that do not support many Unicode symbols.
 
+These functions should have specialized methods for each concrete subtype of `PNSystem`.
+For example, the `BBH` system has 14 state variables, as seen in the following example:
 ```jldoctest
 julia> using PostNewtonian: BBH
 
@@ -64,11 +69,11 @@ julia> ascii_symbols(pnsystem)
 (:M1, :M2, :chi1x, :chi1y, :chi1z, :chi2x, :chi2y, :chi2z, :Rw, :Rx, :Ry, :Rz, :v, :Phi)
 ```
 """
-symbols(pnsystem::PNSystem) = symbols(typeof(pnsystem))
+@export symbols(pnsystem::PNSystem) = symbols(typeof(pnsystem))
 function symbols(::Type{T}) where {T<:PNSystem}
     error("`symbols` is not yet defined for PNSystem subtype `$T`.")
 end
-ascii_symbols(pnsystem::PNSystem) = ascii_symbols(typeof(pnsystem))
+@export ascii_symbols(pnsystem::PNSystem) = ascii_symbols(typeof(pnsystem))
 function ascii_symbols(::Type{T}) where {T<:PNSystem}
     error("`ascii_symbols` is not yet defined for PNSystem subtype `$T`.")
 end
