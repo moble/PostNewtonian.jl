@@ -5,6 +5,7 @@ function Base.ismutabletype(::Type{<:PNSystem{NT,PNOrder,ST}}) where {NT,PNOrder
     ismutabletype(ST)
 end
 
+### Symbol-based indexing
 """
     symbol_index(::Type{T}, s::Symbol) where {T<:PNSystem}
     symbol_index(::Type{T}, ::Val{S}) where {T<:PNSystem,S}
@@ -31,15 +32,13 @@ types.
         index
     end
 end
-
 Base.getindex(pnsystem::PNSystem, s::Symbol) = getindex(pnsystem, Val(s))
-function Base.getindex(pnsystem::T, ::Val{S}) where {T<:PNSystem,S}
+function Base.getindex(pnsystem::T, s::Val{S}) where {T<:PNSystem,S}
     # If `S` is not actually a symbol in `pnsystem`, `symbol_index` will error, so we know
     # that the `index` is inbounds if it returns.
-    index = symbol_index(T, Val(S))
+    index = symbol_index(T, s)
     @inbounds state(pnsystem)[index]
 end
-
 Base.setindex!(pnsystem::PNSystem, v, s::Symbol) = setindex!(pnsystem, v, Val(s))
 function Base.setindex!(pnsystem::T, v, ::Val{S}) where {T<:PNSystem,S}
     index = symbol_index(T, Val(S))
@@ -48,8 +47,8 @@ end
 
 ### Interfaces: https://docs.julialang.org/en/v1/manual/interfaces
 # Iteration
-Base.iterate(pnsystem::PNSystem) = iterate(state(pnsystem))
-Base.iterate(pnsystem::PNSystem, state) = iterate(state(pnsystem), state)
+# Base.iterate(pnsystem::PNSystem) = iterate(state(pnsystem))
+# Base.iterate(pnsystem::PNSystem, state) = iterate(state(pnsystem), state)
 Base.IteratorSize(::Type{T}) where {T<:PNSystem} = Base.HasShape{1}()
 Base.length(pnsystem::PNSystem) = length(state(pnsystem))
 Base.ndims(pnsystem::PNSystem) = ndims(state(pnsystem))
@@ -60,8 +59,16 @@ Base.IteratorEltype(::Type{T}) where {T<:PNSystem} = Base.HasEltype()
 Base.isdone(pnsystem::PNSystem) = isdone(state(pnsystem))
 Base.isdone(pnsystem::PNSystem, iterstate) = isdone(state(pnsystem), iterstate)
 # Indexing
-@propagate_inbounds Base.getindex(pnsystem::PNSystem, i::Int) = getindex(state(pnsystem), i)
-@propagate_inbounds Base.setindex!(pn::PNSystem, v, i::Int) = setindex!(state(pn), v, i)
+@propagate_inbounds Base.getindex(pnsystem::PNSystem, i::T) where {T} = getindex(
+    state(pnsystem), i
+)
+@propagate_inbounds Base.setindex!(pn::PNSystem, v, i::T) where {T} = setindex!(
+    state(pn), v, i
+)
+@propagate_inbounds Base.getindex(pnsystem::PNSystem, i...) = getindex(
+    state(pnsystem), i...
+)
+@propagate_inbounds Base.setindex!(pn::PNSystem, v, i...) = setindex!(state(pn), v, i...)
 Base.firstindex(pnsystem::PNSystem) = firstindex(state(pnsystem))
 Base.lastindex(pnsystem::PNSystem) = lastindex(state(pnsystem))
 Base.eachindex(pnsystem::PNSystem) = eachindex(state(pnsystem))
@@ -72,144 +79,32 @@ Base.IndexStyle(::Type{T}) where {T<:PNSystem} = Base.IndexLinear()
 Base.axes(pnsystem::PNSystem) = axes(state(pnsystem))
 # Strided Arrays
 Base.strides(pnsystem::PNSystem) = strides(state(pnsystem))
-function Base.unsafe_convert(::Type{Ptr{T}}, A::PNSystem) where {T}
-    Base.unsafe_convert(Ptr{T}, state(A))
+function Base.unsafe_convert(::Type{Ptr{ST}}, pnsystem::PNSystem{ST}) where {ST}
+    Base.unsafe_convert(Ptr{ST}, state(pnsystem))
 end
 Base.elsize(::Type{<:PNSystem{T}}) where {T} = sizeof(T)
 Base.stride(pnsystem::PNSystem, k::Int) = stride(state(pnsystem), k)
 
-# function PreallocationTools.get_tmp(
-#     dc::PreallocationTools.DiffCache, u::LArray{T,N,D,Syms}
-# ) where {T<:ForwardDiff.Dual,N,D,Syms}
-#     nelem = div(sizeof(T), sizeof(eltype(dc.dual_du))) * length(dc.du)
-#     if nelem > length(dc.dual_du)
-#         PreallocationTools.enlargedualcache!(dc, nelem)
-#     end
-#     _x = ArrayInterface.restructure(dc.du, reinterpret(T, view(dc.dual_du, 1:nelem)))
-#     LabelledArrays.LArray{T,N,D,Syms}(_x)
-# end
+# NamedTuple interface
+function Base.convert(::Type{NamedTuple}, pnsystem::PNSystem{N,P,S}) where {N,P,S}
+    NamedTuple{symbols(pnsystem),N}(state(pnsystem))
+end
+Base.keys(pnsystem::PNSystem) = symbols(pnsystem)
+function Base.pairs(pnsystem::PNSystem{N,P,S}) where {N,P,S}
+    (s=>v for (s, v) ∈ zip(symbols(pnsystem), state(pnsystem)))
+end
 
-# function RecursiveArrayTools.recursive_unitless_eltype(
-#     a::Type{LArray{T,N,D,Syms}}
-# ) where {T,N,D,Syms}
-#     LArray{typeof(one(T)),N,D,Syms}
-# end
-
-# #####################################
-# # NamedTuple compatibility
-# #####################################
-# ## SLArray to named tuple
-# function Base.convert(::Type{NamedTuple}, x::SLArray{S,T,N,L,Syms}) where {S,T,N,L,Syms}
-#     tup = NTuple{length(Syms),T}(x.__x)
-#     NamedTuple{Syms,typeof(tup)}(tup)
-# end
-# Base.keys(x::SLArray{S,T,N,L,Syms}) where {S,T,N,L,Syms} = Syms
-
-# ## pairs iterator
-# function Base.pairs(x::LArray{T,N,D,Syms}) where {T,N,D,Syms}
-#     # (label => getproperty(x, label) for label in Syms) # not type stable?
-#     (Syms[i] => x[i] for i ∈ 1:length(Syms))
-# end
-
-# function Base.iterate(x::SLArray, args...)
-#     iterate(convert(NamedTuple, x), args...)
-# end
-
-# #####################################
-# # Array Interface
-# #####################################
-# function Base.print_array(io::IO, w::WignerMatrix{NT,IT}) where {NT,IT<:Rational}
-#     Base.print_array(io, parent(w))
-# end
-
-# Base.size(x::LArray) = size(getfield(x, :__x))
-# Base.@propagate_inbounds Base.getindex(x::LArray, i...) = getfield(x, :__x)[i...]
-# Base.@propagate_inbounds function Base.setindex!(x::LArray, y, i...)
-#     getfield(x, :__x)[i...] = y
-#     return x
-# end
-
-# Base.propertynames(::LArray{T,N,D,Syms}) where {T,N,D,Syms} = Syms
-# symnames(::Type{LArray{T,N,D,Syms}}) where {T,N,D,Syms} = Syms
-
-# Base.@propagate_inbounds function Base.getproperty(x::LArray, s::Symbol)
-#     if s == :__x
-#         return getfield(x, :__x)
-#     end
-#     return getindex(x, Val(s))
-# end
-
-# Base.@propagate_inbounds function Base.setproperty!(x::LArray, s::Symbol, y)
-#     if s == :__x
-#         return setfield!(x, :__x, y)
-#     end
-#     setindex!(x, y, Val(s))
-# end
-
-# Base.@propagate_inbounds Base.getindex(x::LArray, s::Symbol) = getindex(x, Val(s))
-# Base.@propagate_inbounds Base.getindex(x::LArray, s::Val) = __getindex(x, s)
-# Base.@propagate_inbounds Base.setindex!(x::LArray, v, s::Symbol) = setindex!(x, v, Val(s))
-
-# @generated function Base.setindex!(x::LArray, y, ::Val{s}) where {s}
-#     syms = symnames(x)
-#     if syms isa NamedTuple
-#         idxs = syms[s]
-#         return quote
-#             Base.@_propagate_inbounds_meta
-#             setindex!(getfield(x, :__x), y, $idxs)
-#             return x
-#         end
-#     else # Tuple
-#         idx = findfirst(y -> y == s, symnames(x))
-#         return quote
-#             Base.@_propagate_inbounds_meta
-#             setindex!(getfield(x, :__x), y, $idx)
-#             return x
-#         end
-#     end
-# end
-
-# Base.@propagate_inbounds function Base.getindex(x::LArray, s::AbstractArray{Symbol,1})
-#     [getindex(x, si) for si ∈ s]
-# end
-
-# function Base.similar(
-#     x::LArray{T,K,D,Syms}, ::Type{S}, dims::NTuple{N,Int}
-# ) where {T,K,D,Syms,S,N}
-#     tmp = similar(x.__x, S, dims)
-#     LArray{S,N,typeof(tmp),Syms}(tmp)
-# end
-
-# function StaticArrays.similar_type(
-#     ::Type{SLArray{S,T,N,L,Syms}}, T2, ::Size{S}
-# ) where {S,T,N,L,Syms}
-#     SLArray{S,T2,N,L,Syms}
-# end
+Base.@propagate_inbounds function Base.getindex(
+    pnsystem::PNSystem, s::AbstractVector{Symbol}
+)
+    # We trick broadcasting into treating `pnsystem` as a scalar by putting it into a
+    # 1-tuple.
+    getindex.((pnsystem,), s)
+end
 
 # # Allow copying LArray of uninitialized data, as with regular Array
-# Base.copy(x::LArray) = typeof(x)(copy(getfield(x, :__x)))
-# Base.copyto!(x::LArray, y::LArray) = copyto!(getfield(x, :__x), getfield(y, :__x))
-
-# # enable the usage of LAPACK
-# function Base.unsafe_convert(::Type{Ptr{T}}, a::LArray{T,N,D,S}) where {T,N,D,S}
-#     Base.unsafe_convert(Ptr{T}, getfield(a, :__x))
-# end
-
-# Base.convert(::Type{T}, x) where {T<:LArray} = T(x)
-# Base.convert(::Type{T}, x::T) where {T<:LArray} = x
-# Base.convert(::Type{<:Array}, x::LArray) = convert(Array, getfield(x, :__x))
-# function Base.convert(
-#     ::Type{AbstractArray{T,N}}, x::LArray{S,N,<:Any,Syms}
-# ) where {T,S,N,Syms}
-#     LArray{Syms}(convert(AbstractArray{T,N}, getfield(x, :__x)))
-# end
-# Base.convert(::Type{AbstractArray{T,N}}, x::LArray{T,N}) where {T,N} = x
-
-# function ArrayInterface.restructure(
-#     x::LArray{T,N,D,Syms}, y::LArray{T2,N2,D2,Syms}
-# ) where {T,N,D,T2,N2,D2,Syms}
-#     reshape(y, size(x)...)
-# end
+Base.copy(pnsystem::PNSystem) = typeof(pnsystem)(copy(state(pnsystem)))
+Base.copyto!(x::PNSystem, y::PNSystem) = copyto!(state(x), state(y))
 
 # #####################################
 # # Broadcast
@@ -245,9 +140,118 @@ Base.stride(pnsystem::PNSystem, k::Int) = stride(state(pnsystem), k)
 #     end
 # end
 
-# # Broadcasting checks for aliasing with Base.dataids but the fallback
-# # for AbstractArrays is very slow. Instead, we just call dataids on the
-# # wrapped buffer
-# Base.dataids(pnsystem::PNSystem) = Base.dataids(state(pnsystem))
+# Broadcasting checks for aliasing with Base.dataids but the fallback
+# for AbstractArrays is very slow. Instead, we just call dataids on the
+# wrapped state
+Base.dataids(pnsystem::PNSystem) = Base.dataids(state(pnsystem))
 
-# Base.elsize(::Type{<:LArray{T}}) where {T} = sizeof(T)
+## Misc
+
+# function ArrayInterface.restructure(
+#     x::LArray{T,N,D,Syms}, y::LArray{T2,N2,D2,Syms}
+# ) where {T,N,D,T2,N2,D2,Syms}
+#     reshape(y, size(x)...)
+# end
+
+# function PreallocationTools.get_tmp(
+#     dc::PreallocationTools.DiffCache, u::LArray{T,N,D,Syms}
+# ) where {T<:ForwardDiff.Dual,N,D,Syms}
+#     nelem = div(sizeof(T), sizeof(eltype(dc.dual_du))) * length(dc.du)
+#     if nelem > length(dc.dual_du)
+#         PreallocationTools.enlargedualcache!(dc, nelem)
+#     end
+#     _x = ArrayInterface.restructure(dc.du, reinterpret(T, view(dc.dual_du, 1:nelem)))
+#     LabelledArrays.LArray{T,N,D,Syms}(_x)
+# end
+
+# function RecursiveArrayTools.recursive_unitless_eltype(
+#     a::Type{LArray{T,N,D,Syms}}
+# ) where {T,N,D,Syms}
+#     LArray{typeof(one(T)),N,D,Syms}
+# end
+
+@testitem "Vector interface" begin
+    using PostNewtonian: state
+
+    for pnsystem ∈ (BBH(randn(14), 7//2), BHNS(randn(15), 7//2), NSNS(randn(16), 7//2))
+        @test_throws ErrorException symbol_index(typeof(pnsystem), Val(:nonexistent_symbol))
+        @test symbol_index(typeof(pnsystem), Val(:M₁)) == 1
+        @test symbol_index(typeof(pnsystem), Val(:M1)) == 1
+        @test pnsystem[:M₁] == pnsystem[:M1] == pnsystem[1] == pnsystem.state[1]
+        @test symbol_index(typeof(pnsystem), Val(:M₂)) == 2
+        @test symbol_index(typeof(pnsystem), Val(:M2)) == 2
+        @test pnsystem[:M₂] == pnsystem[:M2] == pnsystem[2] == pnsystem.state[2]
+        @test symbol_index(typeof(pnsystem), Val(:χ⃗₁ˣ)) == 3
+        @test symbol_index(typeof(pnsystem), Val(:chi1x)) == 3
+        @test pnsystem[:χ⃗₁ˣ] == pnsystem[:chi1x] == pnsystem[3] == pnsystem.state[3]
+        @test symbol_index(typeof(pnsystem), Val(:χ⃗₁ʸ)) == 4
+        @test symbol_index(typeof(pnsystem), Val(:chi1y)) == 4
+        @test pnsystem[:χ⃗₁ʸ] == pnsystem[:chi1y] == pnsystem[4] == pnsystem.state[4]
+        @test symbol_index(typeof(pnsystem), Val(:χ⃗₁ᶻ)) == 5
+        @test symbol_index(typeof(pnsystem), Val(:chi1z)) == 5
+        @test pnsystem[:χ⃗₁ᶻ] == pnsystem[:chi1z] == pnsystem[5] == pnsystem.state[5]
+        @test symbol_index(typeof(pnsystem), Val(:χ⃗₂ˣ)) == 6
+        @test symbol_index(typeof(pnsystem), Val(:chi2x)) == 6
+        @test pnsystem[:χ⃗₂ˣ] == pnsystem[:chi2x] == pnsystem[6] == pnsystem.state[6]
+        @test symbol_index(typeof(pnsystem), Val(:χ⃗₂ʸ)) == 7
+        @test symbol_index(typeof(pnsystem), Val(:chi2y)) == 7
+        @test pnsystem[:χ⃗₂ʸ] == pnsystem[:chi2y] == pnsystem[7] == pnsystem.state[7]
+        @test symbol_index(typeof(pnsystem), Val(:χ⃗₂ᶻ)) == 8
+        @test symbol_index(typeof(pnsystem), Val(:chi2z)) == 8
+        @test pnsystem[:χ⃗₂ᶻ] == pnsystem[:chi2z] == pnsystem[8] == pnsystem.state[8]
+        @test symbol_index(typeof(pnsystem), Val(:Rʷ)) == 9
+        @test symbol_index(typeof(pnsystem), Val(:Rw)) == 9
+        @test pnsystem[:Rʷ] == pnsystem[:Rw] == pnsystem[9] == pnsystem.state[9]
+        @test symbol_index(typeof(pnsystem), Val(:Rˣ)) == 10
+        @test symbol_index(typeof(pnsystem), Val(:Rx)) == 10
+        @test pnsystem[:Rˣ] == pnsystem[:Rx] == pnsystem[10] == pnsystem.state[10]
+        @test symbol_index(typeof(pnsystem), Val(:Rʸ)) == 11
+        @test symbol_index(typeof(pnsystem), Val(:Ry)) == 11
+        @test pnsystem[:Rʸ] == pnsystem[:Ry] == pnsystem[11] == pnsystem.state[11]
+        @test symbol_index(typeof(pnsystem), Val(:Rᶻ)) == 12
+        @test symbol_index(typeof(pnsystem), Val(:Rz)) == 12
+        @test pnsystem[:Rᶻ] == pnsystem[:Rz] == pnsystem[12] == pnsystem.state[12]
+        @test symbol_index(typeof(pnsystem), Val(:v)) == 13
+        @test pnsystem[:v] == pnsystem[13] == pnsystem.state[13]
+        @test symbol_index(typeof(pnsystem), Val(:Φ)) == 14
+        @test symbol_index(typeof(pnsystem), Val(:Phi)) == 14
+        @test pnsystem[:Φ] == pnsystem[:Phi] == pnsystem[14] == pnsystem.state[14]
+    end
+    let
+        pnsystem = BHNS(randn(15), 7//2)
+        @test symbol_index(typeof(pnsystem), Val(:Λ₂)) == 15
+        @test symbol_index(typeof(pnsystem), Val(:Lambda2)) == 15
+        # @test pnsystem[:Λ₂] == pnsystem[:Lambda2] == pnsystem[15] == pnsystem.state[15]
+    end
+    let
+        pnsystem = NSNS(randn(16), 7//2)
+        @test symbol_index(typeof(pnsystem), Val(:Λ₁)) == 15
+        @test symbol_index(typeof(pnsystem), Val(:Lambda1)) == 15
+        @test pnsystem[:Λ₁] == pnsystem[:Lambda1] == pnsystem[15] == pnsystem.state[15]
+        @test symbol_index(typeof(pnsystem), Val(:Λ₂)) == 16
+        @test symbol_index(typeof(pnsystem), Val(:Lambda2)) == 16
+        @test pnsystem[:Λ₂] == pnsystem[:Lambda2] == pnsystem[16] == pnsystem.state[16]
+    end
+
+    for FT ∈ (Float16, Float32, Float64)
+        for PNOrder ∈ (0, 1, 3//2, 2, 5//2, 3, 7//2, 4)
+            pnsystem = BBH(randn(FT, 14), PNOrder)
+            @test Base.ismutable(pnsystem)
+            @test Base.ismutabletype(typeof(pnsystem))
+            @test collect(pnsystem) == state(pnsystem)
+            @test length(pnsystem) == 14
+            @test ndims(pnsystem) == 1
+            @test size(pnsystem) == (14,)
+            @test size(pnsystem, 1) == 14
+            @test axes(pnsystem) == (Base.OneTo(14),)
+            @test Base.eltype(pnsystem) == FT
+            @test Base.eltype(typeof(pnsystem)) == FT
+            @test Base.eltype(state(pnsystem)) == FT
+            @test Base.elsize(pnsystem) == sizeof(FT)
+            @test Base.elsize(typeof(pnsystem)) == sizeof(FT)
+            for (i, v) ∈ enumerate(pnsystem)
+                @test v == pnsystem[i] == pnsystem.state[i]
+            end
+        end
+    end
+end
