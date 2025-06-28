@@ -24,16 +24,16 @@ and `Λ₂` holding the (constant) tidal-coupling parameters of the neutron star
         state = vcat(state, Λ₁, Λ₂)
         return new{eltype(state),PNOrder,typeof(state)}(state)
     end
-    function NSNS(state; PNOrder=typemax(Int))
-        if eachindex(state) != Base.OneTo(16)
-            error(
-                "The `state` vector for `NSNS` must be indexed from 1 to 16; " *
-                "input is indexed `$(eachindex(state))`.",
-            )
-        end
-        NT, PNOrder, ST = eltype(state), prepare_pn_order(PNOrder), typeof(state)
-        return new{NT,PNOrder,ST}(state)
-    end
+    # function NSNS(state, PNOrder=typemax(Int))
+    #     if eachindex(state) != Base.OneTo(16)
+    #         error(
+    #             "The `state` vector for `NSNS` must be indexed from 1 to 16; " *
+    #             "input is indexed `$(eachindex(state))`.",
+    #         )
+    #     end
+    #     NT, PNOrder, ST = eltype(state), prepare_pn_order(PNOrder), typeof(state)
+    #     return new{NT,PNOrder,ST}(state)
+    # end
 end
 @public const BNS = NSNS
 
@@ -46,13 +46,19 @@ end
 function ascii_symbols(::Type{<:NSNS})
     (ascii_symbols(Quasispherical)..., :Lambda1, :Lambda2)
 end
-for (i, symbol) ∈ enumerate(symbols(NSNS))
-    # This will define, e.g., `M₁(pnsystem::NSNS) = pnsystem.state[1]`.  We
-    # could do this manually, but this is more concise and less error-prone.
+for (i, (symbol, ascii_symbol)) ∈ enumerate(zip(symbols(NSNS), ascii_symbols(NSNS)))
+    # We could do this manually, but this is more concise and less error-prone.
     @eval begin
+        # Define, e.g., `M₁(pnsystem::NSNS) = pnsystem.state[1]`.
         $(symbol)(pnsystem::NSNS) = @inbounds pnsystem.state[$i]
-        function symbol_index(::Type{T}, ::Val{Symbol($symbol)}) where {T<:NSNS}
-            $i
+
+        # Specialize `symbol_index` for Val{:M₁}, Val{:M₂}, etc.
+        symbol_index(::Type{T}, ::Val{$(QuoteNode(symbol))}) where {T<:NSNS} = $i
+    end
+    if symbol ≠ ascii_symbol
+        @eval begin
+            # Specialize `symbol_index` for Val{:M1}, Val{:M2}, etc.
+            symbol_index(::Type{T}, ::Val{$(QuoteNode(ascii_symbol))}) where {T<:NSNS} = $i
         end
     end
 end

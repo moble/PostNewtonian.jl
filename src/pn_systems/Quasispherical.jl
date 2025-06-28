@@ -28,6 +28,10 @@ tidal-coupling parameters, `Λ₁` and `Λ₂` (or `Lambda1` and `Lambda2`).
 """
 Quasispherical
 
+function (::Type{T})(state, PNOrder=typemax(Int)) where {T<:Quasispherical}
+    T{eltype(state),prepare_pn_order(PNOrder),typeof(state)}(state)
+end
+
 function prepare_Quasispherical(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0, PNOrder=typemax(Int))
     χ⃗₁ = QuatVec(χ⃗₁)
     χ⃗₂ = QuatVec(χ⃗₂)

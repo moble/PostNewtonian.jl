@@ -33,7 +33,6 @@ This function should have a specialized method for each concrete subtype of `PNS
 @public function state(::T) where {T<:PNSystem}
     error("`state` is not yet defined for PNSystem subtype `$T`.")
 end
-Base.vec(pnsystem::PNSystem) = state(pnsystem)
 
 Base.eltype(::Type{PNT}) where {NT,PNT<:PNSystem{NT}} = NT
 Base.one(::Type{PNT}) where {PNT<:PNSystem} = one(eltype(PNT))

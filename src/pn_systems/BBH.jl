@@ -39,16 +39,16 @@ difficult to extract this quantity from `R`.
         (NT, PNOrder, state) = prepare_Quasispherical(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
         return new{NT,PNOrder,typeof(state)}(state)
     end
-    function BBH(state; PNOrder=typemax(Int))
-        if eachindex(state) != Base.OneTo(14)
-            error(
-                "The `state` vector for `BBH` must be indexed from 1 to 14; " *
-                "input is indexed `$(eachindex(state))`.",
-            )
-        end
-        NT, PNOrder, ST = eltype(state), prepare_pn_order(PNOrder), typeof(state)
-        return new{NT,PNOrder,ST}(state)
-    end
+    # function BBH(state, PNOrder=typemax(Int))
+    #     if eachindex(state) != Base.OneTo(14)
+    #         error(
+    #             "The `state` vector for `BBH` must be indexed from 1 to 14; " *
+    #             "input is indexed `$(eachindex(state))`.",
+    #         )
+    #     end
+    #     NT, PNOrder, ST = eltype(state), prepare_pn_order(PNOrder), typeof(state)
+    #     return new{NT,PNOrder,ST}(state)
+    # end
 end
 @public const BHBH = BBH
 
@@ -57,13 +57,19 @@ end
 state(pnsystem::BBH) = pnsystem.state
 symbols(::Type{<:BBH}) = symbols(Quasispherical)
 ascii_symbols(::Type{<:BBH}) = ascii_symbols(Quasispherical)
-for (i, symbol) ∈ enumerate(symbols(BBH))
-    # This will define, e.g., `M₁(pnsystem::BBH) = pnsystem.state[1]`.  We
-    # could do this manually, but this is more concise and less error-prone.
+for (i, (symbol, ascii_symbol)) ∈ enumerate(zip(symbols(BBH), ascii_symbols(BBH)))
+    # We could do this manually, but this is more concise and less error-prone.
     @eval begin
+        # Define, e.g., `M₁(pnsystem::BBH) = pnsystem.state[1]`.
         $(symbol)(pnsystem::BBH) = @inbounds pnsystem.state[$i]
-        function symbol_index(::Type{T}, ::Val{Symbol($symbol)}) where {T<:BBH}
-            $i
+
+        # Specialize `symbol_index` for Val{:M₁}, Val{:M₂}, etc.
+        symbol_index(::Type{T}, ::Val{$(QuoteNode(symbol))}) where {T<:BBH} = $i
+    end
+    if symbol ≠ ascii_symbol
+        @eval begin
+            # Specialize `symbol_index` for Val{:M1}, Val{:M2}, etc.
+            symbol_index(::Type{T}, ::Val{$(QuoteNode(ascii_symbol))}) where {T<:BBH} = $i
         end
     end
 end
