@@ -24,16 +24,6 @@ and `Λ₂` holding the (constant) tidal-coupling parameters of the neutron star
         state = vcat(state, Λ₁, Λ₂)
         return new{eltype(state),PNOrder,typeof(state)}(state)
     end
-    # function NSNS(state, PNOrder=typemax(Int))
-    #     if eachindex(state) != Base.OneTo(16)
-    #         error(
-    #             "The `state` vector for `NSNS` must be indexed from 1 to 16; " *
-    #             "input is indexed `$(eachindex(state))`.",
-    #         )
-    #     end
-    #     NT, PNOrder, ST = eltype(state), prepare_pn_order(PNOrder), typeof(state)
-    #     return new{NT,PNOrder,ST}(state)
-    # end
 end
 @public const BNS = NSNS
 

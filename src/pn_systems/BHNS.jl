@@ -33,16 +33,6 @@ also [`NSNS`](@ref).
         state = vcat(state, Λ₂)
         return new{eltype(state),PNOrder,typeof(state)}(state)
     end
-    # function BHNS(state, PNOrder=typemax(Int))
-    #     if eachindex(state) != Base.OneTo(15)
-    #         error(
-    #             "The `state` vector for `BHNS` must be indexed from 1 to 15; " *
-    #             "input is indexed `$(eachindex(state))`.",
-    #         )
-    #     end
-    #     NT, PNOrder, ST = eltype(state), prepare_pn_order(PNOrder), typeof(state)
-    #     return new{NT,PNOrder,ST}(state)
-    # end
 end
 
 # The following are methods of functions defined in `state_variables.jl`, specialized for
