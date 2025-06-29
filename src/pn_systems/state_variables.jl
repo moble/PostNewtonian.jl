@@ -340,3 +340,30 @@ PostNewtonian.ℓ̂), [`Ω`](@ref PostNewtonian.Ω), and [`𝛡`](@ref PostNewto
     Rotor{NT}(Rʷ(pnsystem), Rˣ(pnsystem), Rʸ(pnsystem), Rᶻ(pnsystem))
 end
 R(fdpnsystem::FDPNSystem) = fdpnsystem[:R]
+
+@testitem "State variables" begin
+    # Test BBH, BHNS, and NSNS state variables
+    for pnsystem ∈ (BBH(randn(14)), BHNS(randn(15)), NSNS(randn(16)))
+        for (i, (s, a)) ∈ enumerate(zip(symbols(pnsystem), ascii_symbols(pnsystem)))
+            @test PostNewtonian.eval(s)(pnsystem) == pnsystem.state[i]
+            @test PostNewtonian.eval(a)(pnsystem) == pnsystem.state[i]
+        end
+    end
+    bbh = BBH(randn(14))
+    @test PostNewtonian.Λ₁(bbh) == 0
+    @test PostNewtonian.Λ₂(bbh) == 0
+    @test PostNewtonian.Lambda1(bbh) == 0
+    @test PostNewtonian.Lambda2(bbh) == 0
+    bhns = BHNS(randn(15))
+    @test PostNewtonian.Λ₁(bhns) == 0
+    @test PostNewtonian.Lambda1(bhns) == 0
+
+    # Test FDPNSystem state variables
+    for pnsystem ∈ (BBH(randn(14)), BHNS(randn(15)), NSNS(randn(16)))
+        fdpnsystem = FDPNSystem(pnsystem)
+        for (i, (s, a)) ∈ enumerate(zip(symbols(pnsystem), ascii_symbols(pnsystem)))
+            @test PostNewtonian.eval(s)(fdpnsystem).node_value == s
+            @test PostNewtonian.eval(a)(fdpnsystem).node_value == s
+        end
+    end
+end
