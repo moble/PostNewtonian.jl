@@ -12,7 +12,7 @@ One important example of what this type is used for is computing the derivative 
 orbital binding energy, `𝓔′` — and in particular, for generating the corresponding function
 method to apply to a given `PNSystem`.
 """
-@export struct FDPNSystem{NT,PNOrder,PN<:Type{<:PNSystem{NT,PNOrder}}} <:
+@export struct FDPNSystem{NT,PNOrder,PN<:PNSystem{NT,PNOrder}} <:
                PNSystem{FDNode,PNOrder,Vector{FDNode}}
     state::Vector{FDNode}
 
@@ -22,15 +22,61 @@ method to apply to a given `PNSystem`.
     end
 end
 
+state(pnsystem::FDPNSystem) = pnsystem.state
+
 symbols(pnsystem::FDPNSystem{NT,PNOrder,PN}) where {NT,PNOrder,PN} = symbols(PN)
+symbols(::Type{T}) where {NT,PNOrder,PN,T<:FDPNSystem{NT,PNOrder,PN}} = symbols(PN)
 
 function symbol_index(pnsystem::FDPNSystem{NT,PNOrder,PN}, s::Symbol) where {NT,PNOrder,PN}
     symbol_index(PN, Val(s))
 end
+function symbol_index(::Type{T}, ::Val{S}) where {T<:FDPNSystem,S}
+    index = findfirst(y -> y == S, symbols(T))
+    if isnothing(index)
+        index = findfirst(y -> y == S, ascii_symbols(T))
+    end
+    if isnothing(index)
+        error(
+            "Type `$(T)` has no symbol `:$(S)`.\n" *
+            "This type's symbols are `$(symbols(T))`.\n" *
+            "The ASCII equivalents are `$(ascii_symbols(T))`.\n",
+        )
+    else
+        index
+    end
+end
 
-## TODO: See if this method is needed
+Base.eltype(::FDPNSystem{FT}) where {FT} = FT
 
-## The old code had this, but I think it would probably just cause errors.  It might be
-## relied upon in the functions where we take derivatives — 𝓔′code and γₚₙ₀′ — but even if
-## so, maybe we could work around it with another function.
-#Base.eltype(::FDPNSystem{FT}) where {FT} = FT
+@testitem "FDPNSystem" begin
+    @testset "BBH" begin
+        PNOrder = 7//2
+        bbh = BBH(randn(14), PNOrder)
+        fdpnsystem = FDPNSystem(bbh)
+        @test fdpnsystem isa FDPNSystem{eltype(bbh),PNOrder,typeof(bbh)}
+        @test pn_order(fdpnsystem) == PNOrder
+        @test eltype(fdpnsystem) == eltype(bbh)
+        @test symbols(fdpnsystem) == symbols(bbh)
+        @test length(fdpnsystem) == 14
+    end
+    @testset "BHNS" begin
+        PNOrder = typemax(Int)
+        bhns = BHNS(randn(15), PNOrder)
+        fdpnsystem = FDPNSystem(bhns)
+        @test fdpnsystem isa FDPNSystem{eltype(bhns),max_pn_order,typeof(bhns)}
+        @test pn_order(fdpnsystem) == max_pn_order
+        @test eltype(fdpnsystem) == eltype(bhns)
+        @test symbols(fdpnsystem) == symbols(bhns)
+        @test length(fdpnsystem) == 15
+    end
+    @testset "NSNS" begin
+        PNOrder = 3.5
+        nsns = NSNS(randn(16), PNOrder)
+        fdpnsystem = FDPNSystem(nsns)
+        @test fdpnsystem isa FDPNSystem{eltype(nsns),7//2,typeof(nsns)}
+        @test pn_order(fdpnsystem) == 7//2
+        @test eltype(fdpnsystem) == eltype(nsns)
+        @test symbols(fdpnsystem) == symbols(nsns)
+        @test length(fdpnsystem) == 16
+    end
+end
