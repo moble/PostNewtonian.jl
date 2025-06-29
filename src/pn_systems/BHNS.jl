@@ -35,8 +35,9 @@ also [`NSNS`](@ref).
     end
 end
 
-# The following are methods of functions defined in `state_variables.jl`, specialized for
-# `BHNS` systems.
+# The following are methods of functions defined in `vector_interface.jl` and
+# `state_variables.jl`, specialized for `BBH` systems.
+Base.length(pnsystem::BHNS) = 15
 state(pnsystem::BHNS) = pnsystem.state
 function symbols(::Type{<:BHNS})
     (symbols(Quasispherical)..., :Λ₂)

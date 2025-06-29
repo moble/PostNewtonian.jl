@@ -27,8 +27,9 @@ and `Λ₂` holding the (constant) tidal-coupling parameters of the neutron star
 end
 @public const BNS = NSNS
 
-# The following are methods of functions defined in `state_variables.jl`, specialized for
-# `NSNS` systems.
+# The following are methods of functions defined in `vector_interface.jl` and
+# `state_variables.jl`, specialized for `BBH` systems.
+Base.length(pnsystem::BHNS) = 16
 state(pnsystem::NSNS) = pnsystem.state
 function symbols(::Type{<:NSNS})
     (symbols(Quasispherical)..., :Λ₁, :Λ₂)

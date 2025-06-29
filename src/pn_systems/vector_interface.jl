@@ -56,8 +56,8 @@ Base.size(pnsystem::PNSystem) = size(state(pnsystem))
 Base.size(pnsystem::PNSystem, dim) = size(state(pnsystem), dim)
 Base.IteratorEltype(::Type{T}) where {T<:PNSystem} = Base.HasEltype()
 # Base.eltype(::Type{<:PNSystem{NT}}) where {NT} = NT  ## Already defined in `PNSystem.jl`
-Base.isdone(pnsystem::PNSystem) = isdone(state(pnsystem))
-Base.isdone(pnsystem::PNSystem, iterstate) = isdone(state(pnsystem), iterstate)
+Base.isdone(pnsystem::PNSystem) = Base.isdone(state(pnsystem))
+Base.isdone(pnsystem::PNSystem, iterstate) = Base.isdone(state(pnsystem), iterstate)
 # Indexing
 @propagate_inbounds Base.getindex(pnsystem::PNSystem, i::T) where {T} = getindex(
     state(pnsystem), i
@@ -87,7 +87,7 @@ Base.stride(pnsystem::PNSystem, k::Int) = stride(state(pnsystem), k)
 
 # NamedTuple interface
 function Base.convert(::Type{NamedTuple}, pnsystem::PNSystem{N,P,S}) where {N,P,S}
-    NamedTuple{symbols(pnsystem),N}(state(pnsystem))
+    NamedTuple{symbols(pnsystem),NTuple{length(pnsystem),N}}(state(pnsystem))
 end
 Base.keys(pnsystem::PNSystem) = symbols(pnsystem)
 function Base.pairs(pnsystem::PNSystem{N,P,S}) where {N,P,S}
@@ -102,7 +102,6 @@ Base.@propagate_inbounds function Base.getindex(
     getindex.((pnsystem,), s)
 end
 
-# # Allow copying LArray of uninitialized data, as with regular Array
 Base.copy(pnsystem::PNSystem) = typeof(pnsystem)(copy(state(pnsystem)))
 Base.copyto!(x::PNSystem, y::PNSystem) = copyto!(state(x), state(y))
 
@@ -172,6 +171,7 @@ Base.dataids(pnsystem::PNSystem) = Base.dataids(state(pnsystem))
 
 @testitem "Vector interface" begin
     using PostNewtonian: state
+    using LinearAlgebra
 
     for pnsystem ∈ (BBH(randn(14), 7//2), BHNS(randn(15), 7//2), NSNS(randn(16), 7//2))
         @test_throws ErrorException symbol_index(typeof(pnsystem), Val(:nonexistent_symbol))
@@ -247,11 +247,46 @@ Base.dataids(pnsystem::PNSystem) = Base.dataids(state(pnsystem))
             @test Base.eltype(pnsystem) == FT
             @test Base.eltype(typeof(pnsystem)) == FT
             @test Base.eltype(state(pnsystem)) == FT
-            @test Base.elsize(pnsystem) == sizeof(FT)
-            @test Base.elsize(typeof(pnsystem)) == sizeof(FT)
             for (i, v) ∈ enumerate(pnsystem)
                 @test v == pnsystem[i] == pnsystem.state[i]
             end
+            for (i, v) ∈ enumerate(symbols(pnsystem))
+                pnsystem[i] = 2
+                @test pnsystem[v] == 2
+                @test pnsystem.state[i] == 2
+                pnsystem[v] = 3
+                @test pnsystem[i] == 3
+                @test pnsystem.state[i] == 3
+            end
+            @test [pnsystem[i] for i ∈ firstindex(pnsystem):lastindex(pnsystem)] == pnsystem.state
+            @test [pnsystem[i] for i ∈ eachindex(pnsystem)] == pnsystem.state
+            @test eachindex(pnsystem) == axes(pnsystem, 1)
+            if FT ≠ Float16
+                @test state(LinearAlgebra.BLAS.scal(FT(1.2), pnsystem)) ≈ 1.2state(pnsystem) atol=0 rtol=4eps(
+                    FT
+                )
+            end
+            @test stride(pnsystem, 1) == strides(state(pnsystem))[1]
+            @test Base.elsize(pnsystem) == sizeof(FT)
+            @test Base.elsize(typeof(pnsystem)) == sizeof(FT)
+            nt = convert(NamedTuple, pnsystem)
+            for symbol ∈ symbols(pnsystem)
+                @test haskey(nt, symbol)
+                @test nt[symbol] == pnsystem[symbol]
+            end
+            @test keys(pnsystem) == symbols(pnsystem)
+            @test collect(pairs(pnsystem)) ==
+                collect(k=>v for (k, v) ∈ zip(symbols(pnsystem), state(pnsystem)))
+            @test pnsystem[collect(symbols(pnsystem))] == state(pnsystem)
+            pnsystem2 = BBH(randn(FT, 14), PNOrder)
+            pnsystem3 = copy(pnsystem2)
+            @test typeof(pnsystem2) == typeof(pnsystem3)
+            @test pnsystem2 == pnsystem3
+            @test state(pnsystem2) == state(pnsystem3)
+            copyto!(pnsystem, pnsystem2)
+            @test typeof(pnsystem) == typeof(pnsystem2)
+            @test pnsystem == pnsystem2
+            @test state(pnsystem) == state(pnsystem2)
         end
     end
 end

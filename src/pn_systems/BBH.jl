@@ -42,8 +42,9 @@ difficult to extract this quantity from `R`.
 end
 @public const BHBH = BBH
 
-# The following are methods of functions defined in `state_variables.jl`, specialized for
-# `BBH` systems.
+# The following are methods of functions defined in `vector_interface.jl` and
+# `state_variables.jl`, specialized for `BBH` systems.
+Base.length(pnsystem::BBH) = 14
 state(pnsystem::BBH) = pnsystem.state
 symbols(::Type{<:BBH}) = symbols(Quasispherical)
 ascii_symbols(::Type{<:BBH}) = ascii_symbols(Quasispherical)
