@@ -24,7 +24,7 @@ types.
     if isnothing(index)
         error(
             "Type `$(T)` has no symbol `:$(S)`.\n" *
-            "Its symbols are `$(symbols(T))`.\n" *
+            "This type's symbols are `$(symbols(T))`.\n" *
             "The ASCII equivalents are `$(ascii_symbols(T))`.\n",
         )
     else

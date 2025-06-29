@@ -29,7 +29,7 @@ end
 
 # The following are methods of functions defined in `vector_interface.jl` and
 # `state_variables.jl`, specialized for `BBH` systems.
-Base.length(pnsystem::BHNS) = 16
+Base.length(pnsystem::NSNS) = 16  # Specialize this just for efficiency
 state(pnsystem::NSNS) = pnsystem.state
 function symbols(::Type{<:NSNS})
     (symbols(Quasispherical)..., :Λ₁, :Λ₂)
