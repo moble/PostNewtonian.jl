@@ -51,32 +51,38 @@ Base.eltype(::FDPNSystem{FT}) where {FT} = FT
 @testitem "FDPNSystem" begin
     @testset "BBH" begin
         PNOrder = 7//2
-        bbh = BBH(randn(14), PNOrder)
-        fdpnsystem = FDPNSystem(bbh)
-        @test fdpnsystem isa FDPNSystem{eltype(bbh),PNOrder,typeof(bbh)}
-        @test pn_order(fdpnsystem) == PNOrder
-        @test eltype(fdpnsystem) == eltype(bbh)
-        @test symbols(fdpnsystem) == symbols(bbh)
-        @test length(fdpnsystem) == 14
+        for NT ∈ (Float16, Float64)
+            bbh = BBH(randn(NT, 14), PNOrder)
+            fdpnsystem = FDPNSystem(bbh)
+            @test fdpnsystem isa FDPNSystem{eltype(bbh),PNOrder,typeof(bbh)}
+            @test pn_order(fdpnsystem) == PNOrder
+            @test eltype(fdpnsystem) == NT
+            @test symbols(fdpnsystem) == symbols(bbh)
+            @test length(fdpnsystem) == 14
+        end
     end
     @testset "BHNS" begin
         PNOrder = typemax(Int)
-        bhns = BHNS(randn(15), PNOrder)
-        fdpnsystem = FDPNSystem(bhns)
-        @test fdpnsystem isa FDPNSystem{eltype(bhns),max_pn_order,typeof(bhns)}
-        @test pn_order(fdpnsystem) == max_pn_order
-        @test eltype(fdpnsystem) == eltype(bhns)
-        @test symbols(fdpnsystem) == symbols(bhns)
-        @test length(fdpnsystem) == 15
+        for NT ∈ (Float16, Float64)
+            bhns = BHNS(randn(NT, 15), PNOrder)
+            fdpnsystem = FDPNSystem(bhns)
+            @test fdpnsystem isa FDPNSystem{eltype(bhns),max_pn_order,typeof(bhns)}
+            @test pn_order(fdpnsystem) == max_pn_order
+            @test eltype(fdpnsystem) == NT
+            @test symbols(fdpnsystem) == symbols(bhns)
+            @test length(fdpnsystem) == 15
+        end
     end
     @testset "NSNS" begin
         PNOrder = 3.5
-        nsns = NSNS(randn(16), PNOrder)
-        fdpnsystem = FDPNSystem(nsns)
-        @test fdpnsystem isa FDPNSystem{eltype(nsns),7//2,typeof(nsns)}
-        @test pn_order(fdpnsystem) == 7//2
-        @test eltype(fdpnsystem) == eltype(nsns)
-        @test symbols(fdpnsystem) == symbols(nsns)
-        @test length(fdpnsystem) == 16
+        for NT ∈ (Float16, Float64)
+            nsns = NSNS(randn(NT, 16), PNOrder)
+            fdpnsystem = FDPNSystem(nsns)
+            @test fdpnsystem isa FDPNSystem{eltype(nsns),7//2,typeof(nsns)}
+            @test pn_order(fdpnsystem) == 7//2
+            @test eltype(fdpnsystem) == NT
+            @test symbols(fdpnsystem) == symbols(nsns)
+            @test length(fdpnsystem) == 16
+        end
     end
 end
