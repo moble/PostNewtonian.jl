@@ -90,11 +90,6 @@ and replace them with the appropriate float values.
 ```@docs
 PostNewtonian.γₑ
 PostNewtonian.ζ3
-PostNewtonian.ln2
-PostNewtonian.ln3
-PostNewtonian.ln5
-PostNewtonian.ln³╱₂
-PostNewtonian.ln⁵╱₂
 ```
 
 ## Truncated series

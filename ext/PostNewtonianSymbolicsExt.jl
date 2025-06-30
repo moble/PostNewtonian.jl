@@ -44,9 +44,6 @@ import PostNewtonian:
     X₁,
     X₂,
     ln,
-    ln2,
-    ln3,
-    ln5,
     ζ3,
     γₑ,
     _efficient_vector

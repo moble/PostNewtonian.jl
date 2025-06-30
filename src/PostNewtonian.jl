@@ -19,7 +19,7 @@ using .InlineExports: @public, @export
 # this package.
 @public const ln = log
 @public const 𝒾 = im  # Type this as `\scre<tab>`
-@public const γₑ = Base.MathConstants.γ  # Distinguished from PN's `γₚₙ = M/r`
+@public const γₑ = Base.MathConstants.γ  # Distinguish Euler's constant from `γₚₙ = M/r`
 public ζ3  # Defined in `core/utilities/misc.jl`
 
 include("core/core.jl")
