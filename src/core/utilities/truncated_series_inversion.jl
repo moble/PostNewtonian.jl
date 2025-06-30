@@ -16,7 +16,7 @@ This function is essentially a helper function for the [`lagrange_inversion`](@r
 function.
 
 """
-function x╱f_mod_xⁿ⁻¹(a::NTuple{N,T}) where {N,T}
+@public function x╱f_mod_xⁿ⁻¹(a::NTuple{N,T}) where {N,T}
     b = zeros(MVector{N,typeof(inv(a[1]))})
     b[1] = inv(a[1])
     for i ∈ 2:N
@@ -113,7 +113,7 @@ This function is essentially a helper function for the [`lagrange_inversion`](@r
 function.
 
 """
-function hⁱ✖h_mod_xⁿ⁻¹(hⁱ::NTuple{N,T}, h::NTuple{N,T}) where {N,T}
+@public function hⁱ✖h_mod_xⁿ⁻¹(hⁱ::NTuple{N,T}, h::NTuple{N,T}) where {N,T}
     hⁱ⁺¹ = zeros(MVector{N,T})
     for i ∈ 1:N
         hⁱ⁺¹[i] = sum((hⁱ[j] * h[i - j + 1] for j ∈ 1:i))
@@ -394,7 +394,7 @@ actually be beneficial in practice, so we stick with the basic algorithm here �
 would not be too difficult to implement if needed.
 
 """
-function lagrange_inversion(a::NTuple{N,T}) where {N,T}
+@public function lagrange_inversion(a::NTuple{N,T}) where {N,T}
     h = x╱f_mod_xⁿ⁻¹(a)
     f⁻¹ = zeros(MVector{N,typeof(h[end] / 2)})
     hⁱ = h  # Create storage for the loop

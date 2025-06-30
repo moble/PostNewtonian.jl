@@ -25,7 +25,7 @@ julia> sum((1:10_000_000).^-3)
 
 Return `x` or the value wrapped by the `Dual` number `x`
 """
-value(x::T) where {T} = hasproperty(x, :value) ? getproperty(x, :value) : x
+@public value(x::T) where {T} = hasproperty(x, :value) ? getproperty(x, :value) : x
 
 """
     find_symbols_of_type(mod, T)

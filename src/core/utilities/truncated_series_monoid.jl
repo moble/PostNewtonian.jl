@@ -57,7 +57,7 @@ product of the series and its inverse must be zero.  This gives
 b_{i+1} = -b_0\sum_{j=1}^{i} a_j b_{i-j}.
 ```
 """
-function truncated_series_inverse(a::AbstractVector)
+@public function truncated_series_inverse(a::AbstractVector)
     b = similar(a)
     return truncated_series_inverse!(b, a)
 end
@@ -68,7 +68,7 @@ function truncated_series_inverse(a::NTuple{N,T}) where {N,T}
     return Tuple(b)
 end
 
-function truncated_series_inverse!(b, a)
+@public function truncated_series_inverse!(b, a)
     @assert length(b) == length(a)
     n = length(a)
     @inbounds @fastmath if n > 0
@@ -102,7 +102,7 @@ Internally, the sums are performed using `evalpoly`.
 
 See also [`truncated_series_ratio`](@ref).
 """
-function truncated_series_product(a, b, v)
+@public function truncated_series_product(a, b, v)
     @assert length(a) == length(b)
     N = length(a) - 1
     if N < 0
@@ -145,7 +145,7 @@ and return the *value* of the ratio ``A / B`` truncated at ``v^n``.
 This function simply combines [`truncated_series_product`](@ref) and
 [`truncated_series_inverse`](@ref).
 """
-function truncated_series_ratio(a, b, v)
+@public function truncated_series_ratio(a, b, v)
     return truncated_series_product(a, truncated_series_inverse(b), v)
 end
 
