@@ -3,8 +3,9 @@ module PostNewtonian
 using Base: @propagate_inbounds
 using FastDifferentiation: Node as FDNode
 #using InlineExports: @public, @export  # See below
+using IrrationalConstants: @irrational
 using Quaternionic: Quaternionic, QuatVec, Rotor, abs2vec, components, normalize, ⋅, ×
-using StaticArrays: @MVector, MVector, SVector
+using StaticArrays: MVector, SVector
 using TestItems: @testitem
 
 # While I wait for https://github.com/dalum/InlineExports.jl/pull/2 to be merged, we do the
@@ -14,6 +15,12 @@ using TestItems: @testitem
 include("core/utilities/InlineExports.jl")
 using .InlineExports: @public, @export
 
+# These are definitions / aliases that are common in PN literature and are used throughout
+# this package.
+@public const ln = log
+@public const 𝒾 = im  # Type this as `\scre<tab>`
+@public const γₑ = Base.MathConstants.γ  # Distinguished from PN's `γₚₙ = M/r`
+public ζ3  # Defined in `core/utilities/misc.jl`
 
 include("core/core.jl")
 include("pn_systems/pn_systems.jl")

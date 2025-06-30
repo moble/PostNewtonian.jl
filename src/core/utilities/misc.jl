@@ -1,3 +1,25 @@
+@irrational ζ3 1.2020569031595942 big"1.20205690315959428539973816151144999076498629234049888179227155534183820578631309018645587360933525814619915"
+"""
+    ζ3
+    apery
+
+[Apéry's constant](https://en.wikipedia.org/wiki/Ap%C3%A9ry%27s_constant) is
+defined as ``ζ(3)``, where ``ζ`` is the Riemann zeta function.  This is OEIS
+sequence [A002117](https://oeis.org/A002117).
+
+```julia-repl
+julia> PostNewtonian.apery
+ζ3 = 1.2020569031595...
+
+julia> PostNewtonian.ζ3
+ζ3 = 1.2020569031595...
+
+julia> sum((1:10_000_000).^-3)
+1.2020569031595896
+```
+"""
+ζ3  # We document it this way because `@irrational` cannot handle docstrings.
+
 """
     value(x)
 
