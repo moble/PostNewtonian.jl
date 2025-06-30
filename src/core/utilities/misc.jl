@@ -3,7 +3,7 @@
 
 Return `x` or the value wrapped by the `Dual` number `x`
 """
-value(x) = hasproperty(x, :value) ? getproperty(x, :value) : x
+value(x::T) where {T} = hasproperty(x, :value) ? getproperty(x, :value) : x
 
 """
     find_symbols_of_type(mod, T)
