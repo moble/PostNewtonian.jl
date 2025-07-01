@@ -69,10 +69,11 @@ function pn_reference(expr)
             expr.args[2],  # This is the name of the module
             Expr(  # This is the new module body
                 :block,
-                :(import Base),
-                :(eval(x) = Core.eval(Mod, x)),
-                :(include(p) = Base.include(Mod, p)),
-                :(using PostNewtonian: @pn_expression, @pn_expansion),
+                :(using Base: Base, Val),
+                :(eval(x::Expr) = Core.eval(Mod, x)),
+                :(include(p::AbstractString) = Base.include(Mod, p)),
+                :(using PostNewtonian: @pn_expression, @pn_expansion, 𝒾, γₑ, ζ3),
+                :(using PostNewtonian.PNExpressionArithmetic),
                 expr.args[3].args...,  # The original module body
             ),
         )
@@ -119,15 +120,15 @@ end
     using PostNewtonian: @pn_reference
 
     input = @macroexpand @pn_reference module Einstein1918
-    using PostNewtonian: G, c, M, χ⃗₁, χ⃗₂, v, pn_order
-    using Quaternionic: absvec
+    import PostNewtonian: G, c, M, χ⃗₁, χ⃗₂, v, pn_order
+    import Quaternionic: absvec
     @pn_expression χ₁(pnsystem) = absvec(χ⃗₁)
     @pn_expression χ₂(pnsystem) = absvec(χ⃗₂)
     const x = 3
     module InnerMod
         const z = 4
     end
-    using .InnerMod: z
+    import .InnerMod: z
     @pn_expression function y(pnsystem)
         G*M/c^3 * @pn_expansion(x + χ₁ + χ₂ + z*(v/c))
     end
@@ -136,19 +137,20 @@ end
     output = quote
         baremodule Einstein1918
         import Base
-        eval(x) = Core.eval(Mod, x)
-        include(p) = Base.include(Mod, p)
-        using PostNewtonian: @pn_expression, @pn_expansion
+        eval(x::Expr) = Core.eval(Mod, x)
+        include(p::AbstractString) = Base.include(Mod, p)
+        using PostNewtonian: @pn_expression, @pn_expansion, 𝒾, γₑ, ζ3
+        using PostNewtonian.PNExpressionArithmetic
 
-        using PostNewtonian: G, c, M, χ⃗₁, χ⃗₂, v, pn_order
-        using Quaternionic: absvec
+        import PostNewtonian: G, c, M, χ⃗₁, χ⃗₂, v, pn_order
+        import Quaternionic: absvec
         @pn_expression χ₁(pnsystem) = absvec(χ⃗₁)
         @pn_expression χ₂(pnsystem) = absvec(χ⃗₂)
         const x = 3
         module InnerMod
             const z = 4
         end
-        using .InnerMod: z
+        import .InnerMod: z
         @pn_expression function y(pnsystem)
             G*M/c^3 * @pn_expansion(x + χ₁ + χ₂ + z*(v/c))
         end

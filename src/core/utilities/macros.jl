@@ -80,7 +80,7 @@ function pn_expression(pnsystem::Symbol, body)
         unary_funcs_exprs
     ]
 
-    # Next, add pnsystem as the argument to each @pn_expansion call
+    # Next, add `pnsystem` as the argument to each @pn_expansion call
     new_body = MacroTools.unblock(
         macroexpand(
             @__MODULE__,
