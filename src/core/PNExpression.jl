@@ -1,4 +1,3 @@
-
 macro pn_expression(arg_index, func=:(nothing))
     # Note that macros secretly get two extra variables: `__module__` and `__source__`.
     # These refer to the place where the macro was called.  The second is useful for
@@ -136,8 +135,37 @@ function pn_expression(arg_index, func, pnsystem_functions, __module__, __source
     return MacroTools.combinedef(splitfunc)
 end
 
-# baremodule Mod
-# import Base
-# (+)(x, y) = Base.:+(Base.BigFloat(x), y)
-# const x = Base.π + 3
-# end
+@testitem "@pn_expression" begin
+    baremodule Mod
+    # These are the expressions added by `@pn_reference`
+    using Base: Base, Val
+    eval(x::Expr) = Core.eval(@__MODULE__, x)
+    include(p::AbstractString) = Base.include(@__MODULE__, p)
+    using PostNewtonian: @pn_expression, @pn_expansion, 𝒾, γₑ, ζ3
+    using PostNewtonian.PNExpressionArithmetic
+
+    const x = 7
+    f(pnsys::PNSystem) = x
+    @pn_expression function g(pnsy)
+        f + 2
+    end
+    @pn_expression function h(pns)
+        f - 2
+    end
+    @pn_expression function i(pn)
+        f * 2
+    end
+    @pn_expression function j(p)
+        f / 2
+    end
+    end
+    # Test that `f` and only `f` is the thing visible to the macro function finder
+    # Test the output against BBH{Float16}, BBH{Float64}, and BBH{BigFloat}
+
+    # @pn_expression function test_arithmetic(pnsystem)
+    #     return (pnsystem.M + pnsystem.c) * (pnsystem.M - pnsystem.c) / pnsystem.c^2
+    # end
+    # result = test_arithmetic(pnsystem)
+    # @test result == (pnsystem.M^2 - pnsystem.c^2) / pnsystem.c^2
+
+end
