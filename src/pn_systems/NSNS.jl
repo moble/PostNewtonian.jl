@@ -55,7 +55,7 @@ for (i, (symbol, ascii_symbol)) ∈ enumerate(zip(symbols(NSNS), ascii_symbols(N
 end
 
 @testitem "NSNS constructors" begin
-    using PostNewtonian: state
+    using PostNewtonian: state, constant_convert
     using Quaternionic
 
     # minimal constructor: default Φ=0, R=Rotor(1)
@@ -87,6 +87,8 @@ end
         5.0;
         6.0
     ]
+    @test constant_convert(pnA, π) isa Float32
+    @test constant_convert(pnA, π) == Float32(π)
 
     # explicit orbital phase
     pnB = NSNS(
@@ -117,6 +119,8 @@ end
         5.0;
         6.0
     ]
+    @test constant_convert(pnB, π) isa Float32
+    @test constant_convert(pnB, π) == Float32(π)
 
     # custom rotor, default Φ
     R = randn(RotorF32)
@@ -132,6 +136,8 @@ end
     )
     @test state(pn1) ≈
         [1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; components(R)...; 0.23; 0.0; 5.0; 6.0]
+    @test constant_convert(pn1, π) isa Float32
+    @test constant_convert(pn1, π) == Float32(π)
 
     # custom rotor and Φ
     pn2 = NSNS(
@@ -147,6 +153,8 @@ end
     )
     @test state(pn2) ≈
         [1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; components(R)...; 0.23; 9.0; 5.0; 6.0]
+    @test constant_convert(pn2, π) isa Float32
+    @test constant_convert(pn2, π) == Float32(π)
 
     # mutating the second-to-last element (Φ) to match pn2
     pn1[end - 2] = 9.0f0

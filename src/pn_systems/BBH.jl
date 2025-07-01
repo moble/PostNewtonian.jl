@@ -71,7 +71,7 @@ end
 Λ₂(pnsystem::BBH) = zero(pnsystem)
 
 @testitem "BBH constructors" begin
-    using PostNewtonian: state
+    using PostNewtonian: state, constant_convert
     using Quaternionic
 
     pnA = BBH(;
@@ -80,6 +80,8 @@ end
     @test eltype(pnA) == Float32
     @test state(pnA) ==
         Float32[1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 1.0; 0.0; 0.0; 0.0; 0.23; 0.0]
+    @test constant_convert(pnA, π) isa Float32
+    @test constant_convert(pnA, π) == Float32(π)
 
     pnB = BBH(;
         M₁=1.0f0,
@@ -91,6 +93,8 @@ end
     )
     @test state(pnB) ==
         Float32[1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 1.0; 0.0; 0.0; 0.0; 0.23; 9.0]
+    @test constant_convert(pnB, π) isa Float32
+    @test constant_convert(pnB, π) == Float32(π)
 
     R = randn(RotorF32)
     pn1 = BBH(;
@@ -102,6 +106,8 @@ end
         v=0.23f0,
     )
     @test state(pn1) ≈ [1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; components(R)...; 0.23; 0.0]
+    @test constant_convert(pn1, π) isa Float32
+    @test constant_convert(pn1, π) == Float32(π)
 
     pn2 = BBH(;
         M₁=1.0f0,
@@ -113,6 +119,8 @@ end
         Φ=9.0f0,
     )
     @test state(pn2) ≈ [1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; components(R)...; 0.23; 9.0]
+    @test constant_convert(pn2, π) isa Float32
+    @test constant_convert(pn2, π) == Float32(π)
 
     state(pn1)[end] = 9.0f0
     @test state(pn1) == state(pn2)

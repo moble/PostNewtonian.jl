@@ -16,12 +16,16 @@ using TestItems: @testitem
 include("core/utilities/InlineExports.jl")
 using .InlineExports: @public, @export
 
-# These are definitions / aliases that are common in PN literature and are used throughout
+# These are definitions / aliases that are common in PN literature and/or used throughout
 # this package.
 @public const ln = log
 @public const 𝒾 = im  # Type this as `\scre<tab>`
 @public const γₑ = Base.MathConstants.γ  # Distinguish Euler's constant from `γₚₙ = M/r`
 public ζ3  # Defined in `core/utilities/misc.jl`
+
+# We will use these types to ensure that precision is preserved in PN expressions.
+@public const exact_real = Union{Integer,Rational,AbstractIrrational}
+@public const exact_number = Union{exact_real,Complex{<:exact_real}}
 
 include("pn_systems/pn_systems.jl")
 include("core/core.jl")

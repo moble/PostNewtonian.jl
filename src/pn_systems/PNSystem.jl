@@ -19,6 +19,48 @@ should be carried out when using the given object.
                       AbstractVector{NT} end
 
 """
+    pnsystem::PNSystem(; kwargs...)
+
+State-modifying copy constructor for `PNSystem` objects.
+
+!!! warning
+
+    This function is slow; it should not be used in performance-critical code.
+
+Note that this cannot modify the type's parameters — the number type `NT`, the `PNOrder` of
+the system, or the state type `ST`.  However, it can modify any of the state variables by
+symbol or by ASCII symbol.  This function will raise an AssertionError if any of the keys in
+`kwargs` is not a valid symbol for the given `PNSystem` type.
+
+```jldoctest
+julia> using PostNewtonian: BBH
+
+julia> pnsystem = BBH(ones(14)/2; PNOrder=7//2)
+BBH{Vector{Float64}, 7//2}([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
+
+julia> pnsystem2 = pnsystem(M₁=0.2, M₂=0.8, chi1x=0.1)
+BBH{Vector{Float64}, 7//2}([0.2, 0.8, 0.1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
+```
+"""
+function (pnsystem::PNSystem{NT,PNOrder,ST})(; kwargs...) where {NT,PNOrder,ST}
+    all_symbols = Set(symbols(pnsystem)) ∪ Set(ascii_symbols(pnsystem))
+    @assert keys(kwargs) ⊆ all_symbols (
+        "PNSystem of type $(typeof(pnsystem)) does not have these symbols, which were " *
+        "input as keyword arguments:\n    $(setdiff(keys(kwargs), all_symbols))\n" *
+        "Maybe you passed `String`s instead of `Symbol`s?\n" *
+        "The available symbols for this type are\n" *
+        "    $(symbols(pnsystem))\n" *
+        "and their ASCII equivalents:\n" *
+        "    $(ascii_symbols(pnsystem))"
+    )
+    state = Tuple(
+        get(kwargs, symbol, get(kwargs, ascii_symbol, pnsystem[symbol])) for
+        (symbol, ascii_symbol) ∈ zip(symbols(pnsystem), ascii_symbols(pnsystem))
+    )
+    typeof(pnsystem)(ST(SVector(state)))
+end
+
+"""
     state(pnsystem::PNSystem)
 
 Return the state vector of `pnsystem`, which is a vector of fundamental variables for the
@@ -78,39 +120,15 @@ function ascii_symbols(::Type{T}) where {T<:PNSystem}
 end
 
 """
-    pnsystem::PNSystem(; kwargs...)
+    constant_convert(pnsystem, x)
 
-State-modifying copy constructor for `PNSystem` objects.
+Convert `x` to the type of the constant numbers to be used with `pnsystem`.  Usually, this
+type will be the first template parameter.  However, when that parameter is a `Dual`, for
+example, we don't want to bother defining constants as `Dual`, so we will just define them
+as the `Dual`'s underlying type in PostNewtonianForwardDiffExt.
 
-Note that this cannot modify the type's parameters, including the number type `NT`, the
-state type `ST`, or the `PNOrder` of the system.  However, it can modify any of the state
-variables by symbol or by ASCII symbol.  This function will raise an AssertionError if
-any of the keys in `kwargs` is not a valid symbol for the given `PNSystem` type.
-
-```jldoctest
-julia> using PostNewtonian: BBH
-
-julia> pnsystem = BBH(ones(14)/2; PNOrder=7//2)
-BBH{Vector{Float64}, 7//2}([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
-
-julia> pnsystem2 = pnsystem(M₁=0.2, M₂=0.8, chi1x=0.1)
-BBH{Vector{Float64}, 7//2}([0.2, 0.8, 0.1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
-```
+You generally will not need to call this function directly; it will be used automatically by
+the [`@pn_expression`](@ref) macro.
 """
-function (pnsystem::PNSystem{NT,PNOrder,ST})(; kwargs...) where {NT,PNOrder,ST}
-    all_symbols = Set(symbols(pnsystem)) ∪ Set(ascii_symbols(pnsystem))
-    @assert keys(kwargs) ⊆ all_symbols (
-        "PNSystem of type $(typeof(pnsystem)) does not have these symbols, which were " *
-        "input as keyword arguments:\n    $(setdiff(keys(kwargs), all_symbols))\n" *
-        "Maybe you passed `String`s instead of `Symbol`s?\n" *
-        "The available symbols for this type are\n" *
-        "    $(symbols(pnsystem))\n" *
-        "and their ASCII equivalents:\n" *
-        "    $(ascii_symbols(pnsystem))"
-    )
-    state = Tuple(
-        get(kwargs, symbol, get(kwargs, ascii_symbol, pnsystem[symbol])) for
-        (symbol, ascii_symbol) ∈ zip(symbols(pnsystem), ascii_symbols(pnsystem))
-    )
-    typeof(pnsystem)(ST(SVector(state)))
-end
+@public constant_convert(::T, x::exact_number) where {NT,T<:PNSystem{NT}} = NT(x)
+constant_convert(::T, x::NT) where {NT,T<:PNSystem{NT}} = x
