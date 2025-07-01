@@ -1,3 +1,7 @@
 include("utilities/misc.jl")
 include("utilities/truncated_series_monoid.jl")
 include("utilities/truncated_series_inversion.jl")
+include("PNTerm.jl")
+include("PNExpansion.jl")
+# include("PNExpression.jl")
+include("PNReference.jl")

@@ -1,9 +1,10 @@
 module PostNewtonian
 
 using Base: @propagate_inbounds
-using FastDifferentiation: Node as FDNode
+using FastDifferentiation: FastDifferentiation, Node as FDNode
 #using InlineExports: @public, @export  # See below
 using IrrationalConstants: @irrational
+using MacroTools: MacroTools
 using Quaternionic: Quaternionic, QuatVec, Rotor, abs2vec, components, normalize, ⋅, ×
 using StaticArrays: MVector, SVector
 using TestItems: @testitem
@@ -22,8 +23,8 @@ using .InlineExports: @public, @export
 @public const γₑ = Base.MathConstants.γ  # Distinguish Euler's constant from `γₚₙ = M/r`
 public ζ3  # Defined in `core/utilities/misc.jl`
 
-include("core/core.jl")
 include("pn_systems/pn_systems.jl")
+include("core/core.jl")
 include("literature/literature.jl")
 include("pn_expressions/pn_expressions.jl")
 include("interface/interface.jl")

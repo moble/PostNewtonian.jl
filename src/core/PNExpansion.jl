@@ -39,7 +39,7 @@ The `N` parameter is not related to the PN order; it is just used by Julia to kn
 elements are currently in the coefficients, but is required to be 1 ≤ N ≤ NMax.
 
 """
-struct PNExpansion{N,T,NMax}
+@public struct PNExpansion{N,T,NMax}
     coeffs::NTuple{N,T}
 
     function PNExpansion{N,T,NMax}(coeffs) where {N,T,NMax}
@@ -165,95 +165,6 @@ end
 Base.Tuple(pn::PNExpansion) = pn.coeffs
 SVector(pn::PNExpansion) = SVector(pn.coeffs)
 
-"""
-    PNTerm{T,PNOrder,c⁻¹Exponent}
-
-This object represents a single term in a PNExpansion.  It has a single field: `coeff`,
-which is the coefficient of the term.  The type parameter `T` is the type of the
-coefficient.  The type parameter `PNOrder` is a half-integer (just as in
-[`PNSystem`](@ref)s) representing the PN order of the expansion.  And the type parameter
-`c⁻¹Exponent` is an integer representing the exponent of the PN expansion parameter ``1/c``.
-
-`PNTerm`s can be multiplied and divided by scalars and exponentiated by integers, to produce
-another `PNTerm`.  They can also be added to other `PNTerm`s to produce a `PNExpansion`.
-
-A simple way to define a `PNTerm` or a `PNExpansion` is to define the PN expansion parameter
-```julia
-c = PNExpansionParameter(pnsystem)
-```
-and use that naturally in formulas, as in
-```julia
-e = 1 + (v/c)^2 * (-ν/12 - 3//4) + (v/c)^4 * (-ν^2/24 + 19ν/8 - 27//8)
-```
-Any exponent higher than the desired `PNOrder` will be automatically set to zero.
-
-Useful facts:
-  - `v` has order `1/c`
-  - `x` has order `1/c^2`
-  - `γ` has order `1/c^2`
-  - `1/r` has order `1/c^2`
-
-"""
-struct PNTerm{T,PNOrder,c⁻¹Exponent}
-    coeff::T
-
-    function PNTerm{T,PNOrder,c⁻¹Exponent}(coeff) where {T,PNOrder,c⁻¹Exponent}
-        if c⁻¹Exponent > 2PNOrder
-            coeff = zero(coeff)
-        end
-        return new{T,PNOrder,c⁻¹Exponent}(coeff)
-    end
-    function PNTerm{T,PNOrder}(c⁻¹exp::Int, coeff) where {T,PNOrder}
-        if c⁻¹exp > 2PNOrder
-            coeff = zero(coeff)
-        end
-        return new{T,PNOrder,c⁻¹exp}(coeff)
-    end
-end
-
-Base.length(pn::PNTerm) = 1
-Base.eltype(pn::PNTerm{T}) where {T} = T
-c⁻¹exp(pn::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent} = c⁻¹Exponent
-
-function Base.sum(pn::PNTerm)
-    return pn.coeff
-end
-
-function Base.:+(pn::PNTerm)
-    return pn
-end
-
-function Base.inv(term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent}
-    return PNTerm{T,PNOrder}(-c⁻¹exp(term), inv(term.coeff))
-end
-
-function Base.:^(term::PNTerm{T,PNOrder,c⁻¹Exponent}, n::Int) where {T,PNOrder,c⁻¹Exponent}
-    coeff = term.coeff^n
-    return PNTerm{typeof(coeff),PNOrder}(c⁻¹exp(term) * n, coeff)
-end
-
-function Base.:*(
-    x::Number, term::PNTerm{T,PNOrder,c⁻¹Exponent}
-) where {T,PNOrder,c⁻¹Exponent}
-    coeff = x * term.coeff
-    return PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
-end
-Base.:*(term::PNTerm, x::Number) = x * term
-
-function Base.:/(
-    term::PNTerm{T,PNOrder,c⁻¹Exponent}, x::Number
-) where {T,PNOrder,c⁻¹Exponent}
-    coeff = term.coeff / x
-    return PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
-end
-
-function Base.:/(
-    x::Number, term::PNTerm{T,PNOrder,c⁻¹Exponent}
-) where {T,PNOrder,c⁻¹Exponent}
-    coeff = x / term.coeff
-    return PNTerm{typeof(coeff),PNOrder}(-c⁻¹exp(term), coeff)
-end
-
 function Base.:+(
     x::T1, term::PNTerm{T2,PNOrder,c⁻¹Exponent}
 ) where {T1<:Number,T2,PNOrder,c⁻¹Exponent}
@@ -282,22 +193,6 @@ Base.:+(term::PNTerm, x::Number) = x + term
 
 function Base.:-(term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent}
     return PNTerm{T,PNOrder,c⁻¹Exponent}(-term.coeff)
-end
-
-function Base.:*(
-    term1::PNTerm{T1,PNOrder,c⁻¹E1}, term2::PNTerm{T2,PNOrder,c⁻¹E2}
-) where {T1,T2,PNOrder,c⁻¹E1,c⁻¹E2}
-    c⁻¹Exponent = c⁻¹exp(term1) + c⁻¹exp(term2)
-    coeff = term1.coeff * term2.coeff
-    return PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
-end
-
-function Base.:/(
-    term1::PNTerm{T1,PNOrder,c⁻¹E1}, term2::PNTerm{T2,PNOrder,c⁻¹E2}
-) where {T1,T2,PNOrder,c⁻¹E1,c⁻¹E2}
-    c⁻¹Exponent = c⁻¹E1 - c⁻¹E2
-    coeff = term1.coeff / term2.coeff
-    return PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
 end
 
 function Base.:+(
@@ -411,14 +306,40 @@ Base.:*(term::PNTerm, expansion::PNExpansion) = expansion * term
 
 Base.:/(expansion::PNExpansion, term::PNTerm) = expansion * inv(term)
 
-"""
-    PNExpansionParameter(pnsystem)
+@testitem "PNExpansion algebra" begin
+    using Symbolics: @variables, simplify, substitute
+    using PostNewtonian: PNExpansion
 
-Create a [`PNTerm`](@ref) object representing the post-Newtonian expansion parameter ``c``.
-This can be used to automatically create more complicated `PNTerm`s, which combine to form a
-[`PNExpansion`](@ref).  This is a simple but effective way to write PN formulas while
-automatically tracking the PN order of each term.
-"""
-function PNExpansionParameter(::PNSystem{ST,PNOrder}) where {ST,PNOrder}
-    return PNTerm{eltype(ST),PNOrder}(-1, one(eltype(ST)))
+    for N1 ∈ 1:9
+        for N2 ∈ 1:9
+            for NMax ∈ max(N1, N2):(N1 + N2 + 3)
+                @variables c⁻¹ x[1:N1] y[1:N2] z
+                poly(e::PNExpansion) = sum(e[i] * c⁻¹^(i - 1) for i ∈ 1:length(e))
+                eˣ = PNExpansion(tuple(x...), NMax)
+                eʸ = PNExpansion(tuple(y...), NMax)
+
+                # Test sums
+                polysum = simplify(poly(eˣ + eʸ); expand=true)
+                sumpoly = simplify(poly(eˣ) + poly(eʸ); expand=true)
+                Δ = simplify(polysum - sumpoly; expand=true)
+                @test iszero(Δ)
+                @test_throws ArgumentError eˣ + PNExpansion(tuple(z, x...), NMax + 1)
+                @test_throws ArgumentError PNExpansion(tuple(z, x...), NMax + 1) + eˣ
+
+                # Test products
+                polyprod = simplify(poly(eˣ * eʸ); expand=true)
+                prodpoly = simplify(
+                    substitute(
+                        simplify(poly(eˣ) * poly(eʸ); expand=true),
+                        Dict([c⁻¹^n => 0 for n ∈ NMax:(2NMax + 3)]),
+                    );
+                    expand=true,
+                )
+                Δ = simplify(polyprod - prodpoly; expand=true)
+                @test iszero(Δ)
+                @test_throws ArgumentError eˣ * PNExpansion(tuple(z, x...), NMax + 1)
+                @test_throws ArgumentError PNExpansion(tuple(z, x...), NMax + 1) * eˣ
+            end
+        end
+    end
 end
