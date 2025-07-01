@@ -7,7 +7,7 @@ import Base: @__doc__
 
 export @export, @public
 
-quote
+eval(quote
     """
         @export
 
@@ -16,7 +16,7 @@ quote
     macro $(Symbol("export"))(expr::Expr)
         return esc(expr)
     end
-end |> eval
+end)
 
 """
     @public
@@ -35,7 +35,7 @@ import Base: @__doc__
 
 export @export, @public
 
-quote
+eval(quote
     """
         @export
 
@@ -64,7 +64,7 @@ quote
     macro $(Symbol("export"))(expr::Expr)
         return handle(expr, :export)
     end
-end |> eval
+end)
 
 if VERSION < v"1.11"
     using ..NoExport: @public
@@ -124,13 +124,14 @@ handle(::Val{:function}, expr) = handle(expr.args[1])
 handle(::Val{:where}, expr) = handle(expr.args[1])
 handle(::Val{:macro}, expr) = Symbol("@", handle(expr.args[1]))
 handle(::Val{:struct}, expr) = handle(expr.args[2])
-handle(::Union{Val{:abstract}, Val{:primitive}}, expr) = handle(expr.args[1])
+handle(::Union{Val{:abstract},Val{:primitive}}, expr) = handle(expr.args[1])
 
 handle(::Val{:<:}, expr) = handle(expr.args[1])
 handle(::Val{:curly}, expr) = handle(expr.args[1])
 handle(::Val{:call}, expr) = handle(expr.args[1])
 function handle(::Val{:macrocall}, expr)
-    if expr.args[1]==Symbol("@doc") || (expr.args[1] == Core.GlobalRef(Core, Symbol("@doc")))
+    if expr.args[1]==Symbol("@doc") ||
+        (expr.args[1] == Core.GlobalRef(Core, Symbol("@doc")))
         if length(expr.args) != 4
             error("@doc expression found with $(length(expr.args)) args:\n$expr")
         end
@@ -144,23 +145,6 @@ end # module InlineExports
 
 @testitem "InlineExports" begin
     using Markdown: @doc_str
-
-    # This code is taken from julia/test/docs.jl
-    function docstrings_equal(d1, d2; debug=true)
-        io1 = IOBuffer()
-        io2 = IOBuffer()
-        show(io1, MIME"text/markdown"(), d1)
-        show(io2, MIME"text/markdown"(), d2)
-        s1 = String(take!(io1))
-        s2 = String(take!(io2))
-        if debug && s1 != s2
-            print(s1)
-            println("--------------------------------------------------------------------------------")
-            print(s2)
-            println("================================================================================")
-        end
-        return s1 == s2
-    end
 
     module Bla
     using PostNewtonian.InlineExports: @export, @public
@@ -263,38 +247,16 @@ end # module InlineExports
     # @test Base.hasproperty(Bla, :X)  # to do with `InlineExports`?!
     # @test Base.hasproperty(Bla, :h)  # Anyway, we used them in tests above... 🤷
 
-    # doc"" plays silly games with newlines, so we just define these three in long form.
-    """
-        f(x)
-
-    Here a doc!
-    """
-    const f_test=51
-
-    """
-        g(x)
-
-    There a doc!
-    """
-    const g_test=52
-
-    """
-        h(x)
-
-    Everywhere a doc, doc!
-    """
-    const h_test=53
-
-    @test docstrings_equal(@doc(Bla.a), doc"`const a` doc")
-    @test docstrings_equal(@doc(Bla.b), doc"`const b` doc")
-    @test docstrings_equal(@doc(Bla.c), doc"`const c` doc")
-    @test docstrings_equal(@doc(Bla.S), doc"`abstract type S` doc")
-    @test docstrings_equal(@doc(Bla.U), doc"`abstract type U` doc")
-    @test docstrings_equal(@doc(Bla.W), doc"`abstract type W` doc")
-    @test docstrings_equal(@doc(Bla.T), doc"`struct T` doc")
-    @test docstrings_equal(@doc(Bla.V), doc"`struct V` doc")
-    @test docstrings_equal(@doc(Bla.X), doc"`struct X` doc")
-    @test docstrings_equal(@doc(Bla.f), @doc(f_test))
-    @test docstrings_equal(@doc(Bla.g), @doc(g_test))
-    @test docstrings_equal(@doc(Bla.h), @doc(h_test))
+    @test repr(@doc(Bla.a)) == "`const a` doc\n"
+    @test repr(@doc(Bla.b)) == "`const b` doc\n"
+    @test repr(@doc(Bla.c)) == "`const c` doc\n"
+    @test repr(@doc(Bla.S)) == "`abstract type S` doc\n"
+    @test repr(@doc(Bla.U)) == "`abstract type U` doc\n"
+    @test repr(@doc(Bla.W)) == "`abstract type W` doc\n"
+    @test repr(@doc(Bla.T)) == "`struct T` doc\n"
+    @test repr(@doc(Bla.V)) == "`struct V` doc\n"
+    @test repr(@doc(Bla.X)) == "`struct X` doc\n"
+    @test repr(@doc(Bla.f)) == """```\nf(x)\n```\n\nHere a doc!\n"""
+    @test repr(@doc(Bla.g)) == """```\ng(x)\n```\n\nThere a doc!\n"""
+    @test repr(@doc(Bla.h)) == """```\nh(x)\n```\n\nEverywhere a doc, doc!\n"""
 end
