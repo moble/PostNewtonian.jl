@@ -22,7 +22,7 @@ macro pn_expression(arg_index, func=:(nothing))
             if isdefined(__module__, name)
                 f = getfield(__module__, name)
                 if isa(f, Base.Callable)
-                    if !isempty(methods(f, Tuple{PNSystem}, __module__))
+                    if !isempty(methods(f, Tuple{PNSystem}))
                         return true
                     end
                 end
@@ -109,8 +109,6 @@ function pn_expression(arg_index, func, pnsystem_functions, __module__, __source
     # # `pnexpressionarithmetic_functions`, and insert `pnsystem` as the first argument.
     new_body = MacroTools.postwalk(new_body) do x
         if iscall(x, pnexpressionarithmetic_functions)
-            @show x.head x.args
-            println()
             insert!(x.args, 2, (pnsystem))
             x
         else
@@ -124,7 +122,7 @@ function pn_expression(arg_index, func, pnsystem_functions, __module__, __source
     new_body = MacroTools.unblock(quote
         #@fastmath
         let $(pnsystem_function_exprs...)
-            $(new_body)
+            $(MacroTools.unblock(new_body))
         end
     end)
 
@@ -139,26 +137,47 @@ end
     baremodule Mod
     # These are the expressions added by `@pn_reference`
     using Base: Base, Val
-    eval(x::Expr) = Core.eval(@__MODULE__, x)
-    include(p::AbstractString) = Base.include(@__MODULE__, p)
-    using PostNewtonian: @pn_expression, @pn_expansion, 𝒾, γₑ, ζ3
+    eval(x::Expr) = Core.eval(Base.@__MODULE__, x)
+    include(p::AbstractString) = Base.include(Base.@__MODULE__, p)
+    using PostNewtonian: PostNewtonian, @pn_expression, @pn_expansion, 𝒾, γₑ, ζ3
     using PostNewtonian.PNExpressionArithmetic
 
-    const x = 7
-    f(pnsys::PNSystem) = x
+    # Below are what we would normally write manually
+    import PostNewtonian: M₁, M₂, χ₁ˣ, χ₁ʸ, χ₁ᶻ, v, Φ
+    const x = Base.://(7, 2)
+    f(pnsys::PostNewtonian.PNSystem) = x
     @pn_expression function g(pnsy)
-        f + 2
+        f + M₁
     end
-    @pn_expression function h(pns)
-        f - 2
-    end
+    @pn_expression h(pns) = f - M₂
     @pn_expression function i(pn)
-        f * 2
+        f * χ₁ˣ
     end
-    @pn_expression function j(p)
-        f / 2
+    @pn_expression function j(pnsyst)
+        f / χ₁ʸ
     end
+    @pn_expression function k(pnsyste)
+        f ^ χ₁ᶻ
     end
+    @pn_expression function l(pnsystm)
+        f * ln(v)
+    end
+    @pn_expression function m(pnsystem)
+        √f * Φ
+    end
+    end  # baremodule Mod
+
+    import .Mod
+
+    const ln = log
+
+    for NT ∈ (Float16, Float64, BigFloat)
+        pnsystem = BHNS(NT.(1:15))
+        for v ∈ (:g, :h, :i, :j, :k, :l, :m)
+            @test eval(:(Mod.$v))(pnsystem) isa NT
+        end
+    end
+
     # Test that `f` and only `f` is the thing visible to the macro function finder
     # Test the output against BBH{Float16}, BBH{Float64}, and BBH{BigFloat}
 
