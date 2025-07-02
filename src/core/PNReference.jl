@@ -92,6 +92,23 @@ end
 
 Create a module for a specific Post-Newtonian reference.
 
+!!! warning
+
+    Due to limitations of Julia versions less than 1.12, you *must* use `import` instead of
+    `using` to import variables inside the module created by `@pn_reference`, or they won't
+    be available to `@pn_expression`.
+
+The purposes of this macro are:
+
+    1. To isolate the code for each reference, allowing for different notations such as
+       `η` or `ν` for the reduced mass ratio, or for subtly different definitions of
+       fundamental quantities like spin.
+    2. To require that all functions and variables used in the expressions defined in the
+       module are explicitly imported or defined, to minimize the chance of accidentally
+       using incorrect definitions.
+    3. To preserve precision relevant to the number type of the input `PNSystem`
+       by redefining basic operations such as addition, multiplication, and so on.
+
 Different sources in the literature may use different notations for the same variables, so
 enclosing definitions related to a particular reference in a module allows us to use the
 appropriate notation within that module while still interfacing with this package and its
