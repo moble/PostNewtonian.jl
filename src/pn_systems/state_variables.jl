@@ -55,88 +55,88 @@ M₂(fdpnsystem::FDPNSystem) = fdpnsystem[:M₂]
 @public const M2 = M₂
 
 """
-    χ⃗₁ˣ(pnsystem)
+    χ₁ˣ(pnsystem)
     chi1x(pnsystem)
 
 `x`-component of dimensionless spin vector of object 1 in this system, as a `QuatVec`.
 
 See [`χ⃗₁`](@ref) for details.
 """
-@public function χ⃗₁ˣ(::T) where {T<:PNSystem}
-    error("χ⃗₁ˣ is not (yet) defined for PNSystem subtype `$T`.")
+@public function χ₁ˣ(::T) where {T<:PNSystem}
+    error("χ₁ˣ is not (yet) defined for PNSystem subtype `$T`.")
 end
-χ⃗₁ˣ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ⃗₁ˣ]
-@public const chi1x = χ⃗₁ˣ
+χ₁ˣ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ₁ˣ]
+@public const chi1x = χ₁ˣ
 
 """
-    χ⃗₁ʸ(pnsystem)
+    χ₁ʸ(pnsystem)
     chi1y(pnsystem)
 
 `y`-component of dimensionless spin vector of object 1 in this system, as a `QuatVec`.
 
 See [`χ⃗₁`](@ref) for details.
 """
-@public function χ⃗₁ʸ(::T) where {T<:PNSystem}
-    error("χ⃗₁ʸ is not (yet) defined for PNSystem subtype `$T`.")
+@public function χ₁ʸ(::T) where {T<:PNSystem}
+    error("χ₁ʸ is not (yet) defined for PNSystem subtype `$T`.")
 end
-χ⃗₁ʸ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ⃗₁ʸ]
-@public const chi1y = χ⃗₁ʸ
+χ₁ʸ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ₁ʸ]
+@public const chi1y = χ₁ʸ
 
 """
-    χ⃗₁ᶻ(pnsystem)
+    χ₁ᶻ(pnsystem)
     chi1z(pnsystem)
 
 `z`-component of dimensionless spin vector of object 1 in this system, as a `QuatVec`.
 
 See [`χ⃗₁`](@ref) for details.
 """
-@public function χ⃗₁ᶻ(::T) where {T<:PNSystem}
-    error("χ⃗₁ᶻ is not (yet) defined for PNSystem subtype `$T`.")
+@public function χ₁ᶻ(::T) where {T<:PNSystem}
+    error("χ₁ᶻ is not (yet) defined for PNSystem subtype `$T`.")
 end
-χ⃗₁ᶻ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ⃗₁ᶻ]
-@public const chi1z = χ⃗₁ᶻ
+χ₁ᶻ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ₁ᶻ]
+@public const chi1z = χ₁ᶻ
 
 """
-    χ⃗₂ˣ(pnsystem)
+    χ₂ˣ(pnsystem)
     chi2x(pnsystem)
 
 `x`-component of dimensionless spin vector of object 2 in this system, as a `QuatVec`.
 
 See [`χ⃗₂`](@ref) for details.
 """
-@public function χ⃗₂ˣ(::T) where {T<:PNSystem}
-    error("χ⃗₂ˣ is not (yet) defined for PNSystem subtype `$T`.")
+@public function χ₂ˣ(::T) where {T<:PNSystem}
+    error("χ₂ˣ is not (yet) defined for PNSystem subtype `$T`.")
 end
-χ⃗₂ˣ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ⃗₂ˣ]
-@public const chi2x = χ⃗₂ˣ
+χ₂ˣ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ₂ˣ]
+@public const chi2x = χ₂ˣ
 
 """
-    χ⃗₂ʸ(pnsystem)
+    χ₂ʸ(pnsystem)
     chi2y(pnsystem)
 
 `y`-component of dimensionless spin vector of object 2 in this system, as a `QuatVec`.
 
 See [`χ⃗₂`](@ref) for details.
 """
-@public function χ⃗₂ʸ(::T) where {T<:PNSystem}
-    error("χ⃗₂ʸ is not (yet) defined for PNSystem subtype `$T`.")
+@public function χ₂ʸ(::T) where {T<:PNSystem}
+    error("χ₂ʸ is not (yet) defined for PNSystem subtype `$T`.")
 end
-χ⃗₂ʸ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ⃗₂ʸ]
-@public const chi2y = χ⃗₂ʸ
+χ₂ʸ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ₂ʸ]
+@public const chi2y = χ₂ʸ
 
 """
-    χ⃗₂ᶻ(pnsystem)
+    χ₂ᶻ(pnsystem)
     chi2z(pnsystem)
 
 `z`-component of dimensionless spin vector of object 2 in this system, as a `QuatVec`.
 
 See [`χ⃗₂`](@ref) for details.
 """
-@public function χ⃗₂ᶻ(::T) where {T<:PNSystem}
-    error("χ⃗₂ᶻ is not (yet) defined for PNSystem subtype `$T`.")
+@public function χ₂ᶻ(::T) where {T<:PNSystem}
+    error("χ₂ᶻ is not (yet) defined for PNSystem subtype `$T`.")
 end
-χ⃗₂ᶻ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ⃗₂ᶻ]
-@public const chi2z = χ⃗₂ᶻ
+χ₂ᶻ(fdpnsystem::FDPNSystem) = fdpnsystem[:χ₂ᶻ]
+@public const chi2z = χ₂ᶻ
 
 """
     Rʷ(pnsystem)
@@ -295,10 +295,10 @@ end
 
 Dimensionless spin vector of object 1 in this system, as a `QuatVec`.
 
-See also [`χ⃗₁ˣ`](@ref), [`χ⃗₁ʸ`](@ref), and [`χ⃗₁ᶻ`](@ref) for the individual components.
+See also [`χ₁ˣ`](@ref), [`χ₁ʸ`](@ref), and [`χ₁ᶻ`](@ref) for the individual components.
 """
 @public function χ⃗₁(::T) where {T<:PNSystem}
-    QuatVec(χ⃗₁ˣ(pnsystem), χ⃗₁ʸ(pnsystem), χ⃗₁ᶻ(pnsystem))
+    QuatVec(χ₁ˣ(pnsystem), χ₁ʸ(pnsystem), χ₁ᶻ(pnsystem))
 end
 @public const chi1 = χ⃗₁
 
@@ -308,10 +308,10 @@ end
 
 Dimensionless spin vector of object 2 in this system, as a `QuatVec`.
 
-See also [`χ⃗₂ˣ`](@ref), [`χ⃗₂ʸ`](@ref), and [`χ⃗₂ᶻ`](@ref) for the individual components.
+See also [`χ₂ˣ`](@ref), [`χ₂ʸ`](@ref), and [`χ₂ᶻ`](@ref) for the individual components.
 """
 @public function χ⃗₂(::T) where {T<:PNSystem}
-    QuatVec(χ⃗₂ˣ(pnsystem), χ⃗₂ʸ(pnsystem), χ⃗₂ᶻ(pnsystem))
+    QuatVec(χ₂ˣ(pnsystem), χ₂ʸ(pnsystem), χ₂ᶻ(pnsystem))
 end
 @public const chi2 = χ⃗₂
 

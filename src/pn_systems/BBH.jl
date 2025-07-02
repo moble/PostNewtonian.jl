@@ -8,7 +8,7 @@ spins, orientation, velocity, and orbital phase of the system.  The spins unpack
 three components each.  The orientation is described by the four components of the `Rotor`
 `R`.  This gives us a total of 14 elements:
 
-    M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ
+    M₁, M₂, χ₁ˣ, χ₁ʸ, χ₁ᶻ, χ₂ˣ, χ₂ʸ, χ₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ
 
 The "orbital phase" `Φ` is tracked as the 14th element of the `state` vector.  This is just
 the integral of the (scalar) orbital angular frequency `Ω`, and holds little interest for

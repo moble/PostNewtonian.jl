@@ -181,24 +181,24 @@ Base.dataids(pnsystem::PNSystem) = Base.dataids(state(pnsystem))
         @test symbol_index(typeof(pnsystem), Val(:M₂)) == 2
         @test symbol_index(typeof(pnsystem), Val(:M2)) == 2
         @test pnsystem[:M₂] == pnsystem[:M2] == pnsystem[2] == pnsystem.state[2]
-        @test symbol_index(typeof(pnsystem), Val(:χ⃗₁ˣ)) == 3
+        @test symbol_index(typeof(pnsystem), Val(:χ₁ˣ)) == 3
         @test symbol_index(typeof(pnsystem), Val(:chi1x)) == 3
-        @test pnsystem[:χ⃗₁ˣ] == pnsystem[:chi1x] == pnsystem[3] == pnsystem.state[3]
-        @test symbol_index(typeof(pnsystem), Val(:χ⃗₁ʸ)) == 4
+        @test pnsystem[:χ₁ˣ] == pnsystem[:chi1x] == pnsystem[3] == pnsystem.state[3]
+        @test symbol_index(typeof(pnsystem), Val(:χ₁ʸ)) == 4
         @test symbol_index(typeof(pnsystem), Val(:chi1y)) == 4
-        @test pnsystem[:χ⃗₁ʸ] == pnsystem[:chi1y] == pnsystem[4] == pnsystem.state[4]
-        @test symbol_index(typeof(pnsystem), Val(:χ⃗₁ᶻ)) == 5
+        @test pnsystem[:χ₁ʸ] == pnsystem[:chi1y] == pnsystem[4] == pnsystem.state[4]
+        @test symbol_index(typeof(pnsystem), Val(:χ₁ᶻ)) == 5
         @test symbol_index(typeof(pnsystem), Val(:chi1z)) == 5
-        @test pnsystem[:χ⃗₁ᶻ] == pnsystem[:chi1z] == pnsystem[5] == pnsystem.state[5]
-        @test symbol_index(typeof(pnsystem), Val(:χ⃗₂ˣ)) == 6
+        @test pnsystem[:χ₁ᶻ] == pnsystem[:chi1z] == pnsystem[5] == pnsystem.state[5]
+        @test symbol_index(typeof(pnsystem), Val(:χ₂ˣ)) == 6
         @test symbol_index(typeof(pnsystem), Val(:chi2x)) == 6
-        @test pnsystem[:χ⃗₂ˣ] == pnsystem[:chi2x] == pnsystem[6] == pnsystem.state[6]
-        @test symbol_index(typeof(pnsystem), Val(:χ⃗₂ʸ)) == 7
+        @test pnsystem[:χ₂ˣ] == pnsystem[:chi2x] == pnsystem[6] == pnsystem.state[6]
+        @test symbol_index(typeof(pnsystem), Val(:χ₂ʸ)) == 7
         @test symbol_index(typeof(pnsystem), Val(:chi2y)) == 7
-        @test pnsystem[:χ⃗₂ʸ] == pnsystem[:chi2y] == pnsystem[7] == pnsystem.state[7]
-        @test symbol_index(typeof(pnsystem), Val(:χ⃗₂ᶻ)) == 8
+        @test pnsystem[:χ₂ʸ] == pnsystem[:chi2y] == pnsystem[7] == pnsystem.state[7]
+        @test symbol_index(typeof(pnsystem), Val(:χ₂ᶻ)) == 8
         @test symbol_index(typeof(pnsystem), Val(:chi2z)) == 8
-        @test pnsystem[:χ⃗₂ᶻ] == pnsystem[:chi2z] == pnsystem[8] == pnsystem.state[8]
+        @test pnsystem[:χ₂ᶻ] == pnsystem[:chi2z] == pnsystem[8] == pnsystem.state[8]
         @test symbol_index(typeof(pnsystem), Val(:Rʷ)) == 9
         @test symbol_index(typeof(pnsystem), Val(:Rw)) == 9
         @test pnsystem[:Rʷ] == pnsystem[:Rw] == pnsystem[9] == pnsystem.state[9]

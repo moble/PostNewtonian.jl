@@ -23,7 +23,7 @@ symbols as usual:
 julia> using PostNewtonian, Symbolics
 
 julia> symbolic_pnsystem = PostNewtonian.SymbolicPNSystem()
-PostNewtonian.SymbolicPNSystem{Vector{Num}, 9223372036854775805//2, Num}(Num[M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ], Λ₁, Λ₂)
+PostNewtonian.SymbolicPNSystem{Vector{Num}, 9223372036854775805//2, Num}(Num[M₁, M₂, χ₁ˣ, χ₁ʸ, χ₁ᶻ, χ₂ˣ, χ₂ʸ, χ₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ], Λ₁, Λ₂)
 
 julia> v = PostNewtonian.v(symbolic_pnsystem)
 v

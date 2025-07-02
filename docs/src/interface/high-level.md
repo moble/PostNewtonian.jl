@@ -53,9 +53,9 @@ using Plots  # Requires also installing `Plots` in your project
 plotlyjs()  # hide
 default(size=(800,480), linewidth=2, leg=:top)  # hide
 
-plot(inspiral.t, inspiral[:χ⃗₁ˣ], label=raw"$\vec{\chi}_1^x$")
-plot!(inspiral.t, inspiral[:χ⃗₁ʸ], label=raw"$\vec{\chi}_1^y$")
-plot!(inspiral.t, inspiral[:χ⃗₁ᶻ], label=raw"$\vec{\chi}_1^z$")
+plot(inspiral.t, inspiral[:χ₁ˣ], label=raw"$\vec{\chi}_1^x$")
+plot!(inspiral.t, inspiral[:χ₁ʸ], label=raw"$\vec{\chi}_1^y$")
+plot!(inspiral.t, inspiral[:χ₁ᶻ], label=raw"$\vec{\chi}_1^z$")
 plot!(xlabel="Time (𝑀)", ylabel="Dimensionless spin components")
 savefig("inspiral_spins.html"); nothing  # hide
 ```
@@ -78,7 +78,7 @@ They can be accessed by their symbols, like the spins above, or by their number
 in this list.  To access the `i`th variable at time step `j`, use `sol[i, j]`.
 You can also use colons: `sol[i, :]` is a vector of the `i`th variable at all
 times, and `sol[:, j]` is a vector of all the data at time step `j`.  For
-example, `inspiral[:χ⃗₁ˣ]` could also be written as `inspiral[3, :]`.
+example, `inspiral[:χ₁ˣ]` could also be written as `inspiral[3, :]`.
 
 By default, the output of `orbital_evolution` is just the time steps to which
 the adaptive ODE integrator happened to step.  If you know that you want the

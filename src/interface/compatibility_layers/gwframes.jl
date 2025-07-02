@@ -231,8 +231,8 @@ function PNWaveform(
         frame=transpose(stack(solution[[:Rʷ, :Rˣ, :Rʸ, :Rᶻ]])),
         M1=solution[:M₁],
         M2=solution[:M₂],
-        chi1=transpose(stack(solution[[:χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ]])),
-        chi2=transpose(stack(solution[[:χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ]])),
+        chi1=transpose(stack(solution[[:χ₁ˣ, :χ₁ʸ, :χ₁ᶻ]])),
+        chi2=transpose(stack(solution[[:χ₂ˣ, :χ₂ʸ, :χ₂ᶻ]])),
         v=solution[:v],
         Phi=solution[:Φ],
     )

@@ -104,7 +104,7 @@ julia> using PostNewtonian: BBH
 julia> pnsystem = BBH(randn(14); PNOrder=7//2);
 
 julia> symbols(pnsystem)
-(:M₁, :M₂, :χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ, :χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ, :Rʷ, :Rˣ, :Rʸ, :Rᶻ, :v, :Φ)
+(:M₁, :M₂, :χ₁ˣ, :χ₁ʸ, :χ₁ᶻ, :χ₂ˣ, :χ₂ʸ, :χ₂ᶻ, :Rʷ, :Rˣ, :Rʸ, :Rᶻ, :v, :Φ)
 
 julia> ascii_symbols(pnsystem)
 (:M1, :M2, :chi1x, :chi1y, :chi1z, :chi2x, :chi2y, :chi2z, :Rw, :Rx, :Ry, :Rz, :v, :Phi)

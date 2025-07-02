@@ -3,7 +3,7 @@ module CommonVariables
 # Import the fundamental variables, which are generally part of the `state` vector of a
 # PNSystem.
 import ..PostNewtonian:
-    M₁, M₂, χ⃗₁, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, R, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ, Λ₁, Λ₂
+    M₁, M₂, χ⃗₁, χ₁ˣ, χ₁ʸ, χ₁ᶻ, χ⃗₂, χ₂ˣ, χ₂ʸ, χ₂ᶻ, R, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ, Λ₁, Λ₂
 
 # Now, we define all the common variables used throughout the literature as functions of
 # those fundamental variables.

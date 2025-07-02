@@ -257,10 +257,10 @@ end
 causes_domain_error!(u̇, ::PNSystem{VT}) where {VT<:Vector{Symbolics.Num}} = false
 
 function SymbolicPNSystem(PNOrder=typemax(Int))
-    Symbolics.@variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
+    Symbolics.@variables M₁ M₂ χ₁ˣ χ₁ʸ χ₁ᶻ χ₂ˣ χ₂ʸ χ₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
     ET = typeof(M₁)
     return SymbolicPNSystem{Vector{ET},prepare_pn_order(PNOrder),ET}(
-        [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ], Λ₁, Λ₂
+        [M₁, M₂, χ₁ˣ, χ₁ʸ, χ₁ᶻ, χ₂ˣ, χ₂ʸ, χ₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ], Λ₁, Λ₂
     )
 end
 

@@ -3,7 +3,7 @@
 @public abstract type Quasispherical{NT,PNOrder,ST} <: PNSystem{NT,PNOrder,ST} end
 
 function symbols(::Type{<:Quasispherical})
-    (:M₁, :M₂, :χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₁ᶻ, :χ⃗₂ˣ, :χ⃗₂ʸ, :χ⃗₂ᶻ, :Rʷ, :Rˣ, :Rʸ, :Rᶻ, :v, :Φ)
+    (:M₁, :M₂, :χ₁ˣ, :χ₁ʸ, :χ₁ᶻ, :χ₂ˣ, :χ₂ʸ, :χ₂ᶻ, :Rʷ, :Rˣ, :Rʸ, :Rᶻ, :v, :Φ)
 end
 function ascii_symbols(::Type{<:Quasispherical})
     (:M1, :M2, :chi1x, :chi1y, :chi1z, :chi2x, :chi2y, :chi2z, :Rw, :Rx, :Ry, :Rz, :v, :Phi)
