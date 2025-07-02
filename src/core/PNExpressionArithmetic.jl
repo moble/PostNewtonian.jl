@@ -50,24 +50,32 @@ ensure that the arithmetic operations preserve the number type of the input `PNS
 PNExpressionArithmetic
 
 @testitem "PNExpressionArithmetic" begin
-    const ln = log
     baremodule Mod
     using PostNewtonian.PNExpressionArithmetic
     end
 
+    using PostNewtonian: pnexpressionarithmetic_functions
+
+    const ln = log
+
     for NT ∈ (Float16, Float64, BigFloat)
         pnsystem = BHNS(randn(NT, 15))
+        z = (1, 2, 3, 17, 31, ℯ, π, 3//13, 47//59)
 
-        @test PostNewtonian.constant_convert(pnsystem, 17) isa NT
-        @test PostNewtonian.constant_convert(pnsystem, 17) == NT(17)
-
-        # for f ∈ (:+, :-, :*, :/, :^, :ln, :√)
-        #     @test Mod.$f(pnsystem, 17) isa NT
-        #     @test Mod.$f(pnsystem, 17) == eval(:((√)(17)))
-        # end
+        for f ∈ (:+, :-, :*, :/, :^, :ln, :√)
+            @test f ∈ pnexpressionarithmetic_functions
+        end
+        for f ∈ (:+, :-, :*, :/, :^)
+            for x ∈ z, y ∈ z
+                @test eval(:(Mod.$f))(pnsystem, x, y) isa NT
+                @test eval(:(Mod.$f))(pnsystem, x, y) == eval(:($f))(NT(x), NT(y))
+            end
+        end
         for f ∈ (:ln, :√)
-            @test eval(:(Mod.$f($pnsystem, 17))) isa NT
-            @test eval(:(Mod.$f($pnsystem, 17))) == eval(:(($f)($(NT(17)))))
+            for x ∈ z
+                @test eval(:(Mod.$f))(pnsystem, x) isa NT
+                @test eval(:(Mod.$f))(pnsystem, x) == eval(:($f))(NT(x))
+            end
         end
     end
 end
