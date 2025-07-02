@@ -1,4 +1,4 @@
-"""
+raw"""
 
 We need to parse Mathematica expressions in Julia, using SymPy's parsing capabilities.
 Unfortunately, at the moment, there is a bug in SymPy
@@ -58,9 +58,6 @@ One problem is unicode's combining characters, some of which
 
 """
 
-
-
-
 using Pkg
 Pkg.activate(@__DIR__)
 
@@ -77,20 +74,20 @@ greek_replacements = (
     raw"\[Lambda]" => "λ",
 )
 
-
-
-const parse_mathematica = PythonCall.pyimport("sympy.parsing.mathematica" => "parse_mathematica")
+const parse_mathematica = PythonCall.pyimport(
+    "sympy.parsing.mathematica" => "parse_mathematica"
+)
 
 s = replace(
     raw"((1594323*I)/4480)*Sqrt[Pi/4199]*x^(9/2)*\[Nu]*(\[Delta] - 6*\[Delta]*\[Nu] + 10*\[Delta]*\[Nu]^2 - 4*\[Delta]*\[Nu]^3)",
-    greek_replacements...
+    greek_replacements...,
 )
 
 ex = parse_mathematica(s)#, Dict("EllipticE[x]"=>"elliptic_e(x)"))
 
-
-
-const elliptic_e = PythonCall.pyimport("sympy.functions.special.elliptic_integrals" => "elliptic_e")
+const elliptic_e = PythonCall.pyimport(
+    "sympy.functions.special.elliptic_integrals" => "elliptic_e"
+)
 
 s = raw"(Sqrt[Pi])/(2*EllipticE[m])"
 s = raw"((1594323*I)/4480)*Sqrt[Pi/4199]*x^(9/2)*\[Nu]*(\[Delta] - 6*\[Delta]*\[Nu] + 10*\[Delta]*\[Nu]^2 - 4*\[Delta]*\[Nu]^3)"
