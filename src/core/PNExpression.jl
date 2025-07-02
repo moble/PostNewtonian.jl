@@ -1,4 +1,70 @@
-macro pn_expression(arg_index, func=:(nothing))
+"""
+    @pn_expression [arg_index=1] func
+
+This macro makes it easier to define post-Newtonian expressions.
+
+The optional first argument to this macro is `arg_index`, which just tells us which argument
+to the function `func` is a `PNSystem` — defaulting to the first argument.  For example, the
+variables defined in [`PostNewtonian.FundamentalVariables`](@ref "Fundamental variables")
+all take a single argument of `pnsystem`, which is used to compute the values for those
+variables; this macro just needs to know where to find `pnsystem`.
+
+The required argument to this macro is a function the will compute some values related to
+the `pnsystem`.
+
+Once it has this information, there are three types of transformations the macro will make:
+
+ 1. Adds a keyword argument `pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum)` to the
+    function signature.  This is used to determine how to reduce the PN expansion terms.
+    The default is `Val(sum)`, which will just return a single number,  but `Val(identity)`
+    can be used to return the expansion.  The reducing function can be used inside the main
+    function as `PNExpansionReducer`, and will be automatically used inside any
+    `@pn_expansion`.
+ 2. For every function defined in the module where this macro is called that takes a single
+    `PNSystem` argument, this macro will look for the name of that function inside the
+    expression.  If it finds any such names, it will replace them with the corresponding
+    calls to the function with `pnsystem` as the argument.  For example, you can simply use
+    the symbols `M₁` or `μ` in your code, rather than calling them as [`M₁(pnsystem)`](@ref
+    M₁) or [`μ(pnsystem)`](@ref μ) every time they appear.  To be more explicit, this is
+    achieved by defining the relevant quantities in a `let` block placed around the body of
+    `func`, so that the values may be used efficiently without recomputation.  If you need
+    to use one of those functions with different arguments, you'll need to address them
+    explicitly with the module name — as in `PostNewtonian.v(;Ω, M)`.
+ 3. Insert the `pnsystem` argument as the first argument to each occurrence of
+    `@pn_expansion` that needs it.
+
+For example, we might write a function like this:
+```julia
+@pn_expression function f(pnsystem)
+    5μ/c^2 * @pn_expansion(1 + 4(v/c)^2)
+end
+```
+That is effectively rewritten by this macro as
+```julia
+function f(pnsystem, ::Val{PNExpansionReducer}=Val(sum)) where {PNExpansionReducer}
+    let μ=μ(pnsystem), c=c(pnsystem), v=v(pnsystem)
+        5μ/c^2 * @pn_expansion pnsystem (1 + 4(v/c)^2)
+    end
+end
+```
+The [`@pn_expansion`](@ref) macro is further expanded so that the final result looks like
+```julia
+function f(pnsystem, ::Val{PNExpansionReducer}=Val(sum)) where {PNExpansionReducer}
+    let μ=μ(pnsystem), c=c(pnsystem), v=v(pnsystem)
+        5μ/c^2 * (
+            let c=PNExpansionParameter(pnsystem)
+                PNExpansionReducer(1 + 4(v/c)^2)
+            end
+        )
+    end
+end
+```
+Moreover, this expression should itself be defined within an [`@pn_reference`](@ref) module,
+which preserves the precision of the `pnsystem`, so that we can define `pnsystem` with,
+e.g., `Float16` or `BigFloat` numbers, and natural expressions like `2π` or `4/3` won't
+automatically be converted to `Float64` and spoil the requested precision.
+"""
+@public macro pn_expression(arg_index, func=:(nothing))
     # Note that macros secretly get two extra variables: `__module__` and `__source__`.
     # These refer to the place where the macro was called.  The second is useful for
     # debugging, but the first is crucial here, because it lets us see what's defined in the
@@ -13,6 +79,7 @@ macro pn_expression(arg_index, func=:(nothing))
     else
         names(__module__; all=true, imported=true, usings=true)
     end
+
     # Next, we narrow that list down to callable objects defined in the `__module__` where
     # this macro was used.  Specifically, we filter for those objects that take one
     # `PNSystem`, and nothing else, as an argument.  These will be valid targets for
@@ -30,6 +97,8 @@ macro pn_expression(arg_index, func=:(nothing))
             return false
         end, all_names
     )
+
+    # Now, we pass that information along to the function that actually modifies our code
     return esc(pn_expression(arg_index, func, pnsystem_functions, __module__, __source__))
 end
 
@@ -73,7 +142,8 @@ function pn_expression(arg_index, func, pnsystem_functions, __module__, __source
 
     # Append a keyword argument `pn_expansion_reducer` to the function signature, with
     # default value `Val(sum)`.  The `Val` parameter is captured as `PNExpansionReducer`,
-    # which we can then use in the body of the function.
+    # which we can then use in the body of the function — specifically, it is automatically
+    # used by the `@pn_expansion` macro.
     splitfunc[:kwargs] = [
         splitfunc[:kwargs]
         :($(Expr(:kw, :(pn_expansion_reducer::Val{PNExpansionReducer}), :(Val(Base.sum)))))

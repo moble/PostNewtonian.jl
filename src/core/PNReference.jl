@@ -43,6 +43,7 @@ function pn_reference(expr)
     # 2. the module name (a `Symbol`)
     # 3. the module body (an `Expr` with head `:block`)
     if MacroTools.isexpr(expr, :module)
+        # Check to make sure that this module is structured exactly as expected
         if length(expr.args) ≠ 3
             error(
                 "Found a module expression with $(length(expr.args)) arguments:\n" *
@@ -61,6 +62,7 @@ function pn_reference(expr)
         if ! MacroTools.isexpr(expr.args[3], :block)
             error("Found a module expression with a non-block body: $(dump(expr.args[3]))")
         end
+
         # Now, we assemble the new module, mostly by prepending some imports to the
         # contents
         new_module = Expr(
