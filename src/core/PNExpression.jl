@@ -72,8 +72,8 @@ function pn_expression(arg_index, func, pnsystem_functions, __module__, __source
     pnsystem = MacroTools.namify(splitfunc[:args][arg_index])
 
     # Append a keyword argument `pn_expansion_reducer` to the function signature, with
-    # default value `Val(sum)`.  The `Val` is captured in the "where" parameter
-    # `PNExpansionReducer`
+    # default value `Val(sum)`.  The `Val` parameter is captured as `PNExpansionReducer`,
+    # which we can then use in the body of the function.
     splitfunc[:kwargs] = [
         splitfunc[:kwargs]
         :($(Expr(:kw, :(pn_expansion_reducer::Val{PNExpansionReducer}), :(Val(Base.sum)))))
@@ -105,8 +105,8 @@ function pn_expression(arg_index, func, pnsystem_functions, __module__, __source
     # Now expand all the macros inside the body
     new_body = macroexpand(__module__, new_body; recursive=true)
 
-    # # Next, we walk the expression tree and find any function calls to one of the
-    # # `pnexpressionarithmetic_functions`, and insert `pnsystem` as the first argument.
+    # Next, we walk the expression tree and find all function calls to any of the
+    # `pnexpressionarithmetic_functions`, and insert `pnsystem` as the first argument.
     new_body = MacroTools.postwalk(new_body) do x
         if iscall(x, pnexpressionarithmetic_functions)
             insert!(x.args, 2, (pnsystem))
@@ -117,8 +117,8 @@ function pn_expression(arg_index, func, pnsystem_functions, __module__, __source
     end
 
     # Finally, include the `let` statements so that the functions can all be used as plain
-    # symbols without having to call them on `pnsystem`, but do so without burying it in a
-    # code block.
+    # symbols without having to call them on `pnsystem`, but we do so without burying it in
+    # a code block.
     new_body = MacroTools.unblock(quote
         #@fastmath
         let $(pnsystem_function_exprs...)
@@ -151,7 +151,7 @@ end
     end
     @pn_expression h(pns) = f - M₂
     @pn_expression function i(pn)
-        f * χ₁ˣ
+        f * χ₁ˣ * γₑ
     end
     @pn_expression function j(pnsyst)
         f / χ₁ʸ
@@ -160,7 +160,7 @@ end
         f ^ χ₁ᶻ
     end
     @pn_expression function l(pnsystm)
-        f * ln(v)
+        f * ln(v) * ζ3
     end
     @pn_expression function m(pnsystem)
         √f * Φ
@@ -176,15 +176,12 @@ end
         for v ∈ (:g, :h, :i, :j, :k, :l, :m)
             @test eval(:(Mod.$v))(pnsystem) isa NT
         end
+        @test Mod.g(pnsystem) == NT(7//2) + pnsystem[:M₁]
+        @test Mod.h(pnsystem) == NT(7//2) - pnsystem[:M₂]
+        @test Mod.i(pnsystem) == NT(7//2) * pnsystem[:χ₁ˣ] * PostNewtonian.γₑ
+        @test Mod.j(pnsystem) == NT(7//2) / pnsystem[:χ₁ʸ]
+        @test Mod.k(pnsystem) == NT(7//2) ^ pnsystem[:χ₁ᶻ]
+        @test Mod.l(pnsystem) == NT(7//2) * log(pnsystem[:v]) * PostNewtonian.ζ3
+        @test Mod.m(pnsystem) == √(NT(7//2)) * pnsystem[:Φ]
     end
-
-    # Test that `f` and only `f` is the thing visible to the macro function finder
-    # Test the output against BBH{Float16}, BBH{Float64}, and BBH{BigFloat}
-
-    # @pn_expression function test_arithmetic(pnsystem)
-    #     return (pnsystem.M + pnsystem.c) * (pnsystem.M - pnsystem.c) / pnsystem.c^2
-    # end
-    # result = test_arithmetic(pnsystem)
-    # @test result == (pnsystem.M^2 - pnsystem.c^2) / pnsystem.c^2
-
 end
