@@ -63,8 +63,7 @@ function pn_reference(expr)
             error("Found a module expression with a non-block body: $(dump(expr.args[3]))")
         end
 
-        # Now, we assemble the new module, mostly by prepending some imports to the
-        # contents
+        # Now, we assemble the new module, mostly by prepending some imports to the contents
         new_module = Expr(
             :module,
             false,  # We turn this into a `baremodule`
@@ -72,8 +71,8 @@ function pn_reference(expr)
             Expr(  # This is the new module body
                 :block,
                 :(using Base: Base, Val),
-                :(eval(x::Expr) = Core.eval(Mod, x)),
-                :(include(p::AbstractString) = Base.include(Mod, p)),
+                :(eval(x::Expr) = Core.eval($(expr.args[2]), x)),
+                :(include(p::AbstractString) = Base.include($(expr.args[2]), p)),
                 :(using PostNewtonian: @pn_expression, @pn_expansion, 𝒾, γₑ, ζ3),
                 :(using PostNewtonian.PNExpressionArithmetic),
                 expr.args[3].args...,  # The original module body
@@ -155,9 +154,9 @@ end
 
     output = quote
         baremodule Einstein1918
-        import Base
-        eval(x::Expr) = Core.eval(Mod, x)
-        include(p::AbstractString) = Base.include(Mod, p)
+        using Base: Base, Val
+        eval(x::Expr) = Core.eval(Einstein1918, x)
+        include(p::AbstractString) = Base.include(Einstein1918, p)
         using PostNewtonian: @pn_expression, @pn_expansion, 𝒾, γₑ, ζ3
         using PostNewtonian.PNExpressionArithmetic
 
