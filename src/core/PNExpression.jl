@@ -204,6 +204,8 @@ function pn_expression(arg_index, func, pnsystem_functions, __module__, __source
 end
 
 @testitem "@pn_expression" begin
+    using MacroTools
+
     baremodule Mod
     # These are the expressions added by `@pn_reference`
     using Base: Base, Val
@@ -235,11 +237,27 @@ end
     @pn_expression function m(pnsystem)
         √f * Φ
     end
+
+    const expr = Base.@macroexpand @pn_expression function n(pnsystem)
+        l * f * ln(v) * ζ3 + m * Φ
+    end
+
     end  # baremodule Mod
 
     import .Mod
 
     const ln = log
+
+    output = :(
+        function n(
+            pnsystem; pn_expansion_reducer::Val{PNExpansionReducer}=Val(Base.sum)
+        ) where {PNExpansionReducer}
+            let f=f(pnsystem), l=l(pnsystem), m=m(pnsystem), v=v(pnsystem), Φ=Φ(pnsystem)
+                pnsystem + pnsystem * l * f * ln(pnsystem, v) * ζ3 + pnsystem * m * Φ
+            end
+        end
+    )
+    @test MacroTools.striplines(Mod.expr) == MacroTools.striplines(output)
 
     for NT ∈ (Float16, Float64, BigFloat)
         pnsystem = BHNS(NT.(1:15))
