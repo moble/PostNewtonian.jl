@@ -16,7 +16,7 @@ tidal couplings ``\Lambda_1`` and ``\Lambda_2`` of the two components.
 
 See also [`Λ₁`](@ref) and [`Λ₂`](@ref).
 """
-Λ̃(s::VecOrPNSystem) =
+@public Λ̃(s::PNSystem) =
     16//13 * ((M₁(s) + 12M₂(s)) * M₁(s)^4 * Λ₁(s) + (M₂(s) + 12M₁(s)) * M₂(s)^4 * Λ₂(s)) /
     M(s)^5
-const Lambda_tilde = Λ̃
+@public const Lambda_tilde = Λ̃

@@ -5,7 +5,8 @@ using FastDifferentiation: FastDifferentiation, Node as FDNode
 #using InlineExports: @public, @export  # See below
 using IrrationalConstants: @irrational
 using MacroTools: MacroTools
-using Quaternionic: Quaternionic, QuatVec, Rotor, abs2vec, components, normalize, ⋅, ×
+using Quaternionic:
+    Quaternionic, QuatVec, Rotor, 𝐢, 𝐣, 𝐤, abs2vec, absvec, components, normalize, ⋅, ×
 using StaticArrays: MVector, SVector
 using TestItems: @testitem
 

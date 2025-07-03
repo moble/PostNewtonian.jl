@@ -3,14 +3,14 @@
 
 Dimensionful spin vector of object 1.
 """
-S⃗₁(s::VecOrPNSystem) = χ⃗₁(s) * M₁(s)^2
+@public S⃗₁(s::PNSystem) = χ⃗₁(s) * M₁(s)^2
 
 """
     S⃗₂(pnsystem)
 
 Dimensionful spin vector of object 2.
 """
-S⃗₂(s::VecOrPNSystem) = χ⃗₂(s) * M₂(s)^2
+@public S⃗₂(s::PNSystem) = χ⃗₂(s) * M₂(s)^2
 
 """
     S⃗(pnsystem)
@@ -18,8 +18,8 @@ S⃗₂(s::VecOrPNSystem) = χ⃗₂(s) * M₂(s)^2
 
 Total (dimensionful) spin vector ``S⃗₁+S⃗₂``.
 """
-S⃗(M₁, M₂, χ⃗₁, χ⃗₂) = χ⃗₁ * M₁^2 + χ⃗₂ * M₂^2
-S⃗(s::VecOrPNSystem) = S⃗(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
+@public S⃗(M₁, M₂, χ⃗₁, χ⃗₂) = χ⃗₁ * M₁^2 + χ⃗₂ * M₂^2
+S⃗(s::PNSystem) = S⃗(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
 
 """
     Σ⃗(pnsystem)
@@ -27,8 +27,8 @@ S⃗(s::VecOrPNSystem) = S⃗(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
 
 Differential spin vector ``M(a⃗₂-a⃗₁)``.
 """
-Σ⃗(M₁, M₂, χ⃗₁, χ⃗₂) = (M₁ + M₂) * (χ⃗₂ * M₂ - χ⃗₁ * M₁)
-Σ⃗(s::VecOrPNSystem) = Σ⃗(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
+@public Σ⃗(M₁, M₂, χ⃗₁, χ⃗₂) = (M₁ + M₂) * (χ⃗₂ * M₂ - χ⃗₁ * M₁)
+Σ⃗(s::PNSystem) = Σ⃗(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
 
 """
     χ⃗(pnsystem)
@@ -36,29 +36,29 @@ Differential spin vector ``M(a⃗₂-a⃗₁)``.
 
 Normalized spin vector ``S⃗/M²``.
 """
-χ⃗(S⃗, M) = S⃗ / M^2
-χ⃗(s::VecOrPNSystem) = χ⃗(S⃗(s), M(s))
+@public χ⃗(S⃗, M) = S⃗ / M^2
+χ⃗(s::PNSystem) = χ⃗(S⃗(s), M(s))
 
 """
     χ⃗ₛ(M₁, M₂, χ⃗₁, χ⃗₂)
 
 Symmetric spin vector ``(χ⃗₁+χ⃗₂)/2``.
 """
-χ⃗ₛ(χ⃗₁, χ⃗₂) = (χ⃗₁ + χ⃗₂) / 2
+@public χ⃗ₛ(χ⃗₁, χ⃗₂) = (χ⃗₁ + χ⃗₂) / 2
 χ⃗ₛ(M₁, M₂, χ⃗₁, χ⃗₂) = (χ⃗₁ + χ⃗₂) / 2
-χ⃗ₛ(s::VecOrPNSystem) = χ⃗ₛ(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
+χ⃗ₛ(s::PNSystem) = χ⃗ₛ(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
 
 """
     χ⃗ₐ(M₁, M₂, χ⃗₁, χ⃗₂)
 
 Antisymmetric spin vector ``(χ⃗₁-χ⃗₂)/2``.
 """
-χ⃗ₐ(χ⃗₁, χ⃗₂) = (χ⃗₁ - χ⃗₂) / 2
+@public χ⃗ₐ(χ⃗₁, χ⃗₂) = (χ⃗₁ - χ⃗₂) / 2
 χ⃗ₐ(M₁, M₂, χ⃗₁, χ⃗₂) = (χ⃗₁ - χ⃗₂) / 2
-χ⃗ₐ(s::VecOrPNSystem) = χ⃗ₐ(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
+χ⃗ₐ(s::PNSystem) = χ⃗ₐ(M₁(s), M₂(s), χ⃗₁(s), χ⃗₂(s))
 
-χₚₑᵣₚ(s::VecOrPNSystem) = √(χ₁²(s) - (χ₁ₗ(s))^2 + χ₂²(s) - (χ₂ₗ(s))^2)
-const chi_perp = χₚₑᵣₚ
+@public χₚₑᵣₚ(s::PNSystem) = √(χ₁²(s) - (χ₁ₗ(s))^2 + χ₂²(s) - (χ₂ₗ(s))^2)
+@public const chi_perp = χₚₑᵣₚ
 
 @doc raw"""
     χₑ(s)
@@ -74,10 +74,8 @@ Defined as
 \right) \cdot \frac{\hat{\mathbf{L}}_{\mathrm{N}}} {M}.
 ```
 """
-function χₑ(s::VecOrPNSystem)
-    return (S₁ₗ(s) / M₁(s) + S₂ₗ(s) / M₂(s)) / M(s)
-end
-const chi_eff = χₑ
+@public χₑ(s::PNSystem) = (S₁ₗ(s) / M₁(s) + S₂ₗ(s) / M₂(s)) / M(s)
+@public const chi_eff = χₑ
 
 @doc raw"""
     χₚ(s)
@@ -112,7 +110,7 @@ convention.
 
 Because it seems to be the trend, this function uses the latter definition.
 """
-function χₚ(s::VecOrPNSystem)
+@public function χₚ(s::PNSystem)
     χ₁ₚₑᵣₚ = √(χ₁ₙ(s)^2 + χ₁λ(s)^2)
     χ₂ₚₑᵣₚ = √(χ₂ₙ(s)^2 + χ₂λ(s)^2)
     let q = 1 / q(s)  # This is to convert to LVK's convention
@@ -152,16 +150,16 @@ the case for black holes.  You can define `κ₁` and `κ₂` to have other valu
 
 See also [`S⃗₀⁻`](@ref).
 """
-S⃗₀⁺(s::VecOrPNSystem) = S⃗₀⁺(M₁(s), M₂(s), κ₁(s), κ₂(s), S⃗₁(s), S⃗₂(s))
+@public S⃗₀⁺(s::PNSystem) = S⃗₀⁺(M₁(s), M₂(s), κ₁(s), κ₂(s), S⃗₁(s), S⃗₂(s))
 function S⃗₀⁺(M₁, M₂, κ₁, κ₂, S⃗₁, S⃗₂)
     M = M₁ + M₂
     κᵣ = (κ₁ / κ₂)^(1//4)
     return (M / M₁) * κᵣ * √(1 + √(1 - κ₁ * κ₂)) * S⃗₁ +
            (M / M₂) / κᵣ * √(1 - √(1 - κ₁ * κ₂)) * S⃗₂
 end
-S₀⁺ₙ(s::VecOrPNSystem) = S⃗₀⁺(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁ₙ(s), S₂ₙ(s))
-S₀⁺λ(s::VecOrPNSystem) = S⃗₀⁺(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁λ(s), S₂λ(s))
-S₀⁺ₗ(s::VecOrPNSystem) = S⃗₀⁺(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁ₗ(s), S₂ₗ(s))
+@public S₀⁺ₙ(s::PNSystem) = S⃗₀⁺(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁ₙ(s), S₂ₙ(s))
+@public S₀⁺λ(s::PNSystem) = S⃗₀⁺(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁λ(s), S₂λ(s))
+@public S₀⁺ₗ(s::PNSystem) = S⃗₀⁺(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁ₗ(s), S₂ₗ(s))
 
 @doc raw"""
     S⃗₀⁻(s)
@@ -181,38 +179,38 @@ the case for black holes.  You can define `κ₁` and `κ₂` to have other valu
 
 See also [`S⃗₀⁺`](@ref).
 """
-S⃗₀⁻(s::VecOrPNSystem) = S⃗₀⁻(M₁(s), M₂(s), κ₁(s), κ₂(s), S⃗₁(s), S⃗₂(s))
+@public S⃗₀⁻(s::PNSystem) = S⃗₀⁻(M₁(s), M₂(s), κ₁(s), κ₂(s), S⃗₁(s), S⃗₂(s))
 S⃗₀⁻(M₁, M₂, κ₁, κ₂, S⃗₁, S⃗₂) = S⃗₀⁺(M₂, M₁, κ₂, κ₁, S⃗₂, S⃗₁)
-S₀⁻ₙ(s::VecOrPNSystem) = S⃗₀⁻(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁ₙ(s), S₂ₙ(s))
-S₀⁻λ(s::VecOrPNSystem) = S⃗₀⁻(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁λ(s), S₂λ(s))
-S₀⁻ₗ(s::VecOrPNSystem) = S⃗₀⁻(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁ₗ(s), S₂ₗ(s))
+@public S₀⁻ₙ(s::PNSystem) = S⃗₀⁻(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁ₙ(s), S₂ₙ(s))
+@public S₀⁻λ(s::PNSystem) = S⃗₀⁻(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁λ(s), S₂λ(s))
+@public S₀⁻ₗ(s::PNSystem) = S⃗₀⁻(M₁(s), M₂(s), κ₁(s), κ₂(s), S₁ₗ(s), S₂ₗ(s))
 
-χ₁²(s::VecOrPNSystem) = abs2vec(χ⃗₁(s))
-χ₂²(s::VecOrPNSystem) = abs2vec(χ⃗₂(s))
-χ₁(s::VecOrPNSystem) = absvec(χ⃗₁(s))
-χ₂(s::VecOrPNSystem) = absvec(χ⃗₂(s))
-χ₁₂(s::VecOrPNSystem) = χ⃗₁(s) ⋅ χ⃗₂(s)
-χₛₗ(s::VecOrPNSystem) = χ⃗ₛ(s) ⋅ ℓ̂(s)
-χₐₗ(s::VecOrPNSystem) = χ⃗ₐ(s) ⋅ ℓ̂(s)
-χ₁ₙ(s::VecOrPNSystem) = χ⃗₁(s) ⋅ n̂(s)
-χ₁λ(s::VecOrPNSystem) = χ⃗₁(s) ⋅ λ̂(s)
-χ₁ₗ(s::VecOrPNSystem) = χ⃗₁(s) ⋅ ℓ̂(s)
-χ₂ₙ(s::VecOrPNSystem) = χ⃗₂(s) ⋅ n̂(s)
-χ₂λ(s::VecOrPNSystem) = χ⃗₂(s) ⋅ λ̂(s)
-χ₂ₗ(s::VecOrPNSystem) = χ⃗₂(s) ⋅ ℓ̂(s)
+@public χ₁²(s::PNSystem) = abs2vec(χ⃗₁(s))
+@public χ₂²(s::PNSystem) = abs2vec(χ⃗₂(s))
+@public χ₁(s::PNSystem) = absvec(χ⃗₁(s))
+@public χ₂(s::PNSystem) = absvec(χ⃗₂(s))
+@public χ₁₂(s::PNSystem) = χ⃗₁(s) ⋅ χ⃗₂(s)
+@public χₛₗ(s::PNSystem) = χ⃗ₛ(s) ⋅ ℓ̂(s)
+@public χₐₗ(s::PNSystem) = χ⃗ₐ(s) ⋅ ℓ̂(s)
+@public χ₁ₙ(s::PNSystem) = χ⃗₁(s) ⋅ n̂(s)
+@public χ₁λ(s::PNSystem) = χ⃗₁(s) ⋅ λ̂(s)
+@public χ₁ₗ(s::PNSystem) = χ⃗₁(s) ⋅ ℓ̂(s)
+@public χ₂ₙ(s::PNSystem) = χ⃗₂(s) ⋅ n̂(s)
+@public χ₂λ(s::PNSystem) = χ⃗₂(s) ⋅ λ̂(s)
+@public χ₂ₗ(s::PNSystem) = χ⃗₂(s) ⋅ ℓ̂(s)
 
-Sₙ(s::VecOrPNSystem) = S⃗(s) ⋅ n̂(s)
-Σₙ(s::VecOrPNSystem) = Σ⃗(s) ⋅ n̂(s)
-Sλ(s::VecOrPNSystem) = S⃗(s) ⋅ λ̂(s)
-Σλ(s::VecOrPNSystem) = Σ⃗(s) ⋅ λ̂(s)
-Sₗ(s::VecOrPNSystem) = S⃗(s) ⋅ ℓ̂(s)
-Σₗ(s::VecOrPNSystem) = Σ⃗(s) ⋅ ℓ̂(s)
-sₗ(s::VecOrPNSystem) = S⃗(s) ⋅ ℓ̂(s) / M(s)^2
-σₗ(s::VecOrPNSystem) = Σ⃗(s) ⋅ ℓ̂(s) / M(s)^2
+@public Sₙ(s::PNSystem) = S⃗(s) ⋅ n̂(s)
+@public Σₙ(s::PNSystem) = Σ⃗(s) ⋅ n̂(s)
+@public Sλ(s::PNSystem) = S⃗(s) ⋅ λ̂(s)
+@public Σλ(s::PNSystem) = Σ⃗(s) ⋅ λ̂(s)
+@public Sₗ(s::PNSystem) = S⃗(s) ⋅ ℓ̂(s)
+@public Σₗ(s::PNSystem) = Σ⃗(s) ⋅ ℓ̂(s)
+@public sₗ(s::PNSystem) = S⃗(s) ⋅ ℓ̂(s) / M(s)^2
+@public σₗ(s::PNSystem) = Σ⃗(s) ⋅ ℓ̂(s) / M(s)^2
 
-S₁ₙ(s::VecOrPNSystem) = S⃗₁(s) ⋅ n̂(s)
-S₁λ(s::VecOrPNSystem) = S⃗₁(s) ⋅ λ̂(s)
-S₁ₗ(s::VecOrPNSystem) = S⃗₁(s) ⋅ ℓ̂(s)
-S₂ₙ(s::VecOrPNSystem) = S⃗₂(s) ⋅ n̂(s)
-S₂λ(s::VecOrPNSystem) = S⃗₂(s) ⋅ λ̂(s)
-S₂ₗ(s::VecOrPNSystem) = S⃗₂(s) ⋅ ℓ̂(s)
+@public S₁ₙ(s::PNSystem) = S⃗₁(s) ⋅ n̂(s)
+@public S₁λ(s::PNSystem) = S⃗₁(s) ⋅ λ̂(s)
+@public S₁ₗ(s::PNSystem) = S⃗₁(s) ⋅ ℓ̂(s)
+@public S₂ₙ(s::PNSystem) = S⃗₂(s) ⋅ n̂(s)
+@public S₂λ(s::PNSystem) = S⃗₂(s) ⋅ λ̂(s)
+@public S₂ₗ(s::PNSystem) = S⃗₂(s) ⋅ ℓ̂(s)

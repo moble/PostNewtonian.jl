@@ -10,9 +10,9 @@ The unit vector pointing from object 2 to object 1, when the frame is given by t
 n̂(R) = R x̂ R̄
 ```
 """
-n̂(R) = QuatVec(R(𝐢))
-n̂(s::VecOrPNSystem) = n̂(R(s))
-const n_hat = n̂
+@public n̂(R) = QuatVec(R(𝐢))
+n̂(s::PNSystem) = n̂(R(s))
+@public const n_hat = n̂
 
 """
     λ̂(pnsystem)
@@ -27,9 +27,9 @@ the frame is given by the rotor `R`.  This is equal to
 ```
 This also completes the right-handed triple of ``(n̂, λ̂, ℓ̂)``.
 """
-λ̂(R) = QuatVec(R(𝐣))
-λ̂(s::VecOrPNSystem) = λ̂(R(s))
-const lambda_hat = λ̂
+@public λ̂(R) = QuatVec(R(𝐣))
+λ̂(s::PNSystem) = λ̂(R(s))
+@public const lambda_hat = λ̂
 
 """
     ℓ̂(pnsystem)
@@ -43,9 +43,9 @@ given by the rotor `R`.  This is equal to
 ℓ̂(R) = R ẑ R̄
 ```
 """
-ℓ̂(R) = QuatVec(R(𝐤))
-ℓ̂(s::VecOrPNSystem) = ℓ̂(R(s))
-const ell_hat = ℓ̂
+@public ℓ̂(R) = QuatVec(R(𝐤))
+ℓ̂(s::PNSystem) = ℓ̂(R(s))
+@public const ell_hat = ℓ̂
 
 @doc raw"""
     Ω(pnsystem)
@@ -63,8 +63,6 @@ definition* as
 ```
 See also [`v`](@ref).
 """
-Ω(; v, M=1) = v^3 / M
-Ω(s::VecOrPNSystem) = Ω(; v=v(s), M=M(s))
-const Omega = Ω
-
-lnv(s::VecOrPNSystem) = ln(v(s))
+@public Ω(; v, M=1) = v^3 / M
+Ω(s::PNSystem) = Ω(; v=v(s), M=M(s))
+@public const Omega = Ω
