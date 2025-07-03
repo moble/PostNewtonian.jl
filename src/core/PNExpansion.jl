@@ -387,8 +387,15 @@ the expansion will still be correct.
     end)
 end
 
-# @testitem "@pn_expansion" begin
-#     using PostNewtonian: @pn_expansion
+@testitem "@pn_expansion" begin
+    using PostNewtonian: @pn_expansion
+    using MacroTools
 
-#     @pn_expansion [pnsystem] expansion
-# end
+    input = @macroexpand @pn_expansion pnsystem (1 - (ν/12 + 3/4) * (v/c)^2)
+    output = quote
+        let c = PNExpansionParameter(pnsystem)
+            PNExpansionReducer(1 - (ν/12 + 3/4) * (v/c)^2)
+        end
+    end
+    @test MacroTools.striplines(input) == MacroTools.striplines(output)
+end
