@@ -66,7 +66,7 @@ eval(quote
     end
 end)
 
-if VERSION < v"1.11"
+@static if VERSION < v"1.11"
     using ..NoExport: @public
 else
     """
