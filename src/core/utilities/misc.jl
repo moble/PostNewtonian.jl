@@ -20,6 +20,32 @@ julia> sum((1:10_000_000).^-3)
 """
 ζ3  # We document it this way because `@irrational` cannot handle docstrings.
 
+@doc raw"""
+    γₑ
+
+[Euler's constant](https://en.wikipedia.org/wiki/Euler%27s_constant) (also known as the
+Euler–Mascheroni constant) is defined as the limit as ``n \to \infty`` of the difference
+between the ``n``th partial sum of the harmonic series and ``\log(n)``.  This is OEIS
+sequence [A001620](https://oeis.org/A001620).
+
+This is distinct from the Euler's number ``e``, which is defined as the limit as ``n \to
+\infty`` of the sum of ``1/n!``.
+
+Note that it is usually denoted simply as `γ` in the broader literature, but that is used in
+the post-Newtonian literature for the quantity denoted in this package as [`γₚₙ`](@ref).  To
+distinguish between the two, the PN literature uses ``\gamma_\mathrm{E}`` for Euler's
+constant.  (There is no Unicode subscript "E", so we use "e" instead.)
+
+```julia-repl
+julia> PostNewtonian.γₑ
+γₑ = 0.5772156649015...
+
+julia> n=10_000_000; sum(1 ./ (1:n))-log(n)
+0.5772157149015307
+```
+"""
+γₑ  # We document it here because docs don't fit nicely in the main file where it's defined.
+
 """
     value(x)
 
