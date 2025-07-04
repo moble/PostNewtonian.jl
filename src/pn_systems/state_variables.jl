@@ -201,14 +201,20 @@ Rᶻ(fdpnsystem::FDPNSystem) = fdpnsystem[:Rᶻ]
 Post-Newtonian velocity parameter.  This is related to the orbital angular frequency
 ``\Omega`` as
 ```math
-v \colonequals (M\,\Omega)^{1/3},
+v \colonequals (G\,M\,\Omega)^{1/3},
 ```
-where ``M`` is the total mass of the binary.
+where [`M`](@ref) is the total mass of the binary, and [`G`](@ref) is the gravitational
+constant.  This has units of speed, so it must be divided by [`c`](@ref) to be
+dimensionless.  In particular, it is related to the "frequency-related parameter"
+[`x`](@ref) via
+```math
+x = \left(\frac{v}{c}\right)^{2}.
+```
 
-Note that if you want to pass the value ``Ω`` (rather than a `PNSystem`), you must pass it
+Note that if you want to pass the value ``Ω`` (rather than a `PNSystem`), you *must* pass it
 as a keyword argument — as in `v(Ω=0.1)`.
 
-See also [`Ω`](@ref).
+See also [`Ω`](@ref) and [`x`](@ref).
 """
 @public function v(::T) where {T<:PNSystem}
     error("v is not (yet) defined for PNSystem subtype `$T`.")
