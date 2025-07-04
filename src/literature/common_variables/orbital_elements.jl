@@ -66,3 +66,19 @@ See also [`v`](@ref).
 @public Ω(; v, M=1) = v^3 / M
 Ω(s::PNSystem) = Ω(; v=v(s), M=M(s))
 @public const Omega = Ω
+
+@doc raw"""
+    x(pnsystem)
+    x(;v, M=1)
+
+The "frequency-related parameter" defined in Eq. (375) of [Blanchet2024](@cite) as
+```math
+x \colonequals \left(\frac{Gm\Omega}{c^3}\right)^{2/3}
+```
+where `m` is the total mass of the binary, and `Ω` is the orbital angular frequency.
+This is related to the PN velocity parameter `v` as
+```math
+x = \left(\frac{v}{c}\right)^{2}.
+```
+"""
+@public x(s::PNSystem) = (v(s)/c(s))^2
