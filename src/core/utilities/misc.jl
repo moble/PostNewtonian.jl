@@ -28,13 +28,14 @@ Euler–Mascheroni constant) is defined as the limit as ``n \to \infty`` of the 
 between the ``n``th partial sum of the harmonic series and ``\log(n)``.  This is OEIS
 sequence [A001620](https://oeis.org/A001620).
 
-This is distinct from the Euler's number ``e``, which is defined as the limit as ``n \to
+This is distinct from the Euler's *number* ``e``, which is defined as the limit as ``n \to
 \infty`` of the sum of ``1/n!``.
 
-Note that it is usually denoted simply as `γ` in the broader literature, but that is used in
-the post-Newtonian literature for the quantity denoted in this package as [`γₚₙ`](@ref).  To
-distinguish between the two, the PN literature uses ``\gamma_\mathrm{E}`` for Euler's
-constant.  (There is no Unicode subscript "E", so we use "e" instead.)
+Note that it is usually denoted simply as `γ` in the broader literature (and in Julia's own
+`Base.MathConstants`), but that symbol is used in the post-Newtonian literature for the
+quantity denoted in this package as [`γₚₙ`](@ref).  To distinguish between the two, the PN
+literature uses ``\gamma_\mathrm{E}`` for Euler's constant.  (There is no Unicode subscript
+"E", so we use "e" instead.)
 
 ```julia-repl
 julia> PostNewtonian.γₑ
