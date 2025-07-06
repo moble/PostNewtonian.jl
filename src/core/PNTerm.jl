@@ -61,6 +61,19 @@ Base.eltype(pn::PNTerm{T}) where {T} = T
 @public c⁻¹exp(pn::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent} =
     c⁻¹Exponent
 
+function constant_convert(pn::PNSystem, term::PNTerm)
+    # Generic fallback to provide a useful error message
+    error(
+        "Input values to `constant_convert` must have the same `NT` and `PNOrder` type " *
+        "parameters; got `$(typeof(pn))` and `$(typeof(term))`.",
+    )
+end
+function constant_convert(
+    pn::P, term::T
+) where {NT,PNOrder,P<:PNSystem{NT,PNOrder},T<:PNTerm{NT,PNOrder}}
+    term
+end
+
 function Base.sum(pn::PNTerm)
     return pn.coeff
 end
@@ -71,6 +84,11 @@ end
 
 function Base.inv(term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent}
     return PNTerm{T,PNOrder}(-c⁻¹exp(term), inv(term.coeff))
+end
+
+function Base.sqrt(term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent}
+    @assert iseven(c⁻¹Exponent) "Only half-integer PN orders are supported."
+    return PNTerm{T,PNOrder}(c⁻¹Exponent ÷ 2, sqrt(term.coeff))
 end
 
 function Base.:^(term::PNTerm{T,PNOrder,c⁻¹Exponent}, n::Int) where {T,PNOrder,c⁻¹Exponent}

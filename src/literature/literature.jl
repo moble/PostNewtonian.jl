@@ -9,4 +9,5 @@ include("common_variables/tidal_coupling.jl")
 
 # Now we include the `@pn_reference` modules themselves, named by the bibtex keys we use for
 # them in ``../references.bib`.
-#include("references/Einstein1918.jl")
+#include("Einstein1918.jl")
+include("Blanchet2024.jl")
