@@ -37,7 +37,7 @@ replaced with a call to that function.
 
 """
 
-function pn_reference(expr)
+function pn_reference(expr, __module__, __source__)
     # A module `Expr` has head `:module` and three arguments:
     # 1. a boolean indicating if this is a module (true) as opposed to a baremodule (false)
     # 2. the module name (a `Symbol`)
@@ -63,6 +63,19 @@ function pn_reference(expr)
             error("Found a module expression with a non-block body: $(dump(expr.args[3]))")
         end
 
+        # Warn if the module uses `using` on Julia < 1.12
+        if VERSION < v"1.12.0-beta1" && any(
+            arg -> hasproperty(arg, :head) && getproperty(arg, :head) ≡ :using,
+            expr.args[3].args,
+        )
+            @warn "Prefer `import` inside `@pn_reference` modules on Julia<1.12\n" *
+                "You are defining a `@pn_reference` module that uses `using` at\n" *
+                "`$(__source__)`.\n" *
+                "Due to a limitation in Julia 1.11 and earlier, you must use `import`\n" *
+                "rather than `using` to import function names that you want to use in a\n" *
+                "`@pn_expression`."
+        end
+
         # Now, we assemble the new module, mostly by prepending some imports to the contents
         new_module = Expr(
             :module,
@@ -70,10 +83,11 @@ function pn_reference(expr)
             expr.args[2],  # This is the name of the module
             Expr(  # This is the new module body
                 :block,
-                :(using Base: Base, Val),
+                :(using Base: Base, Val, π),
                 :(eval(x::Expr) = Core.eval($(expr.args[2]), x)),
                 :(include(p::AbstractString) = Base.include($(expr.args[2]), p)),
-                :(using PostNewtonian: @pn_expression, @pn_expansion, 𝒾, γₑ, ζ3),
+                :(using PostNewtonian:
+                    @pn_expression, @pn_expansion, PNExpansionParameter, 𝒾, γₑ, ζ3),
                 :(using PostNewtonian.PNExpressionArithmetic),
                 expr.args[3].args...,  # The original module body
             ),
@@ -130,7 +144,7 @@ extended.
 
 """
 @public macro pn_reference(ex)
-    esc(pn_reference(ex))
+    esc(pn_reference(ex, __module__, __source__))
 end
 
 @testitem "@pn_reference" begin
@@ -154,10 +168,10 @@ end
 
     output = quote
         baremodule Einstein1918
-        using Base: Base, Val
+        using Base: Base, Val, π
         eval(x::Expr) = Core.eval(Einstein1918, x)
         include(p::AbstractString) = Base.include(Einstein1918, p)
-        using PostNewtonian: @pn_expression, @pn_expansion, 𝒾, γₑ, ζ3
+        using PostNewtonian: @pn_expression, @pn_expansion, PNExpansionParameter, 𝒾, γₑ, ζ3
         using PostNewtonian.PNExpressionArithmetic
 
         import PostNewtonian: G, c, M, χ⃗₁, χ⃗₂, v, pn_order

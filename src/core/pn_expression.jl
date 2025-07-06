@@ -14,7 +14,8 @@ the `pnsystem`.
 
 Once it has this information, there are three types of transformations the macro will make:
 
- 1. Adds a keyword argument `pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum)` to the
+ 1. If either `PNExpansionReducer` or `@pn_expansion` is used in the expression, this adds a
+    keyword argument `pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum)` to the
     function signature.  This is used to determine how to reduce the PN expansion terms.
     The default is `Val(sum)`, which will just return a single number,  but `Val(identity)`
     can be used to return the expansion.  The reducing function can be used inside the main
@@ -72,9 +73,7 @@ automatically be converted to `Float64` and spoil the requested precision.
 
     # First, we just search for everything defined in the module where this macro is called.
     all_names = if VERSION < v"1.12.0-beta1"
-        @warn "Some `names` in `@pn_expression` at $(__source__)\n" *
-            "may not be found in Julia 1.11 or earlier; for now, be sure to use\n" *
-            "`import` rather than `using` inside `@pn_reference` modules." maxlog=10
+        # See the warning in `@pn_reference` for why we should avoid `using` on Julia <1.12
         names(__module__; all=true, imported=true)
     else
         names(__module__; all=true, imported=true, usings=true)
@@ -140,26 +139,7 @@ function pn_expression(arg_index, func, pnsystem_functions, __module__, __source
     # Get the name of the PNSystem argument
     pnsystem = MacroTools.namify(splitfunc[:args][arg_index])
 
-    # Append a keyword argument `pn_expansion_reducer` to the function signature, with
-    # default value `Val(sum)`.  The `Val` parameter is captured as `PNExpansionReducer`,
-    # which we can then use in the body of the function — specifically, it is automatically
-    # used by the `@pn_expansion` macro.
-    splitfunc[:kwargs] = [
-        splitfunc[:kwargs]
-        :($(Expr(:kw, :(pn_expansion_reducer::Val{PNExpansionReducer}), :(Val(Base.sum)))))
-    ]
-
-    # Add `PNExpansionReducer` to the `where` clause (see previous comment)
-    splitfunc[:whereparams] = (splitfunc[:whereparams]..., :PNExpansionReducer)
-
-    # Now look for any of the `pnsystem_functions` in the body of the function and prepare
-    # an entry for the `let` block that will surround the body on output.
-    pnsystem_function_exprs = [
-        :($s = $s($pnsystem)) for
-        s ∈ filter(s -> MacroTools.inexpr(splitfunc[:body], s), pnsystem_functions)
-    ]
-
-    # Next, add `pnsystem` as the argument to each @pn_expansion call...
+    # Add `pnsystem` as the argument to each @pn_expansion call...
     new_body = MacroTools.postwalk(splitfunc[:body]) do x
         if MacroTools.isexpr(x, :macrocall) &&
             x.args[1] == Symbol("@pn_expansion") &&
@@ -172,10 +152,45 @@ function pn_expression(arg_index, func, pnsystem_functions, __module__, __source
         end
     end
 
-    # Now expand all the macros inside the body
+    # Expand all the macros inside the body
     new_body = macroexpand(__module__, new_body; recursive=true)
 
-    # Next, we walk the expression tree and find all function calls to any of the
+    # If `PNExpansionReducer` is or will be in the body of the function, we need to make
+    # sure it is included in the function signature.
+    if MacroTools.inexpr(new_body, :(@pn_expansion)) ||
+        MacroTools.inexpr(new_body, :(PNExpansionReducer))
+
+        # Just so we don't accidentally add it twice, make sure it's not already in the
+        # function signature.
+        if !any(MacroTools.inexpr.(splitfunc[:kwargs], :(PNExpansionReducer)))
+            # Append a keyword argument `pn_expansion_reducer` to the function signature,
+            # with default value `Val(sum)`.  The `Val` parameter is captured as
+            # `PNExpansionReducer`, which we can then use in the body of the function —
+            # specifically, it is automatically used by the `@pn_expansion` macro.
+            splitfunc[:kwargs] = [
+                splitfunc[:kwargs]
+                :(
+                    $(Expr(
+                        :kw,
+                        :(pn_expansion_reducer::Val{PNExpansionReducer}),
+                        :(Val(Base.sum)),
+                    ))
+                )
+            ]
+
+            # Add `PNExpansionReducer` to the `where` clause
+            splitfunc[:whereparams] = (splitfunc[:whereparams]..., :PNExpansionReducer)
+        end
+    end
+
+    # Look for any of the `pnsystem_functions` in the body of the function and prepare an
+    # entry for the `let` block that will surround the body on output.
+    pnsystem_function_exprs = [
+        :($s = $s($pnsystem)) for
+        s ∈ filter(s -> MacroTools.inexpr(new_body, s), pnsystem_functions)
+    ]
+
+    # Walk the expression tree and find all function calls to any of the
     # `pnexpressionarithmetic_functions`, and insert `pnsystem` as the first argument.
     new_body = MacroTools.postwalk(new_body) do x
         if iscall(x, pnexpressionarithmetic_functions)
@@ -186,9 +201,9 @@ function pn_expression(arg_index, func, pnsystem_functions, __module__, __source
         end
     end
 
-    # Finally, include the `let` statements so that the functions can all be used as plain
-    # symbols without having to call them on `pnsystem`, but we do so without burying it in
-    # a code block.
+    # Include the `let` statements so that the functions can all be used as plain symbols
+    # without having to call them on `pnsystem`, but we do so without burying it in a code
+    # block.
     new_body = MacroTools.unblock(quote
         #@fastmath
         let $(pnsystem_function_exprs...)
@@ -238,8 +253,12 @@ end
         √f * Φ
     end
 
-    const expr = Base.@macroexpand @pn_expression function n(pnsystem)
-        l * f * ln(v) * ζ3 + m * Φ
+    const expr1 = Base.@macroexpand @pn_expression function n(pnsystem)
+        l * f * ln(v) * ζ3 + m * Φ / c
+    end
+
+    const expr2 = Base.@macroexpand @pn_expression function n(pnsystem)
+        @pn_expansion l * f * ln(v) * ζ3 + m * Φ / c
     end
 
     end  # baremodule Mod
@@ -248,16 +267,38 @@ end
 
     const ln = log
 
-    output = :(
+    output1 = :(
+        function n(pnsystem;)
+            let f=f(pnsystem), l=l(pnsystem), m=m(pnsystem), v=v(pnsystem), Φ=Φ(pnsystem)
+
+                pnsystem +
+                pnsystem * l * f * ln(pnsystem, v) * ζ3 +
+                /(pnsystem, pnsystem * m * Φ, c)
+            end
+        end
+    )
+    @test MacroTools.striplines(Mod.expr1) == MacroTools.striplines(output1)
+
+    # Because the `c...` in the `let c...` statement is actually in a block, we have to do
+    # this little `c2` hack, so our explicit version resembles the generated version.
+    c2 = [:(c = pnsystem * c * PNExpansionParameter(pnsystem))]
+    output2 = :(
         function n(
             pnsystem; pn_expansion_reducer::Val{PNExpansionReducer}=Val(Base.sum)
         ) where {PNExpansionReducer}
             let f=f(pnsystem), l=l(pnsystem), m=m(pnsystem), v=v(pnsystem), Φ=Φ(pnsystem)
-                pnsystem + pnsystem * l * f * ln(pnsystem, v) * ζ3 + pnsystem * m * Φ
+
+                let $(c2...)
+                    PNExpansionReducer(
+                        pnsystem +
+                        pnsystem * l * f * ln(pnsystem, v) * ζ3 +
+                        /(pnsystem, pnsystem * m * Φ, c),
+                    )
+                end
             end
         end
     )
-    @test MacroTools.striplines(Mod.expr) == MacroTools.striplines(output)
+    @test MacroTools.striplines(Mod.expr2) == MacroTools.striplines(output2)
 
     for NT ∈ (Float16, Float64, BigFloat)
         pnsystem = BHNS(NT.(1:15))
