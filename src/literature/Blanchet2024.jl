@@ -1,8 +1,9 @@
-@pn_reference module Blanchet2024
+@doc raw"""
+Expressions from [Blanchet2024](@cite)
 
-import PostNewtonian: G, c, v, x, ν, γₑ
-
-Base.raw"""
+This package mostly derives its notation from that paper.  The biggest (mild) exception is
+that Blanchet uses the symbol `m` for mass, while we reserve that for the azimuthal number
+of spin-weighted spherical harmonics, and use `M` for mass instead.
 
 In Sec. 3.2.4, Blanchet defines the total mass ``m=m₁+m₂``, the relative mass difference
 ``\Delta = (m₁ - m₂) / m``, the reduced mass ``μ = m₁ m₂ / m``, and the symmetric mass ratio
@@ -16,23 +17,24 @@ In Eq. (369), he defines
 
 In Eq. (375), he defines the "frequency-related parameter"
 ```math
-x = \left(\frac{Gm\Omega}{c^3}\right)^{2/3}
+x = \left(\frac{GM\Omega}{c^3}\right)^{2/3}
 ```
 
 """
+@pn_reference module Blanchet2024
+
+import PostNewtonian: G, c, x, ν, γₑ
 
 """
     Eq483(pnsystem)
 
-Quasi-circular 4.5PN energy flux.
+Quasi-circular non-spinning 4.5PN energy flux terms.
 
 As given in Eq. (483) of [Blanchet2024](@cite), this expression includes "contributions from
-tails, iterated tails, and tails-of-memory".
+tails, iterated tails, and tails-of-memory", but no contributions from spin.
 
 """
 @pn_expression function Eq483(pnsystem)
-    # TODO: Deal with, e.g., x^(3/2)
-
     ℱ =
         (32c^5 / 5G * ν * x^5) * @pn_expansion(
             1 +
