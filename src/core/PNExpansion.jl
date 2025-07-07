@@ -69,7 +69,7 @@ Base.length(pn::PNExpansion) = length(pn.coeffs)
 Base.eltype(pn::PNExpansion) = eltype(pn.coeffs)
 
 function Base.sum(pn_expansion::PNExpansion{N,T,NMax}) where {N,T,NMax}
-    return sum(pn_expansion[i] for i ∈ 1:N, init ∈ zero(T))
+    return sum(pn_expansion[i] for i ∈ 1:N; init=zero(T))
 end
 
 function Base.:+(pn::PNExpansion{N,T1,NMax}, x::T2) where {N,T1,NMax,T2<:Number}
@@ -147,8 +147,8 @@ function product_term(
 ) where {N1,N2,T1,T2,NMax}
     T3 = promote_type(T1, T2)
     return sum(
-        pn1.coeffs[j] * pn2.coeffs[i - j + 1] for
-        j ∈ max(1, i - N2 + 1):min(i, N1), init ∈ zero(T3)
+        pn1.coeffs[j] * pn2.coeffs[i - j + 1] for j ∈ max(1, i - N2 + 1):min(i, N1);
+        init=zero(T3),
     )
 end
 
