@@ -1,8 +1,15 @@
 public PNBase
 
+"""
+    PNBase
+
+This module provides many of the same essential functions available in Julia's `Base`
+module, but restricted to operations we expect to be used in post-Newtonian contexts, so
+that we can ensure that the resulting expressions are valid within that framework.
+"""
 baremodule PNBase
 import Base
-using PostNewtonian: constant_convert, PNSystem
+using PostNewtonian: constant_convert, PNSystem, PNTerm, PNExpansionParameter, PNExpansion
 using PostNewtonian.InlineExports: @export
 using Base: @inline
 
@@ -10,21 +17,23 @@ using Base: @inline
 
 @export @inline √(pnsystem::PNSystem, x) = Base.sqrt(constant_convert(pnsystem, x))
 
-@export @inline (+)(pnsystem::PNSystem, x) = constant_convert(pnsystem, x)
-@export @inline (*)(pnsystem::PNSystem, x) = constant_convert(pnsystem, x)
-
 @export @inline (+)(pnsystem::PNSystem, x, y) = Base.:+(constant_convert(pnsystem, x), y)
-@export @inline (-)(pnsystem::PNSystem, x, y) = Base.:-(constant_convert(pnsystem, x), y)
-@export @inline (*)(pnsystem::PNSystem, x, y) = Base.:*(constant_convert(pnsystem, x), y)
-@export @inline (/)(pnsystem::PNSystem, x, y) = Base.:/(constant_convert(pnsystem, x), y)
-@export @inline (^)(pnsystem::PNSystem, x, n) = Base.:^(constant_convert(pnsystem, x), n)
-
-@export @inline function (+)(pnsystem::PNSystem, w, x, y, z...)
+@inline (+)(pnsystem::PNSystem, x) = constant_convert(pnsystem, x)
+@inline function (+)(pnsystem::PNSystem, w, x, y, z...)
     return Base.:+(constant_convert(pnsystem, w), x, y, z...)
 end
-@export @inline function (*)(pnsystem::PNSystem, w, x, y, z...)
+
+@export @inline (-)(pnsystem::PNSystem, x, y) = Base.:-(constant_convert(pnsystem, x), y)
+
+@export @inline (*)(pnsystem::PNSystem, x, y) = Base.:*(constant_convert(pnsystem, x), y)
+@inline (*)(pnsystem::PNSystem, x) = constant_convert(pnsystem, x)
+@inline function (*)(pnsystem::PNSystem, w, x, y, z...)
     return Base.:*(constant_convert(pnsystem, w), x, y, z...)
 end
+
+@export @inline (/)(pnsystem::PNSystem, x, y) = Base.:/(constant_convert(pnsystem, x), y)
+
+@export @inline (^)(pnsystem::PNSystem, x, n) = Base.:^(constant_convert(pnsystem, x), n)
 
 end  # baremodule PNBase
 

@@ -9,9 +9,9 @@ include("utilities/truncated_series_monoid.jl")
 include("utilities/truncated_series_inversion.jl")
 
 # These are types and modules that help to build the post-Newtonian framework.
+include("PNBase.jl")
 include("PNTerm.jl")
 include("PNExpansion.jl")
-include("PNBase.jl")
 
 # These macros effectively form the interface used directly in the rest of the code.
 include("pn_expansion.jl")
