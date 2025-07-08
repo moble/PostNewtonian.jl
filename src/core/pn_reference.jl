@@ -77,21 +77,22 @@ function pn_reference(expr, __module__, __source__)
         end
 
         # Now, we assemble the new module, mostly by prepending some imports to the contents
-        new_module = Expr(
-            :module,
-            false,  # We turn this into a `baremodule`
-            expr.args[2],  # This is the name of the module
-            Expr(  # This is the new module body
-                :block,
-                :(using Base: Base, Val, π),
-                :(eval(x::Expr) = Core.eval($(expr.args[2]), x)),
-                :(include(p::AbstractString) = Base.include($(expr.args[2]), p)),
-                :(using PostNewtonian:
-                    @pn_expression, @pn_expansion, PNExpansionParameter, 𝒾, γₑ, ζ3),
-                :(using PostNewtonian.PNExpressionArithmetic),
-                expr.args[3].args...,  # The original module body
-            ),
-        )
+        module_name = expr.args[2]
+        module_body = expr.args[3].args
+        public = VERSION ≥ v"1.11.0-beta1" ? Expr(:public, module_name) : :()
+        new_module = quote
+            $public
+            Base.@__doc__ baremodule $(module_name)
+            using Base: Base, Val, π, @raw_str, @doc
+            eval(x::Expr) = Core.eval($(module_name), x)
+            include(p::AbstractString) = Base.include($(module_name), p)
+            using PostNewtonian:
+                @pn_expression, @pn_expansion, PNExpansionParameter, 𝒾, γₑ, ζ3
+            using PostNewtonian.PNBase
+            $(module_body...)
+            end
+        end
+
         # Finally, we return this as a `:toplevel` expression, to ensure that it is
         # not buried in some block that causes an error.
         return Expr(:toplevel, new_module)
