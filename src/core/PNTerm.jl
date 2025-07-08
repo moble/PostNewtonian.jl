@@ -61,13 +61,6 @@ Base.eltype(pn::PNTerm{T}) where {T} = T
 @public c⁻¹exp(pn::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent} =
     c⁻¹Exponent
 
-function constant_convert(pn::PNSystem, term::PNTerm)
-    # Generic fallback to provide a useful error message
-    error(
-        "Input values to `constant_convert` must have the same `NT` and `PNOrder` type " *
-        "parameters; got `$(typeof(pn))` and `$(typeof(term))`.",
-    )
-end
 function constant_convert(
     pn::P, term::T
 ) where {NT,PNOrder,P<:PNSystem{NT,PNOrder},T<:PNTerm{NT,PNOrder}}

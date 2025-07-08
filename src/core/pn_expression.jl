@@ -191,9 +191,9 @@ function pn_expression(arg_index, func, pnsystem_functions, __module__, __source
     ]
 
     # Walk the expression tree and find all function calls to any of the
-    # `pnexpressionarithmetic_functions`, and insert `pnsystem` as the first argument.
+    # `pnbase_functions`, and insert `pnsystem` as the first argument.
     new_body = MacroTools.postwalk(new_body) do x
-        if iscall(x, pnexpressionarithmetic_functions)
+        if iscall(x, pnbase_functions)
             insert!(x.args, 2, (pnsystem))
             x
         else
@@ -227,7 +227,7 @@ end
     eval(x::Expr) = Core.eval(Base.@__MODULE__, x)
     include(p::AbstractString) = Base.include(Base.@__MODULE__, p)
     using PostNewtonian: PostNewtonian, @pn_expression, @pn_expansion, 𝒾, γₑ, ζ3
-    using PostNewtonian.PNExpressionArithmetic
+    using PostNewtonian.PNBase
 
     # Below are what we would normally write manually
     import PostNewtonian: M₁, M₂, χ₁ˣ, χ₁ʸ, χ₁ᶻ, v, Φ

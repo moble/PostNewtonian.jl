@@ -1,6 +1,6 @@
-public PNExpressionArithmetic
+public PNBase
 
-baremodule PNExpressionArithmetic
+baremodule PNBase
 import Base
 using PostNewtonian: constant_convert, PNSystem
 using PostNewtonian.InlineExports: @export
@@ -26,14 +26,12 @@ end
     return Base.:*(constant_convert(pnsystem, w), x, y, z...)
 end
 
-end  # baremodule PNExpressionArithmetic
+end  # baremodule PNBase
 
-const pnexpressionarithmetic_functions = filter(
-    s -> isa(getfield(PNExpressionArithmetic, s), Function), names(PNExpressionArithmetic)
-)
+const pnbase_functions = filter(s -> isa(getfield(PNBase, s), Function), names(PNBase))
 
 @doc """
-    PNExpressionArithmetic
+    PNBase
 
 This module provides arithmetic operations to be used inside `@pn_expression` modules.
 
@@ -41,20 +39,20 @@ It is intentionally very restrictive, so that it only includes the basic arithme
 operations that are used in post-Newtonian expressions, and even then only in modified forms
 that take a `PNSystem` as the first argument.  The defined operations are
 
-    $(pnexpressionarithmetic_functions)
+    $(pnbase_functions)
 
 This module is not intended to be used directly, but is imported by the
 [`@pn_expression`](@ref) macro, and its methods are called by [`@pn_expansion`](@ref) to
 ensure that the arithmetic operations preserve the number type of the input `PNSystem`.
 """
-PNExpressionArithmetic
+PNBase
 
-@testitem "PNExpressionArithmetic" begin
+@testitem "PNBase" begin
     baremodule Mod
-    using PostNewtonian.PNExpressionArithmetic
+    using PostNewtonian.PNBase
     end
 
-    using PostNewtonian: pnexpressionarithmetic_functions
+    using PostNewtonian: pnbase_functions
 
     const ln = log
 
@@ -63,7 +61,7 @@ PNExpressionArithmetic
         z = (1, 2, 3, 17, 31, ℯ, π, 3//13, 47//59)
 
         for f ∈ (:+, :-, :*, :/, :^, :ln, :√)
-            @test f ∈ pnexpressionarithmetic_functions
+            @test f ∈ pnbase_functions
         end
         for f ∈ (:+, :-, :*, :/, :^)
             for x ∈ z, y ∈ z
