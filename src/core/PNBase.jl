@@ -1,15 +1,9 @@
 public PNBase
 
-"""
-    PNBase
-
-This module provides many of the same essential functions available in Julia's `Base`
-module, but restricted to operations we expect to be used in post-Newtonian contexts, so
-that we can ensure that the resulting expressions are valid within that framework.
-"""
+# Documented below so that we can list the functions in the module automatically.
 baremodule PNBase
 import Base
-using PostNewtonian: constant_convert, PNSystem, PNTerm, PNExpansionParameter, PNExpansion
+using PostNewtonian: constant_convert, PNSystem
 using PostNewtonian.InlineExports: @export
 using Base: @inline
 
@@ -33,6 +27,8 @@ end
 
 @export @inline (/)(pnsystem::PNSystem, x, y) = Base.:/(constant_convert(pnsystem, x), y)
 
+@export @inline (//)(x, y) = Base.://(x, y)
+
 @export @inline (^)(pnsystem::PNSystem, x, n) = Base.:^(constant_convert(pnsystem, x), n)
 
 end  # baremodule PNBase
@@ -42,7 +38,10 @@ const pnbase_functions = filter(s -> isa(getfield(PNBase, s), Function), names(P
 @doc """
     PNBase
 
-This module provides arithmetic operations to be used inside `@pn_expression` modules.
+This module provides many of the same essential functions available in Julia's `Base`
+module, but restricted to operations we expect to be used in post-Newtonian contexts, so
+that we can ensure that the resulting expressions are valid within that framework.  This is
+intended to be used inside `@pn_expression` modules.
 
 It is intentionally very restrictive, so that it only includes the basic arithmetic
 operations that are used in post-Newtonian expressions, and even then only in modified forms
