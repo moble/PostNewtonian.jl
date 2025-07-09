@@ -60,7 +60,7 @@ in this package as [`γₑ`](@ref).
     half-integers in any expansion.  Evaluating a term like `x^(7/2)` generically will be
     relatively inefficient, requiring a floating-point division, the logarithm of `x`, a
     floating-point multiplication, and exponentiation.  Compared to a single square-root and
-    integer exponentiation, this is very slow.  Moreover, it does not work well with the
+    integer exponentiation, this is slow.  Moreover, it does not work well with the
     [`PNTerm`](@ref) mechanism.  So another thing this macro does is search for terms like
     `x^(7/2)` and convert them to `(√x)^7`, and similarly for `γₚₙ` and `γ`.  This only
     works for explicit half-integers, rather than variables that may be half-integers.
