@@ -76,7 +76,7 @@ function PNBase.:+(pn::PNExpansion{N,T1,NMax}, x::T2) where {N,T1,NMax,T2<:Numbe
     T3 = promote_type(T1, T2)
     return PNExpansion(ntuple(i -> i == 1 ? pn[1] + x : T3(pn[i]), Val(N)), NMax)
 end
-PNBase.:+(x::T, pn::PNExpansion) where {T<:Number} = PNBase.(+)(pn, x)
+PNBase.:+(x::T, pn::PNExpansion) where {T<:Number} = PNBase.:+(pn, x)
 
 function PNBase.:-(pn::PNExpansion{N,T,NMax}) where {N,T,NMax}
     return PNExpansion{N,T,NMax}((-).(pn.coeffs))
@@ -86,7 +86,7 @@ function PNBase.:*(pn::PNExpansion{N,T1,NMax}, x::T2) where {N,T1,NMax,T2<:Numbe
     T3 = promote_type(T1, T2)
     return PNExpansion{N,T3,NMax}(@. T3(pn.coeffs * x))
 end
-PNBase.:*(x::T, pn::PNExpansion) where {T<:Number} = PNBase.(*)(pn, x)
+PNBase.:*(x::T, pn::PNExpansion) where {T<:Number} = PNBase.:*(pn, x)
 
 function PNBase.:+(
     pn1::PNExpansion{N1,T1,NMax1}, pn2::PNExpansion{N2,T2,NMax2}
@@ -135,7 +135,7 @@ function PNBase.:*(
     pn1::PNExpansion{N1,T1,NMax}, pn2::PNExpansion{N2,T2,NMax}
 ) where {N1,N2,T1,T2,NMax}
     if N1 > N2
-        return PNBase.(*)(pn2, pn1)
+        return PNBase.:*(pn2, pn1)
     else
         N3 = min(N1 + N2 - 1, NMax)
         PNExpansion(ntuple(i -> product_term(i, pn1, pn2), Val(N3)), NMax)
@@ -189,7 +189,7 @@ function PNBase.:+(
     end
     return PNExpansion{N,T,NMax}(Tuple(coeffs))
 end
-PNBase.:+(term::PNTerm, x::Number) = PNBase.(+)(x, term)
+PNBase.:+(term::PNTerm, x::Number) = PNBase.:+(x, term)
 
 function PNBase.:-(term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent}
     return PNTerm{T,PNOrder,c⁻¹Exponent}(-term.coeff)
@@ -232,7 +232,7 @@ function PNBase.:+(
     return PNExpansion{N,T,NMax}(Tuple(coeffs))
 end
 
-PNBase.:-(term1::PNTerm, term2::PNTerm) = PNBase.(+)(term1, -term2)
+PNBase.:-(term1::PNTerm, term2::PNTerm) = PNBase.:+(term1, -term2)
 
 function PNBase.:+(
     term::PNTerm{T1,PNOrder,c⁻¹E1}, expansion::PNExpansion{N2,T2,NMax2}
@@ -263,14 +263,14 @@ function PNBase.:+(
     end
     return PNExpansion{N,T,NMax}(Tuple(coeffs))
 end
-PNBase.:+(expansion::PNExpansion, term::PNTerm) = PNBase.(+)(term, expansion)
+PNBase.:+(expansion::PNExpansion, term::PNTerm) = PNBase.:+(term, expansion)
 
-PNBase.:-(term::PNTerm, x::Number) = PNBase.(+)(term, -x)
-PNBase.:-(x::Number, term::PNTerm) = PNBase.(+)(x, -term)
-PNBase.:-(term::PNTerm, expansion::PNExpansion) = PNBase.(+)(term, -expansion)
-PNBase.:-(expansion::PNExpansion, term::PNTerm) = PNBase.(+)(expansion, -term)
-PNBase.:-(x::Number, expansion::PNExpansion) = PNBase.(+)(x, -expansion)
-PNBase.:-(expansion::PNExpansion, x::Number) = PNBase.(+)(expansion, -x)
+PNBase.:-(term::PNTerm, x::Number) = PNBase.:+(term, -x)
+PNBase.:-(x::Number, term::PNTerm) = PNBase.:+(x, -term)
+PNBase.:-(term::PNTerm, expansion::PNExpansion) = PNBase.:+(term, -expansion)
+PNBase.:-(expansion::PNExpansion, term::PNTerm) = PNBase.:+(expansion, -term)
+PNBase.:-(x::Number, expansion::PNExpansion) = PNBase.:+(x, -expansion)
+PNBase.:-(expansion::PNExpansion, x::Number) = PNBase.:+(expansion, -x)
 
 function PNBase.:*(
     expansion::PNExpansion{N1,T1,NMax1}, term::PNTerm{T2,PNOrder,c⁻¹E2}
@@ -301,10 +301,10 @@ function PNBase.:*(
     end
     return PNExpansion{N,T,NMax}(Tuple(coeffs))
 end
-PNBase.:*(term::PNTerm, expansion::PNExpansion) = PNBase.(*)(expansion, term)
+PNBase.:*(term::PNTerm, expansion::PNExpansion) = PNBase.:*(expansion, term)
 # (a, b, c, d, e, f, g) * (c⁻¹^2) = (0, 0, a, b, c, d, e)
 
-PNBase.:/(expansion::PNExpansion, term::PNTerm) = PNBase.(*)(expansion, inv(term))
+PNBase.:/(expansion::PNExpansion, term::PNTerm) = PNBase.:*(expansion, inv(term))
 
 @testitem "PNExpansion algebra" begin
     using Symbolics: @variables, simplify, substitute

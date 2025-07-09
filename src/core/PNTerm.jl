@@ -67,12 +67,16 @@ function constant_convert(
     term
 end
 
-function Base.sum(pn::PNTerm)
-    return pn.coeff
+function Base.sum(term::PNTerm)
+    return term.coeff
 end
 
-function PNBase.:+(pn::PNTerm)
-    return pn
+function PNBase.:+(term::PNTerm)
+    return term
+end
+
+function PNBase.:-(term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent}
+    return PNTerm{T,PNOrder,c⁻¹Exponent}(-term.coeff)
 end
 
 function Base.inv(term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent}
@@ -97,7 +101,7 @@ function PNBase.:*(
     coeff = x * term.coeff
     return PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
 end
-PNBase.:*(term::PNTerm, x::Number) = x * term
+PNBase.:*(term::PNTerm, x::Number) = PNBase.:*(x, term)
 
 function PNBase.:/(
     term::PNTerm{T,PNOrder,c⁻¹Exponent}, x::Number
