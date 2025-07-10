@@ -6,7 +6,7 @@ baremodule PNTerms
 using Base: Base, @doc, @assert, one, zero, >, ÷, + as ⊕, - as ⊖, * as ⊛, / as ⊘, ^ as ↑
 
 import PostNewtonian: constant_convert
-using PostNewtonian: PNSystem
+using PostNewtonian: PostNewtonian, PNSystem
 using PostNewtonian.InlineExports: @export
 using PostNewtonian.PNBase
 
@@ -75,11 +75,14 @@ Base.eltype(pn::PNTerm{T}) where {T} = T
 @export c⁻¹exp(pn::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent} =
     c⁻¹Exponent
 
-function constant_convert(
+function PostNewtonian.constant_convert(
     pn::P, term::T
 ) where {NT,PNOrder,P<:PNSystem{NT,PNOrder},T<:PNTerm{NT,PNOrder}}
     term
 end
+
+### NOTE: Adding or subtracting multiple `PNTerm`s will produce a `PNExpansion`, which
+### is defined in `PNExpansion.jl`.  The following additive functions are just unary.
 
 function Base.sum(term::PNTerm)
     return term.coeff
@@ -94,7 +97,7 @@ function PNBase.:-(term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻
 end
 
 function Base.inv(term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent}
-    return PNTerm{T,PNOrder}(⊖(c⁻¹exp(term)), Base.inv(term.coeff))
+    return PNTerm{T,PNOrder}(⊖(c⁻¹Exponent), Base.inv(term.coeff))
 end
 
 function PNBase.:√(term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent}
@@ -110,12 +113,29 @@ function PNBase.:^(
 end
 
 function PNBase.:*(
+    term1::PNTerm{T1,PNOrder,c⁻¹E1}, term2::PNTerm{T2,PNOrder,c⁻¹E2}
+) where {T1,T2,PNOrder,c⁻¹E1,c⁻¹E2}
+    c⁻¹Exponent = c⁻¹exp(term1) ⊕ c⁻¹exp(term2)
+    coeff = term1.coeff ⊛ term2.coeff
+    return PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
+end
+
+function PNBase.:*(
     x::Number, term::PNTerm{T,PNOrder,c⁻¹Exponent}
 ) where {T,PNOrder,c⁻¹Exponent}
     coeff = x ⊛ term.coeff
     return PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
 end
+
 PNBase.:*(term::PNTerm, x::Number) = PNBase.:*(x, term)
+
+function PNBase.:/(
+    term1::PNTerm{T1,PNOrder,c⁻¹E1}, term2::PNTerm{T2,PNOrder,c⁻¹E2}
+) where {T1,T2,PNOrder,c⁻¹E1,c⁻¹E2}
+    c⁻¹Exponent = c⁻¹E1 ⊖ c⁻¹E2
+    coeff = term1.coeff ⊘ term2.coeff
+    return PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
+end
 
 function PNBase.:/(
     term::PNTerm{T,PNOrder,c⁻¹Exponent}, x::Number
@@ -129,22 +149,6 @@ function PNBase.:/(
 ) where {T,PNOrder,c⁻¹Exponent}
     coeff = x ⊘ term.coeff
     return PNTerm{typeof(coeff),PNOrder}(⊖(c⁻¹exp(term)), coeff)
-end
-
-function PNBase.:*(
-    term1::PNTerm{T1,PNOrder,c⁻¹E1}, term2::PNTerm{T2,PNOrder,c⁻¹E2}
-) where {T1,T2,PNOrder,c⁻¹E1,c⁻¹E2}
-    c⁻¹Exponent = c⁻¹exp(term1) ⊕ c⁻¹exp(term2)
-    coeff = term1.coeff ⊛ term2.coeff
-    return PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
-end
-
-function PNBase.:/(
-    term1::PNTerm{T1,PNOrder,c⁻¹E1}, term2::PNTerm{T2,PNOrder,c⁻¹E2}
-) where {T1,T2,PNOrder,c⁻¹E1,c⁻¹E2}
-    c⁻¹Exponent = c⁻¹E1 ⊖ c⁻¹E2
-    coeff = term1.coeff ⊘ term2.coeff
-    return PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
 end
 
 end  # baremodule PNTerms
@@ -235,4 +239,71 @@ end  # baremodule PNTerms
         @test_throws ArgumentError y / c + x * c^2
         @test_throws ArgumentError x * c^2 + (y / c + z / c^2)
     end
+
+    pn = BBH(randn(14), 2//1)
+
+    # constant_convert should just return the term
+    t0 = PNTerm{Float64,2//1}(0, 5.0)
+    @test constant_convert(pn, t0) === t0
+
+    # Base.sum
+    @test sum(t0) == 5.0
+
+    # unary + (PNBase.+)
+    t1 = PNTerm{Float64,2}(1, 2.5)
+    @test +t1 === t1
+
+    # unary - (PNBase.-)
+    t1n = -t1
+    @test c⁻¹exp(t1n) == c⁻¹exp(t1)
+    @test t1n.coeff == -2.5
+
+    # inv
+    ti = inv(t1)
+    @test c⁻¹exp(ti) == -c⁻¹exp(t1)
+    @test ti.coeff == 1/2.5
+
+    # sqrt on even exponent
+    t2 = PNTerm{Float64,2}(2, 4.0)
+    ts = √(t2)
+    @test c⁻¹exp(ts) == 1
+    @test ts.coeff == 2.0
+
+    # sqrt on odd exponent should error
+    t3 = PNTerm{Float64,2}(1, 9.0)
+    @test_throws AssertionError √(t3)
+
+    # power
+    tp = t1 ^ 3
+    @test c⁻¹exp(tp) == 3*c⁻¹exp(t1)
+    @test tp.coeff == 2.5^3
+
+    # multiply term * term
+    ta = PNTerm{Float64,2}(1, 2.0)
+    tb = PNTerm{Float64,2}(2, 3.0)
+    tab = ta * tb
+    @test c⁻¹exp(tab) == 3
+    @test tab.coeff == 6.0
+
+    # scalar * term and term * scalar
+    ts1 = 4.0 * ta
+    ts2 = ta * 4.0
+    @test c⁻¹exp(ts1) == c⁻¹exp(ta)
+    @test ts1.coeff == 8.0
+    @test ts2.coeff == 8.0
+
+    # term / term
+    td = tb / ta
+    @test c⁻¹exp(td) == 1      # 2 - 1
+    @test td.coeff == 1.5
+
+    # term / scalar
+    td1 = tb / 2.0
+    @test c⁻¹exp(td1) == c⁻¹exp(tb)
+    @test td1.coeff == 1.5
+
+    # scalar / term
+    td2 = 12.0 / ta
+    @test c⁻¹exp(td2) == -1    # -c⁻¹exp(ta)
+    @test td2.coeff == 6.0
 end
