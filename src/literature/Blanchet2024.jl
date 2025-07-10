@@ -1,9 +1,10 @@
 @doc raw"""
 Expressions from [Blanchet2024](@cite)
 
-This package mostly derives its notation from that paper.  The biggest (mild) exception is
-that Blanchet uses the symbol `m` for mass, while we reserve that for the azimuthal number
-of spin-weighted spherical harmonics, and use `M` for mass instead.
+This package mostly derives its notation from that paper.  The main exception is that
+Blanchet uses the symbol ``m`` for mass and ``\mathup{M}`` for ADM mass, while we reserve
+``m`` for the azimuthal number of spin-weighted spherical harmonics, and use ``M`` for mass
+instead.  (ADM mass does not appear in this package as of this writing.)
 
 In Sec. 3.2.4, Blanchet defines the total mass ``m=m₁+m₂``, the relative mass difference
 ``\Delta = (m₁ - m₂) / m``, the reduced mass ``μ = m₁ m₂ / m``, and the symmetric mass ratio
@@ -17,8 +18,15 @@ In Eq. (369), he defines
 
 In Eq. (375), he defines the "frequency-related parameter"
 ```math
-x = \left(\frac{GM\Omega}{c^3}\right)^{2/3}
+x = \left(\frac{GM\Omega}{c^3}\right)^{2/3},
 ```
+Note that this ``\Omega`` is "the orbital frequency [...] of the circular orbit as measured
+by a distant observer."  He does not define this completely, except to say that it is the
+frequency associated with the asymptotic Killing vector field "in any natural coordinate
+system which respects the helical symmetry" for an idealized circular system.
+
+[Trestini2025](@cite) describes roughly the same frequency as the "waveform frequency" Ω,
+and uses "orbital frequency" ω to refer to — presumably — the coordinate frequency.
 
 """
 @pn_reference module Blanchet2024
