@@ -12,6 +12,7 @@ include("utilities/truncated_series_inversion.jl")
 include("PNBase.jl")
 include("PNTerm.jl")
 include("PNExpansion.jl")
+import PostNewtonian.PNTerms: PNExpansionParameter
 
 # These macros effectively form the interface used directly in the rest of the code.
 include("pn_expansion.jl")

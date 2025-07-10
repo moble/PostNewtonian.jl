@@ -2,7 +2,15 @@ public PNBase
 
 # Documented below so that we can list the functions in the module automatically.
 baremodule PNBase
-import Base
+
+# We want to be able to use the Base operators like `+`, `-`, `*`, `/`, and `^`, but we're
+# already redefining those operators here, so we need alternative characters for them.
+# Julia defines operators that can be used with equivalent precedence and as infix operators
+# in this file: https://github.com/JuliaLang/julia/blob/master/src/julia-parser.scm.
+# Circled versions of each will work, except for `^`, for which we use an arrow.  They can
+# be typed as `\oplus`, `\ominus`, `\circledast`, `\oslash`, and `\uparrow`.
+using Base: Base, + as ⊕, - as ⊖, * as ⊛, / as ⊘, ^ as ↑
+
 using PostNewtonian: constant_convert, PNSystem
 using PostNewtonian.InlineExports: @export
 using Base: @inline
@@ -11,25 +19,37 @@ using Base: @inline
 
 @export @inline √(pnsystem::PNSystem, x) = Base.sqrt(constant_convert(pnsystem, x))
 
-@export @inline (+)(pnsystem::PNSystem, x, y) = Base.:+(constant_convert(pnsystem, x), y)
+@export @inline (+)(pnsystem::PNSystem, x, y) = ⊕(constant_convert(pnsystem, x), y)
 @inline (+)(pnsystem::PNSystem, x) = constant_convert(pnsystem, x)
 @inline function (+)(pnsystem::PNSystem, w, x, y, z...)
-    return Base.:+(constant_convert(pnsystem, w), x, y, z...)
+    return ⊕(constant_convert(pnsystem, w), x, y, z...)
 end
+@inline (+)(x::AbstractFloat, y::AbstractFloat) = x ⊕ y
+@inline (+)(x::AbstractFloat) = ⊕(x)
 
-@export @inline (-)(pnsystem::PNSystem, x, y) = Base.:-(constant_convert(pnsystem, x), y)
+@export @inline (-)(pnsystem::PNSystem, x, y) = ⊖(constant_convert(pnsystem, x), y)
+@inline (-)(x::AbstractFloat, y::AbstractFloat) = x ⊖ y
+@inline (-)(pnsystem::PNSystem, x) = ⊖(constant_convert(pnsystem, x))
+@inline (-)(x::AbstractFloat) = ⊖(x)
 
-@export @inline (*)(pnsystem::PNSystem, x, y) = Base.:*(constant_convert(pnsystem, x), y)
+@export @inline (*)(pnsystem::PNSystem, x, y) = ⊛(constant_convert(pnsystem, x), y)
 @inline (*)(pnsystem::PNSystem, x) = constant_convert(pnsystem, x)
 @inline function (*)(pnsystem::PNSystem, w, x, y, z...)
-    return Base.:*(constant_convert(pnsystem, w), x, y, z...)
+    return ⊛(constant_convert(pnsystem, w), x, y, z...)
 end
+@inline (*)(x::AbstractFloat, y::AbstractFloat) = x ⊛ y
 
-@export @inline (/)(pnsystem::PNSystem, x, y) = Base.:/(constant_convert(pnsystem, x), y)
+@export @inline (/)(pnsystem::PNSystem, x, y) = ⊘(constant_convert(pnsystem, x), y)
+@inline (/)(x::AbstractFloat, y::AbstractFloat) = x ⊘ y
 
-@export @inline (//)(x, y) = Base.://(x, y)
+@export @inline (^)(pnsystem::PNSystem, x, n) = ↑(constant_convert(pnsystem, x), n)
+@inline (^)(x::AbstractFloat, n::Integer) = x ↑ n
+@inline (^)(x::AbstractFloat, n::AbstractFloat) = x ↑ n
 
-@export @inline (^)(pnsystem::PNSystem, x, n) = Base.:^(constant_convert(pnsystem, x), n)
+# We can actually use the original definition of `//` for most purposes; we define it
+# both ways here for simplicity.
+@export @inline (//)(pnsystem::PNSystem, x, y) = Base.://(x, y)
+@inline (//)(x, y) = Base.://(x, y)
 
 end  # baremodule PNBase
 

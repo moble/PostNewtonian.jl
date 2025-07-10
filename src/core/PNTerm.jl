@@ -1,3 +1,16 @@
+# We enclose all of this in a `baremodule` so that we can isolate Base operations, and use
+# PNBase operations by default.
+baremodule PNTerms
+
+# See explanation in `PNBase.jl` for why we use these operators.
+using Base: Base, @doc, @assert, one, zero, >, ÷, + as ⊕, - as ⊖, * as ⊛, / as ⊘, ^ as ↑
+
+import PostNewtonian: constant_convert
+using PostNewtonian: PNSystem
+using PostNewtonian.InlineExports: @export
+using PostNewtonian.PNBase
+
+
 """
     PNTerm{T,PNOrder,c⁻¹Exponent}
 
@@ -27,17 +40,17 @@ Useful facts:
   - `1/r` has order `1/c^2`
 
 """
-@public struct PNTerm{T,PNOrder,c⁻¹Exponent}
+@export struct PNTerm{T,PNOrder,c⁻¹Exponent}
     coeff::T
 
     function PNTerm{T,PNOrder,c⁻¹Exponent}(coeff) where {T,PNOrder,c⁻¹Exponent}
-        if c⁻¹Exponent > 2PNOrder
+        if c⁻¹Exponent > 2 ⊛ PNOrder
             coeff = zero(coeff)
         end
         return new{T,PNOrder,c⁻¹Exponent}(coeff)
     end
     function PNTerm{T,PNOrder}(c⁻¹exp::Int, coeff) where {T,PNOrder}
-        if c⁻¹exp > 2PNOrder
+        if c⁻¹exp > 2 ⊛ PNOrder
             coeff = zero(coeff)
         end
         return new{T,PNOrder,c⁻¹exp}(coeff)
@@ -52,13 +65,14 @@ This can be used to automatically create more complicated `PNTerm`s, which combi
 [`PNExpansion`](@ref).  This is a simple but effective way to write PN formulas while
 automatically tracking the PN order of each term.
 """
-@public function PNExpansionParameter(::T) where {NT,PNOrder,T<:PNSystem{NT,PNOrder}}
+@export function PNExpansionParameter(::T) where {NT,PNOrder,T<:PNSystem{NT,PNOrder}}
     return PNTerm{NT,PNOrder}(-1, one(T))
 end
 
 Base.length(pn::PNTerm) = 1
 Base.eltype(pn::PNTerm{T}) where {T} = T
-@public c⁻¹exp(pn::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent} =
+
+@export c⁻¹exp(pn::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent} =
     c⁻¹Exponent
 
 function constant_convert(
@@ -76,29 +90,29 @@ function PNBase.:+(term::PNTerm)
 end
 
 function PNBase.:-(term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent}
-    return PNTerm{T,PNOrder,c⁻¹Exponent}(-term.coeff)
+    return PNTerm{T,PNOrder,c⁻¹Exponent}(⊖(term.coeff))
 end
 
 function Base.inv(term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent}
-    return PNTerm{T,PNOrder}(-c⁻¹exp(term), inv(term.coeff))
+    return PNTerm{T,PNOrder}(⊖(c⁻¹exp(term)), Base.inv(term.coeff))
 end
 
 function PNBase.:√(term::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent}
-    @assert iseven(c⁻¹Exponent) "Only half-integer PN orders are supported."
-    return PNTerm{T,PNOrder}(c⁻¹Exponent ÷ 2, sqrt(term.coeff))
+    @assert Base.iseven(c⁻¹Exponent) "Only half-integer PN orders are supported."
+    return PNTerm{T,PNOrder}(c⁻¹Exponent ÷ 2, Base.sqrt(term.coeff))
 end
 
 function PNBase.:^(
     term::PNTerm{T,PNOrder,c⁻¹Exponent}, n::Int
 ) where {T,PNOrder,c⁻¹Exponent}
-    coeff = term.coeff^n
-    return PNTerm{typeof(coeff),PNOrder}(c⁻¹exp(term) * n, coeff)
+    coeff = term.coeff↑n
+    return PNTerm{typeof(coeff),PNOrder}(c⁻¹exp(term) ⊛ n, coeff)
 end
 
 function PNBase.:*(
     x::Number, term::PNTerm{T,PNOrder,c⁻¹Exponent}
 ) where {T,PNOrder,c⁻¹Exponent}
-    coeff = x * term.coeff
+    coeff = x ⊛ term.coeff
     return PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
 end
 PNBase.:*(term::PNTerm, x::Number) = PNBase.:*(x, term)
@@ -106,46 +120,52 @@ PNBase.:*(term::PNTerm, x::Number) = PNBase.:*(x, term)
 function PNBase.:/(
     term::PNTerm{T,PNOrder,c⁻¹Exponent}, x::Number
 ) where {T,PNOrder,c⁻¹Exponent}
-    coeff = term.coeff / x
+    coeff = term.coeff ⊘ x
     return PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
 end
 
 function PNBase.:/(
     x::Number, term::PNTerm{T,PNOrder,c⁻¹Exponent}
 ) where {T,PNOrder,c⁻¹Exponent}
-    coeff = x / term.coeff
-    return PNTerm{typeof(coeff),PNOrder}(-c⁻¹exp(term), coeff)
+    coeff = x ⊘ term.coeff
+    return PNTerm{typeof(coeff),PNOrder}(⊖(c⁻¹exp(term)), coeff)
 end
 
 function PNBase.:*(
     term1::PNTerm{T1,PNOrder,c⁻¹E1}, term2::PNTerm{T2,PNOrder,c⁻¹E2}
 ) where {T1,T2,PNOrder,c⁻¹E1,c⁻¹E2}
-    c⁻¹Exponent = c⁻¹exp(term1) + c⁻¹exp(term2)
-    coeff = term1.coeff * term2.coeff
+    c⁻¹Exponent = c⁻¹exp(term1) ⊕ c⁻¹exp(term2)
+    coeff = term1.coeff ⊛ term2.coeff
     return PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
 end
 
 function PNBase.:/(
     term1::PNTerm{T1,PNOrder,c⁻¹E1}, term2::PNTerm{T2,PNOrder,c⁻¹E2}
 ) where {T1,T2,PNOrder,c⁻¹E1,c⁻¹E2}
-    c⁻¹Exponent = c⁻¹E1 - c⁻¹E2
-    coeff = term1.coeff / term2.coeff
+    c⁻¹Exponent = c⁻¹E1 ⊖ c⁻¹E2
+    coeff = term1.coeff ⊘ term2.coeff
     return PNTerm{typeof(coeff),PNOrder,c⁻¹Exponent}(coeff)
 end
 
+end  # baremodule PNTerms
+
 @testitem "PNTerm algebra" begin
-    using DoubleFloats
-    using PostNewtonian: PostNewtonian, PNExpansionParameter, PNExpansion, pn_order
+    using Base: Base, one, zero, <, ÷, + as ⊕, - as ⊖, * as ⊛, / as ⊘, ^ as ↑
+    using DoubleFloats: Double64
+    using PostNewtonian: PostNewtonian, pn_order
+    using PostNewtonian.PNBase: ln, (√), (+), (-), (*), (/), (//), (^)
+    using PostNewtonian.PNTerms: PNTerm, PNExpansionParameter, c⁻¹exp, PNBase, constant_convert
+    using PostNewtonian.PNExpansions: PNExpansion
 
     for T ∈ [Float64, Float16, Double64]
         pn = BBH(randn(T, 14), 9//2)
-        pn[:v] = T(1) / 5
+        pn[:v] = /(pn, 1, 5)
         c = PNExpansionParameter(pn)
         z = zero(T)
-        x = T(6) / 5
-        y = T(17) / 5
-        w = T(28) / 5
-        v = T(27) / 13
+        x = /(pn, 6, 5)
+        y = /(pn, 17, 5)
+        w = /(pn, 28, 5)
+        v = /(pn, 27, 13)
 
         # Test behavior of `c` as the basic PNTerm
         for (term, c⁻¹exponent, coeff) ∈ (
@@ -160,7 +180,7 @@ end
             ((x / c^2) / c^4, 6, x),
             ((x / c^2) * (y / c^4), 6, x * y),
         )
-            @test PostNewtonian.c⁻¹exp(term) == c⁻¹exponent
+            @test c⁻¹exp(term) == c⁻¹exponent
             @test term.coeff == coeff
             @test term.coeff isa eltype(pn)
             @test length(term) == 1

@@ -7,7 +7,7 @@ This is a `Rational{Int}` that indicates the order to which the PN expansions sh
 carried out when using the given object.
 """
 @export pn_order(::Type{<:PNSystem{NT,PNOrder}}) where {NT,PNOrder} = PNOrder
-pn_order(pnsystem) = pn_order(typeof(pnsystem))
+pn_order(pnsystem::PNSystem) = pn_order(typeof(pnsystem))
 
 """
     order_index(pnsystem::PNSystem)
