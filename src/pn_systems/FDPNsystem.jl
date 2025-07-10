@@ -61,7 +61,7 @@ end
 
 # These are more examples of where we need to specialize the method for `FDPNSystem`, as
 # explained in the docstring.
-constant_convert(::T, x::exact_number) where {NT,T<:FDPNSystem{NT}} = NT(x)
+constant_convert(::T, x::ExactNumber) where {NT,T<:FDPNSystem{NT}} = NT(x)
 constant_convert(::T, x::NT) where {NT,T<:FDPNSystem{NT}} = x
 
 @testitem "FDPNSystem" begin

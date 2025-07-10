@@ -24,8 +24,9 @@ using .InlineExports: @public, @export
 public ζ3  # Defined and documented in `core/utilities/misc.jl`
 
 # We will use these types to ensure that precision is preserved in PN expressions.
-@public const exact_real = Union{Integer,Rational,AbstractIrrational}
-@public const exact_number = Union{exact_real,Complex{<:exact_real}}
+@public const ExactReal = Union{Integer,Rational,AbstractIrrational}
+@public const ExactNumber = Union{ExactReal,Complex{<:ExactReal}}
+@public const ExactIntegerBased = Union{Integer,Rational}
 
 include("pn_systems/pn_systems.jl")
 include("core/core.jl")

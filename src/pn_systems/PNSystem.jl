@@ -130,5 +130,5 @@ as the `Dual`'s underlying type in PostNewtonianForwardDiffExt.
 You generally will not need to call this function directly; it will be used automatically by
 the [`@pn_expression`](@ref) macro.
 """
-@public constant_convert(::T, x::exact_number) where {NT,T<:PNSystem{NT}} = NT(x)
+@public constant_convert(::T, x::ExactNumber) where {NT,T<:PNSystem{NT}} = NT(x)
 constant_convert(::T, x::NT) where {NT,T<:PNSystem{NT}} = x
