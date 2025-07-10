@@ -11,39 +11,55 @@ baremodule PNBase
 # be typed as `\oplus`, `\ominus`, `\circledast`, `\oslash`, and `\uparrow`.
 using Base: Base, + as ⊕, - as ⊖, * as ⊛, / as ⊘, ^ as ↑
 
-using PostNewtonian: constant_convert, PNSystem
+using PostNewtonian: constant_convert, PNSystem, ExactNumber, ExactIntegerBased
 using PostNewtonian.InlineExports: @export
 using Base: @inline
 
 @export @inline ln(pnsystem::PNSystem, x) = Base.log(constant_convert(pnsystem, x))
+@inline ln(x::AbstractFloat) = Base.log(x)
 
 @export @inline √(pnsystem::PNSystem, x) = Base.sqrt(constant_convert(pnsystem, x))
+@inline √(x::AbstractFloat) = Base.sqrt(x)
 
 @export @inline (+)(pnsystem::PNSystem, x, y) = ⊕(constant_convert(pnsystem, x), y)
 @inline (+)(pnsystem::PNSystem, x) = constant_convert(pnsystem, x)
-@inline function (+)(pnsystem::PNSystem, w, x, y, z...)
-    return ⊕(constant_convert(pnsystem, w), x, y, z...)
-end
+# @inline function (+)(pnsystem::PNSystem, w, x, y, z...)
+#     return ⊕(constant_convert(pnsystem, w), x, y, z...)
+# end
 @inline (+)(x::AbstractFloat, y::AbstractFloat) = x ⊕ y
-@inline (+)(x::AbstractFloat) = ⊕(x)
+@inline (+)(x::AbstractFloat, y::ExactNumber) = x ⊕ y
+@inline (+)(x::ExactNumber, y::AbstractFloat) = x ⊕ y
+@inline (+)(x::ExactIntegerBased, y::ExactIntegerBased) = x ⊕ y
+@inline (+)(x::Number) = x
+(+)(x, y, z, args...) = Base.afoldl(+, (x + y) + z, args...)
 
 @export @inline (-)(pnsystem::PNSystem, x, y) = ⊖(constant_convert(pnsystem, x), y)
 @inline (-)(x::AbstractFloat, y::AbstractFloat) = x ⊖ y
+@inline (-)(x::AbstractFloat, y::ExactNumber) = x ⊖ y
+@inline (-)(x::ExactNumber, y::AbstractFloat) = x ⊖ y
+@inline (-)(x::ExactIntegerBased, y::ExactIntegerBased) = x ⊖ y
+@inline (-)(x::Number) = ⊖(x)
 @inline (-)(pnsystem::PNSystem, x) = ⊖(constant_convert(pnsystem, x))
-@inline (-)(x::AbstractFloat) = ⊖(x)
 
 @export @inline (*)(pnsystem::PNSystem, x, y) = ⊛(constant_convert(pnsystem, x), y)
 @inline (*)(pnsystem::PNSystem, x) = constant_convert(pnsystem, x)
-@inline function (*)(pnsystem::PNSystem, w, x, y, z...)
-    return ⊛(constant_convert(pnsystem, w), x, y, z...)
-end
+# @inline function (*)(pnsystem::PNSystem, w, x, y, z...)
+#     return ⊛(constant_convert(pnsystem, w), x, y, z...)
+# end
 @inline (*)(x::AbstractFloat, y::AbstractFloat) = x ⊛ y
+@inline (*)(x::AbstractFloat, y::ExactNumber) = x ⊛ y
+@inline (*)(x::ExactNumber, y::AbstractFloat) = x ⊛ y
+@inline (*)(x::ExactIntegerBased, y::ExactIntegerBased) = x ⊛ y
+(*)(x, y, z, args...) = Base.afoldl(*, (x * y) * z, args...)
 
 @export @inline (/)(pnsystem::PNSystem, x, y) = ⊘(constant_convert(pnsystem, x), y)
 @inline (/)(x::AbstractFloat, y::AbstractFloat) = x ⊘ y
+@inline (/)(x::AbstractFloat, y::ExactNumber) = x ⊘ y
+@inline (/)(x::ExactNumber, y::AbstractFloat) = x ⊘ y
 
 @export @inline (^)(pnsystem::PNSystem, x, n) = ↑(constant_convert(pnsystem, x), n)
-@inline (^)(x::AbstractFloat, n::Integer) = x ↑ n
+@inline (^)(x::AbstractFloat, n::ExactNumber) = x ↑ n
+@inline (^)(x::ExactNumber, n::AbstractFloat) = x ↑ n
 @inline (^)(x::AbstractFloat, n::AbstractFloat) = x ↑ n
 
 # We can actually use the original definition of `//` for most purposes; we define it
@@ -86,7 +102,35 @@ PNBase
 
     for NT ∈ (Float16, Float64, BigFloat)
         pnsystem = BHNS(randn(NT, 15))
-        z = (1, 2, 3, 17, 31, ℯ, π, 3//13, 47//59)
+        Z = (1, 2, 3, 17, 31, 3//13, 47//59)
+        z = (Z..., ℯ, π)
+
+        for x ∈ z
+            @test eval(:(Mod.:+))(pnsystem, x) isa NT
+            @test eval(:(Mod.:+))(pnsystem, x) == NT(x)
+            @test eval(:(Mod.:+))(x) == x
+
+            @test eval(:(Mod.:-))(pnsystem, x) isa NT
+            @test eval(:(Mod.:-))(pnsystem, x) == -NT(x)
+            @test eval(:(Mod.:-))(x) == -x
+
+            @test eval(:(Mod.:*))(pnsystem, x) isa NT
+            @test eval(:(Mod.:*))(pnsystem, x) == NT(x)
+        end
+
+        for f ∈ (:+, :*)
+            op = f===:+ ? sum : prod
+            for w ∈ Z, x ∈ Z, y ∈ Z
+                @test eval(:(Mod.$f))(pnsystem, w, x, y) isa NT
+                @test eval(:(Mod.$f))(pnsystem, w, x, y) == op(NT, (w, x, y))
+                @test eval(:(Mod.$f))(w, x, y) === op((w, x, y))
+                for v ∈ Z
+                    @test eval(:(Mod.$f))(pnsystem, v, w, x, y) isa NT
+                    @test eval(:(Mod.$f))(pnsystem, v, w, x, y) == op(NT, (v, w, x, y))
+                    @test eval(:(Mod.$f))(v, w, x, y) === op((v, w, x, y))
+                end
+            end
+        end
 
         for f ∈ (:+, :-, :*, :/, :^, :ln, :√)
             @test f ∈ pnbase_functions
@@ -95,12 +139,32 @@ PNBase
             for x ∈ z, y ∈ z
                 @test eval(:(Mod.$f))(pnsystem, x, y) isa NT
                 @test eval(:(Mod.$f))(pnsystem, x, y) == eval(:($f))(NT(x), NT(y))
+                @test eval(:(Mod.$f))(x, NT(y)) isa NT
+                @test eval(:(Mod.$f))(x, NT(y)) ≈ eval(:($f))(NT(x), NT(y))
+                @test eval(:(Mod.$f))(NT(x), y) isa NT
+                @test eval(:(Mod.$f))(NT(x), y) ≈ eval(:($f))(NT(x), NT(y))
+                @test eval(:(Mod.$f))(NT(x), NT(y)) isa NT
+                @test eval(:(Mod.$f))(NT(x), NT(y)) == eval(:($f))(NT(x), NT(y))
             end
+        end
+        for f ∈ (:+, :-, :*, ://)
+            for x ∈ Z, y ∈ Z
+                @test typeof(eval(:(Mod.$f))(x, y)) === typeof(eval(:($f))(x, y))
+                @test eval(:(Mod.$f))(x, y) == eval(:($f))(x, y)
+            end
+        end
+        for x ∈ Z, y ∈ Z
+            @test typeof(eval(:(Mod.://))(pnsystem, x, y)) === typeof(x // y)
+            @test eval(:(Mod.://))(pnsystem, x, y) == x // y
         end
         for f ∈ (:ln, :√)
             for x ∈ z
                 @test eval(:(Mod.$f))(pnsystem, x) isa NT
                 @test eval(:(Mod.$f))(pnsystem, x) == eval(:($f))(NT(x))
+                @test eval(:(Mod.$f))(NT(x)) == eval(:($f))(NT(x))
+            end
+            for x ∈ Z
+                @test_throws MethodError eval(:(Mod.$f))((x))
             end
         end
     end
