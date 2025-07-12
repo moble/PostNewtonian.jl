@@ -52,7 +52,7 @@ julia> n=10_000_000; sum(1 ./ (1:n))-log(n)
 
 Return `x` or the value wrapped by the `Dual` number `x`
 """
-@public value(x::T) where {T} = hasproperty(x, :value) ? getproperty(x, :value) : x
+@public value(x::T) where {T} = hasfield(T, :value) ? getfield(x, :value) : x
 
 """
     find_symbols_of_type(mod, T)
@@ -122,4 +122,59 @@ function apply_to_first_add!(expr, func)
             x
         end
     end
+end
+
+@testitem "core.misc" begin
+    using DoubleFloats
+    using ForwardDiff: Dual
+    using PostNewtonian: ζ3, γₑ, value, find_symbols_of_type
+    using PostNewtonian:
+        iscall, isadd, ismul, flatten_add!, flatten_mul!, apply_to_first_add!
+
+    # ζ3 formula
+    @test ζ3 ≈ sum((1:10_000_000) .^ -3)
+
+    # γₑ formula
+    N = 10_000_000
+    δγₑ = 1/2N
+    @test γₑ ≈ sum(1 ./ (1:N)) - log(N) - δγₑ
+
+    # value
+    struct Dummy
+        value
+    end
+    struct Dummier
+        valuet
+    end
+    for T ∈ (Float16, Float32, Float64, Double16, Double32, Double64, BigFloat)
+        x = T(big"1.2")
+        @test value(x) isa T
+        @test value(x) == x
+        d = Dummy(x)
+        @test value(d) isa T
+        @test value(d) == x
+        dr = Dummier(x)
+        @test value(dr) isa Dummier
+        @test value(dr) == dr
+        v = (T(big"3.4"), T(big"5.6"), T(big"7.8"))
+        for i ∈ eachindex(v)
+            ẋ = Dual{:Taggo}(x, v[begin:i])
+            @test value(ẋ) isa T
+            @test value(ẋ) == x
+        end
+    end
+
+    # iscall and friends
+    @test isadd(:(1 + 2))
+    @test isadd(:(1 + 2c + 3c^2))
+    @test isadd(:(1 + (2n + 3m)))
+    @test isadd(Expr(:call, :+, 1, 2))
+    @test isadd(Expr(:call, (+), 1, 2))
+    @test !isadd(:(1 * 2))
+    @test ismul(:(1 * 2))
+    @test ismul(:(1 * 2c * 3c^2))
+    @test ismul(:(1 * (2c * 3d)))
+    @test ismul(Expr(:call, :*, 1, 2))
+    @test ismul(Expr(:call, (*), 1, 2))
+    @test !ismul(:(1 + 2))
 end
