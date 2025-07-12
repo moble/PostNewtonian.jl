@@ -78,6 +78,9 @@ elements are currently in the coefficients, but is required to be 1 ≤ N ≤ NM
     end
 end
 
+Base.Tuple(pn::PNExpansion) = pn.coeffs
+SVector(pn::PNExpansion) = SVector(pn.coeffs)
+
 PostNewtonian.pn_order(::PNExpansion{N,T,NMax}) where {N,T,NMax} = (NMax ⊖ 1)//2
 
 Base.getindex(pn::PNExpansion, i::Int) = pn.coeffs[i]
@@ -85,24 +88,15 @@ Base.length(pn::PNExpansion) = length(pn.coeffs)
 Base.eltype(pn::PNExpansion) = eltype(pn.coeffs)
 
 function Base.sum(pn_expansion::PNExpansion{N,T,NMax}) where {N,T,NMax}
-    return Base.sum(pn_expansion[i] for i ∈ 1:N; init=zero(T))
+    return Base.sum(pn_expansion.coeffs; init=zero(T))
 end
 
 function PNBase.:+(pn::PNExpansion{N,T1,NMax}, x::T2) where {N,T1,NMax,T2<:Number}
     T3 = promote_type(T1, T2)
     return PNExpansion(ntuple(i -> i == 1 ? pn[1] + x : T3(pn[i]), Val(N)), NMax)
 end
+
 PNBase.:+(x::T, pn::PNExpansion) where {T<:Number} = PNBase.:+(pn, x)
-
-function PNBase.:-(pn::PNExpansion{N,T,NMax}) where {N,T,NMax}
-    return PNExpansion{N,T,NMax}((-).(pn.coeffs))
-end
-
-function PNBase.:*(pn::PNExpansion{N,T1,NMax}, x::T2) where {N,T1,NMax,T2<:Number}
-    T3 = promote_type(T1, T2)
-    return PNExpansion{N,T3,NMax}(@. T3(pn.coeffs * x))
-end
-PNBase.:*(x::T, pn::PNExpansion) where {T<:Number} = PNBase.:*(pn, x)
 
 function PNBase.:+(
     pn1::PNExpansion{N1,T1,NMax1}, pn2::PNExpansion{N2,T2,NMax2}
@@ -136,56 +130,6 @@ function sum_term(
     end
 end
 
-function PNBase.:*(
-    pn1::PNExpansion{N1,T1,NMax1}, pn2::PNExpansion{N2,T2,NMax2}
-) where {N1,N2,T1,T2,NMax1,NMax2}
-    throw(
-        ArgumentError(
-            "`PNExpansion` multiplication is only defined for objects of the same PN order." ⊛
-            "\nGot NMax1=$(NMax1) and NMax2=$(NMax2).",
-        ),
-    )
-end
-
-function PNBase.:*(
-    pn1::PNExpansion{N1,T1,NMax}, pn2::PNExpansion{N2,T2,NMax}
-) where {N1,N2,T1,T2,NMax}
-    if N1 > N2
-        return PNBase.:*(pn2, pn1)
-    else
-        N3 = min(N1 + N2 - 1, NMax)
-        PNExpansion(ntuple(i -> product_term(i, pn1, pn2), Val(N3)), NMax)
-    end
-end
-
-function product_term(
-    i, pn1::PNExpansion{N1,T1,NMax}, pn2::PNExpansion{N2,T2,NMax}
-) where {N1,N2,T1,T2,NMax}
-    T3 = promote_type(T1, T2)
-    return Base.sum(
-        pn1.coeffs[j] ⊛ pn2.coeffs[i - j + 1] for j ∈ max(1, i - N2 + 1):min(i, N1);
-        init=zero(T3),
-    )
-end
-
-PNBase.:/(p::PNExpansion, x::Number) = p * (1 / x)
-
-# Note that an PNExpansion is really a *relative* expansion in `1/c` — *not* `v` or `x`.
-# Therefore, the correct derivative with respect to any variable (other than `c`, which we
-# never differentiate with respect to) extends to just derivatives of the coefficients,
-# without any change to the exponent of `1/c`.
-function FastDifferentiation.derivative(
-    pn_expansion::PNExpansion{N,T,NMax}, fd_node::FastDifferentiation.Node
-) where {N,T,NMax}
-    @assert fd_node.node_value ≠ :c "Can't differentiate `PNExpansion` with respect to `c`."
-    return PNExpansion(
-        ntuple(i -> FastDifferentiation.derivative(pn_expansion[i], fd_node), Val(N)), NMax
-    )
-end
-
-Base.Tuple(pn::PNExpansion) = pn.coeffs
-SVector(pn::PNExpansion) = SVector(pn.coeffs)
-
 function PNBase.:+(
     x::T1, term::PNTerm{T2,PNOrder,c⁻¹Exponent}
 ) where {T1<:Number,T2,PNOrder,c⁻¹Exponent}
@@ -210,6 +154,7 @@ function PNBase.:+(
     end
     return PNExpansion{N,T,NMax}(Tuple(coeffs))
 end
+
 PNBase.:+(term::PNTerm, x::Number) = PNBase.:+(x, term)
 
 function PNBase.:+(
@@ -249,8 +194,6 @@ function PNBase.:+(
     return PNExpansion{N,T,NMax}(Tuple(coeffs))
 end
 
-PNBase.:-(term1::PNTerm, term2::PNTerm) = PNBase.:+(term1, -term2)
-
 function PNBase.:+(
     term::PNTerm{T1,PNOrder,c⁻¹E1}, expansion::PNExpansion{N2,T2,NMax2}
 ) where {T1,PNOrder,c⁻¹E1,N2,T2,NMax2}
@@ -280,14 +223,59 @@ function PNBase.:+(
     end
     return PNExpansion{N,T,NMax}(Tuple(coeffs))
 end
+
 PNBase.:+(expansion::PNExpansion, term::PNTerm) = PNBase.:+(term, expansion)
 
+PNBase.:-(term1::PNTerm, term2::PNTerm) = PNBase.:+(term1, -term2)
 PNBase.:-(term::PNTerm, x::Number) = PNBase.:+(term, -x)
 PNBase.:-(x::Number, term::PNTerm) = PNBase.:+(x, -term)
 PNBase.:-(term::PNTerm, expansion::PNExpansion) = PNBase.:+(term, -expansion)
 PNBase.:-(expansion::PNExpansion, term::PNTerm) = PNBase.:+(expansion, -term)
 PNBase.:-(x::Number, expansion::PNExpansion) = PNBase.:+(x, -expansion)
 PNBase.:-(expansion::PNExpansion, x::Number) = PNBase.:+(expansion, -x)
+
+function PNBase.:-(pn::PNExpansion{N,T,NMax}) where {N,T,NMax}
+    return PNExpansion{N,T,NMax}((-).(pn.coeffs))
+end
+
+function PNBase.:*(pn::PNExpansion{N,T1,NMax}, x::T2) where {N,T1,NMax,T2<:Number}
+    T3 = promote_type(T1, T2)
+    return PNExpansion{N,T3,NMax}(@. T3(pn.coeffs * x))
+end
+
+PNBase.:*(x::T, pn::PNExpansion) where {T<:Number} = PNBase.:*(pn, x)
+
+function PNBase.:*(
+    pn1::PNExpansion{N1,T1,NMax1}, pn2::PNExpansion{N2,T2,NMax2}
+) where {N1,N2,T1,T2,NMax1,NMax2}
+    throw(
+        ArgumentError(
+            "`PNExpansion` multiplication is only defined for objects of the same PN order." ⊛
+            "\nGot NMax1=$(NMax1) and NMax2=$(NMax2).",
+        ),
+    )
+end
+
+function PNBase.:*(
+    pn1::PNExpansion{N1,T1,NMax}, pn2::PNExpansion{N2,T2,NMax}
+) where {N1,N2,T1,T2,NMax}
+    if N1 > N2
+        return PNBase.:*(pn2, pn1)
+    else
+        N3 = min(N1 + N2 - 1, NMax)
+        PNExpansion(ntuple(i -> product_term(i, pn1, pn2), Val(N3)), NMax)
+    end
+end
+
+function product_term(
+    i, pn1::PNExpansion{N1,T1,NMax}, pn2::PNExpansion{N2,T2,NMax}
+) where {N1,N2,T1,T2,NMax}
+    T3 = promote_type(T1, T2)
+    return Base.sum(
+        pn1.coeffs[j] ⊛ pn2.coeffs[i - j + 1] for j ∈ max(1, i - N2 + 1):min(i, N1);
+        init=zero(T3),
+    )
+end
 
 function PNBase.:*(
     expansion::PNExpansion{N1,T1,NMax1}, term::PNTerm{T2,PNOrder,c⁻¹E2}
@@ -313,21 +301,34 @@ function PNBase.:*(
     T = promote_type(T1, T2)
     coeffs = _efficient_vector(Val(N), Val(T))
     coeffs .= zero(T)
-    @inbounds for i ∈ max(1, 1 - ΔN):min(N1, N - ΔN)
-        coeffs[i + ΔN] = expansion[i] ⊛ term.coeff
+    @inbounds for i ∈ max(1, 1 ⊖ ΔN):min(N1, N ⊖ ΔN)
+        coeffs[i ⊕ ΔN] = expansion[i] ⊛ term.coeff
     end
     return PNExpansion{N,T,NMax}(Tuple(coeffs))
 end
+
 PNBase.:*(term::PNTerm, expansion::PNExpansion) = PNBase.:*(expansion, term)
 # (a, b, c, d, e, f, g) * (c⁻¹^2) = (0, 0, a, b, c, d, e)
 
-PNBase.:/(expansion::PNExpansion, term::PNTerm) = PNBase.:*(expansion, inv(term))
+PNBase.:/(expansion::PNExpansion, x) = PNBase.:*(expansion, Base.inv(x))
+
+# Note that an PNExpansion is really a *relative* expansion in `1/c` — *not* `v` or `x`.
+# Therefore, the correct derivative with respect to any variable (other than `c`, which we
+# never differentiate with respect to) extends to just derivatives of the coefficients,
+# without any change to the exponent of `1/c`.
+function FastDifferentiation.derivative(
+    pn_expansion::PNExpansion{N,T,NMax}, fd_node::FastDifferentiation.Node
+) where {N,T,NMax}
+    return PNExpansion(
+        ntuple(i -> FastDifferentiation.derivative(pn_expansion[i], fd_node), Val(N)), NMax
+    )
+end
 
 end  # baremodule PNExpansions
 
 @testitem "PNExpansion algebra" begin
     using Symbolics: @variables, simplify, substitute
-    using PostNewtonian: PNExpansion
+    using PostNewtonian.PNExpansions: PNExpansion
 
     for N1 ∈ 1:9
         for N2 ∈ 1:9
