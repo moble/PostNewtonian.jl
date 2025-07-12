@@ -122,9 +122,7 @@ function truncated_series_product(a::NTuple{NT,T}, b, v) where {NT,T}
     end
     AB = b[begin + N] * a[begin + 0]
     for n ∈ (N - 1):-1:0
-        AB = muladd(
-            v, AB, b[begin + n] * evalpoly(v, @view a[(begin + 0):(begin + (N - n))])
-        )
+        AB = muladd(v, AB, b[begin + n] * evalpoly(v, a[(begin + 0):(begin + (N - n))]))
     end
     return AB
 end
@@ -164,13 +162,28 @@ This is different from `truncated_series_ratio(a, b, 1)` in that `a` and `b` may
 different lengths, and it should be somewhat more efficient.
 """
 function truncated_series_ratio(a::NTuple{N1,T1}, b::NTuple{N2,T2}) where {N1,N2,T1,T2}
+    if N1 == 0 && N2 == 0
+        throw(
+            ArgumentError(
+                "In `truncated_series_ratio(a,b)`, both arguments have length 0; " *
+                "this is not allowed.",
+            ),
+        )
+    end
+    if N2 == 0
+        throw(
+            ArgumentError(
+                "In `truncated_series_ratio(a,b)`, argument `b` has length 0; " *
+                "this is not allowed.",
+            ),
+        )
+    end
+    if N1 == 0
+        return zero(T2)
+    end
+
     N = max(N1, N2)
     T = promote_type(T1, T2)
-    if N2 == 0
-        throw(DomainError("In truncated_series_ratio(a,b): b must have at least one term"))
-    elseif N1 == 0
-        return zero(T)
-    end
 
     # The uppercase `N`s represent the number of terms in the tuples, while the lowercase
     # `n`s represent the highest index of the terms.
@@ -205,13 +218,50 @@ end
     using Random
     using DoubleFloats
     using StaticArrays: SVector
-    import PostNewtonian: truncated_series_inverse, truncated_series_ratio
+    import PostNewtonian:
+        truncated_series_inverse, truncated_series_ratio, truncated_series_product
     Random.seed!(123)
+
+    # truncated_series_product tests
+    # N < 0, empty vectors => always zero
+    @test truncated_series_product((), (), 3.14) == 0.0
+    @test truncated_series_product(Float64[], Float64[], 3.14) == 0.0
+
+    # N = 0, single‐term series => a0*b0
+    a0, b0 = 2.5, -1.5
+    @test truncated_series_product([a0], [b0], 42) == a0 * b0
+
+    # N = 1, two‐term series with vector inputs
+    a = [1.0, 2.0]    # 1 + 2v
+    b = [3.0, 4.0]    # 3 + 4v
+    v = 5.0
+    # (1 + 2v)*(3 + 4v) = 3 + (6+4)v + ··, truncate ⇒ 3 +10⋅5 = 53
+    @test truncated_series_product(a, b, v) == 53.0
+
+    # same with tuple dispatch
+    aτ = (1, 2)
+    bτ = (3, 4)
+    @test truncated_series_product(aτ, bτ, v) == 53
+
+    # truncated_series_ratio edge cases
+    # N2 == 0 (empty b) must throw ArgumentError
+    a = (1.0, 2.0, 3.0)
+    b_empty = ()
+    @test_throws ArgumentError truncated_series_ratio(a, b_empty)
+    a_empty = ()
+    @test_throws ArgumentError truncated_series_ratio(a_empty, b_empty)
+
+    # N1 == 0 (empty a) returns zero of promoted type
+    a_empty = ()
+    b = (5, -2)
+    @test truncated_series_ratio(a_empty, b) ===
+        zero(promote_type(eltype(a_empty), eltype(b)))
+
     for T ∈ [Float32, Float64, Double64]
         for N ∈ 1:15
             A = rand(T, N)
             A[1] = one(T) + rand(T) / 100
-            a = Tuple(A)
+            local a = Tuple(A)
             x = rand(T)
             ϵ = eps(sum(a) * N)
             for N1 ∈ 1:N
