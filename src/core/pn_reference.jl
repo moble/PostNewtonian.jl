@@ -169,7 +169,7 @@ end
 
     output = quote
         baremodule Einstein1918
-        using Base: Base, Val, π
+        using Base: Base, Val, π, @raw_str, @doc
         eval(x::Expr) = Core.eval(Einstein1918, x)
         include(p::AbstractString) = Base.include(Einstein1918, p)
         using PostNewtonian: @pn_expression, @pn_expansion, PNExpansionParameter, 𝒾, γₑ, ζ3
@@ -190,5 +190,6 @@ end
         end
     end
 
-    @test MacroTools.striplines(input).args[1] == MacroTools.striplines(output).args[1]
+    @test MacroTools.striplines(input).args[1].args[2].args[2] ==
+        MacroTools.striplines(output).args[1]
 end
