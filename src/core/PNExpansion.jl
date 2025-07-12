@@ -84,8 +84,8 @@ SVector(pn::PNExpansion) = SVector(pn.coeffs)
 PostNewtonian.pn_order(::PNExpansion{N,T,NMax}) where {N,T,NMax} = (NMax ⊖ 1)//2
 
 Base.getindex(pn::PNExpansion, i::Int) = pn.coeffs[i]
-Base.length(pn::PNExpansion) = length(pn.coeffs)
-Base.eltype(pn::PNExpansion) = eltype(pn.coeffs)
+Base.length(pn::PNExpansion) = Base.length(pn.coeffs)
+Base.eltype(pn::PNExpansion) = Base.eltype(pn.coeffs)
 
 function Base.sum(pn_expansion::PNExpansion{N,T,NMax}) where {N,T,NMax}
     return Base.sum(pn_expansion.coeffs; init=zero(T))
@@ -124,7 +124,7 @@ function sum_term(
 ) where {N1,N2,T1,T2,NMax}
     T3 = promote_type(T1, T2)
     if i ≤ N1
-        return T3(pn1.coeffs[i] + pn2.coeffs[i])
+        return T3(pn1.coeffs[i] ⊕ pn2.coeffs[i])
     else
         return T3(pn2.coeffs[i])
     end
@@ -328,37 +328,39 @@ end  # baremodule PNExpansions
 
 @testitem "PNExpansion algebra" begin
     using Symbolics: @variables, simplify, substitute
+    using Base: Base, one, zero, <, ÷, + as ⊕, - as ⊖, * as ⊛, / as ⊘, ^ as ↑
+    using PostNewtonian.PNBase: ln, (√), (+), (-), (*), (/), (//), (^)
     using PostNewtonian.PNExpansions: PNExpansion
 
     for N1 ∈ 1:9
         for N2 ∈ 1:9
-            for NMax ∈ max(N1, N2):(N1 + N2 + 3)
+            for NMax ∈ max(N1, N2):(N1 ⊕ N2 ⊕ 3)
                 @variables c⁻¹ x[1:N1] y[1:N2] z
-                poly(e::PNExpansion) = sum(e[i] ⊛ c⁻¹^(i - 1) for i ∈ 1:length(e))
+                poly(e::PNExpansion) = sum(e[i] ⊛ c⁻¹↑(i ⊖ 1) for i ∈ 1:length(e))
                 eˣ = PNExpansion(tuple(x...), NMax)
                 eʸ = PNExpansion(tuple(y...), NMax)
 
                 # Test sums
                 polysum = simplify(poly(eˣ + eʸ); expand=true)
-                sumpoly = simplify(poly(eˣ) + poly(eʸ); expand=true)
-                Δ = simplify(polysum - sumpoly; expand=true)
+                sumpoly = simplify(poly(eˣ) ⊕ poly(eʸ); expand=true)
+                Δ = simplify(polysum ⊖ sumpoly; expand=true)
                 @test iszero(Δ)
-                @test_throws ArgumentError eˣ + PNExpansion(tuple(z, x...), NMax + 1)
-                @test_throws ArgumentError PNExpansion(tuple(z, x...), NMax + 1) + eˣ
+                @test_throws ArgumentError eˣ + PNExpansion(tuple(z, x...), NMax ⊕ 1)
+                @test_throws ArgumentError PNExpansion(tuple(z, x...), NMax ⊕ 1) + eˣ
 
                 # Test products
-                polyprod = simplify(poly(eˣ ⊛ eʸ); expand=true)
+                polyprod = simplify(poly(eˣ * eʸ); expand=true)
                 prodpoly = simplify(
                     substitute(
                         simplify(poly(eˣ) ⊛ poly(eʸ); expand=true),
-                        Dict([c⁻¹^n => 0 for n ∈ NMax:(2NMax + 3)]),
+                        Dict([c⁻¹↑n => 0 for n ∈ NMax:(2NMax ⊕ 3)]),
                     );
                     expand=true,
                 )
-                Δ = simplify(polyprod - prodpoly; expand=true)
+                Δ = simplify(polyprod ⊖ prodpoly; expand=true)
                 @test iszero(Δ)
-                @test_throws ArgumentError eˣ ⊛ PNExpansion(tuple(z, x...), NMax + 1)
-                @test_throws ArgumentError PNExpansion(tuple(z, x...), NMax + 1) ⊛ eˣ
+                @test_throws ArgumentError eˣ * PNExpansion(tuple(z, x...), NMax ⊕ 1)
+                @test_throws ArgumentError PNExpansion(tuple(z, x...), NMax ⊕ 1) * eˣ
             end
         end
     end
