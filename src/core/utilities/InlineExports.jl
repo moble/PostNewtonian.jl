@@ -149,6 +149,30 @@ end # module InlineExports
     module Bla
     using PostNewtonian.InlineExports: @export, @public
 
+    @export macro garble(expr::Expr)
+        return esc(expr)
+    end
+
+    @public macro gorble(expr::Expr)
+        return esc(expr)
+    end
+
+    @export abstract type Flork{T} end
+    @public abstract type Flark{T} end
+
+    @export m::Int = 3
+    @public n::Int = 4
+
+    @export @eval :evala
+    @public @eval :evalb
+
+    @export function funca(x)
+        x^2
+    end
+    @public function funcb(x)
+        x^3
+    end
+
     @export begin
         "`const a` doc"
         const a = 2
@@ -203,6 +227,20 @@ end # module InlineExports
     end  # module Bla
 
     using .Bla
+
+    @test (@macroexpand @garble x=3) == :(x=3)
+    @test (@macroexpand Bla.@gorble y=4) == :(y=4)
+
+    @test m isa Int
+    @test m == 3
+    @test Bla.n isa Int
+    @test Bla.n == 4
+
+    # @test hasproperty(Bla, :evala)
+    # @test hasproperty(Bla, :evalb)
+
+    @test funca(3) == 9
+    @test Bla.funcb(3) == 27
 
     @test f(T(a)) == 4
     @test Bla.g(Bla.V(Bla.b)) == 27
