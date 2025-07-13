@@ -19,6 +19,8 @@ import PostNewtonian:
     causes_domain_error!,
     prepare_pn_order,
     order_index,
+    iscall,
+    isadd,
     𝓔′,
     pn_expression,
     pn_expansion,
@@ -53,27 +55,6 @@ function _efficient_vector(N, ::Type{Symbolics.Num})
 end
 
 ### Moved from src/core/utilities/misc.jl
-
-"""
-    iscall(x, symbols)
-
-Return `true` if the `Expr` `x` is a call to any element of `symbols`.
-"""
-iscall(x, symbols) = MacroTools.isexpr(x, :call) && x.args[1] ∈ symbols
-
-"""
-    isadd(x)
-
-Return `true` if the `Expr` `x` is a call to `(+)` or `:+`.
-"""
-isadd(x) = iscall(x, ((+), :+))
-
-"""
-    ismul(x)
-
-Return `true` if the `Expr` `x` is a call to `(*)` or `:*`.
-"""
-ismul(x) = iscall(x, ((*), :*))
 
 """
     flatten_binary!(expr, symbols)

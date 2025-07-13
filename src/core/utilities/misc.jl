@@ -1,3 +1,4 @@
+# Declared public in src/PostNewtonian.jl
 @irrational ζ3 1.2020569031595942 big"1.20205690315959428539973816151144999076498629234049888179227155534183820578631309018645587360933525814619915"
 """
     ζ3
@@ -20,6 +21,7 @@ julia> sum((1:10_000_000).^-3)
 """
 ζ3  # We document it this way because `@irrational` cannot handle docstrings.
 
+# Declared public in src/PostNewtonian.jl
 @doc raw"""
     γₑ
 
@@ -55,20 +57,30 @@ Return `x` or the value wrapped by the `Dual` number `x`
 @public value(x::T) where {T} = hasfield(T, :value) ? getfield(x, :value) : x
 
 """
-    find_symbols_of_type(mod, T)
+    iscall(x, symbols)
 
-Given a module `mod` (not just its name, but the actual imported module), find all objects
-inside that module that are instances of the given type `T`.  The returned quantity is a
-vector of `Symbol`s.
+Return `true` if the `Expr` `x` is a call to any element of `symbols`.
 """
-function find_symbols_of_type(mod, T)
-    return filter(n -> getproperty(mod, n) isa T, names(mod))
-end
+iscall(x, symbols) = MacroTools.isexpr(x, :call) && x.args[1] ∈ symbols
+
+"""
+    isadd(x)
+
+Return `true` if the `Expr` `x` is a call to `(+)` or `:+`.
+"""
+isadd(x) = iscall(x, ((+), :+))
+
+"""
+    ismul(x)
+
+Return `true` if the `Expr` `x` is a call to `(*)` or `:*`.
+"""
+ismul(x) = iscall(x, ((*), :*))
 
 @testitem "core.misc" begin
     using DoubleFloats
     using ForwardDiff: Dual
-    using PostNewtonian: ζ3, γₑ, value, find_symbols_of_type
+    using PostNewtonian: ζ3, γₑ, value, iscall, isadd, ismul
 
     # ζ3 formula
     @test ζ3 ≈ sum((1:10_000_000) .^ -3)
@@ -104,6 +116,9 @@ end
     end
 
     # iscall and friends
+    @test iscall(:(log(1.2)), (:log,))
+    @test iscall(:(log(1.2)), (:log, :sin))
+    @test !iscall(:(log(1.2)), (:sin,))
     @test isadd(:(1 + 2))
     @test isadd(:(1 + 2c + 3c^2))
     @test isadd(:(1 + (2n + 3m)))

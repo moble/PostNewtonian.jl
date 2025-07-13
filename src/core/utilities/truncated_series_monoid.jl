@@ -239,16 +239,14 @@ end
     @test truncated_series_product(a, b, v) == 53.0
 
     # same with tuple dispatch
-    aτ = (1, 2)
-    bτ = (3, 4)
-    @test truncated_series_product(aτ, bτ, v) == 53
+    @test truncated_series_product(Tuple(a), Tuple(b), v) == 53.0
 
     # truncated_series_ratio edge cases
     # N2 == 0 (empty b) must throw ArgumentError
     a = (1.0, 2.0, 3.0)
+    a_empty = ()
     b_empty = ()
     @test_throws ArgumentError truncated_series_ratio(a, b_empty)
-    a_empty = ()
     @test_throws ArgumentError truncated_series_ratio(a_empty, b_empty)
 
     # N1 == 0 (empty a) returns zero of promoted type
