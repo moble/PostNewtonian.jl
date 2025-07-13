@@ -103,7 +103,7 @@ end
 
 function pn_expression(arg_index, func, pnsystem_functions, __module__, __source__)
     # Handle the default argument
-    if func === :(nothing)
+    if func ≡ :(nothing)
         arg_index, func = 1, arg_index
     end
 

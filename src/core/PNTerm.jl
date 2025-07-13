@@ -188,7 +188,7 @@ end  # baremodule PNTerms
             @test term.coeff == coeff
             @test term.coeff isa eltype(pn)
             @test length(term) == 1
-            @test eltype(term) === T
+            @test eltype(term) ≡ T
         end
 
         # Test PNExpressions
@@ -225,7 +225,7 @@ end  # baremodule PNTerms
             @test expr.coeffs == expected
             @test pn_order(expr) == pn_order(pn)
             @test sum(expr) == sum(expected)
-            @test eltype(expr) === T
+            @test eltype(expr) ≡ T
         end
 
         # Can't make a PNExpression with positive exponents
@@ -244,14 +244,14 @@ end  # baremodule PNTerms
 
     # constant_convert should just return the term
     t0 = PNTerm{Float64,2//1}(0, 5.0)
-    @test constant_convert(pn, t0) === t0
+    @test constant_convert(pn, t0) ≡ t0
 
     # Base.sum
     @test sum(t0) == 5.0
 
     # unary + (PNBase.+)
     t1 = PNTerm{Float64,2}(1, 2.5)
-    @test +t1 === t1
+    @test +t1 ≡ t1
 
     # unary - (PNBase.-)
     t1n = -t1

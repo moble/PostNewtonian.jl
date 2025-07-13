@@ -119,15 +119,15 @@ PNBase
         end
 
         for f ∈ (:+, :*)
-            op = f===:+ ? sum : prod
+            op = f≡:+ ? sum : prod
             for w ∈ Z, x ∈ Z, y ∈ Z
                 @test eval(:(Mod.$f))(pnsystem, w, x, y) isa NT
                 @test eval(:(Mod.$f))(pnsystem, w, x, y) == op(NT, (w, x, y))
-                @test eval(:(Mod.$f))(w, x, y) === op((w, x, y))
+                @test eval(:(Mod.$f))(w, x, y) ≡ op((w, x, y))
                 for v ∈ Z
                     @test eval(:(Mod.$f))(pnsystem, v, w, x, y) isa NT
                     @test eval(:(Mod.$f))(pnsystem, v, w, x, y) == op(NT, (v, w, x, y))
-                    @test eval(:(Mod.$f))(v, w, x, y) === op((v, w, x, y))
+                    @test eval(:(Mod.$f))(v, w, x, y) ≡ op((v, w, x, y))
                 end
             end
         end
@@ -149,12 +149,12 @@ PNBase
         end
         for f ∈ (:+, :-, :*, ://)
             for x ∈ Z, y ∈ Z
-                @test typeof(eval(:(Mod.$f))(x, y)) === typeof(eval(:($f))(x, y))
+                @test typeof(eval(:(Mod.$f))(x, y)) ≡ typeof(eval(:($f))(x, y))
                 @test eval(:(Mod.$f))(x, y) == eval(:($f))(x, y)
             end
         end
         for x ∈ Z, y ∈ Z
-            @test typeof(eval(:(Mod.://))(pnsystem, x, y)) === typeof(x // y)
+            @test typeof(eval(:(Mod.://))(pnsystem, x, y)) ≡ typeof(x // y)
             @test eval(:(Mod.://))(pnsystem, x, y) == x // y
         end
         for f ∈ (:ln, :√)

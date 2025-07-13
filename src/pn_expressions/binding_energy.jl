@@ -220,7 +220,7 @@ function 𝓔′code(
     )
     𝓔′statements[end] = 𝓔′return
 
-    if PNExpansionReducer === identity
+    if PNExpansionReducer ≡ identity
         # When `pn_expansion_reducer=Val(identity)` is passed, we return a PNExpansion
         NMax = Int(2PNOrder + 1)
         return quote

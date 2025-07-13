@@ -252,7 +252,7 @@ end
     # N1 == 0 (empty a) returns zero of promoted type
     a_empty = ()
     b = (5, -2)
-    @test truncated_series_ratio(a_empty, b) ===
+    @test truncated_series_ratio(a_empty, b) ≡
         zero(promote_type(eltype(a_empty), eltype(b)))
 
     for T ∈ [Float32, Float64, Double64]
