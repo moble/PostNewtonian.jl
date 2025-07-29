@@ -60,19 +60,19 @@ elements are currently in the coefficients, but is required to be 1 ≤ N ≤ NM
 
     function PNExpansion{N,T,NMax}(coeffs) where {N,T,NMax}
         if N < 1
-            throw(ArgumentError("`N=$N` must be >0."))
+            throw(ArgumentError("`N=$N` must be greater than 0."))  # COV_EXCL_LINE
         end
         if N > NMax
-            throw(ArgumentError("`N=$N` must be <`NMax=$NMax`."))
+            throw(ArgumentError("`N=$N` must be less than `NMax=$NMax`."))  # COV_EXCL_LINE
         end
         return new{N,T,NMax}(coeffs)
     end
     function PNExpansion(coeffs::NTuple{N,T}, NMax) where {N,T}
         if N < 1
-            throw(ArgumentError("`N=$N` must be >0."))
+            throw(ArgumentError("`N=$N` must be greater than 0."))
         end
         if N > NMax
-            throw(ArgumentError("`N=$N` must be <`NMax=$NMax`."))
+            throw(ArgumentError("`N=$N` must be less than `NMax=$NMax`."))  # COV_EXCL_LINE
         end
         return new{N,T,NMax}(coeffs)
     end
@@ -286,13 +286,13 @@ function PNBase.:*(
     N = min(max(N1, N1 ⊕ ΔN), NMax)
 
     # Check that no terms from expansion will be lost to negative PN orders
-    @inbounds for i ∈ 1:min(max(0, -ΔN), N1)
+    @inbounds for i ∈ 1:min(max(0, ⊖(ΔN)), N1)
         if !iszero(expansion[i])
             throw(
                 ArgumentError(
                     "Cannot multiply `PNExpansion` by `PNTerm` with negative exponent: " ⊛
-                    "c⁻¹exp(term)=$(c⁻¹exp(term))." ⊛
-                    "\nResult will be a `PNExpansion`, which cannot store positive exponents.",
+                    "c⁻¹exp(term)=$(c⁻¹exp(term)).\nThe result will be a `PNExpansion`, " ⊛
+                    "which cannot store positive exponents.",
                 ),
             )
         end
@@ -327,14 +327,35 @@ end
 end  # baremodule PNExpansions
 
 @testitem "PNExpansion algebra" begin
-    using Symbolics: @variables, simplify, substitute
     using Base: Base, one, zero, <, ÷, + as ⊕, - as ⊖, * as ⊛, / as ⊘, ^ as ↑
+    using StaticArrays: MVector, SVector
+    using Symbolics: @variables, simplify, substitute
     using PostNewtonian.PNBase: ln, (√), (+), (-), (*), (/), (//), (^)
     using PostNewtonian.PNExpansions: PNExpansion
 
+    # Test edge cases
+    @test_throws ArgumentError PNExpansion{0, Float64, 1}(())
+    @test_throws ArgumentError PNExpansion{2, Float64, 1}((1.2, 3.4))
+    @test_throws ArgumentError PNExpansion((), 0)
+    @test_throws ArgumentError PNExpansion((1.2, 3.4), 1)
+
     for N1 ∈ 1:9
+        # Test conversions
+        coeffs = ntuple(i -> i + 1.0, N1)
+        for NMax ∈ N1:(N1 ⊕ 3)
+            expansion = PNExpansion(coeffs, NMax)
+            @test Base.Tuple(expansion) == coeffs
+            @test SVector(expansion) == SVector(coeffs)
+            @test Base.eltype(expansion) == Float64
+            @test Base.length(expansion) == N1
+            for i ∈ 1:N1
+                @test expansion[i] == coeffs[i]
+            end
+        end
+
         for N2 ∈ 1:9
             for NMax ∈ max(N1, N2):(N1 ⊕ N2 ⊕ 3)
+
                 @variables c⁻¹ x[1:N1] y[1:N2] z
                 poly(e::PNExpansion) = sum(e[i] ⊛ c⁻¹↑(i ⊖ 1) for i ∈ 1:length(e))
                 eˣ = PNExpansion(tuple(x...), NMax)

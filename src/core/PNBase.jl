@@ -69,7 +69,9 @@ using Base: @inline
 
 end  # baremodule PNBase
 
+# COV_EXCL_START  (Covered, but missed due to const-folding)
 const pnbase_functions = filter(s -> isa(getfield(PNBase, s), Function), names(PNBase))
+# COV_EXCL_END
 
 @doc """
     PNBase

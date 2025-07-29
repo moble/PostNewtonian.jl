@@ -69,7 +69,7 @@ automatically tracking the PN order of each term.
     return PNTerm{NT,PNOrder}(-1, one(T))
 end
 
-Base.length(pn::PNTerm) = 1
+Base.length(pn::PNTerm) = 1  # COV_EXCL_LINE  (Covered, but missed due to const-folding)
 Base.eltype(pn::PNTerm{T}) where {T} = T
 
 @export c⁻¹exp(pn::PNTerm{T,PNOrder,c⁻¹Exponent}) where {T,PNOrder,c⁻¹Exponent} =

@@ -106,10 +106,12 @@ function handle(expr::Expr, export_or_public::Symbol)
     else
         Expr(export_or_public, r...)
     end
+    # COV_EXCL_START
     return esc(quote
         $ep
         Base.@__doc__ $expr
     end)
+    # COV_EXCL_END
 end
 
 handle(::Any) = nothing
@@ -133,7 +135,9 @@ function handle(::Val{:macrocall}, expr)
     if expr.args[1]==Symbol("@doc") ||
         (expr.args[1] == Core.GlobalRef(Core, Symbol("@doc")))
         if length(expr.args) != 4
+            # COV_EXCL_START
             error("@doc expression found with $(length(expr.args)) args:\n$expr")
+            # COV_EXCL_END
         end
         handle(expr.args[4])
     else
