@@ -1,13 +1,15 @@
 module PostNewtonian
 
-# Always explicitly address functions similar to functions defined in this package,
-# which come from these packages:
+# We must always explicitly qualify functions similar to functions defined in this package
+# by the name of the package.  We will use such functions from these packages:
 using MacroTools: MacroTools
 using FastDifferentiation: FastDifferentiation
-using FastDifferentiation: Node as FDNode
-using RuntimeGeneratedFunctions: RuntimeGeneratedFunctions
 
-# Otherwise, we just explicitly import specific functions:
+# Otherwise, we just explicitly import specific functions / types.  Note that the difference
+# between `using` and `import` in the following lines is that `using` will only allow us to
+# call the functions, while `import` would also allow us to specialize them (define new
+# methods of the imported functions).
+using FastDifferentiation: Node as FDNode
 using DataInterpolations: CubicSpline
 using InteractiveUtils: methodswith
 using LinearAlgebra: mul!
