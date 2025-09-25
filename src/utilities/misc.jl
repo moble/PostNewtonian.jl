@@ -74,3 +74,6 @@ function apply_to_first_add!(expr, func)
         end
     end
 end
+
+# This function is stolen from SphericalFunctions.jl
+@inline Yindex(ℓ, m, ℓₘᵢₙ=0) = ℓ*(ℓ + 1) - ℓₘᵢₙ^2 + m + 1

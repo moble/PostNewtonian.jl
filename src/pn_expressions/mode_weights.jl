@@ -1,6 +1,3 @@
-# This function is stolen from SphericalFunctions.jl
-@inline Yindex(ℓ, m, ℓₘᵢₙ=0) = ℓ*(ℓ + 1) - ℓₘᵢₙ^2 + m + 1
-
 @doc raw"""
     h!(h, pnsystem; ℓₘᵢₙ=0, ℓₘₐₓ=typemax(Int))
     mode_weights!(h, pnsystem; ℓₘᵢₙ=0, ℓₘₐₓ=typemax(Int))
