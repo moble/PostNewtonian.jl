@@ -166,7 +166,9 @@ export gw_energy_flux,
     separation_dot,  # ṙ,
     separation_inverse,  # r⁻¹,
     mode_weights!,
-    h!
+    h!,
+    mode_weights_Ψ_M!,
+    Ψ_M!
 
 include("dynamics.jl")
 export up_down_instability,

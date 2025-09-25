@@ -55,6 +55,6 @@ Order   = [:module, :type, :constant, :function, :macro]
 
 ```@autodocs
 Modules = [PostNewtonian]
-Pages   = ["pn_expressions/mode_weights.jl"]
+Pages   = ["pn_expressions/mode_weights.jl",  "pn_expressions/mode_weights_Psi_M.jl"]
 Order   = [:module, :type, :constant, :function, :macro]
 ```
