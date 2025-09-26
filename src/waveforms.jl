@@ -33,12 +33,18 @@ function coorbital_waveform_computation_storage(
     return h, pnsystem
 end
 
-"""
-    coorbital_waveform!(storage, inspiral; [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
-    coorbital_waveform!(storage, inspiral; [ell_min=2], [ell_max=8], [PNOrder])
+# Helper function for default ℓₘᵢₙ associated to a certain modes_function
+_default_ℓₘᵢₙ(::typeof(Ψ_M!)) = 0
+_default_ℓₘᵢₙ(::typeof(h!)) = 2
+# Don't have any other details... user must provide
 
-Evaluate the post-Newtonian waveform mode weights in the co-orbital frame for the given
-`inspiral` output by [`orbital_evolution`](@ref), using pre-allocated storage.
+"""
+    coorbital_waveform!(storage, inspiral; [modes_function=h!], [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
+    coorbital_waveform!(storage, inspiral; [modes_function=h!], [ell_min=2], [ell_max=8], [PNOrder])
+
+Evaluate the post-Newtonian waveform mode weights from the `modes_function` in
+the co-orbital frame for the given `inspiral` output by
+[`orbital_evolution`](@ref), using pre-allocated storage.
 
 The storage is assumed to be the object returned from
 [`coorbital_waveform_computation_storage`](@ref).  Other arguments are the same as in
@@ -47,7 +53,8 @@ The storage is assumed to be the object returned from
 function coorbital_waveform!(
     storage,
     inspiral;
-    ell_min=2,
+    modes_function=h!,
+    ell_min=_default_ℓₘᵢₙ(modes_function),
     ell_max=8,
     ℓₘᵢₙ=ell_min,
     ℓₘₐₓ=ell_max,
@@ -59,17 +66,18 @@ function coorbital_waveform!(
     @assert (ℓₘₐₓ + 1)^2 - ℓₘᵢₙ^2 == size(h, 1)
     @inbounds @fastmath for iₜ ∈ eachindex(inspiral)
         pnsystem.state .= inspiral.u[iₜ]
-        h!(@view(h[:, iₜ]), pnsystem; ℓₘᵢₙ, ℓₘₐₓ)
+        modes_function(@view(h[:, iₜ]), pnsystem; ℓₘᵢₙ, ℓₘₐₓ)
     end
     return h
 end
 
 """
-    coorbital_waveform(inspiral; [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
-    coorbital_waveform(inspiral; [ell_min=2], [ell_max=8], [PNOrder])
+    coorbital_waveform(inspiral; [modes_function=h!], [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
+    coorbital_waveform(inspiral; [modes_function=h!], [ell_min=2], [ell_max=8], [PNOrder])
 
-Evaluate the post-Newtonian waveform mode weights in the co-orbital frame for the given
-`inspiral` output by [`orbital_evolution`](@ref).
+Evaluate the post-Newtonian waveform mode weights from the `modes_function` in
+the co-orbital frame for the given `inspiral` output by
+[`orbital_evolution`](@ref).
 
 See also [`inertial_waveform`](@ref) for the waveform in the inertial frame.
 
@@ -102,14 +110,15 @@ even this variation could be factored out.
 """
 function coorbital_waveform(
     inspiral;
-    ell_min=2,
+    modes_function=h!,
+    ell_min=_default_ℓₘᵢₙ(modes_function),
     ell_max=8,
     ℓₘᵢₙ=ell_min,
     ℓₘₐₓ=ell_max,
     PNOrder=pn_order(_pnsystem(inspiral)),
 )
     storage = coorbital_waveform_computation_storage(inspiral; ℓₘᵢₙ, ℓₘₐₓ, PNOrder)
-    return coorbital_waveform!(storage, inspiral; ℓₘᵢₙ, ℓₘₐₓ, PNOrder)
+    return coorbital_waveform!(storage, inspiral; modes_function, ℓₘᵢₙ, ℓₘₐₓ, PNOrder)
 end
 
 """
@@ -139,11 +148,12 @@ function inertial_waveform_computation_storage(
 end
 
 """
-    inertial_waveform!(storage, inspiral; [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
-    inertial_waveform!(storage, inspiral; [ell_min=2], [ell_max=8], [PNOrder])
+    inertial_waveform!(storage, inspiral; [modes_function=h!], [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
+    inertial_waveform!(storage, inspiral; [modes_function=h!], [ell_min=2], [ell_max=8], [PNOrder])
 
-Evaluate the post-Newtonian waveform mode weights in the inertial frame for the given
-`inspiral` output by [`orbital_evolution`](@ref), using pre-allocated storage.
+Evaluate the post-Newtonian waveform mode weights from the `modes_function` in
+the inertial frame for the given `inspiral` output by
+[`orbital_evolution`](@ref), using pre-allocated storage.
 
 The storage is assumed to be the object returned from
 [`inertial_waveform_computation_storage`](@ref).  Other arguments are the same as in
@@ -152,7 +162,8 @@ The storage is assumed to be the object returned from
 function inertial_waveform!(
     storage,
     inspiral;
-    ell_min=2,
+    modes_function=h!,
+    ell_min=_default_ℓₘᵢₙ(modes_function),
     ell_max=8,
     ℓₘᵢₙ=ell_min,
     ℓₘₐₓ=ell_max,
@@ -164,7 +175,7 @@ function inertial_waveform!(
     @assert (ℓₘₐₓ + 1)^2 - ℓₘᵢₙ^2 == size(h, 1)
     @inbounds @fastmath for iₜ ∈ eachindex(inspiral)
         pnsystem.state .= inspiral.u[iₜ]
-        h!(@view(h[:, iₜ]), pnsystem; ℓₘᵢₙ, ℓₘₐₓ)
+        modes_function(@view(h[:, iₜ]), pnsystem; ℓₘᵢₙ, ℓₘₐₓ)
         D!(D, conj(R(pnsystem)), ℓₘₐₓ, H_rec_coeffs, eⁱᵐᵅ, eⁱᵐᵞ)
         f′ = Yiterator(hᵢ, ℓₘₐₓ, ℓₘᵢₙ, 1)
         f = Yiterator(h[:, iₜ], ℓₘₐₓ, ℓₘᵢₙ, 1)
@@ -178,11 +189,12 @@ function inertial_waveform!(
 end
 
 """
-    inertial_waveform(inspiral; [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
-    inertial_waveform(inspiral; [ell_min=2], [ell_max=8], [PNOrder])
+    inertial_waveform(inspiral; [modes_function=h!], [ℓₘᵢₙ=2], [ℓₘₐₓ=8], [PNOrder])
+    inertial_waveform(inspiral; [modes_function=h!], [ell_min=2], [ell_max=8], [PNOrder])
 
-Evaluate the post-Newtonian waveform mode weights in the inertial frame for the given
-`inspiral` output by [`orbital_evolution`](@ref).
+Evaluate the post-Newtonian waveform mode weights from the `modes_function` in
+the inertial frame for the given `inspiral` output by
+[`orbital_evolution`](@ref).
 
 The inertial frame is the one in which inertial observers are found, so this waveform is
 more like one that actual observers would detect.  This function transforms the waveform
@@ -193,12 +205,13 @@ quantity.
 """
 function inertial_waveform(
     inspiral;
-    ell_min=2,
+    modes_function=h!,
+    ell_min=_default_ℓₘᵢₙ(modes_function),
     ell_max=8,
     ℓₘᵢₙ=ell_min,
     ℓₘₐₓ=ell_max,
     PNOrder=pn_order(_pnsystem(inspiral)),
 )
     storage = inertial_waveform_computation_storage(inspiral; ℓₘᵢₙ, ℓₘₐₓ, PNOrder)
-    return inertial_waveform!(storage, inspiral; ℓₘᵢₙ, ℓₘₐₓ, PNOrder)
+    return inertial_waveform!(storage, inspiral; modes_function, ℓₘᵢₙ, ℓₘₐₓ, PNOrder)
 end
