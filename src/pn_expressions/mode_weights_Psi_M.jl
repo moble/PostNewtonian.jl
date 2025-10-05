@@ -146,7 +146,7 @@ These results come from Appendix A of [Mitman, Stein, Boyle, et al.
         Ψ_M[Yindex(0,0,ℓₘᵢₙ)] += Ψ_M₀ * @pn_expansion(
             # Eq. (A1b) of MSB+ (2022)
             + (v/c)^3 * (14//3 * Sₗ + 2δ * Σₗ) / M^2
-            + (v/c)^4 * ((-16S⃗·S⃗ + 3Σ⃗·Σ⃗ + 32Sₗ^2 + 9Σₗ^2)/12
+            + (v/c)^4 * (-(16S⃗·S⃗ + 3Σ⃗·Σ⃗ + 32Sₗ^2 + 9Σₗ^2)/12
                          - 4//3 * δ * (S⃗·Σ⃗ + 2Sₗ*Σₗ)
                          + 4//3 * ν * (Σ⃗·Σ⃗ + 2Σₗ^2)) / M^4
         )
@@ -155,7 +155,7 @@ These results come from Appendix A of [Mitman, Stein, Boyle, et al.
         Ψ_M[Yindex(2,0,ℓₘᵢₙ)] += Ψ_M₀ * 2//7 * √5 * @pn_expansion(
             # Eq. (A1h) of MSB+ (2022)
             + (v/c)^3 * (16//3 * Sₗ + 419//160 * δ*Σₗ) / M^2
-            + (v/c)^4 * ((-128S⃗·S⃗ + 24Σ⃗·Σ⃗ + 256Sₗ^2 + 75Σₗ^2) / 96
+            + (v/c)^4 * (-(128S⃗·S⃗ + 24Σ⃗·Σ⃗ + 256Sₗ^2 + 75Σₗ^2) / 96
                          - 4//3 * δ * (S⃗·Σ⃗ + 2Sₗ*Σₗ)
                          + 4//3 * ν * (Σ⃗·Σ⃗ + 2Σₗ^2)) / M^4
         )
@@ -173,7 +173,7 @@ These results come from Appendix A of [Mitman, Stein, Boyle, et al.
         Ψ_M[Yindex(4,0,ℓₘᵢₙ)] += Ψ_M₀ * 1//42 * @pn_expansion(
             # Eq. (A1r) of MSB+ (2022)
             + (v/c)^3 * (10Sₗ + 57//8 * δ * Σₗ) / M^2
-            + (v/c)^4 * ((-64S⃗·S⃗ + 12Σ⃗·Σ⃗ + 128Sₗ^2 + 41Σₗ^2) / 48
+            + (v/c)^4 * (-(64S⃗·S⃗ + 12Σ⃗·Σ⃗ + 128Sₗ^2 + 41Σₗ^2) / 48
                          - 4//3 * δ * (S⃗·Σ⃗ + 2Sₗ*Σₗ)
                          + 4//3 * ν * (Σ⃗·Σ⃗ + 2Σₗ^2)) / M^4
         )
