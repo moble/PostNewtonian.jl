@@ -1,7 +1,7 @@
 name = "PostNewtonian"
 uuid = "377afc40-5642-4616-8613-b7ebca523866"
-authors = ["Michael Boyle <michael.oliver.boyle@gmail.com> and contributors"]
 version = "0.10.7"
+authors = ["Michael Boyle <michael.oliver.boyle@gmail.com> and contributors"]
 
 [deps]
 DataInterpolations = "82cc6244-b520-54b8-b5a6-8a565e85f1d0"
@@ -54,7 +54,7 @@ SphericalFunctions = "2.2.7"
 StaticArrays = "1.9"
 SymbolicIndexingInterface = "0.3"
 SymbolicUtils = "1, 2, 3"
-Symbolics = "5.25, 6"
+Symbolics = "5.25, 6, 7"
 Test = "1"
 TestItemRunner = "1"
 TestItems = "1"
