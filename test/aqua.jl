@@ -3,6 +3,8 @@
     Aqua.test_all(
         PostNewtonian;
         ambiguities=false,
+        # Unbound args are unavoidable when using an NTuple{N,T} as an argument; see
+        # https://github.com/JuliaTesting/Aqua.jl/issues/86 and link therein for details.
         unbound_args=(broken=true,),
         #persistent_tasks=(broken=true,),
     )
