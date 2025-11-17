@@ -239,7 +239,7 @@ from the Newton iterations in [`γₚₙ′`](@ref).
     )
     γₚₙ₀′statements[end] = γₚₙ₀′return
 
-    if PNExpansionReducer === identity
+    if PNExpansionReducer ≡ identity
         # When `pn_expansion_reducer=Val(identity)` is passed, we return a PNExpansion
         NMax = Int(2PNOrder + 1)
         return quote

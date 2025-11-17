@@ -36,8 +36,8 @@ function be(pnsystem, deriv)
         λ₊ = PostNewtonian.λ₊(pnsystem),
         λ₋ = PostNewtonian.λ₋(pnsystem),
         π = PostNewtonian.type_converter(pnsystem, π),
-        ln2 = PostNewtonian.type_converter(pnsystem, PostNewtonian.ln2),
-        ln3 = PostNewtonian.type_converter(pnsystem, PostNewtonian.ln3),
+        ln2 = PostNewtonian.type_converter(pnsystem, PostNewtonian.ln(2)),
+        ln3 = PostNewtonian.type_converter(pnsystem, PostNewtonian.ln(3)),
         γₑ = PostNewtonian.type_converter(pnsystem, PostNewtonian.γₑ),
         ln = (x -> log(PostNewtonian.type_converter(pnsystem, x))),
         pn_order = PostNewtonian.pn_order(pnsystem)
@@ -55,7 +55,7 @@ function be(pnsystem, deriv)
             77ν^4 / 31104 +
             301ν^3 / 1728 +
             (-498449//3456 + 3157π^2 / 576)ν^2 +
-            (-123671//5760 + 1792ln2 / 15 + 9037π^2 / 1536 + 896γₑ / 15)ν
+            (-123671//5760 + 1792ln(2) / 15 + 9037π^2 / 1536 + 896γₑ / 15)ν
         )
         eˡⁿ[8] = (448ν / 15)
 

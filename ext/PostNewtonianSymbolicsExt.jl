@@ -19,10 +19,9 @@ import PostNewtonian:
     causes_domain_error!,
     prepare_pn_order,
     order_index,
+    iscall,
+    isadd,
     𝓔′,
-    apply_to_first_add!,
-    flatten_add!,
-    flatten_mul!,
     pn_expression,
     pn_expansion,
     @pn_expansion,
@@ -44,19 +43,55 @@ import PostNewtonian:
     X₁,
     X₂,
     ln,
-    ln2,
-    ln3,
-    ln5,
     ζ3,
     γₑ,
     _efficient_vector
-#apply_to_first_add!, flatten_add!, pn_expression,
 using RuntimeGeneratedFunctions: init, @RuntimeGeneratedFunction
 
 init(@__MODULE__)
 
 function _efficient_vector(N, ::Type{Symbolics.Num})
     return Symbolics.variables(string(gensym()), 1:N)
+end
+
+### Moved from src/core/utilities/misc.jl
+
+"""
+    flatten_binary!(expr, symbols)
+
+Flatten nested binary operations — that is, apply associativity repeatedly.
+"""
+function flatten_binary!(expr, symbols)
+    while iscall(expr, symbols) && any(x -> iscall(x, symbols), expr.args[2:end])
+        args = expr.args[2:end]
+        i₊ = findfirst(x -> iscall(x, symbols), args)
+        args′ = [first(symbols); args[1:(i₊ - 1)]; args[i₊].args[2:end]; args[(i₊ + 1):end]]
+        expr.args[:] = args′[1:length(expr.args)]
+        append!(expr.args, args′[(1 + length(expr.args)):end])
+    end
+    return expr
+end
+
+flatten_add!(expr) = flatten_binary!(expr, ((+), :+))
+flatten_mul!(expr) = flatten_binary!(expr, ((*), :*))
+
+"""
+    apply_to_first_add!(expr, func)
+
+Apply `func` to the first sub-expression found in a "prewalk"-traversal of `expr` that
+satisfies [`isadd`](@ref).  If `func` acts in place, so does this function.  In either case,
+the expression should be returned.
+"""
+function apply_to_first_add!(expr, func)
+    found_add = false
+    MacroTools.prewalk(expr) do x
+        if !found_add && isadd(x)
+            found_add = true
+            func(x)
+        else
+            x
+        end
+    end
 end
 
 ### Moved from src/utilities/macros.jl
@@ -68,7 +103,7 @@ Symbolics.derivative(::typeof(hold), args::NTuple{1,Any}, ::Val{1}) = 1
 function unhold(expr)
     MacroTools.postwalk(expr) do x
         m = MacroTools.trymatch(:(f_(i_)), x)
-        m === nothing || m[:f] !== hold ? x : Symbol(m[:i])
+        m ≡ nothing || m[:f] !== hold ? x : Symbol(m[:i])
     end
 end
 
@@ -260,10 +295,10 @@ end
 causes_domain_error!(u̇, ::PNSystem{VT}) where {VT<:Vector{Symbolics.Num}} = false
 
 function SymbolicPNSystem(PNOrder=typemax(Int))
-    Symbolics.@variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
+    Symbolics.@variables M₁ M₂ χ₁ˣ χ₁ʸ χ₁ᶻ χ₂ˣ χ₂ʸ χ₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
     ET = typeof(M₁)
     return SymbolicPNSystem{Vector{ET},prepare_pn_order(PNOrder),ET}(
-        [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ], Λ₁, Λ₂
+        [M₁, M₂, χ₁ˣ, χ₁ʸ, χ₁ᶻ, χ₂ˣ, χ₂ʸ, χ₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ], Λ₁, Λ₂
     )
 end
 

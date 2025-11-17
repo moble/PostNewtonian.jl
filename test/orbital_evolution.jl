@@ -81,7 +81,7 @@
     sol_np = orbital_evolution(
         M₁, M₂, QuatVec(0, 0, χ⃗₁.z), QuatVec(0, 0, χ⃗₂.z), Ωᵢ; Ω₁, Rᵢ, quiet=true
     )
-    for c ∈ [:χ⃗₁ˣ, :χ⃗₁ʸ, :χ⃗₂ˣ, :χ⃗₂ʸ, :Rˣ, :Rʸ]
+    for c ∈ [:χ₁ˣ, :χ₁ʸ, :χ₂ˣ, :χ₂ʸ, :Rˣ, :Rʸ]
         @test all(sol_np[c] .== 0)
     end
 

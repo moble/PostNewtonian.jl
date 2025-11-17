@@ -1,0 +1,111 @@
+"""
+    M(pnsystem)
+    M(M₁, M₂)
+    total_mass(pnsystem)
+    total_mass(M1, M2)
+
+Compute the total mass ``M₁+M₂``.
+"""
+@public M(M₁, M₂) = M₁ + M₂
+M(s::PNSystem) = M(M₁(s), M₂(s))
+@public const total_mass = M
+
+"""
+    μ(pnsystem)
+    μ(M₁, M₂)
+    reduced_mass(pnsystem)
+    reduced_mass(M1, M2)
+
+Compute the reduced mass ``(M₁ M₂)/(M₁+M₂)``.
+"""
+@public μ(M₁, M₂) = (M₁ * M₂) / (M₁ + M₂)
+μ(s::PNSystem) = μ(M₁(s), M₂(s))
+@public const reduced_mass = μ
+
+"""
+    ν(pnsystem)
+    ν(M₁, M₂)
+    reduced_mass_ratio(pnsystem)
+    reduced_mass_ratio(M1, M2)
+
+Compute the reduced mass ratio ``(M₁ M₂)/(M₁+M₂)^2``.
+
+Note that the denominator is squared, unlike in the reduced mass [`μ`](@ref).
+"""
+@public ν(M₁, M₂) = (M₁ * M₂) / (M₁ + M₂)^2
+ν(s::PNSystem) = ν(M₁(s), M₂(s))
+ν(; q) = q / (1 + q)^2
+@public const reduced_mass_ratio = ν
+
+"""
+    δ(pnsystem)
+    δ(M₁, M₂)
+    mass_difference_ratio(pnsystem)
+    mass_difference_ratio(M1, M2)
+
+Compute mass-difference ratio ``(M₁-M₂)/(M₁+M₂)``.
+
+Note that we do not restrict to ``M₁ ≥ M₂`` or vice versa; if you prefer that ``δ`` always
+be positive (or always negative), you are responsible for ensuring that.
+"""
+@public δ(M₁, M₂) = (M₁ - M₂) / (M₁ + M₂)
+δ(s::PNSystem) = δ(M₁(s), M₂(s))
+δ(; q) = (q - 1) / (q + 1)
+@public const mass_difference_ratio = δ
+
+"""
+    q(pnsystem)
+    q(M₁, M₂)
+    mass_ratio(pnsystem)
+    mass_ratio(M1, M2)
+
+Compute mass ratio ``M₁/M₂``.
+
+Note that we do not restrict to ``M₁ ≥ M₂`` or vice versa; if you prefer that ``q`` always
+be greater than or equal to 1 (or vice versa), you are responsible for ensuring that.
+"""
+@public q(M₁, M₂) = M₁ / M₂
+q(s::PNSystem) = q(M₁(s), M₂(s))
+@public const mass_ratio = q
+
+"""
+    ℳ(pnsystem)
+    ℳ(M₁, M₂)
+    chirp_mass(pnsystem)
+    chirp_mass(M1, M2)
+
+Compute the chirp mass ℳ, which determines the leading-order orbital evolution of a binary
+system due to energy loss by gravitational-wave emission.
+
+The chirp mass is defined as
+```math
+  \\mathcal{M} = \\frac{(M_1 M_2)^{3/5}} {(M_1 + M_2)^{1/5}}.
+```
+"""
+@public ℳ(M₁, M₂) = ((M₁ * M₂)^3 / (M₁ + M₂))^(1//5)
+ℳ(s::PNSystem) = ℳ(M₁(s), M₂(s))
+@public const chirp_mass = ℳ
+
+"""
+    X₁(pnsystem)
+    X₁(M₁, M₂)
+    X1(pnsystem)
+    X1(M1, M2)
+
+Compute the reduced *individual* mass ``M₁/(M₁+M₂)``.
+"""
+@public X₁(M₁, M₂) = M₁ / (M₁ + M₂)
+X₁(s::PNSystem) = X₁(M₁(s), M₂(s))
+@public const X1 = X₁
+
+"""
+    X₂(pnsystem)
+    X₂(M₁, M₂)
+    X2(pnsystem)
+    X2(M1, M2)
+
+Compute the reduced *individual* mass ``M₂/(M₁+M₂)``.
+"""
+@public X₂(M₁, M₂) = M₂ / (M₁ + M₂)
+X₂(s::PNSystem) = X₂(M₁(s), M₂(s))
+@public const X2 = X₂

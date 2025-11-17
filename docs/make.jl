@@ -1,6 +1,7 @@
 using PostNewtonian
 using Symbolics  # To document the extension
 using Documenter
+using DocumenterMermaid
 
 DocMeta.setdocmeta!(
     PostNewtonian, :DocTestSetup, :(using PostNewtonian); recursive=true, warn=false
@@ -33,6 +34,7 @@ makedocs(;
             "GWFrames" => "interface/gwframes.md",
         ],
         "Internals" => [
+            "Code diagram" => "internals/code_diagram.md",
             "Code structure" => "internals/code_structure.md",
             "internals/pn_systems.md",
             "internals/fundamental_variables.md",
