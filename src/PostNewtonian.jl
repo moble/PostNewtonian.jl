@@ -32,7 +32,7 @@ using SciMLBase:
 using SciMLBase.ReturnCode: ReturnCode
 using SymbolicIndexingInterface: SymbolCache
 using RecursiveArrayTools: DiffEqArray
-using StaticArrays: SVector, MVector
+using StaticArrays: StaticArrays, SVector, MVector
 using TestItems: @testitem
 
 # See the "Code structure" section of the documentation for a description of the simple

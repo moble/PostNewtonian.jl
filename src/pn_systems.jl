@@ -224,7 +224,7 @@ julia> χ⃗₂(fd_pnsystem)
 """
 const fd_pnsystem = FDPNSystem(Float64)
 
-function SVector(pnsystem::PNSystem)
+function StaticArrays.SVector(pnsystem::PNSystem)
     return SVector{16,eltype(pnsystem)}(
         pnsystem.state[1],
         pnsystem.state[2],
@@ -244,7 +244,7 @@ function SVector(pnsystem::PNSystem)
         Λ₂(pnsystem),
     )
 end
-function SVector(pnsystem::FDPNSystem)
+function StaticArrays.SVector(pnsystem::FDPNSystem)
     return SVector{16,FastDifferentiation.Node}(
         pnsystem.state[1],
         pnsystem.state[2],

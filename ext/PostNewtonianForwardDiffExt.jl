@@ -4,7 +4,7 @@ isdefined(Base, :get_extension) ? (using ForwardDiff: ForwardDiff) : (import ..F
 import ForwardDiff: Dual, valtype
 import PostNewtonian: type_converter, FDPNSystem, PNSystem, PNExpansion, 𝓔′, 𝓔′code
 import FastDifferentiation: FastDifferentiation, Node
-import StaticArrays: SVector, MVector
+import StaticArrays: StaticArrays, SVector, MVector
 using MacroTools: MacroTools
 
 Base.one(::Type{PNT}) where {PNT<:PNSystem{<:Dual}} = one(valtype(eltype(PNT)))

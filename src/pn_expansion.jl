@@ -163,7 +163,7 @@ function FastDifferentiation.derivative(
 end
 
 Base.Tuple(pn::PNExpansion) = pn.coeffs
-SVector(pn::PNExpansion) = SVector(pn.coeffs)
+StaticArrays.SVector(pn::PNExpansion) = SVector(pn.coeffs)
 
 """
     PNTerm{T,PNOrder,c⁻¹Exponent}
