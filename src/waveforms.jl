@@ -53,7 +53,7 @@ The storage is assumed to be the object returned from
 function coorbital_waveform!(
     storage,
     inspiral;
-    modes_function=h!,
+    modes_function=(h!),
     ell_min=_default_ℓₘᵢₙ(modes_function),
     ell_max=8,
     ℓₘᵢₙ=ell_min,
@@ -110,7 +110,7 @@ even this variation could be factored out.
 """
 function coorbital_waveform(
     inspiral;
-    modes_function=h!,
+    modes_function=(h!),
     ell_min=_default_ℓₘᵢₙ(modes_function),
     ell_max=8,
     ℓₘᵢₙ=ell_min,
@@ -162,7 +162,7 @@ The storage is assumed to be the object returned from
 function inertial_waveform!(
     storage,
     inspiral;
-    modes_function=h!,
+    modes_function=(h!),
     ell_min=_default_ℓₘᵢₙ(modes_function),
     ell_max=8,
     ℓₘᵢₙ=ell_min,
@@ -205,7 +205,7 @@ quantity.
 """
 function inertial_waveform(
     inspiral;
-    modes_function=h!,
+    modes_function=(h!),
     ell_min=_default_ℓₘᵢₙ(modes_function),
     ell_max=8,
     ℓₘᵢₙ=ell_min,
