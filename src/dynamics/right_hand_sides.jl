@@ -21,6 +21,31 @@ function TaylorT5_v̇(p)
     return inv(truncated_series_ratio(v̇_denominator_coeffs(p), v̇_numerator_coeffs(p)))
 end
 
+"""
+    causes_domain_error!(u̇, p)
+
+Ensure that these parameters correspond to a physically valid set of PN parameters.
+
+If the parameters are not valid, this function should modify `u̇` to indicate that the
+current step is invalid.  This is done by filling `u̇` with `NaN`s, which will be detected
+by the ODE solver and cause it to try a different (smaller) step size.
+
+Currently, the only check that is done is to test that these parameters result in a PN
+parameter v>0.  In the future, this function may be expanded to include other checks, or it
+may be specialized for specific `PNSystem` subtypes.
+"""
+function causes_domain_error!(u̇::ST, p::PNSystem{NT}) where {ST,NT}
+    if !ismutabletype(ST)
+        error("`causes_domain_error!` cannot modify input `u̇` because it is immutable")
+    end
+    if v(p) ≤ 0  # If this is expanded, document the change in the docstring.
+        u̇ .= convert(eltype(NT), NaN)
+        true
+    else
+        false
+    end
+end
+
 @pn_expression function TaylorTn!(pnsystem, u̇, TaylorTn_v̇::V̇) where {V̇}
     # If these parameters result in v≤0, fill u̇ with NaNs so that `solve` will
     # know that this was a bad step and try again.

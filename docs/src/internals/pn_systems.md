@@ -2,9 +2,9 @@
 
 ```@docs
 PNSystem
+Quasispherical
 BBH
 BHNS
 NSNS
 FDPNSystem
-fd_pnsystem
 ```
