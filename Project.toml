@@ -1,7 +1,7 @@
 name = "PostNewtonian"
 uuid = "377afc40-5642-4616-8613-b7ebca523866"
-authors = ["Michael Boyle <michael.oliver.boyle@gmail.com> and contributors"]
 version = "0.10.9"
+authors = ["Michael Boyle <michael.oliver.boyle@gmail.com> and contributors"]
 
 [deps]
 DataInterpolations = "82cc6244-b520-54b8-b5a6-8a565e85f1d0"
@@ -43,7 +43,7 @@ InteractiveUtils = "1"
 LinearAlgebra = "1"
 Logging = "1"
 MacroTools = "0.5.10"
-OrdinaryDiffEqVerner = "1.1"
+OrdinaryDiffEqVerner = "1.1, 2"
 Quaternionic = "2,3"
 Random = "1"
 RecursiveArrayTools = "3"
