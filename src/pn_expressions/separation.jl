@@ -202,23 +202,29 @@ from the Newton iterations in [`γₚₙ′`](@ref).
     # Turn that into an Expr (FD insists on making it a function)
     in_place = true
     init_with_zeros = false
-    γₚₙ₀′expr = FastDifferentiation.make_Expr(γₚₙ₀′, vars, in_place, init_with_zeros)
+    γₚₙ₀′expr = FastDifferentiation.make_Expr(γₚₙ₀′, vars; in_place, init_with_zeros)
 
     # Now, we use `MacroTools` to get the body of the function.
     γₚₙ₀′body = MacroTools.unblock(MacroTools.splitdef(γₚₙ₀′expr)[:body])
 
     # # At this point, the function is just a long series of statements inside an `@inbounds`
     # # block, which we will want later, but first we need to extract them.
-    MacroTools.@capture(γₚₙ₀′body, @inbounds begin
-        γₚₙ₀′statements__
-    end) || throw(
+    MacroTools.@capture(
+        γₚₙ₀′body,
+        begin
+            preamble__
+            @inbounds begin
+                γₚₙ₀′statements__
+            end
+        end
+    ) || throw(
         ArgumentError(
             "\nNo @inbounds block found in γₚₙ₀′ expression." *
             "\nSomething may have changed in FastDifferentiation." *
             "\nOpen an issue citing this Julia call:" *
             "\n```julia" *
             "\nusing PostNewtonian" *
-            "\nγₚₙ₀′($pnsystem)" *
+            "\nγₚₙ₀′($fdpnsystem)" *
             "\n```",
         ),
     )
@@ -233,7 +239,7 @@ from the Newton iterations in [`γₚₙ′`](@ref).
             "\nOpen an issue citing this Julia call:" *
             "\n```julia" *
             "\nusing PostNewtonian" *
-            "\nγₚₙ₀′($pnsystem)" *
+            "\nγₚₙ₀′($fdpnsystem)" *
             "\n```",
         ),
     )
@@ -243,7 +249,7 @@ from the Newton iterations in [`γₚₙ′`](@ref).
         # When `pn_expansion_reducer=Val(identity)` is passed, we return a PNExpansion
         NMax = Int(2PNOrder + 1)
         return quote
-            input_variables = SVector(pnsystem)
+            input_variables1 = SVector(pnsystem)
             result = MVector{$(length(γₚₙ₀′)),$(eltype(ST))}(undef)
             result .= 0
             @fastmath @inbounds begin
@@ -254,7 +260,7 @@ from the Newton iterations in [`γₚₙ′`](@ref).
     else
         # Otherwise, FD produces a 1-tuple, so we just extract the value from that.
         return quote
-            input_variables = SVector(pnsystem)
+            input_variables1 = SVector(pnsystem)
             result = MVector{1,$(eltype(ST))}(undef)
             result .= 0
             @fastmath @inbounds begin

@@ -183,23 +183,29 @@ function 𝓔′code(
     # Turn that into an Expr (FD insists on making it a function)
     in_place = true
     init_with_zeros = false
-    𝓔′expr = FastDifferentiation.make_Expr(𝓔′, vars, in_place, init_with_zeros)
+    𝓔′expr = FastDifferentiation.make_Expr(𝓔′, vars; in_place, init_with_zeros)
 
     # Now, we use `MacroTools` to get the body of the function.
     𝓔′body = MacroTools.unblock(MacroTools.splitdef(𝓔′expr)[:body])
 
     # At this point, the function is just a long series of statements inside an `@inbounds`
     # block, which we will want later, but first we need to extract them.
-    MacroTools.@capture(𝓔′body, @inbounds begin
-        𝓔′statements__
-    end) || throw(
+    MacroTools.@capture(
+        𝓔′body,
+        begin
+            preamble__
+            @inbounds begin
+                𝓔′statements__
+            end
+        end
+    ) || throw(
         ArgumentError(
             "\nNo @inbounds block found in 𝓔′ expression." *
             "\nSomething may have changed in FastDifferentiation." *
             "\nOpen an issue citing this Julia call:" *
             "\n```julia" *
             "\nusing PostNewtonian" *
-            "\n𝓔′($pnsystem)" *
+            "\n𝓔′($fdpnsystem)" *
             "\n```",
         ),
     )
@@ -214,7 +220,7 @@ function 𝓔′code(
             "\nOpen an issue citing this Julia call:" *
             "\n```julia" *
             "\nusing PostNewtonian" *
-            "\n𝓔′($pnsystem)" *
+            "\n𝓔′($fdpnsystem)" *
             "\n```",
         ),
     )
@@ -224,7 +230,7 @@ function 𝓔′code(
         # When `pn_expansion_reducer=Val(identity)` is passed, we return a PNExpansion
         NMax = Int(2PNOrder + 1)
         return quote
-            input_variables = SVector(pnsystem)
+            input_variables1 = SVector(pnsystem)
             result = MVector{$(length(𝓔′)),$(ScalarType)}(undef)
             result .= 0
             @fastmath @inbounds begin
@@ -235,7 +241,7 @@ function 𝓔′code(
     else
         # Otherwise, FD produces a 1-tuple, so we just extract the value from that.
         return quote
-            input_variables = SVector(pnsystem)
+            input_variables1 = SVector(pnsystem)
             result = MVector{1,$(ScalarType)}(undef)
             result .= 0
             @fastmath @inbounds begin
