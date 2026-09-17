@@ -384,7 +384,7 @@ Base.@constprop :aggressive function orbital_evolution(
     Ωₑ=Omega_e,
     Rᵢ=R_i,
     approximant="TaylorT1",
-    PNOrder=typemax(Int),
+    PNOrder=max_pn_order,
     check_up_down_instability=true,
     time_stepper=Vern9(),
     reltol=nothing,
@@ -519,7 +519,7 @@ end
 
 Base.@constprop :aggressive function orbital_evolution(
     pnsystemᵢ;
-    (RHS!)=(TaylorT1RHS!),
+    (RHS!)=(TaylorT1RHS(typeof(pnsystemᵢ))),
     v₁=zero(pnsystemᵢ),
     vₑ=one(pnsystemᵢ),
     check_up_down_instability=true,

@@ -87,7 +87,7 @@
 
     # Test that non-precessing rotors evolve like orbital phase
     sincosΦ = cat(map(Φ -> [sincos(Φ / 2)...], sol_np[:Φ])...; dims=2)
-    Rwz = sol_np[[PostNewtonian.Rᶻindex, PostNewtonian.Rʷindex], :]
+    Rwz = sol_np[[:Rᶻ, :Rʷ], :]
     @test sincosΦ ≈ Rwz atol = √eps(T) rtol = √eps(T)
 
     # Just check that a few nice/random cases can be integrated
