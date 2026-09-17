@@ -55,6 +55,10 @@ function Base.rand(pnclass::Type{P}; v::T=0.2, PNOrder=typemax(Int)) where {P<:P
     return rand(default_rng(), pnclass; v, PNOrder)
 end
 
+extra_params(rng, ::Type{BBH}, T, Λₘₐₓ) = (;)
+extra_params(rng, ::Type{BHNS}, T, Λₘₐₓ) = (; Λ₂ = Λₘₐₓ * rand(rng, T))
+extra_params(rng, ::Type{NSNS}, T, Λₘₐₓ) = (; Λ₁ = Λₘₐₓ * rand(rng, T), Λ₂ = Λₘₐₓ * rand(rng, T))
+
 function Base.rand(
     rng::AbstractRNG, pnclass::Type{P}; v::T=0.2, PNOrder=typemax(Int)
 ) where {P<:PNSystem,T}
@@ -67,7 +71,9 @@ function Base.rand(
     χ⃗₁ = χₘₐₓ * rand(rng, T) * normalize(randn(rng, QuatVec{T}))
     χ⃗₂ = χₘₐₓ * rand(rng, T) * normalize(randn(rng, QuatVec{T}))
     R = randn(rng, Rotor{T})
-    Λ₁ = Λₘₐₓ * rand(rng, T)
-    Λ₂ = Λₘₐₓ * rand(rng, T)
-    return pnclass(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Λ₁, Λ₂, PNOrder)
+
+    base = (; M₁, M₂, χ⃗₁, χ⃗₂, R, v, PNOrder)
+    extra = extra_params(rng, P, T, Λₘₐₓ)
+
+    return pnclass(; base..., extra...)
 end
