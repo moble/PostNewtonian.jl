@@ -26,7 +26,7 @@ const BNS = NSNS
 # The following are methods of functions defined in `state_variables.jl`, specialized for
 # `NSNS` systems.
 
-function pack_state(::Type{NSNS}; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0, Λ₁, Λ₂)
+function pack_state(::Type{NSNS}; M₁, M₂, χ⃗₁, χ⃗₂, R=Rotor(1), v, Φ=0, Λ₁, Λ₂)
     [M₁; M₂; vec(QuatVec(χ⃗₁)); vec(QuatVec(χ⃗₂)); components(Rotor(R)); v; Φ; Λ₁; Λ₂]
 end
 

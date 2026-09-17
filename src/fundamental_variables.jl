@@ -160,7 +160,7 @@ const Lambda2 = Λ₂
 
 ############################################################
 # TODO This got moved here out of pn_systems.jl
-for PNT ∈ (BBH, BHNS, BNS)
+for PNT ∈ (BBH, BHNS, NSNS)
     for (i, symbol) ∈ enumerate(symbols(PNT))
         # This will define, e.g., `M₁(pnsystem::BBH) = pnsystem.state[1]`.  We
         # could do this manually, but this is more concise and less error-prone.

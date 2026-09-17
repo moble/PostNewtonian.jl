@@ -27,7 +27,7 @@ struct BBH{NT,ST<:DenseVector{NT},PNOrder} <: QuasisphericalSystem{NT,ST,PNOrder
 end
 const BHBH = BBH
 
-function pack_state(::Type{<:BBH}; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0)
+function pack_state(::Type{<:BBH}; M₁, M₂, χ⃗₁, χ⃗₂, R=Rotor(1), v, Φ=0)
     [M₁; M₂; vec(QuatVec(χ⃗₁)); vec(QuatVec(χ⃗₂)); components(Rotor(R)); v; Φ]
 end
 
