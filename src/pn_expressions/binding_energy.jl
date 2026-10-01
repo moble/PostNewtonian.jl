@@ -170,7 +170,7 @@ function 𝓔′code(
 
     # FD expects a single vector of variables, so we concatenate the state vector with the
     # two tidal-coupling parameters
-    vars = FastDifferentiation.Node[fdpnsystem.state; Λ₁(fdpnsystem); Λ₂(fdpnsystem)]
+    vars = fdpnsystem.state
 
     # Now we evaluate 𝓔 using the FD variables.  This will expand all derived variables in
     # terms of the fundamental variables, but FD will take care of evaluating those

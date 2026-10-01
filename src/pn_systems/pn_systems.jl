@@ -61,9 +61,9 @@ Base.isdone(pnsystem::PNSystem, iterstate) = Base.isdone(state(pnsystem), iterst
 
 # Indexing
 
-# Base.getindex(pnsystem::PNSystem, i::Int) = Base.@propagate_inbounds getindex(state(pnsystem), i)
 #Base.setindex!(pn::PNSystem, v, i::Int) = Base.@propagate_inbounds setindex!(state(pn), v, i)
 
+Base.@propagate_inbounds Base.getindex(pnsystem::PNSystem, i::Int) = getindex(state(pnsystem), i)
 Base.@propagate_inbounds Base.getindex(pnsystem::PNSystem, s::Symbol) = getindex(state(pnsystem), symbol_index(typeof(pnsystem), Val(s)))
 Base.@propagate_inbounds Base.setindex!(pnsystem::PNSystem, v, s::Symbol) = setindex!(state(pnsystem), v, symbol_index(typeof(pnsystem), Val(s)))
 

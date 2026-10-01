@@ -51,7 +51,7 @@ orientations.  Note that the `Λᵢ` are only used if the input `pnclass` is `BH
 If you would prefer a different range of parameters, the source code for this function is
 easily modified.
 """
-function Base.rand(pnclass::Type{P}; v::T=0.2, PNOrder=typemax(Int)) where {P<:PNSystem,T}
+function Base.rand(pnclass::Type{P}; v::T=0.2, PNOrder=max_pn_order) where {P<:PNSystem,T}
     return rand(default_rng(), pnclass; v, PNOrder)
 end
 
@@ -60,7 +60,7 @@ extra_params(rng, ::Type{BHNS}, T, Λₘₐₓ) = (; Λ₂ = Λₘₐₓ * rand(
 extra_params(rng, ::Type{NSNS}, T, Λₘₐₓ) = (; Λ₁ = Λₘₐₓ * rand(rng, T), Λ₂ = Λₘₐₓ * rand(rng, T))
 
 function Base.rand(
-    rng::AbstractRNG, pnclass::Type{P}; v::T=0.2, PNOrder=typemax(Int)
+    rng::AbstractRNG, pnclass::Type{P}; v::T=0.2, PNOrder=max_pn_order
 ) where {P<:PNSystem,T}
     qₘᵢₙ = T(big"0.05")  # Note that we're using q≤1 here for consistency with LIGO
     χₘₐₓ = T(big"0.998")
