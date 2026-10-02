@@ -54,7 +54,7 @@ include("pn_systems/BBH.jl")
 export BBH, BHBH
 
 include("pn_systems/FDPNSystem.jl")
-export FDPNSystem, fd_pnsystem
+export FDPNSystem
 
 include("pn_systems/BHNS.jl")
 export BHNS
