@@ -14,7 +14,7 @@
         @test PostNewtonian.macro_test(pnstate) == v * (T(π) * √T(10))
     end
 
-    symbolic_pnsystem = PostNewtonian.SymbolicPNSystem()
+    symbolic_pnsystem = PostNewtonian.SymbolicPNSystem(BBH)
     @test isequal(
         PostNewtonian.macro_test(symbolic_pnsystem),
         PostNewtonian.v(symbolic_pnsystem) *
