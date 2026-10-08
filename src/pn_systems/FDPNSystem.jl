@@ -1,3 +1,5 @@
+using SciMLBase: parameterless_type
+
 """
     FDPNSystem{NT, PNOrder}(state, Λ₁, Λ₂)
 
@@ -14,7 +16,10 @@ struct FDPNSystem{NT,PN<:PNSystem{NT},PNOrder} <: PNSystem{FastDifferentiation.N
     state::Vector{FastDifferentiation.Node}
 
     function FDPNSystem(::Type{PN}, PNOrder=max_pn_order) where {NT,PN<:PNSystem{NT}}
-        return new{NT,PN,prepare_pn_order(PNOrder)}([FastDifferentiation.Node(s) for s ∈ symbols(PN)])
+        raw_PN = parameterless_type(PN)
+        return new{Number,raw_PN{Number,DenseVector{Number},prepare_pn_order(PNOrder)},
+                   prepare_pn_order(PNOrder)}(
+            [FastDifferentiation.Node(s) for s ∈ symbols(PN)])
     end
 end
 
