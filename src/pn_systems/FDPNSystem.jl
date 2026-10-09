@@ -1,59 +1,21 @@
-using SciMLBase: parameterless_type
-
 """
-    FDPNSystem{NT, PNOrder}(state, Λ₁, Λ₂)
+    FDPNSystem(asdf)
 
 TODO UPDATE
-A `PNSystem` that contains information as variables from
-[`FastDifferentiation.jl`](https://docs.juliahub.com/General/FastDifferentiation/stable/).
 
-See also [`fd_pnsystem`](@ref) for a particular instance of this type.  Note that this type
-also involves the type `NT`, which will be the numeric type of actual numbers that eventually
-get fed into (and will be passed out from) functions that use this system.  The correct type
-of `FDPNSystem` is used in calculating `𝓔′`.
 """
-struct FDPNSystem{NT,PN<:PNSystem{NT},PNOrder} <: PNSystem{FastDifferentiation.Node,Vector{FastDifferentiation.Node},PNOrder}
-    state::Vector{FastDifferentiation.Node}
-
-    function FDPNSystem(::Type{PN}, PNOrder=max_pn_order) where {NT,PN<:PNSystem{NT}}
-        raw_PN = parameterless_type(PN)
-        return new{Number,raw_PN{Number,DenseVector{Number},prepare_pn_order(PNOrder)},
-                   prepare_pn_order(PNOrder)}(
-            [FastDifferentiation.Node(s) for s ∈ symbols(PN)])
-    end
+function FDPNSystem(::Type{PN}, PNOrder) where {NT,ST,PN<:PNSystem{NT,ST}}
+    raw_PN = parameterless_type(PN)
+    return raw_PN{FastDifferentiation.Node,
+                  DenseVector{FastDifferentiation.Node},
+                  prepare_pn_order(PNOrder)}(
+                      [FastDifferentiation.Node(s) for s ∈ symbols(raw_PN)])
 end
 
-state(pnsystem::FDPNSystem) = pnsystem.state
+function FDPNSystem(t::Type{PN}) where {NT,ST,PNOrder,PN<:PNSystem{NT,ST,PNOrder}}
+    return FDPNSystem(t, PNOrder)
+end
 
-"""
-    fd_pnsystem
-
-A symbolic `PNSystem` that contains symbolic information for all types of `PNSystem`s.
-
-In particular, note that this object has (essentially) infinite `PNOrder`, has nonzero
-values for quantities like `Λ₁` and `Λ₂`, and assumes that the eventual output will be in
-`Float64`.  If you want different choices, you may need to call [`FDPNSystem`](@ref)
-yourself, or even construct a different specialized subtype of `PNSystem` (it's not hard).
-
-# Examples
-```jldoctest
-julia> using PostNewtonian: M₁, M₂, χ⃗₁, χ⃗₂, FDPNSystem
-
-julia> fd_pnsystem = FDPNSystem(Float64)
-FDPNSystem{Float64, 9223372036854775805//2}(FastDifferentiation.Node[M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ], Λ₁, Λ₂)
-
-julia> M₁(fd_pnsystem), M₂(fd_pnsystem)
-(M₁, M₂)
-
-julia> χ⃗₁(fd_pnsystem)
- + χ⃗₁ˣ𝐢 + χ⃗₁ʸ𝐣 + χ⃗₁ᶻ𝐤
-
-julia> χ⃗₂(fd_pnsystem)
- + χ⃗₂ˣ𝐢 + χ⃗₂ʸ𝐣 + χ⃗₂ᶻ𝐤
-```
-"""
-#const fd_pnsystem = FDPNSystem(Float64)
-
-function StaticArrays.SVector(pnsystem::FDPNSystem)
-    return SVector{length(pnsystem), FastDifferentiation.Node}(pnsystem.state)
+function FDPNSystem(pn::PN) where {PN<:PNSystem}
+    return FDPNSystem(typeof(pn))
 end

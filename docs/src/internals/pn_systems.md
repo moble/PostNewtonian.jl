@@ -5,6 +5,4 @@ PNSystem
 BBH
 BHNS
 NSNS
-FDPNSystem
-fd_pnsystem
 ```

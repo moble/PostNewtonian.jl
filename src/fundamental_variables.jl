@@ -166,11 +166,7 @@ for PNT ∈ (BBH, BHNS, NSNS)
         # could do this manually, but this is more concise and less error-prone.
         @eval PostNewtonian.FundamentalVariables begin
             $(symbol)(pnsystem::$PNT) = @inbounds pnsystem.state[$i]
-            $(symbol)(pnsystem::FDPNSystem{NT,$PNT{NT,ST,PNOrder},PNOrder}) where {NT,ST,PNOrder} = @inbounds pnsystem.state[$i]
             function symbol_index(::Type{T}, ::Val{Symbol($symbol)}) where {T<:$PNT}
-                $i
-            end
-            function symbol_index(::Type{FDPNSystem{NT,$PNT{NT,ST,PNOrder},PNOrder}}, ::Val{Symbol($symbol)}) where {NT,ST,PNOrder}
                 $i
             end
         end

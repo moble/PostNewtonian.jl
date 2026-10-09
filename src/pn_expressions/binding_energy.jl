@@ -166,10 +166,8 @@ function 𝓔′code(
 ) where {NT,ST,PNOrder,PN<:PNSystem{NT,ST,PNOrder},PNExpansionReducer,ScalarType,FloatType}
     # Create a `PNSystem` with `FastDifferentiation` (henceforth FD) variables, using the
     # same PNOrder as the input `pnsystem`.
-    fdpnsystem = FDPNSystem(PN, PNOrder)
 
-    # FD expects a single vector of variables, so we concatenate the state vector with the
-    # two tidal-coupling parameters
+    fdpnsystem = FDPNSystem(PN)
     vars = fdpnsystem.state
 
     # Now we evaluate 𝓔 using the FD variables.  This will expand all derived variables in

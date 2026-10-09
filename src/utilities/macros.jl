@@ -11,18 +11,6 @@ expressions, rather than just assuming everything is a `Float64`.
 function type_converter(pnsystem, x)
     return convert(eltype(pnsystem), x)
 end
-function type_converter(::FDPNSystem{FT}, x) where {FT}
-    return x
-end
-function type_converter(::FDPNSystem{FT}, x::Integer) where {FT}
-    return convert(FT, x)
-end
-function type_converter(::FDPNSystem{FT}, x::Rational) where {FT}
-    return convert(FT, x)
-end
-function type_converter(::FDPNSystem{FT}, x::AbstractIrrational) where {FT}
-    return convert(FT, x)
-end
 
 fundamental_variables = methodswith(PNSystem, FundamentalVariables)
 fundamental_quaternionic_variables = [

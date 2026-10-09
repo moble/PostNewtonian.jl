@@ -2,7 +2,7 @@ module PostNewtonianForwardDiffExt
 isdefined(Base, :get_extension) ? (using ForwardDiff: ForwardDiff) : (import ..ForwardDiff)
 
 import ForwardDiff: Dual, valtype
-import PostNewtonian: type_converter, FDPNSystem, PNSystem, PNExpansion, 𝓔′, 𝓔′code
+import PostNewtonian: type_converter, PNSystem, PNExpansion, 𝓔′, 𝓔′code
 import FastDifferentiation: FastDifferentiation, Node
 import StaticArrays: StaticArrays, SVector, MVector
 using MacroTools: MacroTools
@@ -12,16 +12,16 @@ Base.zero(::Type{PNT}) where {PNT<:PNSystem{<:Dual}} = zero(valtype(eltype(PNT))
 Base.float(::Type{PNT}) where {PNT<:PNSystem{<:Dual}} = float(valtype(eltype(PNT)))
 
 # These three definitions allow us to call 𝓔′ with ForwardDiff.Dual numbers
-function type_converter(::FDPNSystem{Dual{T,V,N}}, x) where {T,V,N}
+function type_converter(::PNSystem{Dual{T,V,N}}, x) where {T,V,N}
     return x
 end
-function type_converter(::FDPNSystem{Dual{T,V,N}}, x::Integer) where {T,V,N}
+function type_converter(::PNSystem{Dual{T,V,N}}, x::Integer) where {T,V,N}
     return convert(V, x)
 end
-function type_converter(::FDPNSystem{Dual{T,V,N}}, x::Rational) where {T,V,N}
+function type_converter(::PNSystem{Dual{T,V,N}}, x::Rational) where {T,V,N}
     return convert(V, x)
 end
-function type_converter(::FDPNSystem{Dual{T,V,N}}, x::AbstractIrrational) where {T,V,N}
+function type_converter(::PNSystem{Dual{T,V,N}}, x::AbstractIrrational) where {T,V,N}
     return convert(V, x)
 end
 

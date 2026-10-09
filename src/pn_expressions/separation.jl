@@ -185,11 +185,8 @@ from the Newton iterations in [`γₚₙ′`](@ref).
 ) where {NT,ST,PNOrder,PNExpansionReducer}
     # Create a `PNSystem` with `FastDifferentiation` (henceforth FD) variables, using the
     # same PNOrder as the input `pnsystem`.
-    fdpnsystem = FDPNSystem(pnsystem,PNOrder)
-
-    # FD expects a single vector of variables, so we concatenate the state vector with the
-    # two tidal-coupling parameters
-    vars = FastDifferentiation.Node[fdpnsystem.state; Λ₁(fdpnsystem); Λ₂(fdpnsystem)]
+    fdpnsystem = FDPNSystem(pnsystem)
+    vars = fdpnsystem.state
 
     # Now we evaluate γₚₙ using the FD variables.  This will expand all derived variables in
     # terms of the fundamental variables, but FD will take care of evaluating those
