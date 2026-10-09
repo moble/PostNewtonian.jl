@@ -17,7 +17,7 @@
     Hc = ForwardDiff.hessian(c1, pn.state)
 
     pn_type = typeof(pn)
-    nonzero_indices = [symbol_index(pn_type, :M₁), symbol_index(pn_type, :M₂), symbol_index(pn_type, :v)]
+    nonzero_indices = [symbol_index(pn_type, s) for s ∈ [:M₁, :M₂, :v]]
     zero_indices = [
         i for i ∈ eachindex(symbols(pn_type)) if i ∉ nonzero_indices
     ]
