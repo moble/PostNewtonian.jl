@@ -150,8 +150,8 @@ function decreasing_v_terminator(PNType, quiet=false)
         return get_du(integrator)[symbol_index(PNType,:v)] < 0  # This translates to v̇<0
     end
     function discrete_terminator!(integrator)
-        v = integrator.u[:v]
-        ∂ₜv = get_du(integrator)[:v]
+        v = integrator.u[symbol_index(PNType,:v)]
+        ∂ₜv = get_du(integrator)[symbol_index(PNType,:v)]
         message = (
             "Terminating forwards evolution because 𝑣 is decreasing:\n" *
             "This is only unusual if 𝑣 ≲ 0.35; the current value is 𝑣=$v\n" *
