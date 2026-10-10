@@ -24,7 +24,7 @@ So this test does all that a little more manually and compares the results at ea
                 numpn = rand(rng, NSNS; v, PNOrder)
                 ϵ = 2eps(PostNewtonian.μ(numpn) * v^2)
                 @test 𝓔(numpn) ≈ be(numpn, false) atol = ϵ rtol = 3eps(T)
-                @test 𝓔′(numpn) ≈ be(numpn, true) atol = ϵ rtol = 5eps(T)
+                @test 𝓔′(numpn) ≈ be(numpn, true) atol = ϵ rtol = 3eps(T)
             end
         end
     end
