@@ -49,8 +49,8 @@ julia> χ⃗₂(symbolic_pnsystem)
 χ⃗₂
 ```
 """
-struct SymbolicPNSystem{ST,PNOrder,ET} <: PNSystem{ST,PNOrder}
+struct SymbolicPNSystem{NT,ST,PNOrder} <: PNSystem{NT,ST,PNOrder}
     state::ST
-    Λ₁::ET
-    Λ₂::ET
+    Λ₁::NT
+    Λ₂::NT
 end

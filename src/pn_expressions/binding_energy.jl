@@ -163,14 +163,12 @@ const binding_energy = 𝓔
 # we factor out this code to minimize duplication.
 function 𝓔′code(
     ::Type{PN}, ::Type{Val{PNExpansionReducer}}, ::Type{ScalarType}, ::Type{FloatType}
-) where {ST,PNOrder,PN<:PNSystem{ST,PNOrder},PNExpansionReducer,ScalarType,FloatType}
+) where {NT,ST,PNOrder,PN<:PNSystem{NT,ST,PNOrder},PNExpansionReducer,ScalarType,FloatType}
     # Create a `PNSystem` with `FastDifferentiation` (henceforth FD) variables, using the
     # same PNOrder as the input `pnsystem`.
-    fdpnsystem = FDPNSystem(FloatType, PNOrder)
 
-    # FD expects a single vector of variables, so we concatenate the state vector with the
-    # two tidal-coupling parameters
-    vars = FastDifferentiation.Node[fdpnsystem.state; Λ₁(fdpnsystem); Λ₂(fdpnsystem)]
+    fdpnsystem = FDPNSystem(PN)
+    vars = fdpnsystem.state
 
     # Now we evaluate 𝓔 using the FD variables.  This will expand all derived variables in
     # terms of the fundamental variables, but FD will take care of evaluating those
@@ -256,9 +254,9 @@ This is computed automatically (via `FastDifferentiation`) from [`𝓔`](@ref); 
 function for details of the PN formulas.
 """
 @generated function 𝓔′(
-    pnsystem::PNSystem{ST,PNOrder}; pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum)
-) where {ST,PNOrder,PNExpansionReducer}
-    𝓔′code(pnsystem, pn_expansion_reducer, eltype(ST), eltype(ST))
+    pnsystem::PNSystem{NT,ST,PNOrder}; pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum)
+) where {NT,ST,PNOrder,PNExpansionReducer}
+    𝓔′code(pnsystem, pn_expansion_reducer, NT, NT)
 end
 
 const binding_energy_deriv = 𝓔′

@@ -10,16 +10,18 @@ The optional `quiet` argument will silence informational messages about reaching
 value of `vₑ` if set to `true`, but warnings will still be issued when terminating for other
 reasons.
 """
-function termination_forwards(vₑ, quiet=false)
+function termination_forwards(PNType, vₑ, quiet=false)
     # Triggers the `continuous_terminator!` whenever one of these conditions crosses 0.
     # More precisely, the integrator performs a root find to finish precisely
     # when one of these conditions crosses 0.
+
+    # NOTE These are very specific to quasicircular; have to generalize for eccentric
     function conditions(out, state, t, integrator)
-        out[1] = state[M₁index]  # Terminate if M₁ ≤ 0
-        out[2] = state[M₂index]  # Terminate if M₂ ≤ 0
-        out[3] = 1 - sum(x -> x^2, @view state[χ⃗₁indices])  # Terminate if χ₁ > 1
-        out[4] = 1 - sum(x -> x^2, @view state[χ⃗₂indices])  # Terminate if χ₂ > 1
-        return out[5] = vₑ - state[vindex]  # Terminate at v = vₑ
+        out[1] = state[symbol_index(PNType, :M₁)] # Terminate if M₁ ≤ 0
+        out[2] = state[symbol_index(PNType, :M₂)]  # Terminate if M₂ ≤ 0
+        out[3] = 1 - sum(abs2, state[symbol_index(PNType, :χ⃗₁ˣ) : symbol_index(PNType, :χ⃗₁ᶻ)]) # Terminate if χ₁ > 1
+        out[4] = 1 - sum(abs2, state[symbol_index(PNType, :χ⃗₂ˣ) : symbol_index(PNType, :χ⃗₂ᶻ)]) # Terminate if χ₂ > 1
+        return out[5] = vₑ - state[symbol_index(PNType, :v)] # Terminate at v = vₑ
     end
     function terminator!(integrator, event_index)
         if event_index == 1
@@ -58,13 +60,13 @@ The optional `quiet` argument will silence informational messages about reaching
 value of `v₁` if set to `true`, but warnings will still be issued when terminating for other
 reasons.
 """
-function termination_backwards(v₁, quiet=false)
+function termination_backwards(PNType, v₁, quiet=false)
     function terminators_backwards(out, state, t, integrator)
-        out[1] = state[M₁index]  # Terminate if M₁≤0
-        out[2] = state[M₂index]  # Terminate if M₂≤0
-        out[3] = 1 - sum(x -> x^2, @view state[χ⃗₁indices])  # Terminate if χ₁>1
-        out[4] = 1 - sum(x -> x^2, @view state[χ⃗₂indices])  # Terminate if χ₂>1
-        return out[5] = v₁ - state[vindex]  # Terminate at v = v₁
+        out[1] = state[symbol_index(PNType, :M₁)]  # Terminate if M₁ ≤ 0
+        out[2] = state[symbol_index(PNType, :M₂)]  # Terminate if M₂ ≤ 0
+        out[3] = 1 - sum(abs2, state[symbol_index(PNType, :χ⃗₁ˣ) : symbol_index(PNType, :χ⃗₁ᶻ)])  # Terminate if χ₁ > 1
+        out[4] = 1 - sum(abs2, state[symbol_index(PNType, :χ⃗₂ˣ) : symbol_index(PNType, :χ⃗₂ᶻ)])  # Terminate if χ₂ > 1
+        return out[5] = v₁ - state[symbol_index(PNType, :v)]  # Terminate at v = v₁
     end
     function terminator_backwards!(integrator, event_index)
         if event_index == 1
@@ -104,13 +106,13 @@ If this terminator is triggered while `v` is less than 0.35, a warning will alwa
 issued; otherwise an `info` message will be issued only if the `quiet` flag is set to
 `false`.
 """
-function dtmin_terminator(T, quiet=false)
+function dtmin_terminator(PNType, T, quiet=false)
     sqrtϵ::T = √eps(T)  # Tricks for faster closures
     discrete_condition = let sqrtϵ = sqrtϵ
         (state, t, integrator) -> abs(integrator.dt) < sqrtϵ
     end
     function discrete_terminator!(integrator)
-        v = integrator.u[vindex]
+        v = integrator.u[symbol_index(PNType, :v)]
         message = (
             "Terminating evolution because the time-step size has become very small:\n" *
             "|dt=$(integrator.dt)| < √ϵ=$(sqrtϵ)\n" *
@@ -142,13 +144,14 @@ If this terminator is triggered while `v` is less than 0.35, a warning will alwa
 issued; otherwise an `info` message will be issued only if the `quiet` flag is set to
 `false`.
 """
-function decreasing_v_terminator(quiet=false)
+function decreasing_v_terminator(PNType, quiet=false)
     function discrete_condition(state, t, integrator)
-        return get_du(integrator)[vindex] < 0  # This translates to v̇<0
+        # How come here I can't just write get_du(integrator)[:v] ?
+        return get_du(integrator)[symbol_index(PNType,:v)] < 0  # This translates to v̇<0
     end
     function discrete_terminator!(integrator)
-        v = integrator.u[vindex]
-        ∂ₜv = get_du(integrator)[vindex]
+        v = integrator.u[symbol_index(PNType,:v)]
+        ∂ₜv = get_du(integrator)[symbol_index(PNType,:v)]
         message = (
             "Terminating forwards evolution because 𝑣 is decreasing:\n" *
             "This is only unusual if 𝑣 ≲ 0.35; the current value is 𝑣=$v\n" *

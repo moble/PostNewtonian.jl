@@ -26,6 +26,8 @@ import PostNewtonian:
     pn_expression,
     pn_expansion,
     @pn_expansion,
+    symbols,
+    BBH, BHNS, NSNS,
     M₁,
     M₂,
     χ⃗₁,
@@ -53,6 +55,8 @@ import PostNewtonian:
 #apply_to_first_add!, flatten_add!, pn_expression,
 using RuntimeGeneratedFunctions: init, @RuntimeGeneratedFunction
 
+using SciMLBase: parameterless_type
+
 init(@__MODULE__)
 
 function _efficient_vector(N, ::Type{Symbolics.Num})
@@ -72,10 +76,10 @@ function unhold(expr)
     end
 end
 
-function type_converter(::PNSystem{T}, x) where {T<:Vector{Symbolics.Num}}
+function type_converter(::PNSystem{T}, x) where {T<:Symbolics.Num}
     return Symbolics.Num(SymbolicUtils.Term(hold, [x]))
 end
-function type_converter(::PNSystem{T}, x::Symbolics.Num) where {T<:Vector{Symbolics.Num}}
+function type_converter(::PNSystem{T}, x::Symbolics.Num) where {T<:Symbolics.Num}
     return x
 end
 
@@ -83,7 +87,7 @@ end
 for method ∈ [fundamental_quaternionic_variables; derived_variables]
     name = method.name
     @eval begin
-        function PostNewtonian.$name(v::PNSystem{T}) where {T<:Vector{Symbolics.Num}}
+        function PostNewtonian.$name(v::PNSystem{T}) where {T<:Symbolics.Num}
             return Symbolics.Num(SymbolicUtils.Sym{Real}(Symbol($name)))
         end
         function PostNewtonian.$name(v::Vector{T}) where {T<:Symbolics.Num}
@@ -257,18 +261,19 @@ end
 
 ## Moved from src/pn_systems.jl
 
-causes_domain_error!(u̇, ::PNSystem{VT}) where {VT<:Vector{Symbolics.Num}} = false
+causes_domain_error!(u̇, ::PNSystem{NT}) where {NT<:Symbolics.Num} = false
 
-function SymbolicPNSystem(PNOrder=typemax(Int))
-    Symbolics.@variables M₁ M₂ χ⃗₁ˣ χ⃗₁ʸ χ⃗₁ᶻ χ⃗₂ˣ χ⃗₂ʸ χ⃗₂ᶻ Rʷ Rˣ Rʸ Rᶻ v Φ Λ₁ Λ₂
-    ET = typeof(M₁)
-    return SymbolicPNSystem{Vector{ET},prepare_pn_order(PNOrder),ET}(
-        [M₁, M₂, χ⃗₁ˣ, χ⃗₁ʸ, χ⃗₁ᶻ, χ⃗₂ˣ, χ⃗₂ʸ, χ⃗₂ᶻ, Rʷ, Rˣ, Rʸ, Rᶻ, v, Φ], Λ₁, Λ₂
+function SymbolicPNSystem(t::Type{PN}, PNOrder=typemax(Int)) where {PN <: QuasisphericalSystem}
+    symbolic_vars = map(Symbolics.variable, symbols(PN))
+    return PN{Symbolics.Num, Vector{Symbolics.Num}, prepare_pn_order(PNOrder)}(
+        [symbolic_vars...]
     )
 end
 
 """
     symbolic_pnsystem
+
+TODO UPDATE
 
 A symbolic `PNSystem` that contains symbolic information for all types of `PNSystem`s.
 
@@ -291,41 +296,46 @@ julia> χ⃗₂(symbolic_pnsystem)
 χ⃗₂
 ```
 """
-const symbolic_pnsystem = SymbolicPNSystem()
-
-## Moved from src/fundamental_variables.jl
-Λ₁(pn::SymbolicPNSystem) = pn.Λ₁
-Λ₂(pn::SymbolicPNSystem) = pn.Λ₂
 
 ## Moved from src/pn_expressions/binding_energy.jl with a little padding to distinguish it
 ## from the new FastDifferentiation-based version
-const 𝓔′Symbolics = let 𝓔 = 𝓔(symbolic_pnsystem), v = v(symbolic_pnsystem)
-    ∂ᵥ = Symbolics.Differential(v)
-    # Evaluate derivative symbolically
-    𝓔′ = SymbolicUtils.simplify(Symbolics.expand_derivatives(∂ᵥ(𝓔)); expand=true)#, simplify_fractions=false)
-    # Turn it into (an Expr of) a function taking one argument: `pnsystem`
-    𝓔′ = Symbolics.build_function(𝓔′, :pnsystem; nanmath=false)
-    # Remove `hold` (which we needed for Symbolics.jl to not collapse to Float64)
-    𝓔′ = unhold(𝓔′)
-    # "Flatten" the main sum, because Symbolics nests sums for some reason
-    𝓔′ = apply_to_first_add!(𝓔′, flatten_add!)
-    # Apply `@pn_expansion` to the main sum
-    splitfunc = MacroTools.splitdef(𝓔′)
-    splitfunc[:body] = apply_to_first_add!(splitfunc[:body], x -> :(@pn_expansion(-1, $x)))
-    𝓔′ = MacroTools.combinedef(splitfunc)
-    # Finally, apply the "macro" to it and get a full function out
-    @RuntimeGeneratedFunction(pn_expression(1, 𝓔′))
+
+function make_symbolic_𝓔′(t::Type{PN}) where {PN <: QuasisphericalSystem}
+    symbolic_pn = SymbolicPNSystem(t)
+    let 𝓔 = 𝓔(symbolic_pn), v = v(symbolic_pn)
+        ∂ᵥ = Symbolics.Differential(v)
+        # Evaluate derivative symbolically
+        𝓔′ = SymbolicUtils.simplify(Symbolics.expand_derivatives(∂ᵥ(𝓔)); expand=true)#, simplify_fractions=false)
+        # Turn it into (an Expr of) a function taking one argument: `pnsystem`
+        𝓔′ = Symbolics.build_function(𝓔′, :pnsystem; nanmath=false)
+        # Remove `hold` (which we needed for Symbolics.jl to not collapse to Float64)
+        𝓔′ = unhold(𝓔′)
+        # "Flatten" the main sum, because Symbolics nests sums for some reason
+        𝓔′ = apply_to_first_add!(𝓔′, flatten_add!)
+        # Apply `@pn_expansion` to the main sum
+        splitfunc = MacroTools.splitdef(𝓔′)
+        splitfunc[:body] = apply_to_first_add!(splitfunc[:body], x -> :(@pn_expansion(-1, $x)))
+        𝓔′ = MacroTools.combinedef(splitfunc)
+        # Finally, apply the "macro" to it and get a full function out
+        @RuntimeGeneratedFunction(pn_expression(1, 𝓔′))
+    end
 end
 
+
+
+const 𝓔′Symbolics =
+    Dict(pn => make_symbolic_𝓔′(pn)
+         for pn ∈ (BBH, BHNS, NSNS))
+
 function 𝓔′(
-    pnsystem::PNSystem{ST,PNOrder},
+    pnsystem::PNSystem{NT,ST,PNOrder},
     ::Val{:Symbolics};
     pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum),
-) where {ST,PNOrder,PNExpansionReducer}
+) where {NT,ST,PNOrder,PNExpansionReducer}
     if PNExpansionReducer != sum
         error("Symbolic 𝓔′ is not implemented for PNExpansionReducer other than `sum`")
     else
-        𝓔′Symbolics(pnsystem)
+        𝓔′Symbolics[parameterless_type(pnsystem)](pnsystem)
     end
 end
 

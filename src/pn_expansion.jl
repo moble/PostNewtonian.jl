@@ -419,6 +419,6 @@ This can be used to automatically create more complicated `PNTerm`s, which combi
 [`PNExpansion`](@ref).  This is a simple but effective way to write PN formulas while
 automatically tracking the PN order of each term.
 """
-function PNExpansionParameter(::PNSystem{ST,PNOrder}) where {ST,PNOrder}
-    return PNTerm{eltype(ST),PNOrder}(-1, one(eltype(ST)))
+function PNExpansionParameter(::PNSystem{NT,ST,PNOrder}) where {NT,ST,PNOrder}
+    return PNTerm{NT,PNOrder}(-1, one(NT))
 end

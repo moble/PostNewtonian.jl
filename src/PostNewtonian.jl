@@ -42,13 +42,25 @@ using TestItems: @testitem
 # It's more common in PN to use `ln` — which I also prefer, as `log` seems ambiguous.
 const ln = log
 
+include("pn_systems/pn_systems.jl")
+export PNSystem, pn_order, QuasisphericalSystem
+
 include("utilities.jl")
 export termination_forwards,
     termination_backwards, dtmin_terminator, decreasing_v_terminator, nonfinite_terminator
 using .MathConstants
 
-include("pn_systems.jl")
-export PNSystem, pn_order, BBH, BHBH, BHNS, NSNS, BNS, FDPNSystem, fd_pnsystem
+include("pn_systems/BBH.jl")
+export BBH, BHBH
+
+include("pn_systems/FDPNSystem.jl")
+export FDPNSystem
+
+include("pn_systems/BHNS.jl")
+export BHNS
+
+include("pn_systems/NSNS.jl")
+export NSNS, BNS
 
 include("pn_expansion.jl")
 export PNExpansion, PNTerm, PNExpansionParameter

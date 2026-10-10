@@ -181,15 +181,12 @@ from the Newton iterations in [`γₚₙ′`](@ref).
 
 """
 @generated function γₚₙ₀′(
-    pnsystem::PNSystem{ST,PNOrder}; pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum)
-) where {ST,PNOrder,PNExpansionReducer}
+    pnsystem::PNSystem{NT,ST,PNOrder}; pn_expansion_reducer::Val{PNExpansionReducer}=Val(sum)
+) where {NT,ST,PNOrder,PNExpansionReducer}
     # Create a `PNSystem` with `FastDifferentiation` (henceforth FD) variables, using the
     # same PNOrder as the input `pnsystem`.
-    fdpnsystem = FDPNSystem(eltype(ST), PNOrder)
-
-    # FD expects a single vector of variables, so we concatenate the state vector with the
-    # two tidal-coupling parameters
-    vars = FastDifferentiation.Node[fdpnsystem.state; Λ₁(fdpnsystem); Λ₂(fdpnsystem)]
+    fdpnsystem = FDPNSystem(pnsystem)
+    vars = fdpnsystem.state
 
     # Now we evaluate γₚₙ using the FD variables.  This will expand all derived variables in
     # terms of the fundamental variables, but FD will take care of evaluating those
@@ -354,7 +351,7 @@ function γₚₙ⁻¹(γ, pnsystem, r₀′=0)
         #   f(v) = γₚₙ(pnsystemᵥ) - γ
         # with
         #   f′(v) = γₚₙ′(pnsystemᵥ)
-        pnsystemᵥ.state[vindex] = v
+        pnsystemᵥ[:v] = v
         γᵥ = γₚₙ(pnsystemᵥ, r₀′)
         γᵥ′ = γₚₙ′(pnsystemᵥ)
         return -((γᵥ - γ) / γᵥ′)
@@ -501,7 +498,7 @@ end
 
 @testitem "separation_inverse" begin
     using Random
-    using PostNewtonian: PostNewtonian, γₚₙ, γₚₙ⁻¹, M₁index, M₂index, v, r, r⁻¹
+    using PostNewtonian: PostNewtonian, γₚₙ, γₚₙ⁻¹, M₁, M₂, v, r, r⁻¹
 
     rng = Random.Xoshiro(1234)
     for _ ∈ 1:100_000
@@ -516,8 +513,8 @@ end
 
         # Now perturb the masses just enough to ensure that the total mass is significantly
         # different from 1, but not so different as to mess with the tolerance.
-        pnsystem.state[M₁index] *= 1.03
-        pnsystem.state[M₂index] *= 1.09
+        pnsystem[:M₁] *= 1.03
+        pnsystem[:M₂] *= 1.09
 
         # And re-test with `r` instead of `γ`.
         vᵣ = r⁻¹(r(pnsystem), pnsystem)
