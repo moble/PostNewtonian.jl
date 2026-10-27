@@ -303,7 +303,7 @@ Note that we ignore a derivative of `M` that appears in the `r₀′` term, as e
 [`γₚₙ′`](@ref).
 """
 @pn_expression function r′(pnsystem, r₀′=0)
-    let γₚₙ = γₚₙ(pnsystem, r₀′), γₚₙ′ = γₚₙ′(pnsystem)
+    let γₚₙ = γₚₙ(pnsystem, r₀′), γₚₙ′ = γₚₙ′(pnsystem, r₀′)
         -γₚₙ′ * G * M / (γₚₙ^2 * c^2)
     end
 end
@@ -316,7 +316,11 @@ const separation_deriv = r′
 Compute the derivative of the separation between the two black holes with respect to time.
 """
 @pn_expression function ṙ(pnsystem, r₀′=0)
-    let γₚₙ = γₚₙ(pnsystem, r₀′), γₚₙ′ = γₚₙ′(pnsystem), 𝓕 = 𝓕(pnsystem), 𝓔′ = 𝓔′(pnsystem)
+    let γₚₙ = γₚₙ(pnsystem, r₀′),
+        γₚₙ′ = γₚₙ′(pnsystem, r₀′),
+        𝓕 = 𝓕(pnsystem),
+        𝓔′ = 𝓔′(pnsystem)
+
         𝓕 * γₚₙ′ * G * M / (γₚₙ^2 * c^2 * 𝓔′)
     end
 end
@@ -351,12 +355,12 @@ function γₚₙ⁻¹(γ, pnsystem, r₀′=0)
         # We denote by pnystemᵥ the `pnsystem` with the value of `v` set to this function's
         # argument, the trial value `v`.  We take a Newton step to find the value of `v`
         # such that γₚₙ(pnsystemᵥ) = γ; that is, we're finding the root of
-        #   f(v) = γₚₙ(pnsystemᵥ) - γ
+        #   f(v) = γₚₙ(pnsystemᵥ, r₀′) - γ
         # with
-        #   f′(v) = γₚₙ′(pnsystemᵥ)
+        #   f′(v) = γₚₙ′(pnsystemᵥ, r₀′)
         pnsystemᵥ.state[vindex] = v
         γᵥ = γₚₙ(pnsystemᵥ, r₀′)
-        γᵥ′ = γₚₙ′(pnsystemᵥ)
+        γᵥ′ = γₚₙ′(pnsystemᵥ, r₀′)
         return -((γᵥ - γ) / γᵥ′)
     end
 
