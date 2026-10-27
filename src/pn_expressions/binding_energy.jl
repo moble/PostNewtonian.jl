@@ -142,7 +142,7 @@ overall factor is used, leading to a sign difference.
                 σₗ^3 * (-3δ * κ₊ + 2δ * λ₊ + 3κ₋ - 2λ₋ + (-2δ * λ₊ + 12δ - 6κ₋ + 6λ₋)ν)
             )
 
-            # NS tidal coupling; Eq. (2.11) of Vines et al. (2011) with λ̂=v^10*Λ₂*(M₂/M)^5
+            # NS tidal deformability; Eq. (2.11) of Vines et al. (2011) with λ̂=v^10*Λ₂*(M₂/M)^5
             +
             (v / c)^10 * (-9Λ₁ * ν * X₁^3 - 9Λ₂ * ν * X₂^3) +
             (v / c)^12 * (
