@@ -91,7 +91,7 @@ Base.:*(x::T, pn::PNExpansion) where {T<:Number} = pn * x
 function Base.:+(
     pn1::PNExpansion{N1,T1,NMax1}, pn2::PNExpansion{N2,T2,NMax2}
 ) where {N1,N2,T1,T2,NMax1,NMax2}
-    throw(
+    return throw(
         ArgumentError(
             "`PNExpansion` addition is only defined for objects of the same PN order." *
             "\nGot NMax1=$(NMax1) and NMax2=$(NMax2).",
@@ -123,7 +123,7 @@ end
 function Base.:*(
     pn1::PNExpansion{N1,T1,NMax1}, pn2::PNExpansion{N2,T2,NMax2}
 ) where {N1,N2,T1,T2,NMax1,NMax2}
-    throw(
+    return throw(
         ArgumentError(
             "`PNExpansion` multiplication is only defined for objects of the same PN order." *
             "\nGot NMax1=$(NMax1) and NMax2=$(NMax2).",

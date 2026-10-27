@@ -68,7 +68,7 @@ Symbolics.derivative(::typeof(hold), args::NTuple{1,Any}, ::Val{1}) = 1
 function unhold(expr)
     MacroTools.postwalk(expr) do x
         m = MacroTools.trymatch(:(f_(i_)), x)
-        m === nothing || m[:f] !== hold ? x : Symbol(m[:i])
+        return m === nothing || m[:f] !== hold ? x : Symbol(m[:i])
     end
 end
 

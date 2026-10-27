@@ -31,6 +31,8 @@ let
         chi2_i = χ⃗₂
         Omega_orb_i = Ωᵢ
         Omega_orb_0 = Ω₁
-        GWFrames.PNWaveform(Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0)
+        return GWFrames.PNWaveform(
+            Approximant, delta, chi1_i, chi2_i, Omega_orb_i; Omega_orb_0
+        )
     end
 end

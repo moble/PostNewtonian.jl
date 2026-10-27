@@ -304,7 +304,9 @@ function convert_evolve_and_evaluate(
     # end
 
     Ω₀ = PostNewtonian.Ω(pnsystem)
-    evolve_and_evaluate(Ω₀, pnsystem, r′₀, vₑ, check_up_down_instability, D0_hack, quiet)
+    return evolve_and_evaluate(
+        Ω₀, pnsystem, r′₀, vₑ, check_up_down_instability, D0_hack, quiet
+    )
 end
 
 function evolve_and_evaluate(

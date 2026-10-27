@@ -123,9 +123,7 @@ struct BHNS{ST,PNOrder,ET} <: PNSystem{ST,PNOrder}
 
     BHNS{T,PNOrder,ET}(state) where {T,PNOrder,ET} = new{T,PNOrder,ET}(state)
     BHNS{T,PNOrder}(state) where {T,PNOrder} = new{T,PNOrder,eltype(T)}(state)
-    function BHNS(;
-        M₁, M₂, χ⃗₁, χ⃗₂, v, R=Rotor(1), Λ₂, Φ=0, PNOrder=typemax(Int), kwargs...
-    )
+    function BHNS(; M₁, M₂, χ⃗₁, χ⃗₂, v, R=Rotor(1), Λ₂, Φ=0, PNOrder=typemax(Int), kwargs...)
         ST, PNOrder, state = prepare_system(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
         ET = eltype(ST)
         return new{ST,PNOrder,ET}(state, convert(ET, Λ₂))
